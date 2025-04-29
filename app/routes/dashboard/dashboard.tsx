@@ -1,7 +1,9 @@
-import LayoutIndex from "~/components/layout";
 
-export default function DashboardIndex() {
+export default function DashboardRoutes() {
     return (
-        <LayoutIndex></LayoutIndex>
+        <div>
+            asd
+        </div>
+        
     );
 }

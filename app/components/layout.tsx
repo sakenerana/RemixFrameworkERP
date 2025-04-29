@@ -7,7 +7,7 @@ import {
     VideoCameraOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
-import { NavLink, Outlet } from '@remix-run/react';
+import { Link, Outlet } from '@remix-run/react';
 
 const { Header, Sider, Content } = Layout;
 
@@ -30,18 +30,29 @@ export default function LayoutIndex() {
                             {
                                 key: '1',
                                 icon: <UserOutlined />,
-                                label: <NavLink to="/">Login</NavLink>,
+                                label: <Link to="/main/dashboard">Dashboard</Link>,
                             },
                             {
                                 key: '2',
-                                icon: <VideoCameraOutlined />,
-                                label: 'nav 2',
+                                icon: <UserOutlined />,
+                                label: "Settings",
+                                children: [{
+                                    key: '2.1',
+                                    icon: <VideoCameraOutlined />,
+                                    label: <Link to="/main/suppliers">Suppliers</Link>,
+                                },
+                                {
+                                    key: '2.2',
+                                    icon: <UploadOutlined />,
+                                    label: <Link to="/main/users">Users</Link>,
+                                },
+                                {
+                                    key: '2.3',
+                                    icon: <UploadOutlined />,
+                                    label: <Link to="/main/departments">Departments</Link>,
+                                },]
                             },
-                            {
-                                key: '3',
-                                icon: <UploadOutlined />,
-                                label: 'nav 3',
-                            },
+
                         ]}
                     />
                 </Sider>
