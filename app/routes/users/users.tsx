@@ -1,4 +1,4 @@
-export default function UsersIndex() {
+export default function UsersRoutes() {
     return (
         <div>Users</div>
     );

@@ -22,7 +22,12 @@ export default defineConfig({
         return defineRoutes((route) => {
           route("/", "auth/login.tsx", { index: true });
           route("forgot-password", "auth/forgot_password.tsx", { index: true });
-          route("dashboard", "routes/dashboard/dashboard.tsx", { index: true });
+          route("main", "components/layout.tsx", () => {
+            route("dashboard", "routes/dashboard/dashboard.tsx", { index: true });
+            route("suppliers", "routes/suppliers/suppliers.tsx", { index: true });
+            route("users", "routes/users/users.tsx", { index: true });
+            route("departments", "routes/departments/departments.tsx", { index: true });
+          });
         });
       },
     }),
