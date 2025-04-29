@@ -18,6 +18,13 @@ export default defineConfig({
         v3_singleFetch: true,
         v3_lazyRouteDiscovery: true,
       },
+      routes(defineRoutes) {
+        return defineRoutes((route) => {
+          route("/", "auth/login.tsx", { index: true });
+          route("forgot-password", "auth/forgot_password.tsx", { index: true });
+          route("dashboard", "routes/dashboard/dashboard.tsx", { index: true });
+        });
+      },
     }),
     tsconfigPaths(),
   ],
