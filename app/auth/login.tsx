@@ -1,10 +1,9 @@
-import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 
 export default function LoginIndex() {
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: string) => {
     console.log('Received values of form: ', values);
   };
 
