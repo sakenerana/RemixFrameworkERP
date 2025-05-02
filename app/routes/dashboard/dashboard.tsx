@@ -1,76 +1,160 @@
-import { Alert, Card, Col, Row, Statistic, TableColumnsType, TableProps, Table } from "antd";
+import { Alert, Card, Col, Row, Statistic, TableColumnsType, TableProps, Table, Flex, Progress, Tag } from "antd";
 import { FcDiploma1, FcMultipleDevices, FcMultipleSmartphones, FcNews, FcPackage, FcPortraitMode } from "react-icons/fc";
 
 interface DataType {
     key: React.Key;
+    date: string;
     name: string;
     created_by: string;
-    math: number;
-    english: number;
-  }
+    action: string;
+    item: string;
+}
+
+interface DataTypeLocation {
+    key: React.Key;
+    name: string;
+    age: number;
+    address: string;
+}
+
+interface DataTypeAssetCategories {
+    key: React.Key;
+    name: string;
+    age: number;
+    address: string;
+}
 
 export default function DashboardRoutes() {
     const columns: TableColumnsType<DataType> = [
         {
-          title: 'Date',
-          dataIndex: 'date',
+            title: 'Date',
+            dataIndex: 'date',
         },
         {
-          title: 'Created By',
-          dataIndex: 'created_by',
+            title: 'Created By',
+            dataIndex: 'created_by',
         },
         {
-          title: 'Action',
-          dataIndex: 'action',
-          sorter: {
-            compare: (a, b) => a.math - b.math,
-            multiple: 2,
-          },
+            title: 'Action',
+            dataIndex: 'action',
         },
         {
-          title: 'English Score',
-          dataIndex: 'english',
-          sorter: {
-            compare: (a, b) => a.english - b.english,
-            multiple: 1,
-          },
+            title: 'Item',
+            dataIndex: 'item',
         },
-      ];
+    ];
 
     const data: DataType[] = [
         {
-          key: '1',
-          name: 'John Brown',
-          chinese: 98,
-          math: 60,
-          english: 70,
+            key: '1',
+            date: 'test',
+            name: 'John Brown',
+            created_by: 'test',
+            action: 'test',
+            item: 'test',
         },
         {
-          key: '2',
-          name: 'Jim Green',
-          chinese: 98,
-          math: 66,
-          english: 89,
+            key: '2',
+            date: 'test',
+            name: 'John Brown',
+            created_by: 'test',
+            action: 'test',
+            item: 'test',
         },
         {
-          key: '3',
-          name: 'Joe Black',
-          chinese: 98,
-          math: 90,
-          english: 70,
+            key: '3',
+            date: 'test',
+            name: 'John Brown',
+            created_by: 'test',
+            action: 'test',
+            item: 'test',
         },
         {
-          key: '4',
-          name: 'Jim Red',
-          chinese: 88,
-          math: 99,
-          english: 89,
+            key: '4',
+            date: 'test',
+            name: 'John Brown',
+            created_by: 'test',
+            action: 'test',
+            item: 'test',
         },
-      ];
+    ];
 
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
-      };
+    };
+
+    const columnsLocation: TableColumnsType<DataTypeLocation> = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Age',
+            dataIndex: 'age',
+        },
+        {
+            title: 'Address',
+            dataIndex: 'address',
+        },
+    ];
+
+    const dataLocation: DataTypeLocation[] = [
+        {
+            key: '1',
+            name: 'John Brown',
+            age: 32,
+            address: 'New York No. 1 Lake Park',
+        },
+        {
+            key: '2',
+            name: 'Jim Green',
+            age: 42,
+            address: 'London No. 1 Lake Park',
+        },
+        {
+            key: '3',
+            name: 'Joe Black',
+            age: 32,
+            address: 'Sydney No. 1 Lake Park',
+        },
+    ];
+
+    const columnsAssetCategories: TableColumnsType<DataTypeAssetCategories> = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Age',
+            dataIndex: 'age',
+        },
+        {
+            title: 'Address',
+            dataIndex: 'address',
+        },
+    ];
+
+    const DataTypeAssetCategories: DataTypeAssetCategories[] = [
+        {
+            key: '1',
+            name: 'John Brown',
+            age: 32,
+            address: 'New York No. 1 Lake Park',
+        },
+        {
+            key: '2',
+            name: 'Jim Green',
+            age: 42,
+            address: 'London No. 1 Lake Park',
+        },
+        {
+            key: '3',
+            name: 'Joe Black',
+            age: 32,
+            address: 'Sydney No. 1 Lake Park',
+        },
+    ];
+
     return (
         <div>
             <Alert message="You can see here all the status of overall inventory. Please check closely." type="info" showIcon />
@@ -164,27 +248,55 @@ export default function DashboardRoutes() {
                 </Col>
             </Row>
 
-            {/* THIS IS THE SECOND ROWN OF DASHBOARD */}
+            {/* THIS IS THE SECOND ROW OF DASHBOARD */}
 
             <Row gutter={16} className="pt-5">
                 <Col span={14}>
                     <div className="shadow-md">
                         <Card variant="borderless">
-                            <Table<DataType> columns={columns} dataSource={data} onChange={onChange} />
+                            <Table<DataType> bordered size={"small"} columns={columns} dataSource={data} onChange={onChange} />
                         </Card>
                     </div>
                 </Col>
                 <Col span={10}>
                     <div className="shadow-md">
-                        <Card variant="borderless">
-                            <Statistic
-                                title="Licenses"
-                                value={9.3}
-                                precision={2}
-                                valueStyle={{ color: '#cf1322' }}
-                                prefix={<FcDiploma1 />}
-                                suffix="%"
-                            />
+                        <Card title='Assets by Status' variant="borderless">
+                            <Flex gap="4px 0" wrap>
+                                <Tag color="#87d068">Ready to Deploy</Tag>
+                                <Tag color="#f50">Pending</Tag>
+                                <Tag color="#b602f7">Archived</Tag>
+                                <Tag color="#079feb">Users</Tag>
+                            </Flex>
+                            <Flex gap="small" vertical>
+                                <Progress percent={30} />
+                                <Progress percent={50} status="active" />
+                                <Progress percent={70} status="exception" />
+                                <Progress percent={100} />
+                                <Progress percent={50} showInfo={false} />
+                            </Flex>
+                        </Card>
+                    </div>
+                </Col>
+            </Row>
+
+            {/* THIS IS THE THIRD ROW OF DASHBOARD */}
+
+            <Row gutter={16} className="pt-5">
+                <Col span={12}>
+                    <div className="shadow-md">
+                        <Card title='Locations' variant="borderless">
+
+                            <Table<DataTypeLocation> bordered size={"small"} columns={columnsLocation} dataSource={dataLocation} />
+
+                        </Card>
+                    </div>
+                </Col>
+                <Col span={12}>
+                    <div className="shadow-md">
+                        <Card title='Asset Categories' variant="borderless">
+
+                            <Table<DataTypeAssetCategories> bordered size={"small"} columns={columnsLocation} dataSource={dataLocation} />
+
                         </Card>
                     </div>
                 </Col>

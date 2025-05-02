@@ -86,8 +86,8 @@ export default function LayoutIndex() {
   ];
 
   return (
-    <div className="flex h-screen">
-      <Layout>
+    <div className="flex">
+      <Layout className="flex flex-col h-auto">
         <Sider trigger={null} collapsible collapsed={collapsed} width={250}>
           <div className="demo-logo-vertical" />
           <Menu
@@ -311,10 +311,11 @@ export default function LayoutIndex() {
           </div>
 
           <Content
+            className="flex flex-col h-screen"
             style={{
               margin: "24px 16px",
               padding: 24,
-              minHeight: 280,
+              // minHeight: 'auto',
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}

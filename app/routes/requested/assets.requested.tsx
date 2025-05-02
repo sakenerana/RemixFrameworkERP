@@ -201,7 +201,7 @@ export default function RequestedRoute() {
   };
 
   return (
-    <div>
+    <div> 
       <div className="flex justify-between">
         <Alert
           message="Note: This is the list of all requested item. Please check closely."
@@ -210,7 +210,7 @@ export default function RequestedRoute() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search by Asset Tag" />
+            <Input placeholder="Search" />
             <Button icon={<FcSearch />} type="default">
               Search
             </Button>
@@ -225,6 +225,8 @@ export default function RequestedRoute() {
         columns={columns}
         dataSource={data}
         onChange={onChange}
+        className="pt-5"
+        bordered
       />
     </div>
   );
