@@ -1,5 +1,7 @@
+import { HomeOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Alert,
+  Breadcrumb,
   Button,
   Input,
   Space,
@@ -201,7 +203,23 @@ export default function RequestedRoute() {
   };
 
   return (
-    <div> 
+    <div>
+      <div className="pb-5">
+        <Breadcrumb
+          items={[
+            {
+              href: "/main/dashboard",
+              title: <HomeOutlined />,
+            },
+            {
+              title: "Assets"
+            },
+            {
+              title: "Requested",
+            },
+          ]}
+        />
+      </div>
       <div className="flex justify-between">
         <Alert
           message="Note: This is the list of all requested item. Please check closely."

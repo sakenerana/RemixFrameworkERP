@@ -1,12 +1,9 @@
 import { useState } from "react";
 import {
-  HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import {
-  Breadcrumb,
   Button,
   Dropdown,
   Input,
@@ -286,29 +283,6 @@ export default function LayoutIndex() {
               </div>
             </div>
           </Header>
-
-          <div className="pt-3 pl-5">
-            <Breadcrumb
-              items={[
-                {
-                  href: "",
-                  title: <HomeOutlined />,
-                },
-                {
-                  href: "",
-                  title: (
-                    <>
-                      <UserOutlined />
-                      <span>Application List</span>
-                    </>
-                  ),
-                },
-                {
-                  title: "Application",
-                },
-              ]}
-            />
-          </div>
 
           <Content
             className="flex flex-col h-screen"
