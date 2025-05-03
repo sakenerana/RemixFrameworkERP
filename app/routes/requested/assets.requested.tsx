@@ -175,7 +175,7 @@ export default function RequestedRoute() {
       ),
     },
     {
-      title: "Checkout",
+      title: "Checkin/Checkout",
       dataIndex: "checkout",
       render: (_, data) => (
         <div>
