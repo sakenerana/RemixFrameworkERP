@@ -14,7 +14,6 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
-
 interface DataType {
     key: React.Key;
     name: string;

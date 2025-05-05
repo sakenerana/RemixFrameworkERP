@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Flex } from 'antd';
+import { Button, Checkbox, Form, Input, Flex, Image } from 'antd';
 
 export default function LoginIndex() {
 
@@ -9,6 +9,9 @@ export default function LoginIndex() {
 
   return (
     <div className='flex flex-col items-center pt-40'>
+      <div>
+        <Image width={120} src="/public/remix-logo.png" />
+      </div>
       <h1 className='flex flex-col items-center'>INVENTORY</h1>
       <Form
         name="login"

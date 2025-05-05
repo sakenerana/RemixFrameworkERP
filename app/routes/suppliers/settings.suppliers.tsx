@@ -259,6 +259,9 @@ export default function SuppliersRoutes() {
                             title: <HomeOutlined />,
                         },
                         {
+                            title: "Settings",
+                        },
+                        {
                             title: "Suppliers",
                         },
                     ]}
