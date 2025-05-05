@@ -16,10 +16,9 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
     key: React.Key;
-    department_name: string;
-    manager: string;
-    users: string;
-    notes: string;
+    company_name: string;
+    email: string;
+    image: string;
     action: string;
 }
 
@@ -28,102 +27,88 @@ export default function CompaniesRoutes() {
     const data: DataType[] = [
         {
             key: "1",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "2",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "3",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "4",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "5",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "6",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "7",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "8",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "9",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
         {
             key: "10",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            company_name: "John Brown",
+            email: "test",
+            image: 'test',
             action: 'test',
         },
     ];
 
     const columns: TableColumnsType<DataType> = [
         {
-            title: "Department Name",
-            dataIndex: "department_name",
+            title: "Company Name",
+            dataIndex: "company_name",
         },
         {
-            title: "Manager",
-            dataIndex: "manager",
+            title: "Email",
+            dataIndex: "email",
         },
         {
-            title: "Users",
-            dataIndex: "users",
-        },
-        {
-            title: "Notes",
-            dataIndex: "notes",
+            title: "Image",
+            dataIndex: "image",
         },
         {
             title: "Actions",

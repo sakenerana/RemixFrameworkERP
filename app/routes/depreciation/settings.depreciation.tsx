@@ -16,10 +16,12 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
     key: React.Key;
-    department_name: string;
-    manager: string;
-    users: string;
-    notes: string;
+    name: string;
+    term: string;
+    floor_value: string;
+    assets: string;
+    assets_models: string;
+    licenses: string;
     action: string;
 }
 
@@ -28,102 +30,130 @@ export default function DepreciationRoutes() {
     const data: DataType[] = [
         {
             key: "1",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "2",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "3",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "4",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "5",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "6",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "7",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "8",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "9",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
         {
             key: "10",
-            department_name: "John Brown",
-            manager: "test",
-            users: 'test',
-            notes: "test",
+            name: "John Brown",
+            term: "test",
+            floor_value: 'test',
+            assets: "test",
+            assets_models: "test",
+            licenses: "test",
             action: 'test',
         },
     ];
 
     const columns: TableColumnsType<DataType> = [
         {
-            title: "Department Name",
-            dataIndex: "department_name",
+            title: "Name",
+            dataIndex: "name",
         },
         {
-            title: "Manager",
-            dataIndex: "manager",
+            title: "Term",
+            dataIndex: "term",
         },
         {
-            title: "Users",
-            dataIndex: "users",
+            title: "Floor Value",
+            dataIndex: "floor_value",
         },
         {
-            title: "Notes",
-            dataIndex: "notes",
+            title: "Assets",
+            dataIndex: "assets",
+        },
+        {
+            title: "Assets Models",
+            dataIndex: "assets_models",
+        },
+        {
+            title: "Licenses",
+            dataIndex: "licenses",
         },
         {
             title: "Actions",
