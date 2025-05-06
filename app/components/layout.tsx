@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import {
   Button,
   Dropdown,
@@ -11,9 +8,9 @@ import {
   Menu,
   Space,
   theme,
+  Image,
 } from "antd";
 import { Link, Outlet } from "@remix-run/react";
-import { Image } from "antd";
 import {
   FcAutomatic,
   FcBearish,
@@ -142,7 +139,11 @@ export default function LayoutIndex() {
               {
                 key: "6",
                 icon: <FcPaid />,
-                label: <Link to="/main/predefined-kit">Predefined Kits (Bundled)</Link>,
+                label: (
+                  <Link to="/main/predefined-kit">
+                    Predefined Kits (Bundled)
+                  </Link>
+                ),
               },
               {
                 key: "5",
@@ -162,17 +163,25 @@ export default function LayoutIndex() {
                   {
                     key: "2.2",
                     icon: <FcDepartment />,
-                    label: <Link to="/main/settings/departments">Departments</Link>,
+                    label: (
+                      <Link to="/main/settings/departments">Departments</Link>
+                    ),
                   },
                   {
                     key: "2.3",
                     icon: <FcFlowChart />,
-                    label: <Link to="/main/settings/categories">Categories</Link>,
+                    label: (
+                      <Link to="/main/settings/categories">Categories</Link>
+                    ),
                   },
                   {
                     key: "2.4",
                     icon: <FcFactory />,
-                    label: <Link to="/main/settings/manufacturers">Manufacturers</Link>,
+                    label: (
+                      <Link to="/main/settings/manufacturers">
+                        Manufacturers
+                      </Link>
+                    ),
                   },
                   {
                     key: "2.5",
@@ -187,7 +196,9 @@ export default function LayoutIndex() {
                   {
                     key: "2.7",
                     icon: <FcBearish />,
-                    label: <Link to="/main/settings/depreciation">Depreciation</Link>,
+                    label: (
+                      <Link to="/main/settings/depreciation">Depreciation</Link>
+                    ),
                   },
                 ],
               },
@@ -199,12 +210,20 @@ export default function LayoutIndex() {
                   {
                     key: "3.1",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/activity-report">Activity Report</Link>,
+                    label: (
+                      <Link to="/main/reports/activity-report">
+                        Activity Report
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.2",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/custom-asset-report">Custom Asset Report</Link>,
+                    label: (
+                      <Link to="/main/reports/custom-asset-report">
+                        Custom Asset Report
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.3",
@@ -214,34 +233,56 @@ export default function LayoutIndex() {
                   {
                     key: "3.4",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/depreciation-report">Depreciation Report</Link>,
+                    label: (
+                      <Link to="/main/reports/depreciation-report">
+                        Depreciation Report
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.5",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/licenses-report">License Report</Link>,
+                    label: (
+                      <Link to="/main/reports/licenses-report">
+                        License Report
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.6",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/asset-maintenance-report">Asset Maitenance Report</Link>,
+                    label: (
+                      <Link to="/main/reports/asset-maintenance-report">
+                        Asset Maitenance Report
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.7",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/unaccepted-assets">Unaccepted Assets</Link>,
+                    label: (
+                      <Link to="/main/reports/unaccepted-assets">
+                        Unaccepted Assets
+                      </Link>
+                    ),
                   },
                   {
                     key: "3.8",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/accessory-report">Accessory Report</Link>,
+                    label: (
+                      <Link to="/main/reports/accessory-report">
+                        Accessory Report
+                      </Link>
+                    ),
                   },
                 ],
               },
               {
                 key: "4",
                 icon: <FcOk />,
-                label: <Link to="/main/requestable-items">Requestable Items</Link>,
+                label: (
+                  <Link to="/main/requestable-items">Requestable Items</Link>
+                ),
               },
             ]}
           />

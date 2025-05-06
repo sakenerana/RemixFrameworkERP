@@ -1,4 +1,4 @@
-import { HomeOutlined, UserOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
@@ -8,8 +8,10 @@ import {
   Table,
   TableColumnsType,
   TableProps,
+  Tag,
 } from "antd";
-import { FcSearch } from "react-icons/fc";
+import { AiOutlineDelete, AiOutlineExport, AiOutlineImport } from "react-icons/ai";
+import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -142,51 +144,55 @@ export default function RequestedRoute() {
     {
       title: "Image",
       dataIndex: "image",
+      width: 120,
     },
     {
       title: "Name",
       dataIndex: "name",
+      width: 120,
     },
     {
       title: "Location",
       dataIndex: "location",
+      width: 120,
     },
     {
       title: "Expected Checkin Date",
       dataIndex: "exp_checkin_date",
+      width: 120,
     },
     {
       title: "Requesting User",
       dataIndex: "user_requesting",
+      width: 120,
     },
     {
       title: "Requested Date",
       dataIndex: "date_requested",
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
+      fixed: 'right',
+      width: 120,
       render: () => (
         <div>
-          <Button color="pink" variant="solid">
-            Cancel
-          </Button>
+          <Tag icon={<AiOutlineDelete className="float-left mt-1 mr-1" />} color="#d10f5c">Cancel</Tag>
         </div>
       ),
     },
     {
       title: "Checkin/Checkout",
       dataIndex: "checkout",
+      fixed: 'right',
+      width: 100,
       render: (_, data) => (
         <div>
           {data.check_status == "checkin" ? (
-            <Button color="primary" variant="solid">
-              {data.check_status}
-            </Button>
+            <Tag icon={<AiOutlineImport className="float-left mt-1 mr-1" />} color="#108ee8">{data.check_status}</Tag>
           ) : (
-            <Button color="danger" variant="solid">
-              Checkout
-            </Button>
+            <Tag icon={<AiOutlineExport className="float-left mt-1 mr-1" />} color="#ff5500">{data.check_status}</Tag>
           )}
         </div>
       ),
@@ -212,7 +218,7 @@ export default function RequestedRoute() {
               title: <HomeOutlined />,
             },
             {
-              title: "Assets"
+              title: "Assets",
             },
             {
               title: "Requested",
@@ -234,6 +240,11 @@ export default function RequestedRoute() {
             </Button>
           </Space.Compact>
           <Space wrap>
+            <Button icon={<FcRefresh />} type="default">
+              Refresh
+            </Button>
+          </Space>
+          <Space wrap>
             <PrintDropdownComponent></PrintDropdownComponent>
           </Space>
         </Space>
@@ -245,6 +256,7 @@ export default function RequestedRoute() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: 'max-content' }}
       />
     </div>
   );

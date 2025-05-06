@@ -8,7 +8,7 @@ const items: MenuProps['items'] = [
     label: (
       <a className="flex" target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
         <div className="pt-1 pr-2">
-          <AiFillFilePdf />
+          <AiFillFilePdf className="text-red-500" />
         </div>
         <div>PDF</div>
       </a>
@@ -19,7 +19,7 @@ const items: MenuProps['items'] = [
     label: (
       <a className="flex" target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
         <div className="pt-1 pr-2">
-          <AiOutlineFileExcel />
+          <AiOutlineFileExcel className="text-green-500" />
         </div>
         <div>Excel</div>
       </a>
@@ -30,7 +30,7 @@ const items: MenuProps['items'] = [
     label: (
       <a className="flex" target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
         <div className="pt-1 pr-2">
-          <AiFillFileWord />
+          <AiFillFileWord className="text-blue-500" />
         </div>
         <div>Word</div>
       </a>
