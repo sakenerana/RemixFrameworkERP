@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -145,52 +146,83 @@ export default function LocationsRoutes() {
     },
   ];
 
+  const handleUpdateButton = () => {}
+
+  const handleDeleteButton = () => {}
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Location Name",
       dataIndex: "location_name",
+      width: 120
     },
     {
       title: "Image",
       dataIndex: "image",
+      width: 120
     },
     {
       title: "Parent",
       dataIndex: "parent",
+      width: 120
     },
     {
       title: "Current Location",
       dataIndex: "current_location",
+      width: 120
     },
     {
       title: "Address",
       dataIndex: "address",
+      width: 120
     },
     {
       title: "City",
       dataIndex: "city",
+      width: 120
     },
     {
       title: "State",
       dataIndex: "state",
+      width: 120
     },
     {
       title: "Actions",
       dataIndex: "actions",
+      width: 120,
+      fixed: 'right',
       render: () => (
         <div className="flex">
-          <Tag
-            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-            color="#f7b63e"
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this location?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleUpdateButton()}
           >
-            Update
-          </Tag>
-          <Tag
-            icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-            color="#f50"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this location?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton()}
           >
-            Delete
-          </Tag>
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#f50"
+            >
+              Delete
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -261,6 +293,7 @@ export default function LocationsRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: 'max-content' }}
       />
     </div>
   );

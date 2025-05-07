@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -173,66 +174,100 @@ export default function RequestableItemsRoutes() {
     },
   ];
 
+  const handleCancelButton = () => {};
+
+  const handleRequestButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Image",
       dataIndex: "image",
+      width: 120,
     },
     {
       title: "Asset Tag",
       dataIndex: "asset_tag",
+      width: 120,
     },
     {
       title: "Model",
       dataIndex: "model",
+      width: 120,
     },
     {
       title: "Model No.",
       dataIndex: "model_no",
+      width: 120,
     },
     {
       title: "Asset Name",
       dataIndex: "asset_name",
+      width: 120,
     },
     {
       title: "Serial",
       dataIndex: "serial_no",
+      width: 120,
     },
     {
       title: "Location",
       dataIndex: "location",
+      width: 120,
     },
     {
       title: "Status",
       dataIndex: "status",
+      width: 120,
     },
     {
       title: "Expected Checkin Date",
       dataIndex: "expected_checkin_date",
+      width: 120,
     },
     {
       title: "CPU",
       dataIndex: "cpu",
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
+      width: 120,
+      fixed: "right",
       render: (_, data) => (
         <div>
           {data.request_status == "request" ? (
-            <Tag
-              icon={<AiOutlineClose className="float-left mt-1 mr-1" />}
-              color="#f50"
+            <Popconfirm
+              title="Do you want to cancel?"
+              description="Are you sure to cancel this request?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCancelButton()}
             >
-              Cancel
-            </Tag>
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineClose className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                Cancel
+              </Tag>
+            </Popconfirm>
           ) : (
-            <Tag
-              icon={<AiOutlineCheck className="float-left mt-1 mr-1" />}
-              color="#108ee9"
+            <Popconfirm
+              title="Do you want to request?"
+              description="Are you sure to request this item?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleRequestButton()}
             >
-              Request
-            </Tag>
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineCheck className="float-left mt-1 mr-1" />}
+                color="#108ee9"
+              >
+                Request
+              </Tag>
+            </Popconfirm>
           )}
         </div>
       ),
@@ -291,6 +326,7 @@ export default function RequestableItemsRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -156,66 +157,88 @@ export default function UsersRoutes() {
     },
   ];
 
+  const handleUpdateButton = () => {};
+
+  const handleDeleteButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Name",
       dataIndex: "name",
-      width: 120
+      width: 120,
     },
     {
       title: "Title",
       dataIndex: "title",
-      width: 120
+      width: 120,
     },
     {
       title: "Email",
       dataIndex: "email",
-      width: 120
+      width: 120,
     },
     {
       title: "Phone",
       dataIndex: "phone_no",
-      width: 120
+      width: 120,
     },
     {
       title: "Username",
       dataIndex: "username",
-      width: 120
+      width: 120,
     },
     {
       title: "Department",
       dataIndex: "department",
-      width: 120
+      width: 120,
     },
     {
       title: "Location",
       dataIndex: "location",
-      width: 120
+      width: 120,
     },
     {
       title: "Manager",
       dataIndex: "manager",
-      width: 120
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 120,
-      fixed: 'right',
+      fixed: "right",
       render: () => (
         <div className="flex">
-          <Tag
-            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-            color="#f7b63e"
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this user?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleUpdateButton()}
           >
-            Update
-          </Tag>
-          <Tag
-            icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-            color="#f50"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this user?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton()}
           >
-            Delete
-          </Tag>
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#f50"
+            >
+              Delete
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },

@@ -4,13 +4,18 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
   TableProps,
   Tag,
 } from "antd";
-import { AiOutlineDelete, AiOutlineExport, AiOutlineImport } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineExport,
+  AiOutlineImport,
+} from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
@@ -140,6 +145,12 @@ export default function RequestedRoute() {
     },
   ];
 
+  const handleCancelButton = () => {};
+
+  const handleCheckinButton = () => {};
+
+  const handleCheckoutButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Image",
@@ -174,25 +185,67 @@ export default function RequestedRoute() {
     {
       title: "Actions",
       dataIndex: "actions",
-      fixed: 'right',
+      fixed: "right",
       width: 120,
       render: () => (
         <div>
-          <Tag icon={<AiOutlineDelete className="float-left mt-1 mr-1" />} color="#d10f5c">Cancel</Tag>
+          <Popconfirm
+            title="Do you want to cancel?"
+            description="Are you sure to cancel this request?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleCancelButton()}
+          >
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#d10f5c"
+            >
+              Cancel
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
     {
       title: "Checkin/Checkout",
       dataIndex: "checkout",
-      fixed: 'right',
+      fixed: "right",
       width: 100,
       render: (_, data) => (
         <div>
           {data.check_status == "checkin" ? (
-            <Tag icon={<AiOutlineImport className="float-left mt-1 mr-1" />} color="#108ee8">{data.check_status}</Tag>
+            <Popconfirm
+              title="Do you want to checkin?"
+              description="Are you sure to checkin this request?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckinButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
+                color="#108ee8"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
           ) : (
-            <Tag icon={<AiOutlineExport className="float-left mt-1 mr-1" />} color="#ff5500">{data.check_status}</Tag>
+            <Popconfirm
+              title="Do you want to checkout?"
+              description="Are you sure to checkout this request?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckoutButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
+                color="#ff5500"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
           )}
         </div>
       ),
@@ -256,7 +309,7 @@ export default function RequestedRoute() {
         onChange={onChange}
         className="pt-5"
         bordered
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

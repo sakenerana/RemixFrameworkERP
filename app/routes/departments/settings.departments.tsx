@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -112,40 +113,68 @@ export default function DepartmentsRoutes() {
     },
   ];
 
+  const handleUpdateButton = () => {};
+
+  const handleDeleteButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Department Name",
       dataIndex: "department_name",
+      width: 120,
     },
     {
       title: "Manager",
       dataIndex: "manager",
+      width: 120,
     },
     {
       title: "Users",
       dataIndex: "users",
+      width: 120,
     },
     {
       title: "Notes",
       dataIndex: "notes",
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
+      width: 120,
+      fixed: "right",
       render: () => (
         <div className="flex">
-          <Tag
-            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-            color="#f7b63e"
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this department?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleUpdateButton()}
           >
-            Update
-          </Tag>
-          <Tag
-            icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-            color="#f50"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this department?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton()}
           >
-            Delete
-          </Tag>
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#f50"
+            >
+              Delete
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -216,6 +245,7 @@ export default function DepartmentsRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -225,97 +226,134 @@ export default function AssetsRoute() {
     },
   ];
 
+  const handleAuditButton = () => {};
+
+  const handleUpdateButton = () => {};
+
+  const handleDeleteButton = () => {};
+
+  const handleCheckinButton = () => {};
+
+  const handleCheckoutButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Asset Name",
       dataIndex: "asset_name",
-      width: 120
+      width: 120,
     },
     {
       title: "Device Image",
       dataIndex: "device_image",
-      width: 120
+      width: 120,
     },
     {
       title: "Asset Tag",
       dataIndex: "asset_tag",
-      width: 120
+      width: 120,
     },
     {
       title: "Serial",
       dataIndex: "serial_no",
-      width: 120
+      width: 120,
     },
     {
       title: "Model",
       dataIndex: "model",
-      width: 120
+      width: 120,
     },
     {
       title: "Category",
       dataIndex: "category",
-      width: 120
+      width: 120,
     },
     {
       title: "Checked Out To",
       dataIndex: "checked_out_to",
-      width: 120
+      width: 120,
     },
     {
       title: "Location",
       dataIndex: "location",
-      width: 120
+      width: 120,
     },
     {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
-      width: 120
+      width: 120,
     },
     {
       title: "Current Value",
       dataIndex: "current_value",
-      width: 120
+      width: 120,
     },
     {
       title: "Accounting Code",
       dataIndex: "accounting_code",
-      width: 120
+      width: 120,
     },
     {
       title: "Installed",
       dataIndex: "installed",
-      width: 120
+      width: 120,
     },
     {
       title: "Size",
       dataIndex: "size",
-      width: 120
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 250,
-      fixed: 'right',
+      fixed: "right",
       render: () => (
         <div className="flex">
-          <Tag
-            icon={<AiOutlineFileDone className="float-left mt-1 mr-1" />}
-            color="#1778ff"
+          <Popconfirm
+            title="Do you want to audit?"
+            description="Are you sure to audit this asset?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleAuditButton()}
           >
-            Audit
-          </Tag>
-          <Tag
-            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-            color="#f7b63e"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineFileDone className="float-left mt-1 mr-1" />}
+              color="#1778ff"
+            >
+              Audit
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this asset?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleUpdateButton()}
           >
-            Update
-          </Tag>
-          <Tag
-            icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-            color="#f50"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this asset?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton()}
           >
-            Delete
-          </Tag>
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#f50"
+            >
+              Delete
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -323,23 +361,41 @@ export default function AssetsRoute() {
       title: "Checkout",
       dataIndex: "checkout",
       width: 120,
-      fixed: 'right',
+      fixed: "right",
       render: (_, data) => (
         <div>
           {data.check_status == "checkin" ? (
-            <Tag
-              icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
-              color="#108ee9"
+            <Popconfirm
+              title="Do you want to checkin?"
+              description="Are you sure to checkin this asset?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckinButton()}
             >
-              {data.check_status}
-            </Tag>
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
+                color="#108ee9"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
           ) : (
-            <Tag
-              icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-              color="#f50"
+            <Popconfirm
+              title="Do you want to checkout?"
+              description="Are you sure to checkout this asset?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckoutButton()}
             >
-              {data.check_status}
-            </Tag>
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
           )}
         </div>
       ),
@@ -411,7 +467,7 @@ export default function AssetsRoute() {
         onChange={onChange}
         className="pt-5"
         bordered
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

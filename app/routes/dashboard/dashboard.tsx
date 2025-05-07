@@ -295,7 +295,7 @@ export default function DashboardRoutes() {
                     <div className="shadow-md">
                         <Card title='Asset Categories' variant="borderless">
 
-                            <Table<DataTypeAssetCategories> bordered size={"small"} columns={columnsLocation} dataSource={dataLocation} />
+                            <Table<DataTypeAssetCategories> bordered size={"small"} columns={columnsAssetCategories} dataSource={DataTypeAssetCategories} />
 
                         </Card>
                     </div>

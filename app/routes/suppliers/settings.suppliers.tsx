@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -178,60 +179,93 @@ export default function SuppliersRoutes() {
     },
   ];
 
+  const handleUpdateButton = () => {};
+
+  const handleDeleteButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Name",
       dataIndex: "name",
+      width: 120,
     },
     {
       title: "Product Key",
       dataIndex: "product_key",
+      width: 120,
     },
     {
       title: "Expiration Date",
       dataIndex: "expiration_date",
+      width: 120,
     },
     {
       title: "Licensed to Email",
       dataIndex: "licensed_to_email",
+      width: 120,
     },
     {
       title: "Licensed to Name",
       dataIndex: "licensed_to_name",
+      width: 120,
     },
     {
       title: "manufacturer",
       dataIndex: "manufacturer",
+      width: 120,
     },
     {
       title: "Min QTY",
       dataIndex: "min_qty",
+      width: 120,
     },
     {
       title: "Total",
       dataIndex: "total",
+      width: 120,
     },
     {
       title: "Avail",
       dataIndex: "avail",
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
+      width: 120,
+      fixed: "right",
       render: () => (
         <div className="flex">
-          <Tag
-            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-            color="#f7b63e"
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this supplier?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleUpdateButton()}
           >
-            Update
-          </Tag>
-          <Tag
-            icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-            color="#f50"
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this supplier?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton()}
           >
-            Delete
-          </Tag>
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#f50"
+            >
+              Delete
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -302,6 +336,7 @@ export default function SuppliersRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

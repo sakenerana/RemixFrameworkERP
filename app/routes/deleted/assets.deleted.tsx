@@ -4,6 +4,7 @@ import {
   Breadcrumb,
   Button,
   Input,
+  Popconfirm,
   Space,
   Table,
   TableColumnsType,
@@ -217,6 +218,8 @@ export default function DeletedRoute() {
     },
   ];
 
+  const handleRestoreButton = () => {}
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Asset Name",
@@ -287,10 +290,24 @@ export default function DeletedRoute() {
       title: "Actions",
       dataIndex: "actions",
       width: 120,
-      fixed: 'right',
+      fixed: "right",
       render: () => (
-        <div >
-          <Tag  icon={<AiOutlineSync className="float-left mt-1 mr-1" />} color="#d10f5c"> Restore</Tag>
+        <div>
+          <Popconfirm
+            title="Do you want to restore?"
+            description="Are you sure to restore this request?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleRestoreButton()}
+          >
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineSync className="float-left mt-1 mr-1" />}
+              color="#d10f5c"
+            >
+              Restore
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -353,7 +370,7 @@ export default function DeletedRoute() {
         onChange={onChange}
         className="pt-5"
         bordered
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

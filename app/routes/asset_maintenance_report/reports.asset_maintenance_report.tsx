@@ -175,38 +175,47 @@ export default function AssetMaintenanceReportRoutes() {
     {
       title: "Name",
       dataIndex: "name",
+      width: 120
     },
     {
       title: "Product Key",
       dataIndex: "product_key",
+      width: 120
     },
     {
       title: "Expiration Date",
       dataIndex: "expiration_date",
+      width: 120
     },
     {
       title: "Licensed to Email",
       dataIndex: "licensed_to_email",
+      width: 120
     },
     {
       title: "Licensed to Name",
       dataIndex: "licensed_to_name",
+      width: 120
     },
     {
       title: "Manufacturer",
       dataIndex: "manufacturer",
+      width: 120
     },
     {
       title: "Min QTY",
       dataIndex: "min_qty",
+      width: 120
     },
     {
       title: "Total",
       dataIndex: "total",
+      width: 120
     },
     {
       title: "Avail",
       dataIndex: "avail",
+      width: 120
     },
   ];
 
@@ -262,6 +271,7 @@ export default function AssetMaintenanceReportRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: 'max-content' }}
       />
     </div>
   );
