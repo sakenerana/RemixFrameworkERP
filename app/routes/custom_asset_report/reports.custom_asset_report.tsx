@@ -6,7 +6,9 @@ import {
   CheckboxProps,
   Col,
   Divider,
+  Form,
   Row,
+  Select,
 } from "antd";
 import { useState } from "react";
 
@@ -93,6 +95,37 @@ const plainOptions = [
 ];
 const defaultCheckedList = [""];
 
+type FieldType = {
+  company_name?: string;
+  location?: string;
+  default_location?: string;
+  department?: string;
+  supplier?: string;
+  model?: string;
+  manufacturer?: string;
+  category?: string;
+  status?: string;
+  order_number?: string;
+  pruchase_date_from?: string;
+  pruchase_date_to?: string;
+  created_at_from?: string;
+  created_at_to?: string;
+  checkout_from?: string;
+  checkout_to?: string;
+  last_checkin_from?: string;
+  last_checkin_to?: string;
+  expected_checkin_from?: string;
+  expected_checkin_to?: string;
+  eol_from?: string;
+  eol_to?: string;
+  last_audit_from?: string;
+  last_audit_to?: string;
+  next_audit_from?: string;
+  next_audit_to?: string;
+  archived_assets?: string;
+  deleted_assets?: string;
+};
+
 export default function CustomAssetReportRoutes() {
   const [checkedList, setCheckedList] = useState<string[]>(defaultCheckedList);
   //   const [newArrayCheckbox, setnewArrayCheckbox] = useState<number[]>([]);
@@ -124,10 +157,10 @@ export default function CustomAssetReportRoutes() {
               title: <HomeOutlined />,
             },
             {
-              title: "Assets",
+              title: "Reports",
             },
             {
-              title: "Create New",
+              title: "Custom Asset Report",
             },
           ]}
         />
@@ -155,8 +188,246 @@ export default function CustomAssetReportRoutes() {
             onChange={onChange}
           />
         </Col>
-        <Col span={8}>test</Col>
-        <Col span={8}>test</Col>
+        <Col span={16}>
+          <p>
+            Select the fields you would like to include in your custom report,
+            and click Generate. The file (custom-asset-report-YYYY-mm-dd.csv)
+            will download automatically, and you can open it in Excel. If you
+            would like to export only certain assets, use the options below to
+            fine-tune your results.
+          </p>
+          <Form
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            autoComplete="off"
+            labelAlign="right"
+          ></Form>
+          <Form.Item<FieldType>
+            label="Company"
+            name="company_name"
+            rules={[{ required: true, message: "Please select company!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select Company"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Location"
+            name="location"
+            rules={[{ required: true, message: "Please select location!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a location"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Default Location"
+            name="default_location"
+            rules={[{ required: true, message: "Please select location!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a location"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Department"
+            name="department"
+            rules={[{ required: true, message: "Please select department!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a department"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Supplier"
+            name="supplier"
+            rules={[{ required: true, message: "Please select supplier!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a supplier"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Model"
+            name="model"
+            rules={[{ required: true, message: "Please select model!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a model"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Manufacturer"
+            name="manufacturer"
+            rules={[{ required: true, message: "Please select manufacturer!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a manufacturer"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Category"
+            name="category"
+            rules={[{ required: true, message: "Please select category!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a category"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: "Please select status!" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a status"
+              optionFilterProp="label"
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
+        </Col>
       </Row>
     </div>
   );

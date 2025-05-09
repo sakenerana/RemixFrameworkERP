@@ -24,9 +24,24 @@ export default defineConfig({
           route("forgot-password", "auth/forgot_password.tsx", { index: true });
           route("main", "components/layout.tsx", () => {
             route("dashboard", "routes/dashboard/dashboard.tsx", { index: true });
-            route("settings/suppliers", "routes/suppliers/settings.suppliers.tsx", { index: true });
-            route("users", "routes/users/users.tsx", { index: true });
-            route("settings/departments", "routes/departments/settings.departments.tsx", { index: true });
+            route("settings/suppliers", "routes/suppliers/route.tsx", () => {
+              route("", "routes/suppliers/settings.suppliers.tsx", { index: true });
+              route("create-supplier", "routes/suppliers/settings.create.tsx", { index: true });
+              route("update-supplier", "routes/suppliers/settings.update.tsx", { index: true });
+              route("deleted-supplier", "routes/suppliers/settings.deleted.tsx", { index: true });
+            });
+            route("users", "routes/users/route.tsx", () => {
+              route("", "routes/users/users.tsx", { index: true });
+              route("create-user", "routes/users/users.create.tsx", { index: true });
+              route("update-user", "routes/users/users.update.tsx", { index: true });
+              route("deleted-user", "routes/users/users.deleted.tsx", { index: true });
+            });
+            route("settings/departments", "routes/departments/route.tsx", () => {
+              route("", "routes/departments/settings.departments.tsx", { index: true });
+              route("create-departments", "routes/departments/settings.create.tsx", { index: true });
+              route("update-departments", "routes/departments/settings.update.tsx", { index: true });
+              route("deleted-departments", "routes/departments/settings.deleted.tsx", { index: true });
+            });
             route("settings/categories", "routes/categories/settings.categories.tsx", { index: true });
             route("settings/manufacturers", "routes/manufacturers/settings.manufacturers.tsx", { index: true });
             route("settings/locations", "routes/locations/settings.locations.tsx", { index: true });
