@@ -38,19 +38,55 @@ export default defineConfig({
             });
             route("settings/departments", "routes/departments/route.tsx", () => {
               route("", "routes/departments/settings.departments.tsx", { index: true });
-              route("create-departments", "routes/departments/settings.create.tsx", { index: true });
-              route("update-departments", "routes/departments/settings.update.tsx", { index: true });
-              route("deleted-departments", "routes/departments/settings.deleted.tsx", { index: true });
+              route("create-department", "routes/departments/settings.create.tsx", { index: true });
+              route("update-department", "routes/departments/settings.update.tsx", { index: true });
+              route("deleted-department", "routes/departments/settings.deleted.tsx", { index: true });
             });
-            route("settings/categories", "routes/categories/settings.categories.tsx", { index: true });
-            route("settings/manufacturers", "routes/manufacturers/settings.manufacturers.tsx", { index: true });
-            route("settings/locations", "routes/locations/settings.locations.tsx", { index: true });
-            route("settings/companies", "routes/companies/settings.companies.tsx", { index: true });
-            route("settings/depreciation", "routes/depreciation/settings.depreciation.tsx", { index: true });
+            route("settings/categories", "routes/categories/route.tsx", () => {
+              route("", "routes/categories/settings.categories.tsx", { index: true });
+              route("create-category", "routes/categories/settings.create.tsx", { index: true });
+              route("update-category", "routes/categories/settings.update.tsx", { index: true });
+              route("deleted-category", "routes/categories/settings.deleted.tsx", { index: true });
+            });
+            route("settings/manufacturers", "routes/manufacturers/route.tsx", () => {
+              route("", "routes/manufacturers/settings.manufacturers.tsx", { index: true });
+              route("create-manufacturer", "routes/manufacturers/settings.create.tsx", { index: true });
+              route("update-manufacturer", "routes/manufacturers/settings.update.tsx", { index: true });
+              route("deleted-manufacturer", "routes/manufacturers/settings.deleted.tsx", { index: true });
+            });
+            route("settings/locations", "routes/locations/route.tsx", () => {
+              route("", "routes/locations/settings.locations.tsx", { index: true });
+              route("create-location", "routes/locations/settings.create.tsx", { index: true });
+              route("update-location", "routes/locations/settings.update.tsx", { index: true });
+              route("deleted-location", "routes/locations/settings.deleted.tsx", { index: true });
+            });
+            route("settings/companies", "routes/companies/route.tsx", () => {
+              route("", "routes/companies/settings.companies.tsx", { index: true });
+              route("create-company", "routes/companies/settings.create.tsx", { index: true });
+              route("update-company", "routes/companies/settings.update.tsx", { index: true });
+              route("deleted-company", "routes/companies/settings.deleted.tsx", { index: true });
+            });
+            route("settings/depreciation", "routes/depreciation/route.tsx", () => {
+              route("", "routes/depreciation/settings.depreciation.tsx", { index: true });
+              route("create-depreciation", "routes/depreciation/settings.create.tsx", { index: true });
+              route("update-depreciation", "routes/depreciation/settings.update.tsx", { index: true });
+              route("deleted-depreciation", "routes/depreciation/settings.deleted.tsx", { index: true });
+            });
             route("assets/requested", "routes/requested/assets.requested.tsx", { index: true });
             route("assets/deleted", "routes/deleted/assets.deleted.tsx", { index: true });
-            route("assets/create-assets", "routes/assets/assets.create_assets.tsx", { index: true });
-            route("licenses", "routes/licenses/licenses.tsx", { index: true });
+            route("assets/list-assets", "routes/assets/route.tsx", () => {
+              route("", "routes/assets/assets.list_assets.tsx", { index: true });
+              route("audit-assets", "routes/assets/assets.audit.tsx", { index: true });
+              route("create-assets", "routes/assets/assets.create.tsx", { index: true });
+              route("update-assets", "routes/assets/assets.update.tsx", { index: true });
+              route("deleted-assets", "routes/assets/assets.deleted.tsx", { index: true });
+            });
+            route("licenses", "routes/licenses/route.tsx", () => {
+              route("", "routes/licenses/licenses.tsx", { index: true });
+              route("create-license", "routes/licenses/create.tsx", { index: true });
+              route("update-license", "routes/licenses/update.tsx", { index: true });
+              route("deleted-license", "routes/licenses/deleted.tsx", { index: true });
+            });
             route("accessories", "routes/accessories/accessories.tsx", { index: true });
             route("consumables", "routes/consumables/consumables.tsx", { index: true });
             route("components", "routes/components/components.tsx", { index: true });

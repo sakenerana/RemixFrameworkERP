@@ -112,7 +112,7 @@ export default function LayoutIndex() {
                   {
                     key: "11.3",
                     icon: <FcPackage />,
-                    label: <Link to="/main/assets/create-assets">Assets</Link>,
+                    label: <Link to="/main/assets/list-assets">Assets</Link>,
                   },
                 ],
               },
@@ -324,7 +324,6 @@ export default function LayoutIndex() {
               </div>
             </div>
           </Header>
-
           <Content
             className="flex flex-col h-screen"
             style={{
