@@ -17,6 +17,8 @@
     "@remix-run/node": "^2.16.5",
     "@remix-run/react": "^2.16.5",
     "@remix-run/serve": "^2.16.5",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.4",
     "antd": "^5.24.9",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
