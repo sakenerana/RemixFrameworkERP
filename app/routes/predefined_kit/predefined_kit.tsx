@@ -14,8 +14,10 @@ import {
 import {
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineExport,
+  AiOutlineFileExclamation,
+  AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -23,137 +25,71 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 interface DataType {
   key: React.Key;
   name: string;
-  title: string;
-  email: string;
-  phone_no: string;
-  username: string;
-  department: string;
-  location: string;
-  manager: string;
   action: string;
+  check_status: string;
 }
 
-export default function UsersRoutes() {
+export default function PredefinedKitRoute() {
   const data: DataType[] = [
     {
       key: "1",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "2",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "3",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "4",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "5",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "6",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "7",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "8",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "9",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "10",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
       action: "test",
+      check_status: "checkout",
     },
   ];
 
@@ -161,46 +97,15 @@ export default function UsersRoutes() {
 
   const handleDeleteButton = () => {};
 
+  const handleCheckinButton = () => {};
+
+  const handleCheckoutButton = () => {};
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-    },
-    {
-      title: "Title",
-      dataIndex: "title",
-      width: 120,
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      width: 120,
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone_no",
-      width: 120,
-    },
-    {
-      title: "Username",
-      dataIndex: "username",
-      width: 120,
-    },
-    {
-      title: "Department",
-      dataIndex: "department",
-      width: 120,
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      width: 120,
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
-      width: 120,
+      width: 350,
     },
     {
       title: "Actions",
@@ -211,7 +116,7 @@ export default function UsersRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this user?"
+            description="Are you sure to update this predefined kit?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleUpdateButton()}
@@ -226,7 +131,7 @@ export default function UsersRoutes() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to delete?"
-            description="Are you sure to delete this user?"
+            description="Are you sure to delete this predefined kit?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton()}
@@ -239,6 +144,49 @@ export default function UsersRoutes() {
               Delete
             </Tag>
           </Popconfirm>
+        </div>
+      ),
+    },
+    {
+      title: "Checkin/Checkout",
+      dataIndex: "check_status",
+      width: 120,
+      fixed: "right",
+      render: (_, data) => (
+        <div>
+          {data.check_status == "checkin" ? (
+            <Popconfirm
+              title="Do you want to checkin?"
+              description="Are you sure to checkin this request?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckinButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
+                color="#108ee9"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Do you want to checkout?"
+              description="Are you sure to checkout this request?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckoutButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
+          )}
         </div>
       ),
     },
@@ -263,13 +211,13 @@ export default function UsersRoutes() {
               title: <HomeOutlined />,
             },
             {
-              title: "Users",
+              title: "Predefined Kits",
             },
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Users
+          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+            Show Deleted Predefined Kit
           </Button>
           <Button icon={<AiOutlinePlus />} type="primary">
             Create New
@@ -278,7 +226,7 @@ export default function UsersRoutes() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all users. Please check closely."
+          message="Note: This is the list of all predefined kit. Please check closely."
           type="info"
           showIcon
         />
@@ -306,6 +254,7 @@ export default function UsersRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

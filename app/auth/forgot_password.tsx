@@ -1,6 +1,6 @@
 import React from 'react';
 import { MailOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Flex, Alert } from 'antd';
+import { Button, Form, Input, Flex, Alert, Image } from 'antd';
 import { Link } from '@remix-run/react';
 
 export default function ForgotPasswordIndex() {
@@ -11,6 +11,9 @@ export default function ForgotPasswordIndex() {
 
     return (
         <div className='flex flex-col items-center pt-40'>
+            <div>
+                <Image width={120} src="/public/remix-logo.png" />
+            </div>
             <h1 className='flex flex-col items-center'>FORGOT PASSWORD</h1>
 
             <Form
