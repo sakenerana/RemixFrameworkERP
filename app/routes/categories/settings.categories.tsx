@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -18,6 +19,7 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -29,6 +31,8 @@ interface DataType {
 }
 
 export default function CategoriesRoutes() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -102,7 +106,9 @@ export default function CategoriesRoutes() {
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-category");
+  };
 
   const handleDeleteButton = () => {};
 
@@ -191,12 +197,16 @@ export default function CategoriesRoutes() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Categories
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-category"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Categories
+            </Button>
+          </Link>
+          <Link to={"create-category"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

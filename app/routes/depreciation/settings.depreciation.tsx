@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -18,6 +19,7 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -32,6 +34,8 @@ interface DataType {
 }
 
 export default function DepreciationRoutes() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -135,7 +139,9 @@ export default function DepreciationRoutes() {
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-depreciation");
+  };
 
   const handleDeleteButton = () => {};
 
@@ -239,12 +245,16 @@ export default function DepreciationRoutes() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Depreciation
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-depreciation"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Depreciation
+            </Button>
+          </Link>
+          <Link to={"create-depreciation"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

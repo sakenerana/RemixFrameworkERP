@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -38,6 +39,8 @@ interface DataType {
 }
 
 export default function AccesoriessRoute() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -181,7 +184,9 @@ export default function AccesoriessRoute() {
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-accessory");
+  };
 
   const handleDeleteButton = () => {};
 
@@ -344,12 +349,16 @@ export default function AccesoriessRoute() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Accessories
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-accessories"}>
+            <Button icon={<AiOutlineUserDelete />} type="primary" danger>
+              Show Deleted Accessories
+            </Button>
+          </Link>
+          <Link to={"create-accessory"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

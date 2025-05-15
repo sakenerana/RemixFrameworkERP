@@ -1,11 +1,10 @@
-import React from "react";
 import { MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Alert, Image, Card } from "antd";
 import { Link } from "@remix-run/react";
 
 export default function ForgotPasswordIndex() {
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  const onFinish = () => {
+    console.log("Received values of form: ", );
   };
 
   return (

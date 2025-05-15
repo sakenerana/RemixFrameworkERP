@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -20,6 +21,7 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -38,6 +40,8 @@ interface DataType {
 }
 
 export default function LicensesRoute() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -181,13 +185,15 @@ export default function LicensesRoute() {
     },
   ];
 
-  const handleUpdateButton = () => {}
+  const handleUpdateButton = () => {
+    navigate("update-license");
+  };
 
-  const handleDeleteButton = () => {}
+  const handleDeleteButton = () => {};
 
-  const handleCheckinButton = () => {}
+  const handleCheckinButton = () => {};
 
-  const handleCheckoutButton = () => {}
+  const handleCheckoutButton = () => {};
 
   const columns: TableColumnsType<DataType> = [
     {
@@ -344,12 +350,16 @@ export default function LicensesRoute() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Licenses
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-license"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Licenses
+            </Button>
+          </Link>
+          <Link to={"create-license"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

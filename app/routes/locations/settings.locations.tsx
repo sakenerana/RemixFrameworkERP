@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -18,6 +19,7 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -33,6 +35,8 @@ interface DataType {
 }
 
 export default function LocationsRoutes() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -146,51 +150,53 @@ export default function LocationsRoutes() {
     },
   ];
 
-  const handleUpdateButton = () => {}
+  const handleUpdateButton = () => {
+    navigate("update-location");
+  };
 
-  const handleDeleteButton = () => {}
+  const handleDeleteButton = () => {};
 
   const columns: TableColumnsType<DataType> = [
     {
       title: "Location Name",
       dataIndex: "location_name",
-      width: 120
+      width: 120,
     },
     {
       title: "Image",
       dataIndex: "image",
-      width: 120
+      width: 120,
     },
     {
       title: "Parent",
       dataIndex: "parent",
-      width: 120
+      width: 120,
     },
     {
       title: "Current Location",
       dataIndex: "current_location",
-      width: 120
+      width: 120,
     },
     {
       title: "Address",
       dataIndex: "address",
-      width: 120
+      width: 120,
     },
     {
       title: "City",
       dataIndex: "city",
-      width: 120
+      width: 120,
     },
     {
       title: "State",
       dataIndex: "state",
-      width: 120
+      width: 120,
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 120,
-      fixed: 'right',
+      fixed: "right",
       render: () => (
         <div className="flex">
           <Popconfirm
@@ -255,12 +261,16 @@ export default function LocationsRoutes() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Locations
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-location"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Locations
+            </Button>
+          </Link>
+          <Link to={"create-location"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">
@@ -293,7 +303,7 @@ export default function LocationsRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

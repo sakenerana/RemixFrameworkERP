@@ -11,6 +11,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
+import { Link } from "react-router-dom";
 import { AiOutlineCheck, AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -297,9 +298,11 @@ export default function RequestableItemsRoutes() {
             },
           ]}
         />
-        <Button icon={<AiOutlinePlus />} type="primary">
-          Create New
-        </Button>
+        <Link to={"create-request"}>
+          <Button icon={<AiOutlinePlus />} type="primary">
+            Create New
+          </Button>
+        </Link>
       </div>
       <div className="flex justify-between">
         <Alert

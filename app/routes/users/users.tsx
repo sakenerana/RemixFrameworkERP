@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -18,6 +19,7 @@ import {
   AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -34,6 +36,8 @@ interface DataType {
 }
 
 export default function UsersRoutes() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -157,7 +161,9 @@ export default function UsersRoutes() {
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-user");
+  };
 
   const handleDeleteButton = () => {};
 
@@ -268,12 +274,16 @@ export default function UsersRoutes() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Users
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-user"}>
+            <Button icon={<AiOutlineUserDelete />} type="primary" danger>
+              Show Deleted Users
+            </Button>
+          </Link>
+          <Link to={"create-user"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

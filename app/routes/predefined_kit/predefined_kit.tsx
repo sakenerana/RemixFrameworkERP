@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -20,6 +21,7 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
@@ -30,6 +32,8 @@ interface DataType {
 }
 
 export default function PredefinedKitRoute() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -93,7 +97,9 @@ export default function PredefinedKitRoute() {
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-predefined-kit");
+  };
 
   const handleDeleteButton = () => {};
 
@@ -216,12 +222,16 @@ export default function PredefinedKitRoute() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Predefined Kit
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"deleted-predefined-kit"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Predefined Kit
+            </Button>
+          </Link>
+          <Link to={"create-predefined-kit"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

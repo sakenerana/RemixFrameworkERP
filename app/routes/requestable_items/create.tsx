@@ -1,7 +1,7 @@
-export default function CreateDepreciation () {
+export default function CreateRequest () {
     return (
         <div>
-            Create Depreciation
+            Create Request
         </div>
     );
 }

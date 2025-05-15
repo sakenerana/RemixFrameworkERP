@@ -1,4 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -43,6 +44,8 @@ interface DataType {
 }
 
 export default function AssetsRoute() {
+  const navigate = useNavigate();
+
   const data: DataType[] = [
     {
       key: "1",
@@ -228,7 +231,9 @@ export default function AssetsRoute() {
 
   const handleAuditButton = () => {};
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {
+    navigate("update-assets")
+  };
 
   const handleDeleteButton = () => {};
 
@@ -429,12 +434,16 @@ export default function AssetsRoute() {
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-            Show Deleted Assets
-          </Button>
-          <Button icon={<AiOutlinePlus />} type="primary">
-            Create New
-          </Button>
+          <Link to={"/main/assets/list-assets/deleted-assets"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Assets
+            </Button>
+          </Link>
+          <Link to={"/main/assets/list-assets/create-assets"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create New
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

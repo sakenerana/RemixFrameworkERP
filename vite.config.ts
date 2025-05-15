@@ -87,11 +87,34 @@ export default defineConfig({
               route("update-license", "routes/licenses/update.tsx", { index: true });
               route("deleted-license", "routes/licenses/deleted.tsx", { index: true });
             });
-            route("accessories", "routes/accessories/accessories.tsx", { index: true });
-            route("consumables", "routes/consumables/consumables.tsx", { index: true });
-            route("components", "routes/components/components.tsx", { index: true });
-            route("predefined-kit", "routes/predefined_kit/predefined_kit.tsx", { index: true });
-            route("requestable-items", "routes/requestable_items/requestable_items.tsx", { index: true });
+            route("accessories", "routes/accessories/route.tsx", () => {
+              route("", "routes/accessories/accessories.tsx", { index: true });
+              route("create-accessory", "routes/accessories/create.tsx", { index: true });
+              route("update-accessory", "routes/accessories/update.tsx", { index: true });
+              route("deleted-accessories", "routes/accessories/deleted.tsx", { index: true });
+            });
+            route("consumables", "routes/consumables/route.tsx", () => {
+              route("", "routes/consumables/consumables.tsx", { index: true });
+              route("create-consumable", "routes/consumables/create.tsx", { index: true });
+              route("update-consumable", "routes/consumables/update.tsx", { index: true });
+              route("deleted-consumables", "routes/consumables/deleted.tsx", { index: true });
+            });
+            route("components", "routes/components/route.tsx", () => {
+              route("", "routes/components/components.tsx", { index: true });
+              route("create-component", "routes/components/create.tsx", { index: true });
+              route("update-component", "routes/components/update.tsx", { index: true });
+              route("deleted-components", "routes/components/deleted.tsx", { index: true });
+            });
+            route("predefined-kit", "routes/predefined_kit/route.tsx", () => {
+              route("", "routes/predefined_kit/predefined_kit.tsx", { index: true });
+              route("create-predefined-kit", "routes/predefined_kit/create.tsx", { index: true });
+              route("update-predefined-kit", "routes/predefined_kit/update.tsx", { index: true });
+              route("deleted-predefined-kit", "routes/predefined_kit/deleted.tsx", { index: true });
+            });
+            route("requestable-items", "routes/requestable_items/route.tsx", () => {
+              route("", "routes/requestable_items/requestable_items.tsx", { index: true });
+              route("create-request", "routes/requestable_items/create.tsx", { index: true });
+            });
             route("reports/activity-report", "routes/activity_report/reports.activity_report.tsx", { index: true });
             route("reports/custom-asset-report", "routes/custom_asset_report/reports.custom_asset_report.tsx", { index: true });
             route("reports/audit-log", "routes/audit_log/reports.audit_log.tsx", { index: true });
