@@ -14,8 +14,8 @@ import {
 import {
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineFileExclamation,
   AiOutlinePlus,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -23,136 +23,114 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 interface DataType {
   key: React.Key;
   name: string;
-  title: string;
-  email: string;
-  phone_no: string;
-  username: string;
-  department: string;
-  location: string;
-  manager: string;
+  term: string;
+  floor_value: string;
+  assets: string;
+  assets_models: string;
+  licenses: string;
   action: string;
 }
 
-export default function UsersRoutes() {
+export default function DepreciationRoutes() {
   const data: DataType[] = [
     {
       key: "1",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "2",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "3",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "4",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "5",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "6",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "7",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "8",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "9",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
     {
       key: "10",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      term: "test",
+      floor_value: "test",
+      assets: "test",
+      assets_models: "test",
+      licenses: "test",
       action: "test",
     },
   ];
@@ -168,38 +146,28 @@ export default function UsersRoutes() {
       width: 120,
     },
     {
-      title: "Title",
-      dataIndex: "title",
+      title: "Term",
+      dataIndex: "term",
       width: 120,
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: "Floor Value",
+      dataIndex: "floor_value",
       width: 120,
     },
     {
-      title: "Phone",
-      dataIndex: "phone_no",
+      title: "Assets",
+      dataIndex: "assets",
       width: 120,
     },
     {
-      title: "Username",
-      dataIndex: "username",
+      title: "Assets Models",
+      dataIndex: "assets_models",
       width: 120,
     },
     {
-      title: "Department",
-      dataIndex: "department",
-      width: 120,
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      width: 120,
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
+      title: "Licenses",
+      dataIndex: "licenses",
       width: 120,
     },
     {
@@ -211,7 +179,7 @@ export default function UsersRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this user?"
+            description="Are you sure to update this depreciation?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleUpdateButton()}
@@ -226,7 +194,7 @@ export default function UsersRoutes() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to delete?"
-            description="Are you sure to delete this user?"
+            description="Are you sure to delete this depreciation?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton()}
@@ -263,13 +231,16 @@ export default function UsersRoutes() {
               title: <HomeOutlined />,
             },
             {
-              title: "Users",
+              title: "Settings",
+            },
+            {
+              title: "Depreciation",
             },
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Users
+          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+            Show Deleted Depreciation
           </Button>
           <Button icon={<AiOutlinePlus />} type="primary">
             Create New
@@ -278,7 +249,7 @@ export default function UsersRoutes() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all users. Please check closely."
+          message="Note: This is the list of all depreciated items. Please check closely."
           type="info"
           showIcon
         />
@@ -306,6 +277,7 @@ export default function UsersRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

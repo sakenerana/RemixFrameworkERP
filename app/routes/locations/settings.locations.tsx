@@ -14,204 +14,188 @@ import {
 import {
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineFileExclamation,
   AiOutlinePlus,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
   key: React.Key;
-  name: string;
-  title: string;
-  email: string;
-  phone_no: string;
-  username: string;
-  department: string;
-  location: string;
-  manager: string;
+  location_name: string;
+  image: string;
+  parent: string;
+  current_location: string;
+  address: string;
+  city: string;
+  state: string;
   action: string;
 }
 
-export default function UsersRoutes() {
+export default function LocationsRoutes() {
   const data: DataType[] = [
     {
       key: "1",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "2",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "3",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "4",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "5",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "6",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "7",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "8",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "9",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
     {
       key: "10",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      location_name: "John Brown",
+      image: "test",
+      parent: "test",
+      current_location: "test",
+      address: "test",
+      city: "test",
+      state: "test",
       action: "test",
     },
   ];
 
-  const handleUpdateButton = () => {};
+  const handleUpdateButton = () => {}
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => {}
 
   const columns: TableColumnsType<DataType> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      width: 120,
+      title: "Location Name",
+      dataIndex: "location_name",
+      width: 120
     },
     {
-      title: "Title",
-      dataIndex: "title",
-      width: 120,
+      title: "Image",
+      dataIndex: "image",
+      width: 120
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      width: 120,
+      title: "Parent",
+      dataIndex: "parent",
+      width: 120
     },
     {
-      title: "Phone",
-      dataIndex: "phone_no",
-      width: 120,
+      title: "Current Location",
+      dataIndex: "current_location",
+      width: 120
     },
     {
-      title: "Username",
-      dataIndex: "username",
-      width: 120,
+      title: "Address",
+      dataIndex: "address",
+      width: 120
     },
     {
-      title: "Department",
-      dataIndex: "department",
-      width: 120,
+      title: "City",
+      dataIndex: "city",
+      width: 120
     },
     {
-      title: "Location",
-      dataIndex: "location",
-      width: 120,
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
-      width: 120,
+      title: "State",
+      dataIndex: "state",
+      width: 120
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 120,
-      fixed: "right",
+      fixed: 'right',
       render: () => (
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this user?"
+            description="Are you sure to update this location?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleUpdateButton()}
@@ -226,7 +210,7 @@ export default function UsersRoutes() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to delete?"
-            description="Are you sure to delete this user?"
+            description="Are you sure to delete this location?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton()}
@@ -263,13 +247,16 @@ export default function UsersRoutes() {
               title: <HomeOutlined />,
             },
             {
-              title: "Users",
+              title: "Settings",
+            },
+            {
+              title: "Locations",
             },
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Users
+          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+            Show Deleted Locations
           </Button>
           <Button icon={<AiOutlinePlus />} type="primary">
             Create New
@@ -278,7 +265,7 @@ export default function UsersRoutes() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all users. Please check closely."
+          message="Note: This is the list of all locations. Please check closely."
           type="info"
           showIcon
         />
@@ -306,6 +293,7 @@ export default function UsersRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: 'max-content' }}
       />
     </div>
   );

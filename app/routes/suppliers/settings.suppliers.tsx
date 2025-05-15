@@ -14,8 +14,8 @@ import {
 import {
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineFileExclamation,
   AiOutlinePlus,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -23,137 +23,159 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 interface DataType {
   key: React.Key;
   name: string;
-  title: string;
-  email: string;
-  phone_no: string;
-  username: string;
-  department: string;
-  location: string;
-  manager: string;
+  product_key: string;
+  expiration_date: string;
+  licensed_to_email: string;
+  licensed_to_name: string;
+  manufacturer: string;
+  min_qty: string;
+  total: string;
+  avail: string;
   action: string;
+  check_status: string;
 }
 
-export default function UsersRoutes() {
+export default function SuppliersRoutes() {
   const data: DataType[] = [
     {
       key: "1",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "2",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "3",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "4",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkin",
     },
     {
       key: "5",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "6",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkin",
     },
     {
       key: "7",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "8",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
     {
       key: "9",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkin",
     },
     {
       key: "10",
       name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
+      product_key: "test",
+      expiration_date: "test",
+      licensed_to_email: "test",
+      licensed_to_name: "test",
+      manufacturer: "test",
+      min_qty: "test",
+      total: "test",
+      avail: "test",
       action: "test",
+      check_status: "checkout",
     },
   ];
 
@@ -168,38 +190,43 @@ export default function UsersRoutes() {
       width: 120,
     },
     {
-      title: "Title",
-      dataIndex: "title",
+      title: "Product Key",
+      dataIndex: "product_key",
       width: 120,
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: "Expiration Date",
+      dataIndex: "expiration_date",
       width: 120,
     },
     {
-      title: "Phone",
-      dataIndex: "phone_no",
+      title: "Licensed to Email",
+      dataIndex: "licensed_to_email",
       width: 120,
     },
     {
-      title: "Username",
-      dataIndex: "username",
+      title: "Licensed to Name",
+      dataIndex: "licensed_to_name",
       width: 120,
     },
     {
-      title: "Department",
-      dataIndex: "department",
+      title: "manufacturer",
+      dataIndex: "manufacturer",
       width: 120,
     },
     {
-      title: "Location",
-      dataIndex: "location",
+      title: "Min QTY",
+      dataIndex: "min_qty",
       width: 120,
     },
     {
-      title: "Manager",
-      dataIndex: "manager",
+      title: "Total",
+      dataIndex: "total",
+      width: 120,
+    },
+    {
+      title: "Avail",
+      dataIndex: "avail",
       width: 120,
     },
     {
@@ -211,7 +238,7 @@ export default function UsersRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this user?"
+            description="Are you sure to update this supplier?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleUpdateButton()}
@@ -226,7 +253,7 @@ export default function UsersRoutes() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to delete?"
-            description="Are you sure to delete this user?"
+            description="Are you sure to delete this supplier?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton()}
@@ -263,13 +290,16 @@ export default function UsersRoutes() {
               title: <HomeOutlined />,
             },
             {
-              title: "Users",
+              title: "Settings",
+            },
+            {
+              title: "Suppliers",
             },
           ]}
         />
         <Space wrap>
-          <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-            Show Deleted Users
+          <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+            Show Deleted Suppliers
           </Button>
           <Button icon={<AiOutlinePlus />} type="primary">
             Create New
@@ -278,7 +308,7 @@ export default function UsersRoutes() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all users. Please check closely."
+          message="Note: This is the list of all suppliers. Please check closely."
           type="info"
           showIcon
         />
@@ -306,6 +336,7 @@ export default function UsersRoutes() {
         onChange={onChange}
         className="pt-5"
         bordered
+        scroll={{ x: "max-content" }}
       />
     </div>
   );
