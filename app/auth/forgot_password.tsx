@@ -12,7 +12,7 @@ export default function ForgotPasswordIndex() {
     <div className="flex flex-col h-screen items-center pt-40 bg-gradient-to-r from-indigo-950 to-indigo-900">
       <Card>
         <div className="flex flex-col items-center mb-5">
-          <Image width={290} src="/public/img/cficoop.svg" />
+          <Image width={290} src="./img/cficoop.svg" />
         </div>
         <h1 className="flex flex-col items-center"><b>FORGOT PASSWORD</b></h1>
 

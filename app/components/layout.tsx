@@ -303,7 +303,7 @@ export default function LayoutIndex() {
               }}
             />
             <div>
-              <Image width={270} src="./public/img/cficoop.svg" />
+              <Image width={270} src="./img/cficoop.svg" />
             </div>
             <div className="flex-1">
               <div className="flex justify-end">
