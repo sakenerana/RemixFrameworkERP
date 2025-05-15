@@ -1,10 +1,20 @@
 import { MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Alert, Image, Card } from "antd";
 import { Link } from "@remix-run/react";
+import supabase from "~/utils/supabase.client";
+import { useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export default function ForgotPasswordIndex() {
-  const onFinish = () => {
-    console.log("Received values of form: ", );
+  const { resetPassword } = useAuth();
+
+  const onFinish = async (values: any) => {
+    try {
+      const { error } = await resetPassword(values.email);
+      if (error) throw error;
+    } catch (error) {
+      return { error };
+    }
   };
 
   return (
@@ -13,7 +23,9 @@ export default function ForgotPasswordIndex() {
         <div className="flex flex-col items-center mb-5">
           <Image width={290} src="./img/cficoop.svg" />
         </div>
-        <h1 className="flex flex-col items-center"><b>FORGOT PASSWORD</b></h1>
+        <h1 className="flex flex-col items-center">
+          <b>FORGOT PASSWORD</b>
+        </h1>
 
         <Form
           name="login"

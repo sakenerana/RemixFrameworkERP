@@ -21,6 +21,7 @@ export default defineConfig({
       routes(defineRoutes) {
         return defineRoutes((route) => {
           route("/", "auth/login.tsx", { index: true });
+          route("signup", "auth/signup.tsx", { index: true });
           route("forgot-password", "auth/forgot_password.tsx", { index: true });
           route("main", "components/layout.tsx", () => {
             route("", "routes/dashboard/dashboard.tsx", { index: true });

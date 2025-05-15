@@ -1,37 +1,22 @@
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex, Image, Card } from "antd";
 import { useState } from "react";
-import supabase from "~/utils/supabase.client";
+import { Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { useNavigate } from "@remix-run/react";
+import { Button, Card, Checkbox, Flex, Form, Image, Input, Spin } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
-export default function LoginIndex() {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState();
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
-  const navigate = useNavigate();
+  const { signUp } = useAuth();
 
   const onFinish = async (values: any) => {
+    console.log("Received values of form: ", values);
+
     // e.preventDefault();
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-        phone: "",
-      });
-      navigate("/");
-      if (error) throw error;
-      console.log("account signin");
-      
-    } catch (error) {
-      return { error };
-    }
-    // setLoading(true);
-    // console.log("Received values of form: ", values);
-    // await signIn(email, password, phone);
-    // setLoading(false);
+    setLoading(true);
+    await signUp(values.email, values.password);
+    setLoading(false);
   };
 
   return (
@@ -41,7 +26,7 @@ export default function LoginIndex() {
           <Image width={290} src="./img/cficoop.svg" />
         </div>
         <h1 className="flex flex-col items-center">
-          <b>INVENTORY</b>
+          <b>REGISTRATION</b>
         </h1>
         <Form
           name="login"
@@ -66,26 +51,17 @@ export default function LoginIndex() {
               placeholder="Password"
             />
           </Form.Item>
-          <Form.Item>
-            <Flex justify="space-between" align="center">
-              {/* <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item> */}
-              <a href="/forgot-password">Forgot password</a>
-            </Flex>
-          </Form.Item>
 
           <Form.Item>
             <Button block type="primary" htmlType="submit">
-              Log in
+              Signup
             </Button>
             {/* or <a href="">Register now!</a> */}
           </Form.Item>
         </Form>
-        <div className="flex justify-center">
-          <a href="/signup">Register Now</a>
-        </div>
       </Card>
     </div>
   );
-}
+};
+
+export default Signup;
