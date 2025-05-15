@@ -81,7 +81,7 @@ export default function LayoutIndex() {
 
   return (
     <div className="flex">
-      <Layout className="flex flex-col h-auto">
+      <Layout className="flex flex-col h-full">
         <Sider trigger={null} collapsible collapsed={collapsed} width={250}>
           <div className="demo-logo-vertical" />
           <Menu
@@ -303,7 +303,7 @@ export default function LayoutIndex() {
               }}
             />
             <div>
-              <Image width={120} src="/public/remix-logo.png" />
+              <Image width={270} src="/public/img/cficoop.svg" />
             </div>
             <div className="flex-1">
               <div className="flex justify-end">
