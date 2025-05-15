@@ -92,7 +92,7 @@ export default function LayoutIndex() {
               {
                 key: "1",
                 icon: <FcGlobe />,
-                label: <Link to="/main/dashboard">Dashboard</Link>,
+                label: <Link to="/main/">Dashboard</Link>,
               },
               {
                 key: "11",
@@ -303,7 +303,7 @@ export default function LayoutIndex() {
               }}
             />
             <div>
-              <Image width={270} src="/public/img/cficoop.svg" />
+              <Image width={270} src="./public/img/cficoop.svg" />
             </div>
             <div className="flex-1">
               <div className="flex justify-end">

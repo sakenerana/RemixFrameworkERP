@@ -23,7 +23,7 @@ export default defineConfig({
           route("/", "auth/login.tsx", { index: true });
           route("forgot-password", "auth/forgot_password.tsx", { index: true });
           route("main", "components/layout.tsx", () => {
-            route("dashboard", "routes/dashboard/dashboard.tsx", { index: true });
+            route("", "routes/dashboard/dashboard.tsx", { index: true });
             route("settings/suppliers", "routes/suppliers/route.tsx", () => {
               route("", "routes/suppliers/settings.suppliers.tsx", { index: true });
               route("create-supplier", "routes/suppliers/settings.create.tsx", { index: true });

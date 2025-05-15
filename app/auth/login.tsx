@@ -10,7 +10,7 @@ export default function LoginIndex() {
     <div className="flex flex-col h-screen items-center pt-40 bg-gradient-to-r from-indigo-950 to-indigo-900">
       <Card>
         <div className="flex flex-col items-center mb-6">
-          <Image width={290} src="./public/img/cficoop.svg" />
+          <Image width={290} src="/public/img/cficoop.svg" />
         </div>
         <h1 className="flex flex-col items-center"><b>INVENTORY</b></h1>
         <Form
