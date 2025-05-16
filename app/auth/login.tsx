@@ -22,6 +22,7 @@ export default function LoginIndex() {
       });
       if (data) {
         navigate("/landing-page");
+        console.log("fp", data)
       }
       if (error) throw error;
       setLoading(true);

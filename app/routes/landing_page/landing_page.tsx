@@ -6,8 +6,14 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps, TabsProps } from "antd";
 import { Carousel, Menu, Tabs } from "antd";
-import { useNavigate } from "@remix-run/react";
+import {
+  ClientLoaderFunctionArgs,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
+import { supabase } from "~/lib/supabase";
+import { useSupabaseAuth } from "~/hooks/useSupabaseAuth";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -18,6 +24,28 @@ const contentStyle: React.CSSProperties = {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  //   const { access_token, user } = useSupabaseAuth();
+  const onUser = async () => {
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+      if (error) throw error;
+      console.log("test3", user?.id);
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  React.useEffect(() => {
+    // const userData = localStorage.getItem("sb-auth-token");
+    // onUser();
+    // if (userData) {
+    //   console.log("LocalStorage user:", JSON.parse(userData));
+    // }
+  }, []);
+
   const onClick: MenuProps["onClick"] = (e) => {
     if (e.key == "1") {
       navigate("/inventory");
