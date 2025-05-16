@@ -50,32 +50,32 @@ export default function LayoutIndex() {
     {
       key: "1",
       icon: <FcPackage />,
-      label: <Link to="/main/users">Assets</Link>,
+      label: <Link to="/inventory/users">Assets</Link>,
     },
     {
       key: "2",
       icon: <FcDiploma1 />,
-      label: <Link to="/main/users">Licenses</Link>,
+      label: <Link to="/inventory/users">Licenses</Link>,
     },
     {
       key: "3",
       icon: <FcMultipleDevices />,
-      label: <Link to="/main/users">Accessories</Link>,
+      label: <Link to="/inventory/users">Accessories</Link>,
     },
     {
       key: "4",
       icon: <FcNews />,
-      label: <Link to="/main/users">Consumables</Link>,
+      label: <Link to="/inventory/users">Consumables</Link>,
     },
     {
       key: "5",
       icon: <FcMultipleSmartphones />,
-      label: <Link to="/main/users">Tech Components</Link>,
+      label: <Link to="/inventory/users">Tech Components</Link>,
     },
     {
       key: "6",
       icon: <FcPortraitMode />,
-      label: <Link to="/main/users">Users</Link>,
+      label: <Link to="/inventory/users">Users</Link>,
     },
   ];
 
@@ -92,55 +92,55 @@ export default function LayoutIndex() {
               {
                 key: "1",
                 icon: <FcGlobe />,
-                label: <Link to="/main/">Dashboard</Link>,
+                label: <Link to="/inventory">Dashboard</Link>,
               },
               {
                 key: "11",
                 icon: <FcSalesPerformance />,
-                label: <Link to="/main/users">Assets</Link>,
+                label: <Link to="/inventory/users">Assets</Link>,
                 children: [
                   {
                     key: "11.1",
                     icon: <FcInspection />,
-                    label: <Link to="/main/assets/requested">Requested</Link>,
+                    label: <Link to="/inventory/assets/requested">Requested</Link>,
                   },
                   {
                     key: "11.2",
                     icon: <FcCancel />,
-                    label: <Link to="/main/assets/deleted">Deleted</Link>,
+                    label: <Link to="/inventory/assets/deleted">Deleted</Link>,
                   },
                   {
                     key: "11.3",
                     icon: <FcPackage />,
-                    label: <Link to="/main/assets/list-assets">Assets</Link>,
+                    label: <Link to="/inventory/assets/list-assets">Assets</Link>,
                   },
                 ],
               },
               {
                 key: "10",
                 icon: <FcDiploma1 />,
-                label: <Link to="/main/licenses">Licenses</Link>,
+                label: <Link to="/inventory/licenses">Licenses</Link>,
               },
               {
                 key: "9",
                 icon: <FcMultipleDevices />,
-                label: <Link to="/main/accessories">Accessories</Link>,
+                label: <Link to="/inventory/accessories">Accessories</Link>,
               },
               {
                 key: "8",
                 icon: <FcNews />,
-                label: <Link to="/main/consumables">Consumables</Link>,
+                label: <Link to="/inventory/consumables">Consumables</Link>,
               },
               {
                 key: "7",
                 icon: <FcMultipleSmartphones />,
-                label: <Link to="/main/components">Tech Components</Link>,
+                label: <Link to="/inventory/components">Tech Components</Link>,
               },
               {
                 key: "6",
                 icon: <FcPaid />,
                 label: (
-                  <Link to="/main/predefined-kit">
+                  <Link to="/inventory/predefined-kit">
                     Predefined Kits (Bundled)
                   </Link>
                 ),
@@ -148,7 +148,7 @@ export default function LayoutIndex() {
               {
                 key: "5",
                 icon: <FcPortraitMode />,
-                label: <Link to="/main/users">Users</Link>,
+                label: <Link to="/inventory/users">Users</Link>,
               },
               {
                 key: "2",
@@ -158,27 +158,27 @@ export default function LayoutIndex() {
                   {
                     key: "2.1",
                     icon: <FcConferenceCall />,
-                    label: <Link to="/main/settings/suppliers">Suppliers</Link>,
+                    label: <Link to="/inventory/settings/suppliers">Suppliers</Link>,
                   },
                   {
                     key: "2.2",
                     icon: <FcDepartment />,
                     label: (
-                      <Link to="/main/settings/departments">Departments</Link>
+                      <Link to="/inventory/settings/departments">Departments</Link>
                     ),
                   },
                   {
                     key: "2.3",
                     icon: <FcFlowChart />,
                     label: (
-                      <Link to="/main/settings/categories">Categories</Link>
+                      <Link to="/inventory/settings/categories">Categories</Link>
                     ),
                   },
                   {
                     key: "2.4",
                     icon: <FcFactory />,
                     label: (
-                      <Link to="/main/settings/manufacturers">
+                      <Link to="/inventory/settings/manufacturers">
                         Manufacturers
                       </Link>
                     ),
@@ -186,18 +186,18 @@ export default function LayoutIndex() {
                   {
                     key: "2.5",
                     icon: <FcLandscape />,
-                    label: <Link to="/main/settings/locations">Locations</Link>,
+                    label: <Link to="/inventory/settings/locations">Locations</Link>,
                   },
                   {
                     key: "2.6",
                     icon: <FcDepartment />,
-                    label: <Link to="/main/settings/companies">Companies</Link>,
+                    label: <Link to="/inventory/settings/companies">Companies</Link>,
                   },
                   {
                     key: "2.7",
                     icon: <FcBearish />,
                     label: (
-                      <Link to="/main/settings/depreciation">Depreciation</Link>
+                      <Link to="/inventory/settings/depreciation">Depreciation</Link>
                     ),
                   },
                 ],
@@ -211,7 +211,7 @@ export default function LayoutIndex() {
                     key: "3.1",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/activity-report">
+                      <Link to="/inventory/reports/activity-report">
                         Activity Report
                       </Link>
                     ),
@@ -220,7 +220,7 @@ export default function LayoutIndex() {
                     key: "3.2",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/custom-asset-report">
+                      <Link to="/inventory/reports/custom-asset-report">
                         Custom Asset Report
                       </Link>
                     ),
@@ -228,13 +228,13 @@ export default function LayoutIndex() {
                   {
                     key: "3.3",
                     icon: <FcComboChart />,
-                    label: <Link to="/main/reports/audit-log">Audit Log</Link>,
+                    label: <Link to="/inventory/reports/audit-log">Audit Log</Link>,
                   },
                   {
                     key: "3.4",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/depreciation-report">
+                      <Link to="/inventory/reports/depreciation-report">
                         Depreciation Report
                       </Link>
                     ),
@@ -243,7 +243,7 @@ export default function LayoutIndex() {
                     key: "3.5",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/licenses-report">
+                      <Link to="/inventory/reports/licenses-report">
                         License Report
                       </Link>
                     ),
@@ -252,7 +252,7 @@ export default function LayoutIndex() {
                     key: "3.6",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/asset-maintenance-report">
+                      <Link to="/inventory/reports/asset-maintenance-report">
                         Asset Maitenance Report
                       </Link>
                     ),
@@ -261,7 +261,7 @@ export default function LayoutIndex() {
                     key: "3.7",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/unaccepted-assets">
+                      <Link to="/inventory/reports/unaccepted-assets">
                         Unaccepted Assets
                       </Link>
                     ),
@@ -270,7 +270,7 @@ export default function LayoutIndex() {
                     key: "3.8",
                     icon: <FcComboChart />,
                     label: (
-                      <Link to="/main/reports/accessory-report">
+                      <Link to="/inventory/reports/accessory-report">
                         Accessory Report
                       </Link>
                     ),
@@ -281,7 +281,7 @@ export default function LayoutIndex() {
                 key: "4",
                 icon: <FcOk />,
                 label: (
-                  <Link to="/main/requestable-items">Requestable Items</Link>
+                  <Link to="/inventory/requestable-items">Requestable Items</Link>
                 ),
               },
             ]}
@@ -317,9 +317,11 @@ export default function LayoutIndex() {
                   <Dropdown menu={{ items }} placement="topLeft">
                     <Button icon={<FcPlus />}>Create New</Button>
                   </Dropdown>
-                  <Button icon={<FcSettings />} type="text">
-                    Settings
-                  </Button>
+                  <Link to="/inventory/settings">
+                    <Button icon={<FcSettings />} type="text">
+                      Settings
+                    </Button>
+                  </Link>
                 </Space>
               </div>
             </div>

@@ -1,0 +1,113 @@
+import React, { useState } from "react";
+import {
+  ApartmentOutlined,
+  AuditOutlined,
+  DropboxOutlined,
+} from "@ant-design/icons";
+import type { MenuProps, TabsProps } from "antd";
+import { Carousel, Menu, Tabs } from "antd";
+import { useNavigate } from "@remix-run/react";
+
+type MenuItem = Required<MenuProps>["items"][number];
+
+const contentStyle: React.CSSProperties = {
+  textAlign: "center",
+  justifyContent: "center",
+};
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+
+  const onClick: MenuProps["onClick"] = (e) => {
+    console.log("click ", e);
+    if (e.key == '1') {
+        navigate("/inventory")
+    } else if (e.key == '2') {
+        navigate("/budget-tracker")
+    } else if (e.key == '3') {
+        navigate("/workflow-tracker")
+    }
+  };
+
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div>
+          <DropboxOutlined /> Inventory
+        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <div>
+          <AuditOutlined /> Budget Tracker
+        </div>
+      ),
+    },
+    {
+      key: "3",
+      label: (
+        <div>
+          <ApartmentOutlined /> Workflow Tracker
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="h-full">
+      <div className="h-auto">
+        <div className="flex justify-center pt-4">
+          <img className="h-16" src="./img/cficoop.svg" alt="cficoop" />
+        </div>
+
+        <div className="pt-6">
+          <Menu
+            style={contentStyle}
+            onClick={onClick}
+            mode="horizontal"
+            items={items}
+          />
+        </div>
+        <div className="grid grid-cols-1">
+          <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={3000}>
+            <div>
+              <h3>
+                <img
+                  className="h-[100%]"
+                  src="./img/cfionline.jpg"
+                  alt="cfi-online"
+                />
+              </h3>
+            </div>
+            <div>
+              <h3>
+                <img
+                  className="h-[100%]"
+                  src="./img/cfi-bills-payment.jpg"
+                  alt="cfi-bills"
+                />
+              </h3>
+            </div>
+            <div>
+              <h3>
+                <img
+                  className="h-[100%]"
+                  src="./img/cfi-cpp.jpg"
+                  alt="cfi-bills"
+                />
+              </h3>
+            </div>
+          </Carousel>
+        </div>
+        <footer className="bg-gray-800 text-white p-6">
+          <div className="container mx-auto">
+            <p className="text-center">© 2025 CFI. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}

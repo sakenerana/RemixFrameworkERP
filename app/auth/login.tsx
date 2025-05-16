@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex, Image, Card } from "antd";
+import { Button, Checkbox, Form, Input, Flex, Image, Card, Spin } from "antd";
 import { useState } from "react";
 import supabase from "~/utils/supabase.client";
 import { useAuth } from "./AuthContext";
@@ -21,27 +21,29 @@ export default function LoginIndex() {
         password: values.password,
         phone: "",
       });
-      navigate("/");
+      navigate("/landing-page");
       if (error) throw error;
       console.log("account signin");
-      
+      setLoading(true);
     } catch (error) {
+      setLoading(false);
       return { error };
     }
-    // setLoading(true);
-    // console.log("Received values of form: ", values);
-    // await signIn(email, password, phone);
-    // setLoading(false);
   };
 
   return (
     <div className="flex flex-col h-screen items-center pt-40 bg-gradient-to-r from-indigo-950 to-indigo-900">
       <Card>
+        {loading && (
+          <div className="flex justify-center">
+            <Spin />
+          </div>
+        )}
         <div className="flex flex-col items-center mb-6">
           <Image width={290} src="./img/cficoop.svg" />
         </div>
         <h1 className="flex flex-col items-center">
-          <b>INVENTORY</b>
+          <b>LOGIN</b>
         </h1>
         <Form
           name="login"

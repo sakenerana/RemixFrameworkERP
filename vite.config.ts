@@ -23,8 +23,12 @@ export default defineConfig({
           route("/", "auth/login.tsx", { index: true });
           route("signup", "auth/signup.tsx", { index: true });
           route("forgot-password", "auth/forgot_password.tsx", { index: true });
-          route("main", "components/layout.tsx", () => {
+          route("landing-page", "routes/landing_page/landing_page.tsx", { index: true });
+          route("inventory", "components/layout.tsx", () => {
             route("", "routes/dashboard/dashboard.tsx", { index: true });
+            route("settings", "routes/settings/route.tsx", () => {
+              route("", "routes/settings/settings.tsx", { index: true });
+            });
             route("settings/suppliers", "routes/suppliers/route.tsx", () => {
               route("", "routes/suppliers/settings.suppliers.tsx", { index: true });
               route("create-supplier", "routes/suppliers/settings.create.tsx", { index: true });
