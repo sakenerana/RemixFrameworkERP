@@ -223,7 +223,7 @@ export default function ConsumablesRoute() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {

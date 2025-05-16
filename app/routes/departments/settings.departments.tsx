@@ -193,7 +193,7 @@ export default function DepartmentsRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {

@@ -92,7 +92,7 @@ export default function AuditLogReportRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {

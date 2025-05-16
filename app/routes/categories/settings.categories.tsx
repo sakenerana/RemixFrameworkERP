@@ -116,7 +116,7 @@ export default function CategoriesRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {

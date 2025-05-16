@@ -50,32 +50,32 @@ export default function LayoutIndex() {
     {
       key: "1",
       icon: <FcPackage />,
-      label: <Link to="/inventory/users">Assets</Link>,
+      label: <Link to="/inventory/assets/list-assets/create-assets">Assets</Link>,
     },
     {
       key: "2",
       icon: <FcDiploma1 />,
-      label: <Link to="/inventory/users">Licenses</Link>,
+      label: <Link to="/inventory/licenses/create-license">Licenses</Link>,
     },
     {
       key: "3",
       icon: <FcMultipleDevices />,
-      label: <Link to="/inventory/users">Accessories</Link>,
+      label: <Link to="/inventory/accessories/create-accessory">Accessories</Link>,
     },
     {
       key: "4",
       icon: <FcNews />,
-      label: <Link to="/inventory/users">Consumables</Link>,
+      label: <Link to="/inventory/consumables/create-consumable">Consumables</Link>,
     },
     {
       key: "5",
       icon: <FcMultipleSmartphones />,
-      label: <Link to="/inventory/users">Tech Components</Link>,
+      label: <Link to="/inventory/components/create-component">Tech Components</Link>,
     },
     {
       key: "6",
       icon: <FcPortraitMode />,
-      label: <Link to="/inventory/users">Users</Link>,
+      label: <Link to="/inventory/users/create-user">Users</Link>,
     },
   ];
 

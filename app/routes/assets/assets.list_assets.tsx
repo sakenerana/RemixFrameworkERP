@@ -242,7 +242,7 @@ export default function AssetsRoute() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {
@@ -254,12 +254,12 @@ export default function AssetsRoute() {
           ]}
         />
         <Space wrap>
-          <Link to={"/main/assets/list-assets/deleted-assets"}>
+          <Link to={"/inventory/assets/list-assets/deleted-assets"}>
             <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
               Show Deleted Assets
             </Button>
           </Link>
-          <Link to={"/main/assets/list-assets/create-assets"}>
+          <Link to={"/inventory/assets/list-assets/create-assets"}>
             <Button icon={<AiOutlinePlus />} type="primary">
               Create New
             </Button>

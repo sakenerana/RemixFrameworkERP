@@ -94,7 +94,7 @@ export default function AssetMaintenanceReportRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/main/dashboard",
+              href: "/inventory",
               title: <HomeOutlined />,
             },
             {

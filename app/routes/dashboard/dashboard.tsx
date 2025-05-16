@@ -167,11 +167,11 @@ export default function DashboardRoutes() {
                         <Card variant="borderless">
                             <Statistic
                                 title="Assets"
-                                value={11.28}
-                                precision={2}
+                                value={1}
+                                precision={0}
                                 valueStyle={{ color: '#3f8600' }}
                                 prefix={<FcPackage />}
-                                suffix="%"
+                                suffix=""
                             />
                         </Card>
                     </div>
@@ -181,11 +181,11 @@ export default function DashboardRoutes() {
                         <Card variant="borderless">
                             <Statistic
                                 title="Licenses"
-                                value={9.3}
-                                precision={2}
+                                value={1}
+                                precision={0}
                                 valueStyle={{ color: '#cf1322' }}
                                 prefix={<FcDiploma1 />}
-                                suffix="%"
+                                suffix=""
                             />
                         </Card>
                     </div>
@@ -195,11 +195,11 @@ export default function DashboardRoutes() {
                         <Card variant="borderless">
                             <Statistic
                                 title="Accessories"
-                                value={9.3}
-                                precision={2}
+                                value={1}
+                                precision={0}
                                 valueStyle={{ color: '#cf1322' }}
                                 prefix={<FcMultipleDevices />}
-                                suffix="%"
+                                suffix=""
                             />
                         </Card>
                     </div>
@@ -209,11 +209,11 @@ export default function DashboardRoutes() {
                         <Card variant="borderless">
                             <Statistic
                                 title="Consumables"
-                                value={9.3}
-                                precision={2}
+                                value={9}
+                                precision={0}
                                 valueStyle={{ color: '#cf1322' }}
                                 prefix={<FcNews />}
-                                suffix="%"
+                                suffix=""
                             />
                         </Card>
                     </div>
@@ -223,11 +223,11 @@ export default function DashboardRoutes() {
                         <Card variant="borderless">
                             <Statistic
                                 title="Components"
-                                value={9.3}
-                                precision={2}
+                                value={9}
+                                precision={0}
                                 valueStyle={{ color: '#cf1322' }}
                                 prefix={<FcMultipleSmartphones />}
-                                suffix="%"
+                                suffix=""
                             />
                         </Card>
                     </div>
