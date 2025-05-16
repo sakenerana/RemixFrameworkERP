@@ -15,24 +15,10 @@ import { Link } from "react-router-dom";
 import { AiOutlineCheck, AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  image: string;
-  asset_tag: string;
-  model: string;
-  model_no: string;
-  asset_name: string;
-  serial_no: string;
-  location: string;
-  status: string;
-  expected_checkin_date: string;
-  cpu: string;
-  request_status: string;
-}
+import { RequestableItem } from "~/types/requestable_item.type";
 
 export default function RequestableItemsRoutes() {
-  const data: DataType[] = [
+  const data: RequestableItem[] = [
     {
       key: "1",
       image: "John Brown",
@@ -179,7 +165,7 @@ export default function RequestableItemsRoutes() {
 
   const handleRequestButton = () => {};
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<RequestableItem> = [
     {
       title: "Image",
       dataIndex: "image",
@@ -275,7 +261,7 @@ export default function RequestableItemsRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<RequestableItem>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -322,7 +308,7 @@ export default function RequestableItemsRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<RequestableItem>
         size="small"
         columns={columns}
         dataSource={data}

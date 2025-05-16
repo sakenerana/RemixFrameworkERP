@@ -23,30 +23,12 @@ import {
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  asset_name: string;
-  device_image: string;
-  asset_tag: string;
-  serial_no: string;
-  model: string;
-  category: string;
-  checked_out_to: string;
-  location: string;
-  purchase_cost: string;
-  current_value: string;
-  accounting_code: string;
-  installed: string;
-  size: string;
-  action: string;
-  check_status: string;
-}
+import { Asset } from "~/types/asset.type";
 
 export default function AssetsRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Asset[] = [
     {
       key: "1",
       asset_name: "John Brown",
@@ -57,170 +39,8 @@ export default function AssetsRoute() {
       category: "test",
       checked_out_to: "test",
       location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "5",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "7",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      accounting_code: "test",
-      installed: "test",
-      size: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "10",
-      asset_name: "John Brown",
-      device_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      model: "test",
-      category: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
+      purchase_cost: 123,
+      current_value: 123,
       accounting_code: "test",
       installed: "test",
       size: "test",
@@ -229,19 +49,19 @@ export default function AssetsRoute() {
     },
   ];
 
-  const handleAuditButton = () => {};
+  const handleAuditButton = () => { };
 
   const handleUpdateButton = () => {
     navigate("update-assets")
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Asset> = [
     {
       title: "Asset Name",
       dataIndex: "asset_name",
@@ -407,7 +227,7 @@ export default function AssetsRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Asset>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -469,7 +289,7 @@ export default function AssetsRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Asset>
         size="small"
         columns={columns}
         dataSource={data}

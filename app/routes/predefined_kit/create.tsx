@@ -1,7 +1,7 @@
 export default function CreateManufacturer () {
     return (
         <div>
-            Create Manufacturer
+            Create PredefinedKit
         </div>
     );
 }

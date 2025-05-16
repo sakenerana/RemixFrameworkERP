@@ -14,28 +14,10 @@ import {
 import { AiOutlineSync } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  asset_name: string;
-  item_image: string;
-  asset_tag: string;
-  serial_no: string;
-  item_model: string;
-  item_category: string;
-  status: string;
-  checked_out_to: string;
-  location: string;
-  purchase_cost: string;
-  current_value: string;
-  cpu: string;
-  accounting_code: string;
-  check_status: string;
-  action: string;
-}
+import { Deleted } from "~/types/deleted.type";
 
 export default function DeletedRoute() {
-  const data: DataType[] = [
+  const data: Deleted[] = [
     {
       key: "1",
       asset_name: "John Brown",
@@ -47,170 +29,8 @@ export default function DeletedRoute() {
       status: "test",
       checked_out_to: "test",
       location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "2",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "3",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "4",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "5",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "6",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "7",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "8",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "9",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
-      cpu: "test",
-      accounting_code: "test",
-      check_status: "test",
-      action: "test",
-    },
-    {
-      key: "10",
-      asset_name: "John Brown",
-      item_image: "test",
-      asset_tag: "test",
-      serial_no: "test",
-      item_model: "test",
-      item_category: "test",
-      status: "test",
-      checked_out_to: "test",
-      location: "test",
-      purchase_cost: "test",
-      current_value: "test",
+      purchase_cost: 123,
+      current_value: 123,
       cpu: "test",
       accounting_code: "test",
       check_status: "test",
@@ -218,9 +38,9 @@ export default function DeletedRoute() {
     },
   ];
 
-  const handleRestoreButton = () => {}
+  const handleRestoreButton = () => { }
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Deleted> = [
     {
       title: "Asset Name",
       dataIndex: "asset_name",
@@ -313,7 +133,7 @@ export default function DeletedRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Deleted>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -363,7 +183,7 @@ export default function DeletedRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Deleted>
         size="small"
         columns={columns}
         dataSource={data}

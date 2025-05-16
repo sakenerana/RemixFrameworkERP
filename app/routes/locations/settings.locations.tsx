@@ -21,23 +21,12 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  location_name: string;
-  image: string;
-  parent: string;
-  current_location: string;
-  address: string;
-  city: string;
-  state: string;
-  action: string;
-}
+import { Location } from "~/types/location.type";
 
 export default function LocationsRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Location[] = [
     {
       key: "1",
       location_name: "John Brown",
@@ -156,7 +145,7 @@ export default function LocationsRoutes() {
 
   const handleDeleteButton = () => {};
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Location> = [
     {
       title: "Location Name",
       dataIndex: "location_name",
@@ -234,7 +223,7 @@ export default function LocationsRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Location>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -296,7 +285,7 @@ export default function LocationsRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Location>
         size="small"
         columns={columns}
         dataSource={data}

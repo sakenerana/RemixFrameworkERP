@@ -18,21 +18,10 @@ import {
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  image: string;
-  name: string;
-  location: string;
-  exp_checkin_date: string;
-  user_requesting: string;
-  date_requested: string;
-  action: string;
-  check_status: string;
-}
+import { Requested } from "~/types/requested.type";
 
 export default function RequestedRoute() {
-  const data: DataType[] = [
+  const data: Requested[] = [
     {
       key: "1",
       image: "John Brown",
@@ -145,13 +134,13 @@ export default function RequestedRoute() {
     },
   ];
 
-  const handleCancelButton = () => {};
+  const handleCancelButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Requested> = [
     {
       title: "Image",
       dataIndex: "image",
@@ -252,7 +241,7 @@ export default function RequestedRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Requested>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -302,7 +291,7 @@ export default function RequestedRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Requested>
         size="small"
         columns={columns}
         dataSource={data}

@@ -21,117 +21,17 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  term: string;
-  floor_value: string;
-  assets: string;
-  assets_models: string;
-  licenses: string;
-  action: string;
-}
+import { Depreciation } from "~/types/depreciation.type";
 
 export default function DepreciationRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Depreciation[] = [
     {
       key: "1",
       name: "John Brown",
       term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
-      assets: "test",
-      assets_models: "test",
-      licenses: "test",
-      action: "test",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      term: "test",
-      floor_value: "test",
+      floor_value: 2,
       assets: "test",
       assets_models: "test",
       licenses: "test",
@@ -143,9 +43,9 @@ export default function DepreciationRoutes() {
     navigate("update-depreciation");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Depreciation> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -218,7 +118,7 @@ export default function DepreciationRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Depreciation>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -280,7 +180,7 @@ export default function DepreciationRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Depreciation>
         size="small"
         columns={columns}
         dataSource={data}

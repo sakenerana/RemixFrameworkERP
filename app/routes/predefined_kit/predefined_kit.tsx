@@ -23,74 +23,14 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  action: string;
-  check_status: string;
-}
+import { PredefinedKit } from "~/types/predefined_kit.type";
 
 export default function PredefinedKitRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: PredefinedKit[] = [
     {
       key: "1",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "10",
       name: "John Brown",
       action: "test",
       check_status: "checkout",
@@ -101,13 +41,13 @@ export default function PredefinedKitRoute() {
     navigate("update-predefined-kit");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<PredefinedKit> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -198,7 +138,7 @@ export default function PredefinedKitRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<PredefinedKit>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -257,7 +197,7 @@ export default function PredefinedKitRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<PredefinedKit>
         size="small"
         columns={columns}
         dataSource={data}

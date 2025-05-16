@@ -11,24 +11,11 @@ import {
 } from "antd";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { LicensesReport } from "~/types/license_report.type";
 
-interface DataType {
-  key: React.Key;
-  name: string;
-  product_key: string;
-  expiration_date: string;
-  licensed_to_email: string;
-  licensed_to_name: string;
-  manufacturer: string;
-  min_qty: string;
-  total: string;
-  avail: string;
-  action: string;
-  check_status: string;
-}
 
 export default function LicensesReportRoutes() {
-  const data: DataType[] = [
+  const data: LicensesReport[] = [
     {
       key: "1",
       name: "John Brown",
@@ -37,141 +24,15 @@ export default function LicensesReportRoutes() {
       licensed_to_email: "test",
       licensed_to_name: "test",
       manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
+      min_qty: 123,
+      total: 123,
       avail: "test",
       action: "test",
       check_status: "checkout",
     },
   ];
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<LicensesReport> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -219,7 +80,7 @@ export default function LicensesReportRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<LicensesReport>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -264,7 +125,7 @@ export default function LicensesReportRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<LicensesReport>
         size="small"
         columns={columns}
         dataSource={data}

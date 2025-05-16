@@ -23,185 +23,25 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  serial_no: string;
-  category: string;
-  model_no: string;
-  min_qty: string;
-  remaining: string;
-  location: string;
-  total: string;
-  order_no: string;
-  purchase_date: string;
-  purchase_cost: string;
-  action: string;
-  check_status: string;
-}
+import { Component } from "~/types/component.type";
 
 export default function ComponentsRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Component[] = [
     {
       key: "1",
       name: "John Brown",
       serial_no: "test",
       category: "test",
       model_no: "test",
-      min_qty: "test",
+      min_qty: 123,
       remaining: "test",
       location: "test",
-      total: "test",
+      total: 123,
       order_no: "test",
       purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      serial_no: "test",
-      category: "test",
-      model_no: "test",
-      min_qty: "test",
-      remaining: "test",
-      location: "test",
-      total: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
+      purchase_cost: 123,
       action: "test",
       check_status: "checkout",
     },
@@ -211,13 +51,13 @@ export default function ComponentsRoute() {
     navigate("update-component");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Component> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -358,7 +198,7 @@ export default function ComponentsRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Component>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -417,7 +257,7 @@ export default function ComponentsRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Component>
         size="small"
         columns={columns}
         dataSource={data}

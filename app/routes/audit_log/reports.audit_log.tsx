@@ -11,22 +11,10 @@ import {
 } from "antd";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  product_key: string;
-  expiration_date: string;
-  licensed_to_email: string;
-  licensed_to_name: string;
-  manufacturer: string;
-  min_qty: string;
-  total: string;
-  avail: string;
-}
+import { AuditLog } from "~/types/audit_log.type";
 
 export default function AuditLogReportRoutes() {
-  const data: DataType[] = [
+  const data: AuditLog[] = [
     {
       key: "1",
       name: "John Brown",
@@ -35,121 +23,13 @@ export default function AuditLogReportRoutes() {
       licensed_to_email: "test",
       licensed_to_name: "test",
       manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
+      min_qty: 12,
+      total: 123,
       avail: "test",
     },
   ];
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<AuditLog> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -197,7 +77,7 @@ export default function AuditLogReportRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<AuditLog>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -242,7 +122,7 @@ export default function AuditLogReportRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<AuditLog>
         size="small"
         columns={columns}
         dataSource={data}

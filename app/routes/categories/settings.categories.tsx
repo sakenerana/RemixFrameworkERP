@@ -21,87 +21,18 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { Category } from "~/types/category.type";
 
-interface DataType {
-  key: React.Key;
-  name: string;
-  type: string;
-  qty: string;
-  action: string;
-}
 
 export default function CategoriesRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Category[] = [
     {
       key: "1",
       name: "John Brown",
       type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
-      action: "test",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      type: "test",
-      qty: "test",
+      qty: 18,
       action: "test",
     },
   ];
@@ -112,7 +43,7 @@ export default function CategoriesRoutes() {
 
   const handleDeleteButton = () => {};
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Category> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -170,7 +101,7 @@ export default function CategoriesRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Category>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -232,7 +163,7 @@ export default function CategoriesRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Category>
         size="small"
         columns={columns}
         dataSource={data}

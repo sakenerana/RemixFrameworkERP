@@ -11,6 +11,7 @@ import {
   Select,
 } from "antd";
 import { useState } from "react";
+import { CustomAsset } from "~/types/custom_asset.type";
 
 const CheckboxGroup = Checkbox.Group;
 const options = [
@@ -95,37 +96,6 @@ const plainOptions = [
 ];
 const defaultCheckedList = [""];
 
-type FieldType = {
-  company_name?: string;
-  location?: string;
-  default_location?: string;
-  department?: string;
-  supplier?: string;
-  model?: string;
-  manufacturer?: string;
-  category?: string;
-  status?: string;
-  order_number?: string;
-  pruchase_date_from?: string;
-  pruchase_date_to?: string;
-  created_at_from?: string;
-  created_at_to?: string;
-  checkout_from?: string;
-  checkout_to?: string;
-  last_checkin_from?: string;
-  last_checkin_to?: string;
-  expected_checkin_from?: string;
-  expected_checkin_to?: string;
-  eol_from?: string;
-  eol_to?: string;
-  last_audit_from?: string;
-  last_audit_to?: string;
-  next_audit_from?: string;
-  next_audit_to?: string;
-  archived_assets?: string;
-  deleted_assets?: string;
-};
-
 export default function CustomAssetReportRoutes() {
   const [checkedList, setCheckedList] = useState<string[]>(defaultCheckedList);
   //   const [newArrayCheckbox, setnewArrayCheckbox] = useState<number[]>([]);
@@ -202,7 +172,7 @@ export default function CustomAssetReportRoutes() {
             autoComplete="off"
             labelAlign="right"
           ></Form>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Company"
             name="company_name"
             rules={[{ required: true, message: "Please select company!" }]}
@@ -227,7 +197,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Location"
             name="location"
             rules={[{ required: true, message: "Please select location!" }]}
@@ -252,7 +222,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Default Location"
             name="default_location"
             rules={[{ required: true, message: "Please select location!" }]}
@@ -277,7 +247,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Department"
             name="department"
             rules={[{ required: true, message: "Please select department!" }]}
@@ -302,7 +272,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Supplier"
             name="supplier"
             rules={[{ required: true, message: "Please select supplier!" }]}
@@ -327,7 +297,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Model"
             name="model"
             rules={[{ required: true, message: "Please select model!" }]}
@@ -352,7 +322,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Manufacturer"
             name="manufacturer"
             rules={[{ required: true, message: "Please select manufacturer!" }]}
@@ -377,7 +347,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Category"
             name="category"
             rules={[{ required: true, message: "Please select category!" }]}
@@ -402,7 +372,7 @@ export default function CustomAssetReportRoutes() {
               ]}
             />
           </Form.Item>
-          <Form.Item<FieldType>
+          <Form.Item<CustomAsset>
             label="Status"
             name="status"
             rules={[{ required: true, message: "Please select status!" }]}

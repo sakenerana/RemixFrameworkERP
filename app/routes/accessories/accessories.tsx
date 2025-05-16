@@ -22,26 +22,12 @@ import {
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  item_image: string;
-  name: string;
-  asset_category: string;
-  model_no: string;
-  location: string;
-  min_qty: string;
-  total: string;
-  checked_out: string;
-  purchase_cost: string;
-  check_status: string;
-  action: string;
-}
+import { Accessories } from "~/types/accessories.type";
 
 export default function AccesoriessRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Accessories[] = [
     {
       key: "1",
       item_image: "John Brown",
@@ -49,136 +35,10 @@ export default function AccesoriessRoute() {
       asset_category: "test",
       model_no: "test",
       location: "test",
-      min_qty: "test",
+      min_qty: 123,
       total: "test",
       checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "2",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "3",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "4",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "5",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "6",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "7",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "8",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkout",
-      action: "test",
-    },
-    {
-      key: "9",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
-      check_status: "checkin",
-      action: "test",
-    },
-    {
-      key: "10",
-      item_image: "John Brown",
-      name: "test",
-      asset_category: "test",
-      model_no: "test",
-      location: "test",
-      min_qty: "test",
-      total: "test",
-      checked_out: "test",
-      purchase_cost: "test",
+      purchase_cost: 123,
       check_status: "checkout",
       action: "test",
     },
@@ -188,13 +48,13 @@ export default function AccesoriessRoute() {
     navigate("update-accessory");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Accessories> = [
     {
       title: "Item Image",
       dataIndex: "item_image",
@@ -325,7 +185,7 @@ export default function AccesoriessRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Accessories>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -384,7 +244,7 @@ export default function AccesoriessRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Accessories>
         size="small"
         columns={columns}
         dataSource={data}

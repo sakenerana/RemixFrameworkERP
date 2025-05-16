@@ -2,6 +2,7 @@ import {
   LogoutOutlined,
   MenuUnfoldOutlined,
   QuestionOutlined,
+  SwapOutlined,
   TeamOutlined,
   UnlockOutlined,
   UserOutlined,
@@ -45,6 +46,12 @@ export default function Setting() {
     await signOut();
     setLoading(false);
     navigate("/");
+  };
+
+  const handleLandingPage = async () => {
+    setLoading(true);
+    navigate("/landing-page");
+    setLoading(false);
   };
 
   return (
@@ -132,6 +139,22 @@ export default function Setting() {
             <Space direction="vertical" size={16}>
               <LogoutOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <p>Sign-Out</p>
+            </Space>
+          </Card>
+
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleLandingPage}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <SwapOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
+              <p>Back To Landing Page</p>
             </Space>
           </Card>
         </div>

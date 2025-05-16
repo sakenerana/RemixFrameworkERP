@@ -1,0 +1,30 @@
+export interface CustomAsset {
+    company_name?: string;
+    location?: string;
+    default_location?: string;
+    department?: string;
+    supplier?: string;
+    model?: string;
+    manufacturer?: string;
+    category?: string;
+    status?: string;
+    order_number?: string;
+    pruchase_date_from?: string;
+    pruchase_date_to?: string;
+    created_at_from?: string;
+    created_at_to?: string;
+    checkout_from?: string;
+    checkout_to?: string;
+    last_checkin_from?: string;
+    last_checkin_to?: string;
+    expected_checkin_from?: string;
+    expected_checkin_to?: string;
+    eol_from?: string;
+    eol_to?: string;
+    last_audit_from?: string;
+    last_audit_to?: string;
+    next_audit_from?: string;
+    next_audit_to?: string;
+    archived_assets?: string;
+    deleted_assets?: string;
+}

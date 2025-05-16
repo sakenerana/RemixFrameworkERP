@@ -21,20 +21,12 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  department_name: string;
-  manager: string;
-  users: string;
-  notes: string;
-  action: string;
-}
+import { Department } from "~/types/department.type";
 
 export default function DepartmentsRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Department[] = [
     {
       key: "1",
       department_name: "John Brown",
@@ -123,7 +115,7 @@ export default function DepartmentsRoutes() {
 
   const handleDeleteButton = () => {};
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Department> = [
     {
       title: "Department Name",
       dataIndex: "department_name",
@@ -186,7 +178,7 @@ export default function DepartmentsRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Department>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -248,7 +240,7 @@ export default function DepartmentsRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Department>
         size="small"
         columns={columns}
         dataSource={data}

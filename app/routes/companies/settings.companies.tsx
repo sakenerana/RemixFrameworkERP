@@ -21,19 +21,12 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  company_name: string;
-  email: string;
-  image: string;
-  action: string;
-}
+import { Company } from "~/types/company.type";
 
 export default function CompaniesRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Company[] = [
     {
       key: "1",
       company_name: "John Brown",
@@ -110,9 +103,9 @@ export default function CompaniesRoutes() {
     navigate("update-company");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Company> = [
     {
       title: "Company Name",
       dataIndex: "company_name",
@@ -170,7 +163,7 @@ export default function CompaniesRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Company>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -232,7 +225,7 @@ export default function CompaniesRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Company>
         size="small"
         columns={columns}
         dataSource={data}

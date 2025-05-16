@@ -23,26 +23,12 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  product_key: string;
-  expiration_date: string;
-  licensed_to_email: string;
-  licensed_to_name: string;
-  manufacturer: string;
-  min_qty: string;
-  total: string;
-  avail: string;
-  action: string;
-  check_status: string;
-}
+import { License } from "~/types/license.type";
 
 export default function LicensesRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: License[] = [
     {
       key: "1",
       name: "John Brown",
@@ -51,134 +37,8 @@ export default function LicensesRoute() {
       licensed_to_email: "test",
       licensed_to_name: "test",
       manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
+      min_qty: 123,
+      total: 123,
       avail: "test",
       action: "test",
       check_status: "checkout",
@@ -189,13 +49,13 @@ export default function LicensesRoute() {
     navigate("update-license");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const handleCheckinButton = () => {};
+  const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => {};
+  const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<License> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -326,7 +186,7 @@ export default function LicensesRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<License>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -385,7 +245,7 @@ export default function LicensesRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<License>
         size="small"
         columns={columns}
         dataSource={data}

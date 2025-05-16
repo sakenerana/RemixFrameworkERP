@@ -23,180 +23,20 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  category: string;
-  model_no: string;
-  item_no: string;
-  min_qty: string;
-  total: string;
-  remaining: string;
-  location: string;
-  order_no: string;
-  purchase_date: string;
-  purchase_cost: string;
-  action: string;
-  check_status: string;
-}
+import { Consumable } from "~/types/consumable.type";
 
 export default function ConsumablesRoute() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Consumable[] = [
     {
       key: "1",
       name: "John Brown",
       category: "test",
       model_no: "test",
       item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
-      remaining: "test",
-      location: "test",
-      order_no: "test",
-      purchase_date: "test",
-      purchase_cost: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      category: "test",
-      model_no: "test",
-      item_no: "test",
-      min_qty: "test",
-      total: "test",
+      min_qty: 123,
+      total: 123,
       remaining: "test",
       location: "test",
       order_no: "test",
@@ -217,7 +57,7 @@ export default function ConsumablesRoute() {
 
   const handleCheckoutButton = () => {};
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Consumable> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -368,7 +208,7 @@ export default function ConsumablesRoute() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Consumable>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -427,7 +267,7 @@ export default function ConsumablesRoute() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Consumable>
         size="small"
         columns={columns}
         dataSource={data}

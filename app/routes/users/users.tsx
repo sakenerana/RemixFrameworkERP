@@ -21,134 +21,15 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { User } from "~/types/user.type";
 
-interface DataType {
-  key: React.Key;
-  name: string;
-  title: string;
-  email: string;
-  phone_no: string;
-  username: string;
-  department: string;
-  location: string;
-  manager: string;
-  action: string;
-}
 
 export default function UsersRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: User[] = [
     {
       key: "1",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      title: "test",
-      email: "test",
-      phone_no: "test",
-      username: "test",
-      department: "test",
-      location: "test",
-      manager: "test",
-      action: "test",
-    },
-    {
-      key: "10",
       name: "John Brown",
       title: "test",
       email: "test",
@@ -165,9 +46,9 @@ export default function UsersRoutes() {
     navigate("update-user");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<User> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -250,7 +131,7 @@ export default function UsersRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<User>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -309,7 +190,7 @@ export default function UsersRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<User>
         size="small"
         columns={columns}
         dataSource={data}

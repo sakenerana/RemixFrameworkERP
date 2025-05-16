@@ -11,24 +11,10 @@ import {
 } from "antd";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  product_key: string;
-  expiration_date: string;
-  licensed_to_email: string;
-  licensed_to_name: string;
-  manufacturer: string;
-  min_qty: string;
-  total: string;
-  avail: string;
-  action: string;
-  check_status: string;
-}
+import { UnacceptedAssetReport } from "~/types/unaccepted_asset_report.type";
 
 export default function UnacceptedAssetsReportRoutes() {
-  const data: DataType[] = [
+  const data: UnacceptedAssetReport[] = [
     {
       key: "1",
       name: "John Brown",
@@ -37,141 +23,15 @@ export default function UnacceptedAssetsReportRoutes() {
       licensed_to_email: "test",
       licensed_to_name: "test",
       manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "2",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "3",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "4",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "6",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "7",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "8",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkout",
-    },
-    {
-      key: "9",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
-      avail: "test",
-      action: "test",
-      check_status: "checkin",
-    },
-    {
-      key: "10",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: "test",
-      total: "test",
+      min_qty: 123,
+      total: 12,
       avail: "test",
       action: "test",
       check_status: "checkout",
     },
   ];
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<UnacceptedAssetReport> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -219,7 +79,7 @@ export default function UnacceptedAssetsReportRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<UnacceptedAssetReport>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -264,7 +124,7 @@ export default function UnacceptedAssetsReportRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<UnacceptedAssetReport>
         size="small"
         columns={columns}
         dataSource={data}

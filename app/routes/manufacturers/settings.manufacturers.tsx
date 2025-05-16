@@ -21,20 +21,12 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  key: React.Key;
-  name: string;
-  url: string;
-  support_phone_no: string;
-  support_email: string;
-  action: string;
-}
+import { Manufacturer } from "~/types/manufacturer.type";
 
 export default function ManufacturersRoutes() {
   const navigate = useNavigate();
 
-  const data: DataType[] = [
+  const data: Manufacturer[] = [
     {
       key: "1",
       name: "John Brown",
@@ -121,9 +113,9 @@ export default function ManufacturersRoutes() {
     navigate("update-manufacturer");
   };
 
-  const handleDeleteButton = () => {};
+  const handleDeleteButton = () => { };
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<Manufacturer> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -186,7 +178,7 @@ export default function ManufacturersRoutes() {
     },
   ];
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<Manufacturer>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -248,7 +240,7 @@ export default function ManufacturersRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<DataType>
+      <Table<Manufacturer>
         size="small"
         columns={columns}
         dataSource={data}
