@@ -10,6 +10,7 @@ type AuthContextType = {
   signIn: (email: any, password: any, phone: any) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  getUser: () => Promise<{ error: any }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("account signin");
       return { error: null };
     } catch (error) {
-      console.log("account errororor", error);
+      console.log("sign in error", error);
       return { error };
     }
   };
@@ -79,7 +80,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("reset password done");
       return { error: null };
     } catch (error) {
-      console.log("account created");
+      console.log("reset password error");
+      return { error };
+    }
+  };
+
+  const getUser = async () => {
+    try {
+      const { error } = await supabase.auth.getUser();
+      if (error) throw error;
+      console.log("get user done");
+      return { error: null };
+    } catch (error) {
+      console.log("get user error");
       return { error };
     }
   };
@@ -92,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signOut,
     resetPassword,
+    getUser
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -7,6 +7,7 @@ import {
 import type { MenuProps, TabsProps } from "antd";
 import { Carousel, Menu, Tabs } from "antd";
 import { useNavigate } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -17,15 +18,13 @@ const contentStyle: React.CSSProperties = {
 
 export default function LandingPage() {
   const navigate = useNavigate();
-
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
-    if (e.key == '1') {
-        navigate("/inventory")
-    } else if (e.key == '2') {
-        navigate("/budget-tracker")
-    } else if (e.key == '3') {
-        navigate("/workflow-tracker")
+    if (e.key == "1") {
+      navigate("/inventory");
+    } else if (e.key == "2") {
+      navigate("/budget-tracker");
+    } else if (e.key == "3") {
+      navigate("/workflow-tracker");
     }
   };
 

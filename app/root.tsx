@@ -4,11 +4,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
 import "./tailwind.css";
 import { AuthProvider } from "./auth/AuthContext";
+import { createBrowserClient } from "@supabase/ssr";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

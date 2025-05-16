@@ -1,32 +1,34 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex, Image, Card, Spin } from "antd";
+import { Button, Checkbox, Form, Input, Flex, Image, Card, Spin, Alert } from "antd";
 import { useState } from "react";
 import supabase from "~/utils/supabase.client";
 import { useAuth } from "./AuthContext";
-import { useNavigate } from "@remix-run/react";
+import { redirect, useNavigate } from "@remix-run/react";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function LoginIndex() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState();
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [errorAlert, setErrorAlert] = useState(false);
+  const { getUser } = useAuth();
   const navigate = useNavigate();
 
   const onFinish = async (values: any) => {
-    // e.preventDefault();
+    // let user = await supabase.auth.getUser();
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
         phone: "",
       });
-      navigate("/landing-page");
+      if (data) {
+        navigate("/landing-page");
+      }
       if (error) throw error;
-      console.log("account signin");
       setLoading(true);
     } catch (error) {
+      navigate("/");
       setLoading(false);
+      setErrorAlert(true);
       return { error };
     }
   };
@@ -45,6 +47,16 @@ export default function LoginIndex() {
         <h1 className="flex flex-col items-center">
           <b>LOGIN</b>
         </h1>
+
+        {errorAlert && (
+          <Alert
+            className="mt-2"
+            message="Invalid email or password.."
+            type="error"
+            showIcon
+          />
+        )}
+
         <Form
           name="login"
           initialValues={{ remember: true }}
