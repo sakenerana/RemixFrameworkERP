@@ -35,7 +35,7 @@ export default function LoginIndex() {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center pt-40 bg-gradient-to-r from-indigo-950 to-indigo-900">
+    <div className="flex flex-col h-screen items-center pt-40 bg-[url(./img/cfi-bills-payment.jpg)] bg-cover bg-no-repeat">
       <Card>
         {loading && (
           <div className="flex justify-center">
