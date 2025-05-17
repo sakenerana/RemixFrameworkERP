@@ -27,7 +27,7 @@ export default defineConfig({
             route("landing-page", "routes/landing_page/landing_page.tsx", {
               index: true,
             });
-            route("inventory", "components/layout.tsx", () => {
+            route("inventory", "components/inventory_layout.tsx", () => {
               route("", "routes/dashboard/dashboard.tsx", { index: true });
               route("settings", "routes/settings/route.tsx", () => {
                 route("", "routes/settings/settings.tsx", { index: true });
@@ -353,23 +353,62 @@ export default defineConfig({
               );
             });
 
-
-
-            
-            route("budget", "components/layout.tsx", () => {
+            // BUDGET TRACKER
+            route("budget", "components/budget_layout.tsx", () => {
               route("", "routes/budget_dashboard/budget_dashboard.tsx", { index: true });
-              route("budget_accounts", "routes/budget_accounts/route.tsx", () => {
+              route("accounts", "routes/budget_accounts/route.tsx", () => {
                 route("", "routes/budget_accounts/budget_accounts.tsx", { index: true });
-                route("create-budget_accounts", "routes/budget_accounts/create.tsx", {
+                route("create-accounts", "routes/budget_accounts/create.tsx", {
                   index: true,
                 });
-                route("update-budget_accounts", "routes/budget_accounts/update.tsx", {
+                route("update-accounts", "routes/budget_accounts/update.tsx", {
                   index: true,
                 });
-                route("deleted-budget_accounts", "routes/budget_accounts/deleted.tsx", {
+                route("deleted-accounts", "routes/budget_accounts/deleted.tsx", {
                   index: true,
                 });
               });
+
+              route("transactions", "routes/budget_transactions/route.tsx", () => {
+                route("", "routes/budget_transactions/budget_transactions.tsx", { index: true });
+                route("create-transactions", "routes/budget_transactions/create.tsx", {
+                  index: true,
+                });
+                route("update-transactions", "routes/budget_transactions/update.tsx", {
+                  index: true,
+                });
+                route("deleted-transactions", "routes/budget_transactions/deleted.tsx", {
+                  index: true,
+                });
+              });
+
+              route("budgets", "routes/budgets/route.tsx", () => {
+                route("", "routes/budgets/budget.tsx", { index: true });
+                route("create-budget", "routes/budgets/create.tsx", {
+                  index: true,
+                });
+                route("update-budget", "routes/budgets/update.tsx", {
+                  index: true,
+                });
+                route("deleted-budget", "routes/budgets/deleted.tsx", {
+                  index: true,
+                });
+              });
+
+              route("budget-reports", "routes/budget_reports/budget_reports.tsx", { index: true });
+
+            });
+
+            // WORKFLOW TRACKER
+            route("workflow", "components/workflow_layout.tsx", () => {
+              route("", "routes/workflow_dashboard/workflow_dashboard.tsx", { index: true });
+              route("workflows", "routes/workflows/route.tsx", () => {
+                route("", "routes/workflows/workflows.tsx", { index: true });
+                route("assigned", "routes/workflows/assigned.tsx", {
+                  index: true,
+                });
+              });
+              route("workflow-tracker", "routes/workflow_tracker/workflow_tracker.tsx", { index: true });
             });
           });
 

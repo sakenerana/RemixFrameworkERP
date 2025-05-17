@@ -12,27 +12,11 @@ import {
 } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
-  FcAutomatic,
-  FcBearish,
-  FcBullish,
-  FcCancel,
-  FcComboChart,
-  FcConferenceCall,
-  FcDepartment,
   FcDiploma1,
-  FcFactory,
-  FcFlowChart,
   FcGlobe,
-  FcInspection,
-  FcLandscape,
   FcMultipleDevices,
-  FcMultipleSmartphones,
-  FcNews,
-  FcOk,
   FcPackage,
-  FcPaid,
   FcPlus,
-  FcPortraitMode,
   FcSalesPerformance,
   FcSearch,
   FcSettings,
@@ -40,7 +24,7 @@ import {
 
 const { Header, Sider, Content } = Layout;
 
-export default function InventoryLayoutIndex() {
+export default function BudgetLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -50,17 +34,17 @@ export default function InventoryLayoutIndex() {
     {
       key: "1",
       icon: <FcPackage />,
-      label: <Link to="/inventory/assets/list-assets/create-assets">Accounts</Link>,
+      label: <Link to="/budget/accounts/create-accounts">Accounts</Link>,
     },
     {
       key: "2",
       icon: <FcDiploma1 />,
-      label: <Link to="/inventory/licenses/create-license">Transactions</Link>,
+      label: <Link to="/budget/transactions/create-transactions">Transactions</Link>,
     },
     {
       key: "3",
       icon: <FcMultipleDevices />,
-      label: <Link to="/inventory/accessories/create-accessory">Budgets</Link>,
+      label: <Link to="/budget/budgets/create-budget">Budgets</Link>,
     },
   ];
 
@@ -68,197 +52,27 @@ export default function InventoryLayoutIndex() {
     {
       key: "1",
       icon: <FcGlobe />,
-      label: <Link to="/inventory">Dashboard</Link>,
-    },
-    {
-      key: "11",
-      icon: <FcSalesPerformance />,
-      label: <Link to="/inventory/users">Assets</Link>,
-      children: [
-        {
-          key: "11.1",
-          icon: <FcInspection />,
-          label: <Link to="/inventory/assets/requested">Requested</Link>,
-        },
-        {
-          key: "11.2",
-          icon: <FcCancel />,
-          label: <Link to="/inventory/assets/deleted">Deleted</Link>,
-        },
-        {
-          key: "11.3",
-          icon: <FcPackage />,
-          label: <Link to="/inventory/assets/list-assets">Assets</Link>,
-        },
-      ],
-    },
-    {
-      key: "10",
-      icon: <FcDiploma1 />,
-      label: <Link to="/inventory/licenses">Licenses</Link>,
-    },
-    {
-      key: "9",
-      icon: <FcMultipleDevices />,
-      label: <Link to="/inventory/accessories">Accessories</Link>,
-    },
-    {
-      key: "8",
-      icon: <FcNews />,
-      label: <Link to="/inventory/consumables">Consumables</Link>,
-    },
-    {
-      key: "7",
-      icon: <FcMultipleSmartphones />,
-      label: <Link to="/inventory/components">Tech Components</Link>,
-    },
-    {
-      key: "6",
-      icon: <FcPaid />,
-      label: (
-        <Link to="/inventory/predefined-kit">
-          Predefined Kits (Bundled)
-        </Link>
-      ),
-    },
-    {
-      key: "5",
-      icon: <FcPortraitMode />,
-      label: <Link to="/inventory/users">Users</Link>,
+      label: <Link to="/budget">Dashboard</Link>,
     },
     {
       key: "2",
-      icon: <FcAutomatic />,
-      label: "Settings",
-      children: [
-        {
-          key: "2.1",
-          icon: <FcConferenceCall />,
-          label: <Link to="/inventory/settings/suppliers">Suppliers</Link>,
-        },
-        {
-          key: "2.2",
-          icon: <FcDepartment />,
-          label: (
-            <Link to="/inventory/settings/departments">Departments</Link>
-          ),
-        },
-        {
-          key: "2.3",
-          icon: <FcFlowChart />,
-          label: (
-            <Link to="/inventory/settings/categories">Categories</Link>
-          ),
-        },
-        {
-          key: "2.4",
-          icon: <FcFactory />,
-          label: (
-            <Link to="/inventory/settings/manufacturers">
-              Manufacturers
-            </Link>
-          ),
-        },
-        {
-          key: "2.5",
-          icon: <FcLandscape />,
-          label: <Link to="/inventory/settings/locations">Locations</Link>,
-        },
-        {
-          key: "2.6",
-          icon: <FcDepartment />,
-          label: <Link to="/inventory/settings/companies">Companies</Link>,
-        },
-        {
-          key: "2.7",
-          icon: <FcBearish />,
-          label: (
-            <Link to="/inventory/settings/depreciation">Depreciation</Link>
-          ),
-        },
-      ],
+      icon: <FcSalesPerformance />,
+      label: <Link to="/budget/accounts">Accounts</Link>,
     },
     {
       key: "3",
-      icon: <FcBullish />,
-      label: "Reports",
-      children: [
-        {
-          key: "3.1",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/activity-report">
-              Activity Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.2",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/custom-asset-report">
-              Custom Asset Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.3",
-          icon: <FcComboChart />,
-          label: <Link to="/inventory/reports/audit-log">Audit Log</Link>,
-        },
-        {
-          key: "3.4",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/depreciation-report">
-              Depreciation Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.5",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/licenses-report">
-              License Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.6",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/asset-maintenance-report">
-              Asset Maitenance Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.7",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/unaccepted-assets">
-              Unaccepted Assets
-            </Link>
-          ),
-        },
-        {
-          key: "3.8",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/accessory-report">
-              Accessory Report
-            </Link>
-          ),
-        },
-      ],
+      icon: <FcDiploma1 />,
+      label: <Link to="/budget/transactions">Transactions</Link>,
     },
     {
       key: "4",
-      icon: <FcOk />,
-      label: (
-        <Link to="/inventory/requestable-items">Requestable Items</Link>
-      ),
+      icon: <FcMultipleDevices />,
+      label: <Link to="/budget/budgets">Budgets</Link>,
+    },
+    {
+      key: "5",
+      icon: <FcMultipleDevices />,
+      label: <Link to="/budget/budget-reports">Reports</Link>,
     },
   ]
 
@@ -300,12 +114,12 @@ export default function InventoryLayoutIndex() {
                       
                     </Button>
                   </Link>
-                  <Space.Compact style={{ width: "100%" }}>
+                  {/* <Space.Compact style={{ width: "100%" }}>
                     <Input placeholder="Search by Asset Tag" />
                     <Button icon={<FcSearch />} type="default">
                       Search
                     </Button>
-                  </Space.Compact>
+                  </Space.Compact> */}
                   <Dropdown menu={{ items }} placement="topLeft">
                     <Button icon={<FcPlus />}>Create New</Button>
                   </Dropdown>

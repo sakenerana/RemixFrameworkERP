@@ -3,18 +3,13 @@ import {
   ApartmentOutlined,
   AuditOutlined,
   DropboxOutlined,
-  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import type { MenuProps, TabsProps } from "antd";
-import { Card, Carousel, Menu, Space, Tabs } from "antd";
+import { Card, Carousel, Space } from "antd";
 import {
-  ClientLoaderFunctionArgs,
-  useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { LoaderFunctionArgs } from "@remix-run/node";
 import { supabase } from "~/lib/supabase";
-import { useSupabaseAuth } from "~/hooks/useSupabaseAuth";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -48,15 +43,17 @@ export default function LandingPage() {
   }, []);
 
   const handleClickInventory = async () => {
-    navigate("/inventory");
+    await localStorage.setItem('main', '1');
+    await navigate("/inventory");
   }
 
   const handleClickBudget = async () => {
-    navigate("/budget-tracker");
+    await localStorage.setItem('main', '2');
+    navigate("/budget");
   }
 
   const handleClickWorkflow = async () => {
-    navigate("/workflow-tracker");
+    navigate("/workflow");
   }
 
   // const onClick: MenuProps["onClick"] = (e) => {
