@@ -8,7 +8,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
-import { Avatar, Card, Col, List, Row, Space, Spin } from "antd";
+import { Card, Col, List, Row, Space, Spin } from "antd";
 import { useState } from "react";
 import { useAuth } from "~/auth/AuthContext";
 

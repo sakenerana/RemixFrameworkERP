@@ -3,9 +3,10 @@ import {
   ApartmentOutlined,
   AuditOutlined,
   DropboxOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import type { MenuProps, TabsProps } from "antd";
-import { Carousel, Menu, Tabs } from "antd";
+import { Card, Carousel, Menu, Space, Tabs } from "antd";
 import {
   ClientLoaderFunctionArgs,
   useLoaderData,
@@ -46,15 +47,27 @@ export default function LandingPage() {
     // }
   }, []);
 
-  const onClick: MenuProps["onClick"] = (e) => {
-    if (e.key == "1") {
-      navigate("/inventory");
-    } else if (e.key == "2") {
-      navigate("/budget-tracker");
-    } else if (e.key == "3") {
-      navigate("/workflow-tracker");
-    }
-  };
+  const handleClickInventory = async () => {
+    navigate("/inventory");
+  }
+
+  const handleClickBudget = async () => {
+    navigate("/budget-tracker");
+  }
+
+  const handleClickWorkflow = async () => {
+    navigate("/workflow-tracker");
+  }
+
+  // const onClick: MenuProps["onClick"] = (e) => {
+  //   if (e.key == "1") {
+  //     navigate("/inventory");
+  //   } else if (e.key == "2") {
+  //     navigate("/budget-tracker");
+  //   } else if (e.key == "3") {
+  //     navigate("/workflow-tracker");
+  //   }
+  // };
 
   const items: TabsProps["items"] = [
     {
@@ -90,14 +103,67 @@ export default function LandingPage() {
           <img className="h-16" src="./img/cficoop.svg" alt="cficoop" />
         </div>
 
-        <div className="pt-6">
+        <div className="flex flex-wrap gap-6 justify-center mt-2 mb-2">
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleClickInventory}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <DropboxOutlined
+                style={{ fontSize: "32px", color: "#573019" }}
+              />
+              <p className="text-2xl">Inventory</p>
+            </Space>
+          </Card>
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleClickBudget}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <AuditOutlined
+                style={{ fontSize: "32px", color: "#1890ff" }}
+              />
+              <p className="text-2xl">Budget Tracker</p>
+            </Space>
+          </Card>
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleClickWorkflow}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <ApartmentOutlined
+                style={{ fontSize: "32px", color: "#00ed63" }}
+              />
+              <p className="text-2xl">Workflow Tracker</p>
+            </Space>
+          </Card>
+        </div>
+        {/* <div className="">
           <Menu
             style={contentStyle}
             onClick={onClick}
             mode="horizontal"
             items={items}
           />
-        </div>
+        </div> */}
         <div className="grid grid-cols-1">
           <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={3000}>
             <div>
@@ -129,11 +195,11 @@ export default function LandingPage() {
             </div>
           </Carousel>
         </div>
-        <footer className="bg-gray-800 text-white p-6">
+        {/* <footer className="bg-gray-800 text-white p-6">
           <div className="container mx-auto">
             <p className="text-center">© 2025 CFI. All rights reserved.</p>
           </div>
-        </footer>
+        </footer> */}
       </div>
     </div>
   );
