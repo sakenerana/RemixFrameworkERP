@@ -352,6 +352,25 @@ export default defineConfig({
                 { index: true }
               );
             });
+
+
+
+            
+            route("budget", "components/layout.tsx", () => {
+              route("", "routes/budget_dashboard/budget_dashboard.tsx", { index: true });
+              route("budget_accounts", "routes/budget_accounts/route.tsx", () => {
+                route("", "routes/budget_accounts/budget_accounts.tsx", { index: true });
+                route("create-budget_accounts", "routes/budget_accounts/create.tsx", {
+                  index: true,
+                });
+                route("update-budget_accounts", "routes/budget_accounts/update.tsx", {
+                  index: true,
+                });
+                route("deleted-budget_accounts", "routes/budget_accounts/deleted.tsx", {
+                  index: true,
+                });
+              });
+            });
           });
 
           route("*", "routes/404Page/page_not_exist.tsx", { index: true });
