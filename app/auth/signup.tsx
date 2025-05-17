@@ -42,7 +42,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center pt-40 bg-[url(./img/cfionline.jpg)] bg-cover bg-no-repeat">
+    <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfionline.jpg)] bg-cover bg-no-repeat">
       <Card>
         <div className="flex flex-col items-center mb-6">
           <Image width={290} src="./img/cficoop.svg" />
