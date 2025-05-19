@@ -59,8 +59,9 @@ export default function Workflows() {
     fetchData();
   }, []); // Empty dependency array means this runs once on mount
 
-  const handleShowWorkflows = () => {
-    navigate("assigned");
+  const handleShowWorkflows = (value: DataType) => {
+    console.log("value", value)
+    navigate("assigned/id?=" + value.id);
   };
 
   const columns: TableColumnsType<DataType> = [
@@ -79,14 +80,14 @@ export default function Workflows() {
       dataIndex: "actions",
       width: 160,
       fixed: "right",
-      render: () => (
+      render: (_, value) => (
         <div className="flex">
           <Popconfirm
             title="Do you want to view?"
             description="Are you sure to view this workflows?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleShowWorkflows()}
+            onConfirm={() => handleShowWorkflows(value)}
           >
             <Tag
               className="cursor-pointer"

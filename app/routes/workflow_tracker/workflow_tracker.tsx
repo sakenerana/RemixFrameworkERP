@@ -108,7 +108,7 @@ export default function WorkflowTracker() {
             </Tag>
           </Popconfirm>
           <Modal
-            className="shadow-md rounded-lg"
+            style={{ top: 20 }}
             title="Workflow Tracker"
             closable={{ "aria-label": "Custom Close Button" }}
             open={isModalOpen}

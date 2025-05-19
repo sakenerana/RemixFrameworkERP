@@ -1,4 +1,5 @@
 import { Alert, Card, Col, Row, Statistic, TableColumnsType, TableProps, Table, Flex, Progress, Tag } from "antd";
+import { useState } from "react";
 import { FcDiploma1, FcMultipleDevices, FcMultipleSmartphones, FcNews, FcPackage, FcPortraitMode } from "react-icons/fc";
 
 interface DataType {
@@ -25,6 +26,10 @@ interface DataTypeAssetCategories {
 }
 
 export default function BudgetRoutes() {
+    // const [data, setData] = useState<DataType[]>([]);
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(null);
+
     const columns: TableColumnsType<DataType> = [
         {
             title: 'Date',

@@ -404,7 +404,7 @@ export default defineConfig({
               route("", "routes/workflow_dashboard/workflow_dashboard.tsx", { index: true });
               route("workflows", "routes/workflows/route.tsx", () => {
                 route("", "routes/workflows/workflows.tsx", { index: true });
-                route("assigned", "routes/workflows/assigned.tsx", {
+                route("assigned/:id", "routes/workflows/assigned.tsx", {
                   index: true,
                 });
               });
