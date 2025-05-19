@@ -9,4 +9,12 @@ body {
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+
+  .ant-table-container {
+    border: 1px solid #e1e3e1 !important;
+  }
+
+  .ant-modal-content {
+    box-shadow: none !important;
+  }
 }

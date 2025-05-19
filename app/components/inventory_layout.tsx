@@ -279,8 +279,8 @@ export default function InventoryLayoutIndex() {
 
   return (
     <div className="flex">
-      <Layout className="flex flex-col h-full">
-        <Sider trigger={null} collapsible collapsed={collapsed} width={250}>
+      <Layout className="flex flex-col h-screen">
+        <Sider className="h-full" trigger={null} collapsible collapsed={collapsed} width={250}>
           <div className="demo-logo-vertical" />
           <Menu
             theme="dark"
@@ -334,7 +334,7 @@ export default function InventoryLayoutIndex() {
             </div>
           </Header>
           <Content
-            className="flex flex-col h-screen"
+            className="flex flex-col h-full overflow-auto"
             style={{
               margin: "24px 16px",
               padding: 24,

@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { MenuFoldOutlined, MenuUnfoldOutlined, SwapOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, AuditOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SwapOutlined } from "@ant-design/icons";
 import {
   Button,
-  Dropdown,
   Input,
   Layout,
   Menu,
@@ -12,14 +11,11 @@ import {
 } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
-  FcDiploma1,
   FcGlobe,
-  FcMultipleDevices,
-  FcPackage,
-  FcPlus,
-  FcSalesPerformance,
   FcSearch,
   FcSettings,
+  FcTemplate,
+  FcTreeStructure,
 } from "react-icons/fc";
 
 const { Header, Sider, Content } = Layout;
@@ -39,15 +35,20 @@ export default function WorkflowLayoutIndex() {
     },
     {
       key: "2",
-      icon: <FcSalesPerformance />,
+      icon: <FcTemplate />,
       label: <Link to="/workflow/workflows">Workflow</Link>,
+    },
+    {
+      key: "3",
+      icon: <FcTreeStructure />,
+      label: <Link to="/workflow/workflow-tracker">Tracker</Link>,
     },
   ]
 
   return (
     <div className="flex">
-      <Layout className="flex flex-col h-full">
-        <Sider trigger={null} collapsible collapsed={collapsed} width={250}>
+      <Layout className="flex flex-col h-screen">
+        <Sider className="h-full" trigger={null} collapsible collapsed={collapsed} width={250}>
           <div className="demo-logo-vertical" />
           <Menu
             theme="dark"
@@ -82,12 +83,6 @@ export default function WorkflowLayoutIndex() {
                       
                     </Button>
                   </Link>
-                  <Space.Compact style={{ width: "100%" }}>
-                    <Input placeholder="Search by Asset Tag" />
-                    <Button icon={<FcSearch />} type="default">
-                      Search
-                    </Button>
-                  </Space.Compact>
                   <Link to="/inventory/settings">
                     <Button icon={<FcSettings />} type="text">
                       Settings
@@ -98,7 +93,7 @@ export default function WorkflowLayoutIndex() {
             </div>
           </Header>
           <Content
-            className="flex flex-col h-screen"
+            className="flex flex-col h-full overflow-auto"
             style={{
               margin: "24px 16px",
               padding: 24,
