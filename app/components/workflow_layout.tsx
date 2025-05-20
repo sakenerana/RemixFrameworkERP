@@ -116,7 +116,6 @@ export default function WorkflowLayoutIndex() {
                     onOk={handleOk}
                     onCancel={handleCancel}
                     footer=""
-                    mask={false}
                   >
                     <Setting></Setting>
                   </Modal>

@@ -39,13 +39,10 @@ export default function CreateAccounts() {
     setLoading(true);
     console.log("Form values:", values);
     // Simulate API call
-    setTimeout(
-      () => {
-        message.success("Form submitted successfully!");
-        setLoading(false);
-      },
-      1500
-    );
+    setTimeout(() => {
+      message.success("Form submitted successfully!");
+      setLoading(false);
+    }, 1500);
   };
 
   const onReset = () => {
@@ -60,37 +57,39 @@ export default function CreateAccounts() {
 
   return (
     <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/budget",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Budget",
-            },
-            {
-              title: "Create Account",
-            },
-          ]}
-        />
-        <Space direction="horizontal">
-          <Space wrap>
-            <Button onClick={onReset} icon={<FcRefresh />} type="default">
-              Reset Form
-            </Button>
-          </Space>
-          <Space wrap>
-            <Link to={"/budget/accounts"}>
-              <Button icon={<AiOutlineArrowLeft />} type="primary">
-                Back
+      <div className="py-8 px-4">
+        <div className="flex pb-5 justify-between max-w-4xl mx-auto">
+          <Breadcrumb
+            items={[
+              {
+                href: "/budget",
+                title: <HomeOutlined />,
+              },
+              {
+                title: "Budget",
+              },
+              {
+                title: "Create Account",
+              },
+            ]}
+          />
+          <Space direction="horizontal">
+            <Space wrap>
+              <Button onClick={onReset} icon={<FcRefresh />} type="default">
+                Reset Form
               </Button>
-            </Link>
+            </Space>
+            <Space wrap>
+              <Link to={"/budget/accounts"}>
+                <Button icon={<AiOutlineArrowLeft />} type="primary">
+                  Back
+                </Button>
+              </Link>
+            </Space>
           </Space>
-        </Space>
+        </div>
       </div>
-      <div className="bg-gray-200 py-8 px-4">
+      <div className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <Card
             title={
@@ -99,8 +98,8 @@ export default function CreateAccounts() {
                 account.
               </span>
             }
-            bordered={false}
-            className="shadow-lg"
+            bordered={true}
+            className="shadow-lg border-gray-400"
           >
             <Form
               form={form}
