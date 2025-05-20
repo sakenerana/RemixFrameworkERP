@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { ApartmentOutlined, AuditOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SwapOutlined } from "@ant-design/icons";
 import {
-  Button,
-  Input,
-  Layout,
-  Menu,
-  Space,
-  theme,
-  Image,
-} from "antd";
+  ApartmentOutlined,
+  AuditOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SwapOutlined,
+} from "@ant-design/icons";
+import { Button, Input, Layout, Menu, Space, theme, Image, Modal } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
   FcGlobe,
@@ -17,15 +15,29 @@ import {
   FcTemplate,
   FcTreeStructure,
 } from "react-icons/fc";
+import Setting from "~/routes/settings/settings";
 
 const { Header, Sider, Content } = Layout;
 
 export default function WorkflowLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const handleTrack = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const menuItems = [
     {
@@ -43,12 +55,18 @@ export default function WorkflowLayoutIndex() {
       icon: <FcTreeStructure />,
       label: <Link to="/workflow/workflow-tracker">Tracker</Link>,
     },
-  ]
+  ];
 
   return (
     <div className="flex">
       <Layout className="flex flex-col h-screen">
-        <Sider className="h-full" trigger={null} collapsible collapsed={collapsed} width={250}>
+        <Sider
+          className="h-full"
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          width={250}
+        >
           <div className="demo-logo-vertical" />
           <Menu
             theme="dark"
@@ -79,15 +97,29 @@ export default function WorkflowLayoutIndex() {
               <div className="flex justify-end">
                 <Space>
                   <Link to="/landing-page">
-                    <Button icon={<SwapOutlined />} type="text">
-                      
-                    </Button>
+                    <Button icon={<SwapOutlined />} type="text"></Button>
                   </Link>
-                  <Link to="/inventory/settings">
-                    <Button icon={<FcSettings />} type="text">
-                      Settings
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => handleTrack()}
+                    icon={<FcSettings />}
+                    type="text"
+                  >
+                    Settings
+                  </Button>
+                  <Modal
+                    className=""
+                    style={{ top: 20 }}
+                    width={1000}
+                    title="Workflow Tracker"
+                    closable={{ "aria-label": "Custom Close Button" }}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer=""
+                    mask={false}
+                  >
+                    <Setting></Setting>
+                  </Modal>
                 </Space>
               </div>
             </div>

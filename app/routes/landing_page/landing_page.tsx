@@ -10,6 +10,7 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { supabase } from "~/lib/supabase";
+import { AiOutlineReconciliation } from "react-icons/ai";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -150,6 +151,23 @@ export default function LandingPage() {
                 style={{ fontSize: "32px", color: "#00ed63" }}
               />
               <p className="text-2xl">Workflow Tracker</p>
+            </Space>
+          </Card>
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleClickWorkflow}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <AiOutlineReconciliation className="text-center ml-4"
+                style={{ fontSize: "32px", color: "" }}
+              />
+              <p className="text-2xl">Admin</p>
             </Space>
           </Card>
         </div>

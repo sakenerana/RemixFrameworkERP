@@ -11,8 +11,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@ant-design/charts": "^2.2.7",
     "@ant-design/icons": "^6.0.0",
+    "@antv/g2plot": "^2.4.33",
     "@react-icons/all-files": "^4.1.0",
     "@remix-run/node": "^2.16.5",
     "@remix-run/react": "^2.16.5",

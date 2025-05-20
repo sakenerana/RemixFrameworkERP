@@ -75,13 +75,6 @@ export default function WorkflowDashboard() {
 
       {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
       <Row gutter={16} className="pt-5">
-        {/* <Col span={14}>
-                    <div className="shadow-md">
-                        <Card variant="borderless">
-                            <Table<DataType> bordered size={"small"} columns={columns} dataSource={data} onChange={onChange} />
-                        </Card>
-                    </div>
-                </Col> */}
         <Col span={24}>
           <div className="shadow-md">
             {loading && <Spin></Spin>}

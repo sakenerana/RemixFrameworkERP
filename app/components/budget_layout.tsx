@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { MenuFoldOutlined, MenuUnfoldOutlined, SwapOutlined } from "@ant-design/icons";
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SwapOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Dropdown,
@@ -9,41 +13,62 @@ import {
   Space,
   theme,
   Image,
+  Modal,
 } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
+  FcComboChart,
   FcDiploma1,
   FcGlobe,
   FcMultipleDevices,
   FcPackage,
   FcPlus,
+  FcRules,
   FcSalesPerformance,
   FcSearch,
   FcSettings,
 } from "react-icons/fc";
+import Setting from "~/routes/settings/settings";
+import { AiOutlineBook } from "react-icons/ai";
 
 const { Header, Sider, Content } = Layout;
 
 export default function BudgetLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const handleTrack = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const items = [
     {
       key: "1",
-      icon: <FcPackage />,
+      icon: <FcRules />,
       label: <Link to="/budget/accounts/create-accounts">Accounts</Link>,
     },
     {
       key: "2",
       icon: <FcDiploma1 />,
-      label: <Link to="/budget/transactions/create-transactions">Transactions</Link>,
+      label: (
+        <Link to="/budget/transactions/create-transactions">Transactions</Link>
+      ),
     },
     {
       key: "3",
-      icon: <FcMultipleDevices />,
+      icon: <FcSalesPerformance />,
       label: <Link to="/budget/budgets/create-budget">Budgets</Link>,
     },
   ];
@@ -56,7 +81,7 @@ export default function BudgetLayoutIndex() {
     },
     {
       key: "2",
-      icon: <FcSalesPerformance />,
+      icon: <FcRules />,
       label: <Link to="/budget/accounts">Accounts</Link>,
     },
     {
@@ -66,20 +91,26 @@ export default function BudgetLayoutIndex() {
     },
     {
       key: "4",
-      icon: <FcMultipleDevices />,
+      icon: <FcSalesPerformance />,
       label: <Link to="/budget/budgets">Budgets</Link>,
     },
     {
       key: "5",
-      icon: <FcMultipleDevices />,
+      icon: <FcComboChart />,
       label: <Link to="/budget/budget-reports">Reports</Link>,
     },
-  ]
+  ];
 
   return (
     <div className="flex">
-      <Layout className="flex flex-col h-full">
-        <Sider trigger={null} collapsible collapsed={collapsed} width={250}>
+      <Layout className="flex flex-col h-screen">
+        <Sider
+          className="h-full"
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          width={250}
+        >
           <div className="demo-logo-vertical" />
           <Menu
             theme="dark"
@@ -110,30 +141,37 @@ export default function BudgetLayoutIndex() {
               <div className="flex justify-end">
                 <Space>
                   <Link to="/landing-page">
-                    <Button icon={<SwapOutlined />} type="text">
-                      
-                    </Button>
+                    <Button icon={<SwapOutlined />} type="text"></Button>
                   </Link>
-                  {/* <Space.Compact style={{ width: "100%" }}>
-                    <Input placeholder="Search by Asset Tag" />
-                    <Button icon={<FcSearch />} type="default">
-                      Search
-                    </Button>
-                  </Space.Compact> */}
                   <Dropdown menu={{ items }} placement="topLeft">
                     <Button icon={<FcPlus />}>Create New</Button>
                   </Dropdown>
-                  <Link to="/inventory/settings">
-                    <Button icon={<FcSettings />} type="text">
-                      Settings
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => handleTrack()}
+                    icon={<FcSettings />}
+                    type="text"
+                  >
+                    Settings
+                  </Button>
+                  <Modal
+                    className=""
+                    style={{ top: 20 }}
+                    width={1000}
+                    title="Workflow Tracker"
+                    closable={{ "aria-label": "Custom Close Button" }}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer=""
+                  >
+                    <Setting></Setting>
+                  </Modal>
                 </Space>
               </div>
             </div>
           </Header>
           <Content
-            className="flex flex-col h-screen"
+            className="flex flex-col h-full overflow-auto"
             style={{
               margin: "24px 16px",
               padding: 24,

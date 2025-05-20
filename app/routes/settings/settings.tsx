@@ -105,40 +105,8 @@ export default function Setting() {
             }}
           >
             <Space direction="vertical" size={16}>
-              <TeamOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
-              <p>Groups</p>
-            </Space>
-          </Card>
-
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClick}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
               <UnlockOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <p>Change Password</p>
-            </Space>
-          </Card>
-
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleSignout}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <LogoutOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
-              <p>Sign-Out</p>
             </Space>
           </Card>
 
@@ -155,6 +123,22 @@ export default function Setting() {
             <Space direction="vertical" size={16}>
               <SwapOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <p>Back To Landing Page</p>
+            </Space>
+          </Card>
+
+          <Card
+            className="border-gray-300"
+            hoverable // Adds a hover effect
+            onClick={handleSignout}
+            style={{
+              width: 200,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Space direction="vertical" size={16}>
+              <LogoutOutlined style={{ fontSize: "32px", color: "#f70000" }} />
+              <p>Sign-Out</p>
             </Space>
           </Card>
         </div>
