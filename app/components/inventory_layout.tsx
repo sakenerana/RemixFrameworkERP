@@ -72,11 +72,11 @@ export default function InventoryLayoutIndex() {
       icon: <FcMultipleSmartphones />,
       label: <Link to="/inventory/components/create-component">Tech Components</Link>,
     },
-    {
-      key: "6",
-      icon: <FcPortraitMode />,
-      label: <Link to="/inventory/users/create-user">Users</Link>,
-    },
+    // {
+    //   key: "6",
+    //   icon: <FcPortraitMode />,
+    //   label: <Link to="/inventory/users/create-user">Users</Link>,
+    // },
   ];
 
   const menuItems = [
@@ -136,11 +136,11 @@ export default function InventoryLayoutIndex() {
         </Link>
       ),
     },
-    {
-      key: "5",
-      icon: <FcPortraitMode />,
-      label: <Link to="/inventory/users">Users</Link>,
-    },
+    // {
+    //   key: "5",
+    //   icon: <FcPortraitMode />,
+    //   label: <Link to="/inventory/users">Users</Link>,
+    // },
     {
       key: "2",
       icon: <FcAutomatic />,
@@ -151,13 +151,13 @@ export default function InventoryLayoutIndex() {
           icon: <FcConferenceCall />,
           label: <Link to="/inventory/settings/suppliers">Suppliers</Link>,
         },
-        {
-          key: "2.2",
-          icon: <FcDepartment />,
-          label: (
-            <Link to="/inventory/settings/departments">Departments</Link>
-          ),
-        },
+        // {
+        //   key: "2.2",
+        //   icon: <FcDepartment />,
+        //   label: (
+        //     <Link to="/inventory/settings/departments">Departments</Link>
+        //   ),
+        // },
         {
           key: "2.3",
           icon: <FcFlowChart />,

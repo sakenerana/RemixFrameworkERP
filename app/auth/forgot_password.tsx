@@ -1,25 +1,31 @@
-import { MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Alert, Image, Card } from "antd";
+import { LoadingOutlined, MailOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Alert, Image, Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import supabase from "~/utils/supabase.client";
 import { useState } from "react";
 import { useAuth } from "./AuthContext";
 
 export default function ForgotPasswordIndex() {
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm<any>();
   const { resetPassword } = useAuth();
 
   const onFinish = async (values: any) => {
+    setLoading(true);
     try {
       const { error } = await resetPassword(values.email);
-      if (error) throw error;
+      message.success("Successful. Please check your email.");
+      setLoading(false);
+      if (!error) throw error;
     } catch (error) {
+      setLoading(false);
       return { error };
     }
   };
 
   return (
     <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfionline.jpg)] bg-cover bg-no-repeat">
-      <Card>
+      <Card className="shadow-xl">
         <div className="flex flex-col items-center mb-5">
           <Image width={290} src="./img/cficoop.svg" />
         </div>
@@ -67,7 +73,8 @@ export default function ForgotPasswordIndex() {
           </p>
           <Form.Item>
             <Button block type="primary" htmlType="submit">
-              Email Password Reset
+              {loading && <LoadingOutlined className="animate-spin" />}
+              {!loading && <p>Email Password Reset</p>}
             </Button>
             <p className="flex flex-col items-center pt-5 pb-5">or</p>
             <Link to="/">

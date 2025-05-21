@@ -31,7 +31,6 @@ export default function UsersRoutes() {
     {
       key: "1",
       name: "John Brown",
-      title: "test",
       email: "test",
       phone_no: "test",
       username: "test",
@@ -55,11 +54,6 @@ export default function UsersRoutes() {
       width: 120,
     },
     {
-      title: "Title",
-      dataIndex: "title",
-      width: 120,
-    },
-    {
       title: "Email",
       dataIndex: "email",
       width: 120,
@@ -70,23 +64,8 @@ export default function UsersRoutes() {
       width: 120,
     },
     {
-      title: "Username",
-      dataIndex: "username",
-      width: 120,
-    },
-    {
       title: "Department",
       dataIndex: "department",
-      width: 120,
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      width: 120,
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
       width: 120,
     },
     {
@@ -148,6 +127,9 @@ export default function UsersRoutes() {
             {
               href: "/inventory",
               title: <HomeOutlined />,
+            },
+            {
+              title: "Admin",
             },
             {
               title: "Users",

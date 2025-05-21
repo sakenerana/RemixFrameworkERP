@@ -52,42 +52,6 @@ export default defineConfig({
                   { index: true }
                 );
               });
-              route("users", "routes/users/route.tsx", () => {
-                route("", "routes/users/users.tsx", { index: true });
-                route("create-user", "routes/users/users.create.tsx", {
-                  index: true,
-                });
-                route("update-user", "routes/users/users.update.tsx", {
-                  index: true,
-                });
-                route("deleted-user", "routes/users/users.deleted.tsx", {
-                  index: true,
-                });
-              });
-              route(
-                "settings/departments",
-                "routes/departments/route.tsx",
-                () => {
-                  route("", "routes/departments/settings.departments.tsx", {
-                    index: true,
-                  });
-                  route(
-                    "create-department",
-                    "routes/departments/settings.create.tsx",
-                    { index: true }
-                  );
-                  route(
-                    "update-department",
-                    "routes/departments/settings.update.tsx",
-                    { index: true }
-                  );
-                  route(
-                    "deleted-department",
-                    "routes/departments/settings.deleted.tsx",
-                    { index: true }
-                  );
-                }
-              );
               route(
                 "settings/categories",
                 "routes/categories/route.tsx",
@@ -355,32 +319,60 @@ export default defineConfig({
 
             // BUDGET TRACKER
             route("budget", "components/budget_layout.tsx", () => {
-              route("", "routes/budget_dashboard/budget_dashboard.tsx", { index: true });
+              route("", "routes/budget_dashboard/budget_dashboard.tsx", {
+                index: true,
+              });
               route("accounts", "routes/budget_accounts/route.tsx", () => {
-                route("", "routes/budget_accounts/budget_accounts.tsx", { index: true });
+                route("", "routes/budget_accounts/budget_accounts.tsx", {
+                  index: true,
+                });
                 route("create-accounts", "routes/budget_accounts/create.tsx", {
                   index: true,
                 });
                 route("update-accounts", "routes/budget_accounts/update.tsx", {
                   index: true,
                 });
-                route("deleted-accounts", "routes/budget_accounts/deleted.tsx", {
-                  index: true,
-                });
+                route(
+                  "deleted-accounts",
+                  "routes/budget_accounts/deleted.tsx",
+                  {
+                    index: true,
+                  }
+                );
               });
 
-              route("transactions", "routes/budget_transactions/route.tsx", () => {
-                route("", "routes/budget_transactions/budget_transactions.tsx", { index: true });
-                route("create-transactions", "routes/budget_transactions/create.tsx", {
-                  index: true,
-                });
-                route("update-transactions", "routes/budget_transactions/update.tsx", {
-                  index: true,
-                });
-                route("deleted-transactions", "routes/budget_transactions/deleted.tsx", {
-                  index: true,
-                });
-              });
+              route(
+                "transactions",
+                "routes/budget_transactions/route.tsx",
+                () => {
+                  route(
+                    "",
+                    "routes/budget_transactions/budget_transactions.tsx",
+                    { index: true }
+                  );
+                  route(
+                    "create-transactions",
+                    "routes/budget_transactions/create.tsx",
+                    {
+                      index: true,
+                    }
+                  );
+                  route(
+                    "update-transactions",
+                    "routes/budget_transactions/update.tsx",
+                    {
+                      index: true,
+                    }
+                  );
+                  route(
+                    "deleted-transactions",
+                    "routes/budget_transactions/deleted.tsx",
+                    {
+                      index: true,
+                    }
+                  );
+                }
+              );
 
               route("budgets", "routes/budgets/route.tsx", () => {
                 route("", "routes/budgets/budget.tsx", { index: true });
@@ -395,20 +387,62 @@ export default defineConfig({
                 });
               });
 
-              route("budget-reports", "routes/budget_reports/budget_reports.tsx", { index: true });
-
+              route(
+                "budget-reports",
+                "routes/budget_reports/budget_reports.tsx",
+                { index: true }
+              );
             });
 
             // WORKFLOW TRACKER
             route("workflow", "components/workflow_layout.tsx", () => {
-              route("", "routes/workflow_dashboard/workflow_dashboard.tsx", { index: true });
+              route("", "routes/workflow_dashboard/workflow_dashboard.tsx", {
+                index: true,
+              });
               route("workflows", "routes/workflows/route.tsx", () => {
                 route("", "routes/workflows/workflows.tsx", { index: true });
                 route("assigned/:id", "routes/workflows/assigned.tsx", {
                   index: true,
                 });
               });
-              route("workflow-tracker", "routes/workflow_tracker/workflow_tracker.tsx", { index: true });
+              route(
+                "workflow-tracker",
+                "routes/workflow_tracker/workflow_tracker.tsx",
+                { index: true }
+              );
+            });
+
+            // ADMIN PANEL
+            route("admin", "components/admin_layout.tsx", () => {
+              route("", "routes/admin_dashboard/admin_dashboard.tsx", {
+                index: true,
+              });
+              route("users", "routes/users/route.tsx", () => {
+                route("", "routes/users/users.tsx", { index: true });
+                route("create-user", "routes/users/users.create.tsx", {
+                  index: true,
+                });
+                route("update-user", "routes/users/users.update.tsx", {
+                  index: true,
+                });
+                route("deleted-user", "routes/users/users.deleted.tsx", {
+                  index: true,
+                });
+              });
+              route("departments", "routes/departments/route.tsx", () => {
+                route("", "routes/departments/departments.tsx", {
+                  index: true,
+                });
+                route("create-department", "routes/departments/create.tsx", {
+                  index: true,
+                });
+                route("update-department", "routes/departments/update.tsx", {
+                  index: true,
+                });
+                route("deleted-department", "routes/departments/deleted.tsx", {
+                  index: true,
+                });
+              });
             });
           });
 

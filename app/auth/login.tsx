@@ -1,10 +1,17 @@
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex, Image, Card, Spin, Alert } from "antd";
+import { LoadingOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Form,
+  Input,
+  Flex,
+  Image,
+  Card,
+  Alert,
+} from "antd";
 import { useState } from "react";
 import supabase from "~/utils/supabase.client";
 import { useAuth } from "./AuthContext";
-import { redirect, useNavigate } from "@remix-run/react";
-import { createBrowserClient } from "@supabase/ssr";
+import { useNavigate } from "@remix-run/react";
 
 export default function LoginIndex() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +29,7 @@ export default function LoginIndex() {
       });
       if (data) {
         navigate("/landing-page");
-        console.log("fp", data)
+        console.log("fp", data);
       }
       if (error) throw error;
       setLoading(true);
@@ -36,12 +43,12 @@ export default function LoginIndex() {
 
   return (
     <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-no-repeat">
-      <Card>
-        {loading && (
+      <Card className="shadow-2xl">
+        {/* {loading && (
           <div className="flex justify-center">
             <Spin />
           </div>
-        )}
+        )} */}
         <div className="flex flex-col items-center mb-6">
           <Image width={290} src="./img/cficoop.svg" />
         </div>
@@ -83,16 +90,14 @@ export default function LoginIndex() {
           </Form.Item>
           <Form.Item>
             <Flex justify="space-between" align="center">
-              {/* <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item> */}
               <a href="/forgot-password">Forgot password</a>
             </Flex>
           </Form.Item>
 
           <Form.Item>
             <Button block type="primary" htmlType="submit">
-              Log in
+              {loading && <LoadingOutlined className="animate-spin" />}
+              {!loading && <p>Log in</p>}
             </Button>
             {/* or <a href="">Register now!</a> */}
           </Form.Item>

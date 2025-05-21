@@ -29,7 +29,7 @@ const Signup = () => {
       setLoading(true);
       const { error } = await signUp(values.email, values.password);
       setSuccessAlert(true);
-      navigate("/landing-page");
+      // navigate("/landing-page");
       if (error) throw error;
     } catch (error) {
       setSuccessAlert(false);
