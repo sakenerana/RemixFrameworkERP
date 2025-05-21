@@ -7,7 +7,6 @@ import {
 import {
   Button,
   Dropdown,
-  Input,
   Layout,
   Menu,
   Space,
@@ -20,16 +19,12 @@ import {
   FcComboChart,
   FcDiploma1,
   FcGlobe,
-  FcMultipleDevices,
-  FcPackage,
   FcPlus,
   FcRules,
   FcSalesPerformance,
-  FcSearch,
   FcSettings,
 } from "react-icons/fc";
 import Setting from "~/routes/settings/settings";
-import { AiOutlineBook } from "react-icons/ai";
 
 const { Header, Sider, Content } = Layout;
 
@@ -54,18 +49,18 @@ export default function BudgetLayoutIndex() {
   };
 
   const items = [
-    {
-      key: "1",
-      icon: <FcRules />,
-      label: <Link to="/budget/accounts/create-accounts">Accounts</Link>,
-    },
-    {
-      key: "2",
-      icon: <FcDiploma1 />,
-      label: (
-        <Link to="/budget/transactions/create-transactions">Transactions</Link>
-      ),
-    },
+    // {
+    //   key: "1",
+    //   icon: <FcRules />,
+    //   label: <Link to="/budget/accounts/create-accounts">Accounts</Link>,
+    // },
+    // {
+    //   key: "2",
+    //   icon: <FcDiploma1 />,
+    //   label: (
+    //     <Link to="/budget/transactions/create-transactions">Transactions</Link>
+    //   ),
+    // },
     {
       key: "3",
       icon: <FcSalesPerformance />,
@@ -79,11 +74,11 @@ export default function BudgetLayoutIndex() {
       icon: <FcGlobe />,
       label: <Link to="/budget">Dashboard</Link>,
     },
-    {
-      key: "2",
-      icon: <FcRules />,
-      label: <Link to="/budget/accounts">Accounts</Link>,
-    },
+    // {
+    //   key: "2",
+    //   icon: <FcRules />,
+    //   label: <Link to="/budget/accounts">Accounts</Link>,
+    // },
     {
       key: "3",
       icon: <FcDiploma1 />,
@@ -94,11 +89,11 @@ export default function BudgetLayoutIndex() {
       icon: <FcSalesPerformance />,
       label: <Link to="/budget/budgets">Budgets</Link>,
     },
-    {
-      key: "5",
-      icon: <FcComboChart />,
-      label: <Link to="/budget/budget-reports">Reports</Link>,
-    },
+    // {
+    //   key: "5",
+    //   icon: <FcComboChart />,
+    //   label: <Link to="/budget/budget-reports">Reports</Link>,
+    // },
   ];
 
   return (
@@ -143,9 +138,9 @@ export default function BudgetLayoutIndex() {
                   <Link to="/landing-page">
                     <Button icon={<SwapOutlined />} type="text"></Button>
                   </Link>
-                  <Dropdown menu={{ items }} placement="topLeft">
+                  {/* <Dropdown menu={{ items }} placement="topLeft">
                     <Button icon={<FcPlus />}>Create New</Button>
-                  </Dropdown>
+                  </Dropdown> */}
                   <Button
                     onClick={() => handleTrack()}
                     icon={<FcSettings />}

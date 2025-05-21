@@ -1,4 +1,8 @@
-import { HomeOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -10,10 +14,15 @@ import {
   Table,
   TableColumnsType,
   TableProps,
+  Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
+import {
+  AiOutlineCheckCircle,
+  AiOutlineLike,
+  AiOutlinePlus,
+} from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -23,6 +32,7 @@ interface DataType {
   title: string;
   body: string;
   userId?: number; // Optional property
+  amount: number;
 }
 
 export default function BudgetTransactions() {
@@ -30,6 +40,9 @@ export default function BudgetTransactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // DUMMY DATA
+  const value = 123412;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -67,14 +80,54 @@ export default function BudgetTransactions() {
 
   const columns: TableColumnsType<DataType> = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Process ID",
+      dataIndex: "process_id",
       width: 120,
+      render: () => <div>123</div>,
     },
     {
-      title: "Product Key",
-      dataIndex: "product_key",
+      title: "Date",
+      dataIndex: "date",
       width: 120,
+      render: () => <div>test</div>,
+    },
+    {
+      title: "Transaction Type",
+      dataIndex: "transaction_type",
+      width: 120,
+      render: () => <div>Liquidation</div>,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      width: 120,
+      render: (_, value) => {
+        if (value.id === 1) {
+          return (
+            <Tag color="#389e0d">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> End
+            </Tag>
+          );
+        } else if (value.id === 2) {
+          return (
+            <Tag color="#f75b00">
+              <ClockCircleOutlined className="float-left mt-1 mr-1" /> Pending
+            </Tag>
+          );
+        } else if (value.id === 3) {
+          return (
+            <Tag color="#1677ff">
+              <AiOutlineLike className="float-left mt-1 mr-1" /> Approved
+            </Tag>
+          );
+        }
+      },
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      width: 120,
+      render: () => <div className="text-end">{formatCurrency(1241)}</div>,
     },
   ];
 
@@ -104,15 +157,6 @@ export default function BudgetTransactions() {
             },
           ]}
         />
-        <Space direction="horizontal">
-          <Space wrap>
-            <Link to={"create-transactions"}>
-              <Button icon={<AiOutlinePlus />} type="primary">
-                Create Account
-              </Button>
-            </Link>
-          </Space>
-        </Space>
       </div>
       <div className="flex justify-between">
         <Alert

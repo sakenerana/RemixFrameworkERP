@@ -5,12 +5,14 @@ import {
   DropboxOutlined,
 } from "@ant-design/icons";
 import type { MenuProps, TabsProps } from "antd";
-import { Card, Carousel, Space } from "antd";
-import {
-  useNavigate,
-} from "@remix-run/react";
+import { Button, Card, Carousel, Space } from "antd";
+import { Link, useNavigate } from "@remix-run/react";
 import { supabase } from "~/lib/supabase";
 import { AiOutlineReconciliation } from "react-icons/ai";
+import { LuPackageSearch } from "react-icons/lu";
+import { FaClipboardList, FaDollarSign } from "react-icons/fa";
+import { BsShieldCheck } from "react-icons/bs";
+import { Content } from "antd/es/layout/layout";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -35,186 +37,78 @@ export default function LandingPage() {
     }
   };
 
-  React.useEffect(() => {
-    // const userData = localStorage.getItem("sb-auth-token");
-    // onUser();
-    // if (userData) {
-    //   console.log("LocalStorage user:", JSON.parse(userData));
-    // }
-  }, []);
-
-  const handleClickInventory = async () => {
-    await localStorage.setItem('main', '1');
-    await navigate("/inventory");
-  }
-
-  const handleClickBudget = async () => {
-    await localStorage.setItem('main', '2');
-    navigate("/budget");
-  }
-
-  const handleClickWorkflow = async () => {
-    navigate("/workflow");
-  }
-
-  // const onClick: MenuProps["onClick"] = (e) => {
-  //   if (e.key == "1") {
-  //     navigate("/inventory");
-  //   } else if (e.key == "2") {
-  //     navigate("/budget-tracker");
-  //   } else if (e.key == "3") {
-  //     navigate("/workflow-tracker");
-  //   }
-  // };
-
-  const items: TabsProps["items"] = [
+  const features = [
     {
-      key: "1",
-      label: (
-        <div>
-          <DropboxOutlined /> Inventory
-        </div>
-      ),
+      icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
+      title: "Inventory Management",
+      description:
+        "Track stock levels, manage suppliers, and streamline warehouse operations.",
+      link: "/inventory",
     },
     {
-      key: "2",
-      label: (
-        <div>
-          <AuditOutlined /> Budget Tracker
-        </div>
-      ),
+      icon: <FaDollarSign className="h-8 w-8 text-green-500" />,
+      title: "Budget Tracker",
+      description:
+        "Monitor expenses, set budget goals, and visualize financial performance.",
+      link: "/budget",
     },
     {
-      key: "3",
-      label: (
-        <div>
-          <ApartmentOutlined /> Workflow Tracker
-        </div>
-      ),
+      icon: <FaClipboardList className="h-8 w-8 text-orange-500" />,
+      title: "Workflow Tracker",
+      description:
+        "Manage team workflows, assign tasks, and track progress in real-time.",
+      link: "/workflow",
+    },
+    {
+      icon: <BsShieldCheck className="h-8 w-8 text-purple-500" />,
+      title: "Admin Panel",
+      description:
+        "Oversee user roles, permissions, and platform configurations.",
+      link: "/admin",
     },
   ];
 
   return (
-    <div className="h-full">
-      <div className="h-auto">
+    <div className="min-h-screen bg-[url(./img/cfi-bills-payment.jpg)] p-6">
+      <div className="max-w-6xl mx-auto">
         <div className="flex justify-center pt-4">
-          <img className="h-16" src="./img/cficoop.svg" alt="cficoop" />
+          <img className="h-16" src="./img/cficoop.png" alt="cficoop" />
+        </div>
+        <h1 className="text-4xl font-bold mb-4 text-center text-white">
+          Welcome to the ERP System
+        </h1>
+        <p className="text-lg text-white mb-10 text-center">
+          Powerful tools to manage inventory, budgets, workflows, and admin
+          controls.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="rounded-2xl shadow-md hover:shadow-2xl transition-shadow p-4 cursor-pointer"
+            >
+              <Link to={feature.link}>
+                <div className="flex flex-col items-center text-center">
+                  {feature.icon}
+                  <h2 className="text-xl font-semibold mt-4 mb-2">
+                    {feature.title}
+                  </h2>
+                  <p className="text-sm text-gray-500">{feature.description}</p>
+                </div>
+              </Link>
+            </Card>
+          ))}
         </div>
 
-        <div className="flex flex-wrap gap-6 justify-center mt-2 mb-2">
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClickInventory}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <DropboxOutlined
-                style={{ fontSize: "32px", color: "#573019" }}
-              />
-              <p className="text-2xl">Inventory</p>
-            </Space>
-          </Card>
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClickBudget}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <AuditOutlined
-                style={{ fontSize: "32px", color: "#1890ff" }}
-              />
-              <p className="text-2xl">Budget Tracker</p>
-            </Space>
-          </Card>
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClickWorkflow}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <ApartmentOutlined
-                style={{ fontSize: "32px", color: "#00ed63" }}
-              />
-              <p className="text-2xl">Workflow Tracker</p>
-            </Space>
-          </Card>
-          <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClickWorkflow}
-            style={{
-              width: 200,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <AiOutlineReconciliation className="text-center ml-4"
-                style={{ fontSize: "32px", color: "" }}
-              />
-              <p className="text-2xl">Admin</p>
-            </Space>
-          </Card>
+        <div className="mt-32 text-center">
+          <h1 className="text-4xl font-bold mb-4 text-center text-white">
+            GET STARTED
+          </h1>
+          <p className="text-lg text-white mb-10 text-center">
+            All rights reserved © 2025
+          </p>
         </div>
-        {/* <div className="">
-          <Menu
-            style={contentStyle}
-            onClick={onClick}
-            mode="horizontal"
-            items={items}
-          />
-        </div> */}
-        <div className="grid grid-cols-1">
-          <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={3000}>
-            <div>
-              <h3>
-                <img
-                  className="h-[100%]"
-                  src="./img/cfionline.jpg"
-                  alt="cfi-online"
-                />
-              </h3>
-            </div>
-            <div>
-              <h3>
-                <img
-                  className="h-[100%]"
-                  src="./img/cfi-bills-payment.jpg"
-                  alt="cfi-bills"
-                />
-              </h3>
-            </div>
-            <div>
-              <h3>
-                <img
-                  className="h-[100%]"
-                  src="./img/cfi-cpp.jpg"
-                  alt="cfi-bills"
-                />
-              </h3>
-            </div>
-          </Carousel>
-        </div>
-        {/* <footer className="bg-gray-800 text-white p-6">
-          <div className="container mx-auto">
-            <p className="text-center">© 2025 CFI. All rights reserved.</p>
-          </div>
-        </footer> */}
       </div>
     </div>
   );
