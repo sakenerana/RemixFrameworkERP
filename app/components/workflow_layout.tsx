@@ -141,8 +141,7 @@ export default function WorkflowLayoutIndex() {
               by <b>SnipeIT</b>
             </div>
             <div className="pr-5">
-              <b>Email:</b> sakenerana@gmail.com &nbsp; <b>Contact:</b>{" "}
-              +6309553713233
+              <b>Developed by:</b> CFI IT Department
             </div>
           </div>
         </Layout>

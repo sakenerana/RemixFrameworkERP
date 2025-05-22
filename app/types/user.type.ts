@@ -1,12 +1,12 @@
 export interface User {
     key: React.Key;
-    name: string;
-    title: string;
+    first_name: string;
+    middle_name: string;
+    last_name: string;
     email: string;
-    phone_no: string;
-    username: string;
-    department: string;
-    location: string;
-    manager: string;
-    action: string;
+    password: string;
+    phone: string;
+    department: number;
+    group: string;
+    actions: string;
 }

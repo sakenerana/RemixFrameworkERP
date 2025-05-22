@@ -1,12 +1,12 @@
-import { Department } from "~/types/department.type"
+import { Groups } from "~/types/groups.type"
 import supabase from "~/utils/supabase.client"
 
-export const DepartmentService = {
+export const GroupService = {
     
   // Create
-  async createPost(postData: Department) {
+  async createPost(postData: Groups) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .insert(postData)
       .select()
     
@@ -15,9 +15,9 @@ export const DepartmentService = {
   },
 
   // Read (single)
-  async getPostById(id: Department) {
+  async getPostById(id: Groups) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('users_groups')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const DepartmentService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,9 +38,9 @@ export const DepartmentService = {
   },
 
   // Update
-  async updatePost(id: number, updates: Department) {
+  async updatePost(id: number, updates: Groups) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .update(updates)
       .eq('id', id)
       .select()
@@ -50,9 +50,9 @@ export const DepartmentService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Department) {
+  async activateStatus(id: number, updates: Groups) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
@@ -62,9 +62,9 @@ export const DepartmentService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Department) {
+  async deactivateStatus(id: number, updates: Groups) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
@@ -74,9 +74,9 @@ export const DepartmentService = {
   },
 
   // Delete
-  async deletePost(id: Department) {
+  async deletePost(id: Groups) {
     const { error } = await supabase
-      .from('departments')
+      .from('users_groups')
       .delete()
       .eq('id', id)
     
@@ -85,9 +85,9 @@ export const DepartmentService = {
   },
 
   // Custom query example
-  async getPostsByDepartment(userId: Department) {
+  async getPostsByDepartment(userId: Groups) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('users_groups')
       .select('*')
       .eq('user_id', userId)
     

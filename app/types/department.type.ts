@@ -1,9 +1,8 @@
 export interface Department {
   key: string;
-  department_name: string;
-  manager: string;
-  users: string;
-  notes: string;
+  id: number;
+  department: string;
+  status_id: number;
   action: string;
 }
 

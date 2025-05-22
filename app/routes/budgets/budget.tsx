@@ -5,6 +5,7 @@ import {
   Breadcrumb,
   Button,
   Col,
+  DatePicker,
   Divider,
   Form,
   Input,
@@ -16,15 +17,10 @@ import {
   Select,
   Space,
   Spin,
-  Table,
-  TableColumnsType,
-  Tabs,
-  TabsProps,
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { AiOutlinePlus, AiOutlineSend, AiOutlineStock } from "react-icons/ai";
-import { FcInspection, FcRefresh, FcRules, FcStatistics } from "react-icons/fc";
+import { AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
 import LineChart from "~/components/line_chart";
 
 interface DataType {
@@ -36,11 +32,12 @@ interface DataType {
 
 export default function Budgets() {
   const [data, setData] = useState<DataType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<DataType>();
+  const { RangePicker } = DatePicker;
 
   const onReset = () => {
     Modal.confirm({
@@ -182,6 +179,7 @@ export default function Budgets() {
         >
           <div>
             <Form
+              className="mt-6"
               form={form}
               layout="vertical"
               onFinish={onFinish}
@@ -193,7 +191,22 @@ export default function Budgets() {
               <Row gutter={24}>
                 <Col xs={24} sm={24}>
                   <Form.Item
-                    label="Accout Name"
+                    label="Start of Date to End of Date"
+                    name="date"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input date!",
+                      },
+                    ]}
+                  >
+                    <RangePicker className="w-full" />
+                  </Form.Item>
+                </Col>
+
+                {/* <Col xs={24} sm={24}>
+                  <Form.Item
+                    label="Account Name"
                     name="account_name"
                     rules={[
                       {
@@ -204,9 +217,9 @@ export default function Budgets() {
                   >
                     <Input placeholder="e.g. Checking Account" />
                   </Form.Item>
-                </Col>
+                </Col> */}
 
-                <Col xs={24} sm={24}>
+                {/* <Col xs={24} sm={24}>
                   <Form.Item
                     label="Account Type"
                     name="account_type"
@@ -226,7 +239,7 @@ export default function Budgets() {
                       ]}
                     />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
 
               <Row gutter={24}>
@@ -253,7 +266,16 @@ export default function Budgets() {
 
               <Divider />
 
-              <Form.Item>
+              <Form.Item className="flex flex-wrap justify-end">
+                <Button
+                  onClick={onReset}
+                  type="default"
+                  //   loading={loading}
+                  className="w-full sm:w-auto mr-4"
+                  size="large"
+                >
+                  Reset
+                </Button>
                 <Button
                   type="primary"
                   htmlType="submit"

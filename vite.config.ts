@@ -443,6 +443,20 @@ export default defineConfig({
                   index: true,
                 });
               });
+              route("groups", "routes/groups/route.tsx", () => {
+                route("", "routes/groups/groups.tsx", {
+                  index: true,
+                });
+                route("create-groups", "routes/groups/create.tsx", {
+                  index: true,
+                });
+                route("update-groups", "routes/groups/update.tsx", {
+                  index: true,
+                });
+                route("deleted-groups", "routes/groups/deleted.tsx", {
+                  index: true,
+                });
+              });
             });
           });
 

@@ -3,6 +3,8 @@ import {
   HomeOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "@remix-run/react";
+import { User } from "@supabase/supabase-js";
 import {
   Alert,
   Breadcrumb,
@@ -27,19 +29,21 @@ import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineFileExclamation,
   AiOutlinePlus,
   AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { DepartmentService } from "~/services/department.service";
-import { Department } from "~/types/department.type";
+import { GroupService } from "~/services/groups.service";
+import { Groups } from "~/types/groups.type";
 
-export default function DepartmentsRoutes() {
-  const [data, setData] = useState<Department[]>([]);
+export default function GroupsRoutes() {
+  const [data, setData] = useState<Groups[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm<Department>();
+  const [form] = Form.useForm<Groups>();
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const handleRefetch = async () => {
@@ -70,21 +74,15 @@ export default function DepartmentsRoutes() {
     setIsModalOpen(false);
   };
 
-  const handleDeleteButton = async (record: Department) => {
+  const handleDeleteButton = async (record: Groups) => {
     if (record.status_id === 1) {
-      const { error } = await DepartmentService.deactivateStatus(
-        record.id,
-        record
-      );
+      const { error } = await GroupService.deactivateStatus(record.id, record);
 
       if (error) throw error;
       message.success("Record deactivated successfully");
       fetchData();
     } else if (record.status_id === 2) {
-      const { error } = await DepartmentService.activateStatus(
-        record.id,
-        record
-      );
+      const { error } = await GroupService.activateStatus(record.id, record);
 
       if (error) throw error;
       message.success("Record activated successfully");
@@ -96,7 +94,7 @@ export default function DepartmentsRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await DepartmentService.getAllPosts();
+      const dataFetch = await GroupService.getAllPosts();
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -123,14 +121,14 @@ export default function DepartmentsRoutes() {
 
       if (editingId) {
         // Update existing record
-        const { error } = await DepartmentService.updatePost(editingId, values);
+        const { error } = await GroupService.updatePost(editingId, values);
 
         if (error) throw error;
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
-        const { error } = await DepartmentService.createPost(allValues);
+        const { error } = await GroupService.createPost(allValues);
 
         if (error) throw error;
         message.success("Record created successfully");
@@ -147,17 +145,17 @@ export default function DepartmentsRoutes() {
   };
 
   // Edit record
-  const editRecord = (record: Department) => {
+  const editRecord = (record: Groups) => {
     form.setFieldsValue(record);
     setEditingId(record.id);
     setIsModalOpen(true);
     console.log("Record", record.id);
   };
 
-  const columns: TableColumnsType<Department> = [
+  const columns: TableColumnsType<Groups> = [
     {
-      title: "Department Name",
-      dataIndex: "department",
+      title: "Group Name",
+      dataIndex: "group",
       width: 120,
     },
     {
@@ -189,7 +187,7 @@ export default function DepartmentsRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this department?"
+            description="Are you sure to update this group?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => editRecord(record)}
@@ -204,7 +202,7 @@ export default function DepartmentsRoutes() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to delete?"
-            description="Are you sure to delete this department?"
+            description="Are you sure to delete this group?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton(record)}
@@ -233,7 +231,7 @@ export default function DepartmentsRoutes() {
     },
   ];
 
-  const onChange: TableProps<Department>["onChange"] = (
+  const onChange: TableProps<Groups>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -248,14 +246,14 @@ export default function DepartmentsRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/inventory",
+              href: "/admin",
               title: <HomeOutlined />,
             },
             {
-              title: "Settings",
+              title: "Admin",
             },
             {
-              title: "Departments",
+              title: "Groups",
             },
           ]}
         />
@@ -265,13 +263,13 @@ export default function DepartmentsRoutes() {
             icon={<AiOutlinePlus />}
             type="primary"
           >
-            Create Department
+            Create Group
           </Button>
         </Space>
         <Modal
           style={{ top: 20 }}
           width={420}
-          title="Create Department"
+          title="Create Group"
           closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
           onOk={handleOk}
@@ -292,16 +290,16 @@ export default function DepartmentsRoutes() {
               <Row gutter={24}>
                 <Col xs={24} sm={24}>
                   <Form.Item
-                    label="Department"
-                    name="department"
+                    label="Group Name"
+                    name="group"
                     rules={[
                       {
                         required: true,
-                        message: "Please input department!",
+                        message: "Please input group!",
                       },
                     ]}
                   >
-                    <Input placeholder="Department Name" />
+                    <Input placeholder="Group Name" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -339,7 +337,7 @@ export default function DepartmentsRoutes() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all departments. Please check closely."
+          message="Note: This is the list of all groups. Please check closely."
           type="info"
           showIcon
         />
@@ -362,7 +360,7 @@ export default function DepartmentsRoutes() {
       </div>
       {loading && <Spin></Spin>}
       {!loading && (
-        <Table<Department>
+        <Table<Groups>
           size="small"
           columns={columns}
           dataSource={data}
