@@ -30,9 +30,9 @@ export const DepartmentService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('departments')
-      .select('*')
+      .select('*, status_labels(*)')
       .order('created_at', { ascending: false })
-    
+      
     if (error) throw error
     return data
   },

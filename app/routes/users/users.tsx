@@ -1,5 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
+import {
+  CheckCircleOutlined,
+  HomeOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
@@ -11,7 +14,6 @@ import {
   Form,
   GetProp,
   Input,
-  InputNumber,
   message,
   Modal,
   Popconfirm,
@@ -23,39 +25,40 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlinePhone,
   AiOutlinePlus,
   AiOutlineSend,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { DepartmentService } from "~/services/department.service";
+import { GroupService } from "~/services/groups.service";
+import { UserService } from "~/services/user.service";
+import { Department } from "~/types/department.type";
+import { Groups } from "~/types/groups.type";
 import { User } from "~/types/user.type";
 
 export default function UsersRoutes() {
-  const navigate = useNavigate();
+  const [data, setData] = useState<User[]>([]);
+  const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
+  const [dataGroup, setDataGroup] = useState<Groups[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<User>();
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const { Option } = Select;
 
-  const data: User[] = [
-    // {
-    //   key: "1",
-    //   first_name: "John Brown",
-    //   middle_name: "Black",
-    //   last_name: "Gray",
-    //   email: "test",
-    //   phone_no: "09553713233",
-    //   department: "test",
-    //   group: "test",
-    //   actions: "test",
-    // },
-  ];
+  const handleRefetch = async () => {
+    setLoading(true);
+    await fetchData();
+    setLoading(false);
+  };
 
   const onReset = () => {
     Modal.confirm({
@@ -79,17 +82,119 @@ export default function UsersRoutes() {
     setIsModalOpen(false);
   };
 
-  const handleUpdateButton = () => {
-    navigate("update-user");
+  const handleDeleteButton = async (record: User) => {
+    if (record?.status_labels.id === 1) {
+      const { error } = await UserService.deactivateStatus(record.id, record);
+
+      if (error) throw error;
+      message.success("Record deactivated successfully");
+      fetchData();
+    } else if (record?.status_labels.id === 2) {
+      const { error } = await UserService.activateStatus(record.id, record);
+
+      if (error) throw error;
+      message.success("Record activated successfully");
+      fetchData();
+    }
   };
 
-  const handleDeleteButton = () => {};
+  // Fetch data from Supabase
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const dataFetch = await UserService.getAllPosts();
+      setData(dataFetch); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataDepartment = async () => {
+    try {
+      setLoading(true);
+      const dataFetchDepartment = await DepartmentService.getAllPosts();
+      setDataDepartment(dataFetchDepartment); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataGroup = async () => {
+    try {
+      setLoading(true);
+      const dataFetchGroup = await GroupService.getAllPosts();
+      setDataGroup(dataFetchGroup); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchDataDepartment();
+    fetchDataGroup();
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Create or Update record
+  const onFinish = async () => {
+    try {
+      const values = await form.validateFields();
+
+      // Include your extra field
+      const allValues = {
+        ...values,
+        status_id: 1,
+      };
+
+      if (editingId) {
+        // Update existing record
+        const { error } = await UserService.updatePost(editingId, values);
+
+        if (error) throw error;
+        message.success("Record updated successfully");
+      } else {
+        // Create new record
+        setLoading(true);
+        const { error } = await UserService.createPost(allValues);
+
+        if (error) throw error;
+        message.success("Record created successfully");
+      }
+
+      setLoading(false);
+      setIsModalOpen(false);
+      form.resetFields();
+      setEditingId(null);
+      fetchData();
+    } catch (error) {
+      message.error("Error");
+    }
+  };
+
+  // Edit record
+  const editRecord = (record: User) => {
+    form.setFieldsValue(record);
+    setEditingId(record.id);
+    setIsModalOpen(true);
+    console.log("Record", record.id);
+  };
 
   const columns: TableColumnsType<User> = [
     {
       title: "Name",
       dataIndex: "name",
       width: 120,
+      render: (_, record) => (
+        <p>{record.first_name} {record.middle_name} {record.last_name}</p>
+      ),
     },
     {
       title: "Email",
@@ -105,20 +210,45 @@ export default function UsersRoutes() {
       title: "Department",
       dataIndex: "department",
       width: 120,
+      render: (_, record) => (
+        <>
+          <p>{record?.departments.department}</p>
+        </>
+      )
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      width: 120,
+      render: (_, record) => {
+        if (record?.status_labels.id === 1) {
+          return (
+            <Tag color="green">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+            </Tag>
+          );
+        } else if (record?.status_labels.id === 2) {
+          return (
+            <Tag color="red">
+              <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
+            </Tag>
+          );
+        }
+      },
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 120,
       fixed: "right",
-      render: () => (
+      render: (_, record) => (
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
             description="Are you sure to update this user?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleUpdateButton()}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -133,7 +263,7 @@ export default function UsersRoutes() {
             description="Are you sure to deactivate this user?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleDeleteButton()}
+            onConfirm={() => handleDeleteButton(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -155,16 +285,6 @@ export default function UsersRoutes() {
     extra
   ) => {
     console.log("params", pagination, filters, sorter, extra);
-  };
-
-  const onFinish = (values: User) => {
-    setLoading(true);
-    console.log("Form values:", values);
-    // Simulate API call
-    setTimeout(() => {
-      message.success("Form submitted successfully!");
-      setLoading(false);
-    }, 1500);
   };
 
   const onChangeAccess: GetProp<typeof Checkbox.Group, "onChange"> = (
@@ -205,11 +325,11 @@ export default function UsersRoutes() {
           ]}
         />
         <Space wrap>
-          <Link to={"deleted-user"}>
+          {/* <Link to={"deleted-user"}>
             <Button icon={<AiOutlineUserDelete />} type="primary" danger>
               Show Inactive Users
             </Button>
-          </Link>
+          </Link> */}
           <Button
             onClick={() => handleTrack()}
             icon={<AiOutlinePlus />}
@@ -326,14 +446,18 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Input type="number" prefix={<AiOutlinePhone />} placeholder="Phone" />
+                    <Input
+                      type="number"
+                      prefix={<AiOutlinePhone />}
+                      placeholder="Phone"
+                    />
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={12}>
                   <Form.Item
                     label="Department"
-                    name="department"
+                    name="department_id"
                     rules={[
                       {
                         required: true,
@@ -341,21 +465,20 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Select
-                      placeholder="Select department"
-                      options={[
-                        { value: 1, label: "Jack" },
-                        { value: 2, label: "Lucy" },
-                        { value: 3, label: "yiminghe" },
-                      ]}
-                    />
+                    <Select placeholder="Select department">
+                      {dataDepartment.map((item: Department) => (
+                        <Option key={item.id} value={item.id}>
+                          {item.department}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} sm={12}>
                   <Form.Item
                     label="Group"
-                    name="group"
+                    name="group_id"
                     rules={[
                       {
                         required: true,
@@ -363,13 +486,13 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Select
-                      placeholder="Select group"
-                      options={[
-                        { value: "user", label: "User" },
-                        { value: "admin", label: "Admin" },
-                      ]}
-                    />
+                    <Select placeholder="Select group">
+                      {dataGroup.map((item: Groups) => (
+                        <Option key={item.id} value={item.id}>
+                          {item.group}
+                        </Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
               </Row>
@@ -460,7 +583,7 @@ export default function UsersRoutes() {
             </Button>
           </Space.Compact>
           <Space wrap>
-            <Button icon={<FcRefresh />} type="default">
+            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
               Refresh
             </Button>
           </Space>
