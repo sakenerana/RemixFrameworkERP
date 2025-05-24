@@ -6,7 +6,7 @@ export const SupplierService = {
   // Create
   async createPost(postData: Supplier) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('supplier')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const SupplierService = {
   // Read (single)
   async getPostById(id: Supplier) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('supplier')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const SupplierService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('supplier')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,9 +38,9 @@ export const SupplierService = {
   },
 
   // Update
-  async updatePost(id: Supplier, updates: Supplier) {
+  async updatePost(id: number, updates: Supplier) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('supplier')
       .update(updates)
       .eq('id', id)
       .select()
@@ -49,10 +49,34 @@ export const SupplierService = {
     return data[0]
   },
 
+  // Activate
+  async activateStatus(id: number, updates: Supplier) {
+    const { data, error } = await supabase
+      .from("supplier")
+      .update({ status_id: 1 })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Supplier) {
+    const { data, error } = await supabase
+      .from("supplier")
+      .update({ status_id: 2 })
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  },
+
   // Delete
   async deletePost(id: Supplier) {
     const { error } = await supabase
-      .from('posts')
+      .from('supplier')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const SupplierService = {
   // Custom query example
   async getPostsBySupplier(userId: Supplier) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('supplier')
       .select('*')
       .eq('user_id', userId)
     

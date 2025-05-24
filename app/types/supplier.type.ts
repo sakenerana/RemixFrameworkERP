@@ -1,6 +1,7 @@
 export interface Supplier {
   key: React.Key;
-  name: string;
+  id: number;
+  supplier: string;
   product_key: string;
   expiration_date: string;
   licensed_to_email: string;
