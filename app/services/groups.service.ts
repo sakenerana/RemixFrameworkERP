@@ -30,7 +30,7 @@ export const GroupService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('users_groups')
-      .select('*')
+      .select('*, status_labels(*)')
       .order('created_at', { ascending: false })
     
     if (error) throw error

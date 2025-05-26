@@ -20,6 +20,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Table,
   TableColumnsType,
   TableProps,
@@ -83,13 +84,13 @@ export default function UsersRoutes() {
   };
 
   const handleDeleteButton = async (record: User) => {
-    if (record?.status_labels.id === 1) {
+    if (record.status_labels.name === 'Active') {
       const { error } = await UserService.deactivateStatus(record.id, record);
 
       if (error) throw error;
       message.success("Record deactivated successfully");
       fetchData();
-    } else if (record?.status_labels.id === 2) {
+    } else if (record.status_labels.name === 'Inactive') {
       const { error } = await UserService.activateStatus(record.id, record);
 
       if (error) throw error;
@@ -212,7 +213,7 @@ export default function UsersRoutes() {
       width: 120,
       render: (_, record) => (
         <>
-          <p>{record?.departments.department}</p>
+          <p>{record.departments.department}</p>
         </>
       )
     },
@@ -221,13 +222,13 @@ export default function UsersRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record?.status_labels.id === 1) {
+        if (record.status_labels.name === 'Active') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record?.status_labels.id === 2) {
+        } else if (record.status_labels.name === 'Inactive') {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -265,13 +266,24 @@ export default function UsersRoutes() {
             cancelText="No"
             onConfirm={() => handleDeleteButton(record)}
           >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-              color="#f50"
-            >
-              Deactivate
-            </Tag>
+            {record.status_labels.name === 'Active' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                Deactivate
+              </Tag>
+            )}
+            {record.status_labels.name === 'Inactive' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#1677ff"
+              >
+                Activate
+              </Tag>
+            )}
           </Popconfirm>
         </div>
       ),
@@ -379,12 +391,12 @@ export default function UsersRoutes() {
                   <Form.Item
                     label="Middle Name"
                     name="middle_name"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Please input middle name!",
-                    //   },
-                    // ]}
+                  // rules={[
+                  //   {
+                  //     required: true,
+                  //     message: "Please input middle name!",
+                  //   },
+                  // ]}
                   >
                     <Input placeholder="Middle Name" />
                   </Form.Item>
@@ -592,14 +604,18 @@ export default function UsersRoutes() {
           </Space>
         </Space>
       </div>
-      <Table<User>
-        size="small"
-        columns={columns}
-        dataSource={data}
-        onChange={onChange}
-        className="pt-5"
-        bordered
-      />
+      {loading && <Spin></Spin>}
+      {!loading && (
+        <Table<User>
+          size="small"
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+          className="pt-5"
+          bordered
+        />
+      )}
+
     </div>
   );
 }

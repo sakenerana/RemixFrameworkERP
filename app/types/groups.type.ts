@@ -3,5 +3,6 @@ export interface Groups {
     id: number;
     group: string;
     status_id: number;
+    status_labels: any;
     action: string;
 }

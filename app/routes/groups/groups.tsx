@@ -75,13 +75,13 @@ export default function GroupsRoutes() {
   };
 
   const handleDeleteButton = async (record: Groups) => {
-    if (record.status_id === 1) {
+    if (record.status_labels.name === 'Active') {
       const { error } = await GroupService.deactivateStatus(record.id, record);
 
       if (error) throw error;
       message.success("Record deactivated successfully");
       fetchData();
-    } else if (record.status_id === 2) {
+    } else if (record.status_labels.name === 'Inactive') {
       const { error } = await GroupService.activateStatus(record.id, record);
 
       if (error) throw error;
@@ -163,13 +163,13 @@ export default function GroupsRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record.status_id === 1) {
+        if (record.status_labels.name === 'Active') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record.status_id === 2) {
+        } else if (record.status_labels.name === 'Inactive') {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -207,7 +207,7 @@ export default function GroupsRoutes() {
             cancelText="No"
             onConfirm={() => handleDeleteButton(record)}
           >
-            {record.status_id === 1 && (
+            {record.status_labels.name === 'Active' && (
               <Tag
                 className="cursor-pointer"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
@@ -216,7 +216,7 @@ export default function GroupsRoutes() {
                 Deactivate
               </Tag>
             )}
-            {record.status_id === 2 && (
+            {record.status_labels.name === 'Inactive' && (
               <Tag
                 className="cursor-pointer"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
