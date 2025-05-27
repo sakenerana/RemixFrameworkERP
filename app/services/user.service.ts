@@ -31,9 +31,20 @@ export const UserService = {
       .from("users")
       .select("*, departments(*), status_labels(*)")
       .order("created_at", { ascending: false });
-    
+
     if (error) throw error;
     return data;
+  },
+
+  async getTableCounts() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('users') // Replace with your table name
+      .select('*', { count: 'exact', head: true });
+
+    if (error) throw error;
+
+    return count;
   },
 
   // Update

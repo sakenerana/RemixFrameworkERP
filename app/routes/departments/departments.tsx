@@ -39,6 +39,8 @@ export default function DepartmentsRoutes() {
   const [data, setData] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [isTitle, setIsTitle] = useState('');
   const [form] = Form.useForm<Department>();
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -59,9 +61,20 @@ export default function DepartmentsRoutes() {
   };
 
   const handleTrack = () => {
+    setIsEditMode(false);
     setIsModalOpen(true);
     setEditingId(null);
     form.resetFields();
+    setIsTitle('Create Department')
+  };
+
+  // Edit record
+  const editRecord = (record: Department) => {
+    setIsEditMode(true);
+    form.setFieldsValue(record);
+    setEditingId(record.id);
+    setIsModalOpen(true);
+    setIsTitle('Update Department')
   };
 
   const handleOk = () => {
@@ -146,14 +159,6 @@ export default function DepartmentsRoutes() {
     } catch (error) {
       message.error("Error");
     }
-  };
-
-  // Edit record
-  const editRecord = (record: Department) => {
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    console.log("Record", record.id);
   };
 
   const columns: TableColumnsType<Department> = [
@@ -273,7 +278,7 @@ export default function DepartmentsRoutes() {
         <Modal
           style={{ top: 20 }}
           width={420}
-          title="Create Department"
+          title={isTitle}
           closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
           onOk={handleOk}
@@ -332,7 +337,8 @@ export default function DepartmentsRoutes() {
                   className="w-full sm:w-auto"
                   size="large"
                 >
-                  Submit
+                  {isEditMode && <p>Update</p>}
+                  {!isEditMode && <p>Submit</p>}
                 </Button>
               </Form.Item>
             </Form>

@@ -43,6 +43,8 @@ export default function GroupsRoutes() {
   const [data, setData] = useState<Groups[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [isTitle, setIsTitle] = useState('');
   const [form] = Form.useForm<Groups>();
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -63,9 +65,20 @@ export default function GroupsRoutes() {
   };
 
   const handleTrack = () => {
+    setIsEditMode(false);
     setIsModalOpen(true);
     setEditingId(null);
     form.resetFields();
+    setIsTitle('Create Group')
+  };
+
+  // Edit record
+  const editRecord = (record: Groups) => {
+    setIsEditMode(true);
+    form.setFieldsValue(record);
+    setEditingId(record.id);
+    setIsModalOpen(true);
+    setIsTitle('Update Group')
   };
 
   const handleOk = () => {
@@ -144,14 +157,6 @@ export default function GroupsRoutes() {
     } catch (error) {
       message.error("Error");
     }
-  };
-
-  // Edit record
-  const editRecord = (record: Groups) => {
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    console.log("Record", record.id);
   };
 
   const columns: TableColumnsType<Groups> = [
@@ -271,7 +276,7 @@ export default function GroupsRoutes() {
         <Modal
           style={{ top: 20 }}
           width={420}
-          title="Create Group"
+          title={isTitle}
           closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
           onOk={handleOk}
@@ -330,7 +335,8 @@ export default function GroupsRoutes() {
                   className="w-full sm:w-auto"
                   size="large"
                 >
-                  Submit
+                  {isEditMode && <p>Update</p>}
+                  {!isEditMode && <p>Submit</p>}
                 </Button>
               </Form.Item>
             </Form>

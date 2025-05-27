@@ -37,6 +37,17 @@ export const DepartmentService = {
     return data
   },
 
+  async getTableCounts() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('departments') // Replace with your table name
+      .select('*', { count: 'exact', head: true });
+
+    if (error) throw error;
+
+    return count;
+  },
+
   // Update
   async updatePost(id: number, updates: Department) {
     const { data, error } = await supabase

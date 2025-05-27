@@ -53,6 +53,7 @@ export default function UsersRoutes() {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(true);
+  const [isTitle, setIsTitle] = useState('');
   const [form] = Form.useForm<User>();
   const [editingId, setEditingId] = useState<number | null>(null);
   const { Option } = Select;
@@ -79,6 +80,16 @@ export default function UsersRoutes() {
     setIsModalOpen(true);
     setEditingId(null);
     form.resetFields();
+    setIsTitle('Create User & Permissions')
+  };
+
+  // Edit record
+  const editRecord = (record: User) => {
+    setIsEditMode(true);
+    form.setFieldsValue(record);
+    setEditingId(record.id);
+    setIsModalOpen(true);
+    setIsTitle('Update User & Permissions')
   };
 
   const handleOk = () => {
@@ -196,14 +207,6 @@ export default function UsersRoutes() {
     }
   };
 
-  // Edit record
-  const editRecord = (record: User) => {
-    setIsEditMode(true);
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-  };
-
   const columns: TableColumnsType<User> = [
     {
       title: "Name",
@@ -301,36 +304,6 @@ export default function UsersRoutes() {
               </Tag>
             )}
           </Popconfirm>
-          <Popconfirm
-            title="Do you want to reset email?"
-            description="Are you sure to reset this email?"
-            okText="Yes"
-            cancelText="No"
-            onConfirm={() => handleDeleteButton(record)}
-          >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-              color="#1677ff"
-            >
-              Email
-            </Tag>
-          </Popconfirm>
-          <Popconfirm
-            title="Do you want to reset password?"
-            description="Are you sure to reset this password?"
-            okText="Yes"
-            cancelText="No"
-            onConfirm={() => handleDeleteButton(record)}
-          >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-              color="#1677ff"
-            >
-              Password
-            </Tag>
-          </Popconfirm>
         </div>
       ),
     },
@@ -403,8 +376,8 @@ export default function UsersRoutes() {
         </Space>
         <Modal
           style={{ top: 20 }}
-          width={1100}
-          title="Create User & Permissions"
+          width={900}
+          title={isTitle}
           closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
           onOk={handleOk}
@@ -644,7 +617,8 @@ export default function UsersRoutes() {
                   className="w-full sm:w-auto"
                   size="large"
                 >
-                  Submit
+                  {isEditMode && <p>Update</p>}
+                  {!isEditMode && <p>Submit</p>}
                 </Button>
               </Form.Item>
             </Form>

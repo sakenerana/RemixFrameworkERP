@@ -6,13 +6,18 @@ import {
   TableColumnsType,
   TableProps,
   Table,
+  message,
 } from "antd";
-import { useState } from "react";
-import { AiOutlineStock } from "react-icons/ai";
+import { useEffect, useState } from "react";
+import { AiOutlineStock, AiOutlineUserAdd } from "react-icons/ai";
 import {
 } from "react-icons/fc";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
+import { DepartmentService } from "~/services/department.service";
+import { GroupService } from "~/services/groups.service";
+import { UserService } from "~/services/user.service";
+import { User } from "~/types/user.type";
 
 interface DataType {
   key: React.Key;
@@ -38,9 +43,57 @@ interface DataTypeAssetCategories {
 }
 
 export default function BudgetRoutes() {
-  //   const [data, setData] = useState<DataType[]>([]);
+  const [dataUser, setDataUser] = useState<any>();
+  const [dataDepartment, setDataDepartment] = useState<any>();
+  const [dataGroup, setDataGroup] = useState<any>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Fetch data from Supabase
+  const fetchDataUser = async () => {
+    try {
+      setLoading(true);
+      const data = await UserService.getTableCounts();
+      setDataUser(data); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataDepartment = async () => {
+    try {
+      setLoading(true);
+      const data = await DepartmentService.getTableCounts();
+      setDataDepartment(data); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataGroup = async () => {
+    try {
+      setLoading(true);
+      const data = await GroupService.getTableCounts();
+      setDataGroup(data); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataUser();
+    fetchDataDepartment();
+    fetchDataGroup();
+  }, []); // Empty dependency array means this runs once on mount
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -64,41 +117,6 @@ export default function BudgetRoutes() {
     {
       title: "Item",
       dataIndex: "item",
-    },
-  ];
-
-  const data: DataType[] = [
-    {
-      key: "1",
-      date: "test",
-      name: "John Brown",
-      created_by: "test",
-      action: "test",
-      item: "test",
-    },
-    {
-      key: "2",
-      date: "test",
-      name: "John Brown",
-      created_by: "test",
-      action: "test",
-      item: "test",
-    },
-    {
-      key: "3",
-      date: "test",
-      name: "John Brown",
-      created_by: "test",
-      action: "test",
-      item: "test",
-    },
-    {
-      key: "4",
-      date: "test",
-      name: "John Brown",
-      created_by: "test",
-      action: "test",
-      item: "test",
     },
   ];
 
@@ -185,7 +203,7 @@ export default function BudgetRoutes() {
   return (
     <div>
       <Alert
-        message="You can see here all the status of overall budget status. Please check closely."
+        message="You can see here all the status of overall admin status. Please check closely."
         type="info"
         showIcon
       />
@@ -199,12 +217,12 @@ export default function BudgetRoutes() {
             style={{ border: "1px solid #e1e3e1" }}
           >
             <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Net Worth</h2>
+              <h2 className="text-sm font-semibold mb-2">Users</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                <AiOutlineUserAdd className="mt-1 mr-2" />{" "}
+                {dataUser}
               </p>
-              <p>Your total assets minus liabilities</p>
+              <p>Your total user's of ERP System</p>
             </div>
           </div>
           <div
@@ -212,12 +230,12 @@ export default function BudgetRoutes() {
             style={{ border: "1px solid #e1e3e1" }}
           >
             <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Monthly Income</h2>
+              <h2 className="text-sm font-semibold mb-2">Departments</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                {dataDepartment}
               </p>
-              <p>Total income this month</p>
+              <p>Total department's of ERP System</p>
             </div>
           </div>
           <div
@@ -225,12 +243,12 @@ export default function BudgetRoutes() {
             style={{ border: "1px solid #e1e3e1" }}
           >
             <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Monthly Expenses</h2>
+              <h2 className="text-sm font-semibold mb-2">Groups</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                {dataGroup}
               </p>
-              <p>Total expenses this month</p>
+              <p>Total group's of ERP System</p>
             </div>
           </div>
           <div
