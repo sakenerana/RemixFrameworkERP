@@ -64,6 +64,8 @@ export default function GroupsRoutes() {
 
   const handleTrack = () => {
     setIsModalOpen(true);
+    setEditingId(null);
+    form.resetFields();
   };
 
   const handleOk = () => {
@@ -78,13 +80,13 @@ export default function GroupsRoutes() {
     if (record.status_labels.name === 'Active') {
       const { error } = await GroupService.deactivateStatus(record.id, record);
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
     } else if (record.status_labels.name === 'Inactive') {
       const { error } = await GroupService.activateStatus(record.id, record);
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record activated successfully");
       fetchData();
     }
@@ -123,14 +125,14 @@ export default function GroupsRoutes() {
         // Update existing record
         const { error } = await GroupService.updatePost(editingId, values);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
         const { error } = await GroupService.createPost(allValues);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record created successfully");
       }
 

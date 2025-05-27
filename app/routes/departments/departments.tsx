@@ -60,6 +60,8 @@ export default function DepartmentsRoutes() {
 
   const handleTrack = () => {
     setIsModalOpen(true);
+    setEditingId(null);
+    form.resetFields();
   };
 
   const handleOk = () => {
@@ -77,7 +79,7 @@ export default function DepartmentsRoutes() {
         record
       );
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
     } else if (record.status_labels.name === 'Inactive') {
@@ -86,7 +88,7 @@ export default function DepartmentsRoutes() {
         record
       );
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record activated successfully");
       fetchData();
     }
@@ -125,14 +127,14 @@ export default function DepartmentsRoutes() {
         // Update existing record
         const { error } = await DepartmentService.updatePost(editingId, values);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
         const { error } = await DepartmentService.createPost(allValues);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record created successfully");
       }
 

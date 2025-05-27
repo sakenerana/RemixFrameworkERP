@@ -8,7 +8,10 @@ export interface User {
     password: string;
     phone: string;
     department_id: number;
-    group: string;
+    group_id: number;
+    office_id: number;
+    access: any;
+    permissions: any;
     departments: any;
     status_labels: any;
     actions: string;

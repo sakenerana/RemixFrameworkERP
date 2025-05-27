@@ -17,6 +17,7 @@ import {
   message,
   Modal,
   Popconfirm,
+  Radio,
   Row,
   Select,
   Space,
@@ -36,14 +37,14 @@ import {
   AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
-import { User } from "~/types/user.type";
+import { User } from "~/types/user.type"; 
 
 export default function UsersRoutes() {
   const [data, setData] = useState<User[]>([]);
@@ -51,9 +52,11 @@ export default function UsersRoutes() {
   const [dataGroup, setDataGroup] = useState<Groups[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(true);
   const [form] = Form.useForm<User>();
   const [editingId, setEditingId] = useState<number | null>(null);
   const { Option } = Select;
+  const { signUp } = useAuth();
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -72,7 +75,10 @@ export default function UsersRoutes() {
   };
 
   const handleTrack = () => {
+    setIsEditMode(false);
     setIsModalOpen(true);
+    setEditingId(null);
+    form.resetFields();
   };
 
   const handleOk = () => {
@@ -145,7 +151,8 @@ export default function UsersRoutes() {
   }, []); // Empty dependency array means this runs once on mount
 
   // Create or Update record
-  const onFinish = async () => {
+  const onFinish = async (event: any) => {
+    // event.preventDefault(); // Prevents the default form submission
     try {
       const values = await form.validateFields();
 
@@ -158,15 +165,24 @@ export default function UsersRoutes() {
       if (editingId) {
         // Update existing record
         const { error } = await UserService.updatePost(editingId, values);
-
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
-        const { error } = await UserService.createPost(allValues);
 
-        if (error) throw error;
+        const { error } = await signUp(values.email, values.password);
+        setLoading(false);
+        if (error) throw message.error(error.message);
+
+        try {
+          setLoading(true);
+          const { error } = await UserService.createPost(allValues);
+          if (error) throw error;
+        } catch (error) {
+          setLoading(false);
+          message.error("Error Registration");
+        }
         message.success("Record created successfully");
       }
 
@@ -182,10 +198,10 @@ export default function UsersRoutes() {
 
   // Edit record
   const editRecord = (record: User) => {
+    setIsEditMode(true);
     form.setFieldsValue(record);
     setEditingId(record.id);
     setIsModalOpen(true);
-    console.log("Record", record.id);
   };
 
   const columns: TableColumnsType<User> = [
@@ -256,7 +272,7 @@ export default function UsersRoutes() {
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
             >
-              Update
+              Profile
             </Tag>
           </Popconfirm>
           <Popconfirm
@@ -285,6 +301,36 @@ export default function UsersRoutes() {
               </Tag>
             )}
           </Popconfirm>
+          <Popconfirm
+            title="Do you want to reset email?"
+            description="Are you sure to reset this email?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton(record)}
+          >
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#1677ff"
+            >
+              Email
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to reset password?"
+            description="Are you sure to reset this password?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteButton(record)}
+          >
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+              color="#1677ff"
+            >
+              Password
+            </Tag>
+          </Popconfirm>
         </div>
       ),
     },
@@ -296,14 +342,19 @@ export default function UsersRoutes() {
     sorter,
     extra
   ) => {
-    console.log("params", pagination, filters, sorter, extra);
+    // console.log("params", pagination, filters, sorter, extra);
   };
 
   const onChangeAccess: GetProp<typeof Checkbox.Group, "onChange"> = (
     checkedValues
   ) => {
-    console.log("checked = ", checkedValues);
+    // console.log("checked = ", checkedValues);
   };
+
+  const optionsOffice: CheckboxOptionType<any>[] = [
+    { label: "Main Office", value: 1 },
+    { label: "Branch Office", value: 2 },
+  ];
 
   const options: CheckboxOptionType<any>[] = [
     { label: "Inventory Management", value: 1 },
@@ -352,7 +403,7 @@ export default function UsersRoutes() {
         </Space>
         <Modal
           style={{ top: 20 }}
-          width={700}
+          width={1100}
           title="Create User & Permissions"
           closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
@@ -417,7 +468,7 @@ export default function UsersRoutes() {
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={12}>
+                <Col xs={24} sm={8}>
                   <Form.Item
                     label="Email"
                     name="email"
@@ -428,11 +479,11 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Input placeholder="Email" />
+                    <Input disabled={isEditMode} placeholder="Email" />
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={12}>
+                <Col xs={24} sm={8}>
                   <Form.Item
                     label="Password"
                     name="password"
@@ -443,11 +494,11 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Input.Password placeholder="Password" />
+                    <Input.Password disabled={isEditMode} placeholder="Password" />
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={12}>
+                <Col xs={24} sm={8}>
                   <Form.Item
                     label="Phone No."
                     name="phone"
@@ -509,6 +560,25 @@ export default function UsersRoutes() {
                 </Col>
               </Row>
               <Divider />
+              <Row gutter={24}>
+                <Col xs={24} sm={24}>
+                  <Form.Item
+                    label="Office"
+                    name="office_id"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select branch office!",
+                      },
+                    ]}
+                  >
+                    <Radio.Group
+                      options={optionsOffice}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
               <Row gutter={24}>
                 <Col xs={24} sm={24}>
                   <Form.Item
@@ -613,6 +683,7 @@ export default function UsersRoutes() {
           onChange={onChange}
           className="pt-5"
           bordered
+          scroll={{ x: "max-content" }}
         />
       )}
 
