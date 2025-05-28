@@ -12,6 +12,9 @@ import "./tailwind.css";
 import { AuthProvider } from "./auth/AuthContext";
 import { createBrowserClient } from "@supabase/ssr";
 
+import { Provider } from 'react-redux';
+import { store } from "./state/store";
+
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -36,7 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <AuthProvider>
-          {children}
+          <Provider store={store}>
+            {children}
+          </Provider>
           <ScrollRestoration />
           <Scripts />
         </AuthProvider>

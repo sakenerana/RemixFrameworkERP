@@ -1,3 +1,4 @@
+import { CheckCircleOutlined } from "@ant-design/icons";
 import {
   Alert,
   Card,
@@ -7,9 +8,11 @@ import {
   TableProps,
   Table,
   message,
+  Tag,
+  Spin,
 } from "antd";
 import { useEffect, useState } from "react";
-import { AiOutlineStock, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import {
 } from "react-icons/fc";
 import BarChart from "~/components/bar_chart";
@@ -44,8 +47,10 @@ interface DataTypeAssetCategories {
 
 export default function BudgetRoutes() {
   const [dataUser, setDataUser] = useState<any>();
+  const [dataUserTable, setDataUserTable] = useState<User[]>([]);
   const [dataDepartment, setDataDepartment] = useState<any>();
   const [dataGroup, setDataGroup] = useState<any>();
+  const [dataInactiveUsers, setDataInactiveUsers] = useState<any>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -55,6 +60,19 @@ export default function BudgetRoutes() {
       setLoading(true);
       const data = await UserService.getTableCounts();
       setDataUser(data); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataUserTable = async () => {
+    try {
+      setLoading(true);
+      const dataFetch = await UserService.getActiveUsers();
+      setDataUserTable(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
     } finally {
@@ -88,12 +106,27 @@ export default function BudgetRoutes() {
     }
   };
 
+  // Fetch data from Supabase
+  const fetchDataInactiveUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await UserService.getTableCountsInactiveUsers();
+      setDataInactiveUsers(data); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchDataUser();
+    fetchDataUserTable();
     fetchDataDepartment();
     fetchDataGroup();
+    fetchDataInactiveUsers();
   }, []); // Empty dependency array means this runs once on mount
-  
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -129,75 +162,37 @@ export default function BudgetRoutes() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  const columnsLocation: TableColumnsType<DataTypeLocation> = [
+  const columnsUser: TableColumnsType<User> = [
     {
-      title: "Accounts",
-      dataIndex: "name",
+      title: "Email",
+      dataIndex: "email",
     },
     {
-      title: "Balance",
-      dataIndex: "age",
-    },
-  ];
-
-  const dataLocation: DataTypeLocation[] = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
+      title: "Status",
+      dataIndex: "status",
+      render: () => (
+        <>
+          <Tag color="green">
+            <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+          </Tag>
+        </>
+      )
     },
   ];
 
-  const columnsAssetCategories: TableColumnsType<DataTypeAssetCategories> = [
-    {
-      title: "Categories",
-      dataIndex: "name",
-    },
-    {
-      title: "Balance",
-      dataIndex: "age",
-    },
-  ];
-
-  const DataTypeAssetCategories: DataTypeAssetCategories[] = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-    },
-  ];
   const salesData = [
-    { category: "Jan", value: 120 },
+    { category: "Jan", value: dataUser },
     { category: "Feb", value: 200 },
     { category: "Mar", value: 150 },
     { category: "Apr", value: 80 },
     { category: "May", value: 270 },
+    { category: "Jun", value: 270 },
+    { category: "Jul", value: 270 },
+    { category: "Aug", value: 270 },
+    { category: "Sept", value: 270 },
+    { category: "Oct", value: 270 },
+    { category: "Nov", value: 270 },
+    { category: "Dec", value: 270 },
   ];
 
   return (
@@ -216,11 +211,12 @@ export default function BudgetRoutes() {
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div className="p-4">
               <h2 className="text-sm font-semibold mb-2">Users</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineUserAdd className="mt-1 mr-2" />{" "}
-                {dataUser}
+                {loading && <Spin></Spin>}
+                {!loading && dataUser}
               </p>
               <p>Your total user's of ERP System</p>
             </div>
@@ -229,11 +225,12 @@ export default function BudgetRoutes() {
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div className="p-4">
               <h2 className="text-sm font-semibold mb-2">Departments</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {dataDepartment}
+                <AiOutlineSolution className="mt-1 mr-2" />{" "}
+                {loading && <Spin></Spin>}
+                {!loading && dataDepartment}
               </p>
               <p>Total department's of ERP System</p>
             </div>
@@ -242,11 +239,12 @@ export default function BudgetRoutes() {
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div className="p-4">
               <h2 className="text-sm font-semibold mb-2">Groups</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {dataGroup}
+                <AiOutlineUsergroupAdd className="mt-1 mr-2" />{" "}
+                {loading && <Spin></Spin>}
+                {!loading && dataGroup}
               </p>
               <p>Total group's of ERP System</p>
             </div>
@@ -255,11 +253,12 @@ export default function BudgetRoutes() {
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Savings Rate</h2>
-              <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+            <div className="p-4">
+              <h2 className="text-sm font-semibold mb-2">Inactive Users</h2>
+              <p className="flex flex-wrap text-red-600 text-2xl font-bold">
+                <AiOutlineUserDelete className="mt-1 mr-2" />{" "}
+                {loading && <Spin></Spin>}
+                {!loading && dataInactiveUsers}
               </p>
               <p>Percentage of income saved</p>
             </div>
@@ -275,28 +274,32 @@ export default function BudgetRoutes() {
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div className="p-4">
               <h2 className="text-sm font-semibold mb-2">
-                Spending By Category
+                Added By Category
               </h2>
               <p className="flex flex-wrap">Current month breakdown</p>
-              <PieChart
-                data={[
-                  { type: "Food", value: 27 },
-                  { type: "Transport", value: 25 },
-                  { type: "Entertainment", value: 18 },
-                ]}
-                title=""
-              />
+              {loading && <Spin></Spin>}
+              {!loading &&
+                <PieChart
+                  data={[
+                    { type: "Users", value: dataUser },
+                    { type: "Departments", value: dataDepartment },
+                    { type: "Groups", value: dataGroup },
+                    { type: "Inactive Users", value: dataGroup },
+                  ]}
+                  title=""
+                />}
+
             </div>
           </div>
           <div
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
             style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div className="p-4">
               <h2 className="text-sm font-semibold mb-2">
-                Monthly Spending Trend
+                Monthly Data Trend
               </h2>
               <p className="flex flex-wrap">Last current months</p>
               <BarChart
@@ -313,27 +316,17 @@ export default function BudgetRoutes() {
       {/* THIS IS THE THIRD ROW OF DASHBOARD */}
 
       <Row gutter={16} className="pt-5">
-        <Col span={12}>
+        <Col span={24}>
           <div className="shadow-md">
             <Card title="Accounts Overview" variant="borderless">
-              <Table<DataTypeLocation>
-                bordered
-                size={"small"}
-                columns={columnsLocation}
-                dataSource={dataLocation}
-              />
-            </Card>
-          </div>
-        </Col>
-        <Col span={12}>
-          <div className="shadow-md">
-            <Card title="Recent Transactions" variant="borderless">
-              <Table<DataTypeAssetCategories>
-                bordered
-                size={"small"}
-                columns={columnsAssetCategories}
-                dataSource={DataTypeAssetCategories}
-              />
+              {loading && <Spin></Spin>}
+              {!loading &&
+                <Table<User>
+                  bordered
+                  size={"small"}
+                  columns={columnsUser}
+                  dataSource={dataUserTable}
+                />}
             </Card>
           </div>
         </Col>

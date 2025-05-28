@@ -14,6 +14,7 @@ export interface User {
     permissions: any;
     departments: any;
     status_labels: any;
+    status_id: number;
     count: any;
     actions: string;
 }

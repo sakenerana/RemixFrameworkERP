@@ -47,6 +47,28 @@ export const UserService = {
     return count;
   },
 
+  async getTableCountsInactiveUsers() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('users') // Replace with your table name
+      .select('*', { count: 'exact', head: true })
+      .eq('status_id', 2);
+
+    if (error) throw error; 
+    return count;
+  },
+
+  async getActiveUsers() {
+    // Get list of all tables (you'll need to know your table names)
+    const { data, error } = await supabase
+      .from('users') // Replace with your table name
+      .select('*')
+      .eq('status_id', 1);
+
+    if (error) throw error; 
+    return data;
+  },
+
   // Update
   async updatePost(id: number, updates: User) {
     const { data, error } = await supabase

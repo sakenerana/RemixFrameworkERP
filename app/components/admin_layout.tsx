@@ -137,7 +137,7 @@ export default function AdminLayoutIndex() {
                   <Modal
                     className=""
                     style={{ top: 20 }}
-                    width={1000}
+                    width={600}
                     title="Workflow Tracker"
                     closable={{ "aria-label": "Custom Close Button" }}
                     open={isModalOpen}

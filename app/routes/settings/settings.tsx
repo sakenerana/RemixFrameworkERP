@@ -60,12 +60,12 @@ export default function Setting() {
 
       <Col span={24}>
         <div className="flex flex-wrap gap-6">
-          <Card
+          {/* <Card
             className="border-gray-300"
             hoverable // Adds a hover effect
             onClick={handleClick}
             style={{
-              width: 200,
+              width: 160,
               textAlign: "center",
               cursor: "pointer",
             }}
@@ -83,7 +83,7 @@ export default function Setting() {
             hoverable // Adds a hover effect
             onClick={handleClick}
             style={{
-              width: 200,
+              width: 160,
               textAlign: "center",
               cursor: "pointer",
             }}
@@ -92,14 +92,14 @@ export default function Setting() {
               <UserOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <p>User Info</p>
             </Space>
-          </Card>
+          </Card> */}
 
           <Card
             className="border-gray-300"
             hoverable // Adds a hover effect
             onClick={handleClick}
             style={{
-              width: 200,
+              width: 160,
               textAlign: "center",
               cursor: "pointer",
             }}
@@ -115,14 +115,14 @@ export default function Setting() {
             hoverable // Adds a hover effect
             onClick={handleLandingPage}
             style={{
-              width: 200,
+              width: 160,
               textAlign: "center",
               cursor: "pointer",
             }}
           >
             <Space direction="vertical" size={16}>
               <SwapOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
-              <p>Back To Landing Page</p>
+              <p>Landing Page</p>
             </Space>
           </Card>
 
@@ -131,7 +131,7 @@ export default function Setting() {
             hoverable // Adds a hover effect
             onClick={handleSignout}
             style={{
-              width: 200,
+              width: 160,
               textAlign: "center",
               cursor: "pointer",
             }}
