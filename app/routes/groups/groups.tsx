@@ -362,7 +362,7 @@ export default function GroupsRoutes() {
             </Button>
           </Space>
           <Space wrap>
-            <PrintDropdownComponent></PrintDropdownComponent>
+            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>

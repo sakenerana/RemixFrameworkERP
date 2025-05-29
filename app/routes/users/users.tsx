@@ -32,19 +32,22 @@ import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
+  AiOutlineMail,
   AiOutlinePhone,
   AiOutlinePlus,
   AiOutlineSend,
+  AiOutlineUser,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { supabase } from "~/lib/supabase";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
-import { User } from "~/types/user.type"; 
+import { User } from "~/types/user.type";
 
 export default function UsersRoutes() {
   const [data, setData] = useState<User[]>([]);
@@ -167,14 +170,8 @@ export default function UsersRoutes() {
     try {
       const values = await form.validateFields();
 
-      // Include your extra field
-      const allValues = {
-        ...values,
-        status_id: 1,
-      };
-
       if (editingId) {
-        // Update existing record
+        // Update existing record 
         const { error } = await UserService.updatePost(editingId, values);
         if (error) throw message.error(error.message);
         message.success("Record updated successfully");
@@ -182,12 +179,20 @@ export default function UsersRoutes() {
         // Create new record
         setLoading(true);
 
-        const { error } = await signUp(values.email, values.password);
+        const { data, error } = await signUp(values.email, values.password);
         setLoading(false);
+        console.log("DATA PLEASE", data)
         if (error) throw message.error(error.message);
 
         try {
           setLoading(true);
+          // Include your extra field
+          const allValues = {
+            ...values,
+            status_id: 1,
+            auth_id: data?.user?.id
+          };
+          console.log("DATA PLEASE 2 PLEASE 2", data)
           const { error } = await UserService.createPost(allValues);
           if (error) throw error;
         } catch (error) {
@@ -452,7 +457,7 @@ export default function UsersRoutes() {
                       },
                     ]}
                   >
-                    <Input disabled={isEditMode} placeholder="Email" />
+                    <Input prefix={<AiOutlineMail />} disabled={isEditMode} placeholder="Email" />
                   </Form.Item>
                 </Col>
 
@@ -490,7 +495,25 @@ export default function UsersRoutes() {
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={12}>
+                <Col xs={24} sm={8}>
+                  <Form.Item
+                    label="Username"
+                    name="username"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select username!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={<AiOutlineUser />}
+                      placeholder="Username"
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={8}>
                   <Form.Item
                     label="Department"
                     name="department_id"
@@ -511,7 +534,7 @@ export default function UsersRoutes() {
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={12}>
+                <Col xs={24} sm={8}>
                   <Form.Item
                     label="Group"
                     name="group_id"
@@ -644,7 +667,7 @@ export default function UsersRoutes() {
             </Button>
           </Space>
           <Space wrap>
-            <PrintDropdownComponent></PrintDropdownComponent>
+            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>

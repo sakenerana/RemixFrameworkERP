@@ -13,6 +13,17 @@ export const UserService = {
     return data[0];
   },
 
+  // Create
+  async createPostProfile(postData: any) {
+    const { data, error } = await supabase
+      .from("profile")
+      .insert(postData)
+      .select();
+
+    if (error) throw error;
+    return data[0];
+  },
+
   // Read (single)
   async getPostById(id: User) {
     const { data, error } = await supabase

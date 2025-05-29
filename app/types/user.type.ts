@@ -7,6 +7,7 @@ export interface User {
     email: string;
     password: string;
     phone: string;
+    username: string;
     department_id: number;
     group_id: number;
     office_id: number;

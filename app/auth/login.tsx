@@ -102,9 +102,9 @@ export default function LoginIndex() {
             {/* or <a href="">Register now!</a> */}
           </Form.Item>
         </Form>
-        <div className="flex justify-center">
+        {/* <div className="flex justify-center">
           <a href="/signup">Register Now</a>
-        </div>
+        </div> */}
       </Card>
     </div>
   );
