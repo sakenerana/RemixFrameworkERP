@@ -25,7 +25,7 @@ export default function ForgotPasswordIndex() {
 
   return (
     <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfionline.jpg)] bg-cover bg-no-repeat">
-      <Card className="shadow-xl">
+      <Card className="shadow-2xl">
         <div className="flex flex-col items-center mb-5">
           <Image width={290} src="./img/cficoop.svg" />
         </div>
@@ -63,14 +63,14 @@ export default function ForgotPasswordIndex() {
           </Form.Item>
           <p>
             <b>
-              Usernames without an associated email address will not be emailed
+              Accounts without an associated email address will not be emailed
               a password reset link.
             </b>
           </p>
           <br />
-          <p className="pb-5">
+          {/* <p className="pb-5">
             If you cannot remember your username, contact your administrator.
-          </p>
+          </p> */}
           <Form.Item>
             <Button block type="primary" htmlType="submit">
               {loading && <LoadingOutlined className="animate-spin" />}

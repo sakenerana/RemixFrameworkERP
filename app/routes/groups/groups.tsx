@@ -47,6 +47,8 @@ export default function GroupsRoutes() {
   const [isTitle, setIsTitle] = useState('');
   const [form] = Form.useForm<Groups>();
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Groups[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -119,8 +121,16 @@ export default function GroupsRoutes() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.group?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   // Create or Update record
   const onFinish = async () => {
@@ -351,10 +361,7 @@ export default function GroupsRoutes() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
+            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
           </Space.Compact>
           <Space wrap>
             <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
@@ -371,7 +378,7 @@ export default function GroupsRoutes() {
         <Table<Groups>
           size="small"
           columns={columns}
-          dataSource={data}
+          dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"
           bordered

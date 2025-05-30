@@ -151,7 +151,7 @@ export default function BudgetLayoutIndex() {
                   <Modal
                     className=""
                     style={{ top: 20 }}
-                    width={1000}
+                    width={600}
                     title="Workflow Tracker"
                     closable={{ "aria-label": "Custom Close Button" }}
                     open={isModalOpen}
@@ -159,7 +159,7 @@ export default function BudgetLayoutIndex() {
                     onCancel={handleCancel}
                     footer=""
                   >
-                    <Setting></Setting>
+                    <Setting onSendData={(data: any) => setIsModalOpen(data)}></Setting>
                   </Modal>
                 </Space>
               </div>

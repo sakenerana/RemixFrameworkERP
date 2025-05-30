@@ -48,6 +48,7 @@ import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
 import { User } from "~/types/user.type";
+import { useDebounce } from 'use-debounce';
 
 export default function UsersRoutes() {
   const [data, setData] = useState<User[]>([]);
@@ -61,6 +62,8 @@ export default function UsersRoutes() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const { Option } = Select;
   const { signUp } = useAuth();
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<User[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -124,7 +127,7 @@ export default function UsersRoutes() {
     try {
       setLoading(true);
       const dataFetch = await UserService.getAllPosts();
-      setData(dataFetch); // Works in React state
+      setData(dataFetch); // Works in React state     
     } catch (error) {
       message.error("error");
     } finally {
@@ -159,10 +162,22 @@ export default function UsersRoutes() {
   };
 
   useEffect(() => {
-    fetchData();
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.first_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        data.middle_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        data.last_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        data.email?.toLowerCase().includes(searchText.toLowerCase()) ||
+        data.phone?.includes(searchText)
+      );
+      setFilteredData(filtered);
+    }
+
     fetchDataDepartment();
     fetchDataGroup();
-  }, []); // Empty dependency array means this runs once on mount
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   // Create or Update record
   const onFinish = async (event: any) => {
@@ -181,7 +196,6 @@ export default function UsersRoutes() {
 
         const { data, error } = await signUp(values.email, values.password);
         setLoading(false);
-        console.log("DATA PLEASE", data)
         if (error) throw message.error(error.message);
 
         try {
@@ -192,7 +206,7 @@ export default function UsersRoutes() {
             status_id: 1,
             auth_id: data?.user?.id
           };
-          console.log("DATA PLEASE 2 PLEASE 2", data)
+          
           const { error } = await UserService.createPost(allValues);
           if (error) throw error;
         } catch (error) {
@@ -354,7 +368,7 @@ export default function UsersRoutes() {
         <Breadcrumb
           items={[
             {
-              href: "/inventory",
+              href: "/admin",
               title: <HomeOutlined />,
             },
             {
@@ -656,10 +670,7 @@ export default function UsersRoutes() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
+            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
           </Space.Compact>
           <Space wrap>
             <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
@@ -676,7 +687,7 @@ export default function UsersRoutes() {
         <Table<User>
           size="small"
           columns={columns}
-          dataSource={data}
+          dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"
           bordered

@@ -43,6 +43,8 @@ export default function DepartmentsRoutes() {
   const [isTitle, setIsTitle] = useState('');
   const [form] = Form.useForm<Department>();
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Department[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -121,8 +123,16 @@ export default function DepartmentsRoutes() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.department?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   // Create or Update record
   const onFinish = async () => {
@@ -353,10 +363,7 @@ export default function DepartmentsRoutes() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
+            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
           </Space.Compact>
           <Space wrap>
             <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
@@ -373,7 +380,7 @@ export default function DepartmentsRoutes() {
         <Table<Department>
           size="small"
           columns={columns}
-          dataSource={data}
+          dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"
           bordered

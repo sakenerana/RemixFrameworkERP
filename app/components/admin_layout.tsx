@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -7,8 +7,8 @@ import {
 import { Button, Layout, Menu, Space, theme, Image, Modal } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
-    FcConferenceCall,
-    FcDepartment,
+  FcConferenceCall,
+  FcDepartment,
   FcDiploma1,
   FcGlobe,
   FcPortraitMode,
@@ -145,7 +145,7 @@ export default function AdminLayoutIndex() {
                     onCancel={handleCancel}
                     footer=""
                   >
-                    <Setting></Setting>
+                    <Setting onSendData={(data: any) => setIsModalOpen(data)}></Setting>
                   </Modal>
                 </Space>
               </div>
