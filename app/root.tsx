@@ -14,6 +14,7 @@ import { createBrowserClient } from "@supabase/ssr";
 
 import { Provider } from 'react-redux';
 import { store } from "./state/store";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -40,7 +41,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <AuthProvider>
           <Provider store={store}>
-            {children}
+            {/* <ProtectedRoute> */}
+              {children}
+            {/* </ProtectedRoute> */}
           </Provider>
           <ScrollRestoration />
           <Scripts />

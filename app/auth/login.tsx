@@ -29,7 +29,7 @@ export default function LoginIndex() {
       });
       if (data) {
         navigate("/landing-page");
-        console.log("fp", data);
+        // console.log("fp", data.user?.id);
       }
       if (error) throw error;
       setLoading(true);

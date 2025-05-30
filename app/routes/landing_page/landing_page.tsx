@@ -31,7 +31,7 @@ export default function LandingPage() {
         error,
       } = await supabase.auth.getUser();
       if (error) throw error;
-      console.log("test3", user?.id);
+      // console.log("test3", user?.id);
     } catch (error) {
       return { error };
     }
