@@ -25,11 +25,23 @@ export const UserService = {
   },
 
   // Read (single)
-  async getPostById(id: User) {
+  async getPostById(id: any) {
     const { data, error } = await supabase
       .from("users")
       .select("*")
       .eq("id", id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  //Read (single) For UUID
+  async getByUuid(uuid: any) { // Explicit string type for UUID
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', uuid) // Changed from 'id' to 'uuid'
       .single();
 
     if (error) throw error;
@@ -65,7 +77,7 @@ export const UserService = {
       .select('*', { count: 'exact', head: true })
       .eq('status_id', 2);
 
-    if (error) throw error; 
+    if (error) throw error;
     return count;
   },
 
@@ -76,7 +88,7 @@ export const UserService = {
       .select('*')
       .eq('status_id', 1);
 
-    if (error) throw error; 
+    if (error) throw error;
     return data;
   },
 

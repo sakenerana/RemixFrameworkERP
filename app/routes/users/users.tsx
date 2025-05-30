@@ -112,13 +112,13 @@ export default function UsersRoutes() {
 
       if (error) throw error;
       message.success("Record deactivated successfully");
-      fetchData();
+      await fetchData();
     } else if (record.status_labels.name === 'Inactive') {
       const { error } = await UserService.activateStatus(record.id, record);
 
       if (error) throw error;
       message.success("Record activated successfully");
-      fetchData();
+      await fetchData();
     }
   };
 
@@ -127,7 +127,7 @@ export default function UsersRoutes() {
     try {
       setLoading(true);
       const dataFetch = await UserService.getAllPosts();
-      setData(dataFetch); // Works in React state     
+      setData(dataFetch); // Works in React state  
     } catch (error) {
       message.error("error");
     } finally {

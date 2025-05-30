@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ApartmentOutlined,
   AuditOutlined,
   DropboxOutlined,
 } from "@ant-design/icons";
 import type { MenuProps, TabsProps } from "antd";
-import { Button, Card, Carousel, Space } from "antd";
+import { Button, Card, Carousel, message, Space } from "antd";
 import { Link, useNavigate } from "@remix-run/react";
 import { supabase } from "~/lib/supabase";
-import { AiOutlineReconciliation } from "react-icons/ai";
+import { AiFillCheckCircle, AiFillCloseCircle, AiOutlineReconciliation } from "react-icons/ai";
 import { LuPackageSearch } from "react-icons/lu";
 import { FaClipboardList, FaDollarSign } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
 import { Content } from "antd/es/layout/layout";
+import { useAuth } from "~/auth/AuthContext";
+import { UserService } from "~/services/user.service";
+import { User } from "~/types/user.type";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -22,28 +25,36 @@ const contentStyle: React.CSSProperties = {
 };
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  //   const { access_token, user } = useSupabaseAuth();
-  const onUser = async () => {
+  const { user } = useAuth();
+  const [data, setData] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch data from Supabase
+  const fetchDataByUUID = async () => {
     try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-      if (error) throw error;
-      // console.log("test3", user?.id);
+      setLoading(true);
+      const dataFetch = await UserService.getByUuid(user?.id);
+      setData(dataFetch); // Works in React state  
+      console.log("data", dataFetch)
     } catch (error) {
-      return { error };
+      message.error("error");
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDataByUUID();
+  }, []);
 
   const features = [
     {
       icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
-      title: "Inventory Management",
+      title: "Inventory",
       description:
-        "Track stock levels, manage suppliers, and streamline warehouse operations.",
+        "Manage suppliers, inventory, and streamline warehouse operations.",
       link: "/inventory",
+      access: true
     },
     {
       icon: <FaDollarSign className="h-8 w-8 text-green-500" />,
@@ -95,6 +106,10 @@ export default function LandingPage() {
                     {feature.title}
                   </h2>
                   <p className="text-sm text-gray-500">{feature.description}</p>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <p className="flex flex-wrap mt-4 mb-[-20px] text-red-500"><AiFillCloseCircle className="mt-1 mr-2" /> No Access</p>
+                  <p className="flex flex-wrap mt-4 mb-[-20px] text-green-500"><AiFillCheckCircle className="mt-1 mr-2" /> Access</p>
                 </div>
               </Link>
             </Card>

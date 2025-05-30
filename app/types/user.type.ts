@@ -17,5 +17,6 @@ export interface User {
     status_labels: any;
     status_id: number;
     count: any;
+    auth_id: any;
     actions: string;
 }
