@@ -9,6 +9,7 @@ import {
   Space,
   theme,
   Image,
+  Modal,
 } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
@@ -31,20 +32,32 @@ import {
   FcOk,
   FcPackage,
   FcPaid,
-  FcPlus,
-  FcPortraitMode,
   FcSalesPerformance,
-  FcSearch,
   FcSettings,
 } from "react-icons/fc";
+import Setting from "~/routes/settings/settings";
 
 const { Header, Sider, Content } = Layout;
 
 export default function InventoryLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const handleTrack = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const items = [
     {
@@ -268,13 +281,13 @@ export default function InventoryLayoutIndex() {
         },
       ],
     },
-    {
-      key: "4",
-      icon: <FcOk />,
-      label: (
-        <Link to="/inventory/requestable-items">Requestable Items</Link>
-      ),
-    },
+    // {
+    //   key: "4",
+    //   icon: <FcOk />,
+    //   label: (
+    //     <Link to="/inventory/requestable-items">Requestable Items</Link>
+    //   ),
+    // },
   ]
 
   return (
@@ -312,23 +325,38 @@ export default function InventoryLayoutIndex() {
                 <Space>
                   <Link to="/landing-page">
                     <Button icon={<SwapOutlined />} type="text">
-                      
+
                     </Button>
                   </Link>
-                  <Space.Compact style={{ width: "100%" }}>
+                  {/* <Space.Compact style={{ width: "100%" }}>
                     <Input placeholder="Search by Asset Tag" />
                     <Button icon={<FcSearch />} type="default">
                       Search
                     </Button>
-                  </Space.Compact>
-                  <Dropdown menu={{ items }} placement="topLeft">
+                  </Space.Compact> */}
+                  {/* <Dropdown menu={{ items }} placement="topLeft">
                     <Button icon={<FcPlus />}>Create New</Button>
-                  </Dropdown>
-                  <Link to="/inventory/settings">
-                    <Button icon={<FcSettings />} type="text">
-                      Settings
-                    </Button>
-                  </Link>
+                  </Dropdown> */}
+                  <Button
+                    onClick={() => handleTrack()}
+                    icon={<FcSettings />}
+                    type="text"
+                  >
+                    Settings
+                  </Button>
+                  <Modal
+                    className=""
+                    style={{ top: 20 }}
+                    width={600}
+                    title="Workflow Tracker"
+                    closable={{ "aria-label": "Custom Close Button" }}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer=""
+                  >
+                    <Setting onSendData={(data: any) => setIsModalOpen(data)}></Setting>
+                  </Modal>
                 </Space>
               </div>
             </div>

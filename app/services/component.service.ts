@@ -6,7 +6,7 @@ export const ComponentService = {
   // Create
   async createPost(postData: Component) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('components')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const ComponentService = {
   // Read (single)
   async getPostById(id: Component) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('components')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const ComponentService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('components')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const ComponentService = {
   },
 
   // Update
-  async updatePost(id: Component, updates: Component) {
+  async updatePost(id: number, updates: Component) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('components')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Component) {
+    const { data, error } = await supabase
+      .from('components')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Component) {
+    const { data, error } = await supabase
+      .from('components')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const ComponentService = {
   // Delete
   async deletePost(id: Component) {
     const { error } = await supabase
-      .from('posts')
+      .from('components')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const ComponentService = {
   // Custom query example
   async getPostsByDepartment(userId: Component) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('components')
       .select('*')
       .eq('user_id', userId)
     

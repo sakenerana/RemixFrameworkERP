@@ -6,7 +6,7 @@ export const ConsumableService = {
   // Create
   async createPost(postData: Consumable) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('consumables')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const ConsumableService = {
   // Read (single)
   async getPostById(id: Consumable) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('consumables')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const ConsumableService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('consumables')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const ConsumableService = {
   },
 
   // Update
-  async updatePost(id: Consumable, updates: Consumable) {
+  async updatePost(id: number, updates: Consumable) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('consumables')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Consumable) {
+    const { data, error } = await supabase
+      .from('consumables')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Consumable) {
+    const { data, error } = await supabase
+      .from('consumables')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const ConsumableService = {
   // Delete
   async deletePost(id: Consumable) {
     const { error } = await supabase
-      .from('posts')
+      .from('consumables')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const ConsumableService = {
   // Custom query example
   async getPostsByUser(userId: Consumable) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('consumables')
       .select('*')
       .eq('user_id', userId)
     

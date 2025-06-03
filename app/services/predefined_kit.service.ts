@@ -38,10 +38,34 @@ export const PredefinedKitService = {
   },
 
   // Update
-  async updatePost(id: PredefinedKit, updates: PredefinedKit) {
+  async updatePost(id: number, updates: PredefinedKit) {
     const { data, error } = await supabase
       .from('posts')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+    // Activate
+  async activateStatus(id: number, updates: PredefinedKit) {
+    const { data, error } = await supabase
+      .from('departments')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: PredefinedKit) {
+    const { data, error } = await supabase
+      .from('departments')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     

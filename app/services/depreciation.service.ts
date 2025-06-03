@@ -6,7 +6,7 @@ export const DepreciationService = {
   // Create
   async createPost(postData: Depreciation) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const DepreciationService = {
   // Read (single)
   async getPostById(id: Depreciation) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const DepreciationService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const DepreciationService = {
   },
 
   // Update
-  async updatePost(id: Depreciation, updates: Depreciation) {
+  async updatePost(id: number, updates: Depreciation) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Depreciation) {
+    const { data, error } = await supabase
+      .from('depreciations')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Depreciation) {
+    const { data, error } = await supabase
+      .from('depreciations')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const DepreciationService = {
   // Delete
   async deletePost(id: Depreciation) {
     const { error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const DepreciationService = {
   // Custom query example
   async getPostsByDepartment(userId: Depreciation) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('depreciations')
       .select('*')
       .eq('user_id', userId)
     

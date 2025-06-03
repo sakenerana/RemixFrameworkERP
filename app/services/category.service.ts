@@ -6,7 +6,7 @@ export const CategoryService = {
   // Create
   async createPost(postData: Category) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('categories')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const CategoryService = {
   // Read (single)
   async getPostById(id: Category) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('categories')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const CategoryService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('categories')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const CategoryService = {
   },
 
   // Update
-  async updatePost(id: Category, updates: Category) {
+  async updatePost(id: number, updates: Category) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('categories')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Category) {
+    const { data, error } = await supabase
+      .from('categories')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Category) {
+    const { data, error } = await supabase
+      .from('categories')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const CategoryService = {
   // Delete
   async deletePost(id: Category) {
     const { error } = await supabase
-      .from('posts')
+      .from('categories')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const CategoryService = {
   // Custom query example
   async getPostsByUser(userId: Category) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('categories')
       .select('*')
       .eq('user_id', userId)
     

@@ -14,6 +14,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Table,
   TableColumnsType,
   TableProps,
@@ -38,13 +39,14 @@ import { Supplier } from "~/types/supplier.type";
 
 export default function SuppliersRoutes() {
   const [data, setData] = useState<Supplier[]>([]);
-  const [dataDepartment, setDataDepartment] = useState<Supplier[]>([]);
-  const [dataGroup, setDataGroup] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm<any>();
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [isTitle, setIsTitle] = useState('');
+  const [form] = Form.useForm<Supplier>();
   const [editingId, setEditingId] = useState<number | null>(null);
-  const { Option } = Select;
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Supplier[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -63,7 +65,20 @@ export default function SuppliersRoutes() {
   };
 
   const handleTrack = () => {
+    setIsEditMode(false);
     setIsModalOpen(true);
+    setEditingId(null);
+    form.resetFields();
+    setIsTitle('Create Supplier')
+  };
+
+  // Edit record
+  const editRecord = (record: Supplier) => {
+    setIsEditMode(true);
+    form.setFieldsValue(record);
+    setEditingId(record.id);
+    setIsModalOpen(true);
+    setIsTitle('Update Supplier')
   };
 
   const handleOk = () => {
@@ -75,16 +90,22 @@ export default function SuppliersRoutes() {
   };
 
   const handleDeleteButton = async (record: Supplier) => {
-    if (record.id === 1) {
-      const { error } = await SupplierService.deactivateStatus(record.id, record);
+    if (record.status_labels.name === 'Active') {
+      const { error } = await SupplierService.deactivateStatus(
+        record.id,
+        record
+      );
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
-    } else if (record?.id === 2) {
-      const { error } = await SupplierService.activateStatus(record.id, record);
+    } else if (record.status_labels.name === 'Inactive') {
+      const { error } = await SupplierService.activateStatus(
+        record.id,
+        record
+      );
 
-      if (error) throw error;
+      if (error) throw message.error(error.message);
       message.success("Record activated successfully");
       fetchData();
     }
@@ -104,12 +125,21 @@ export default function SuppliersRoutes() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.name?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   // Create or Update record
   const onFinish = async () => {
     try {
+
       const values = await form.validateFields();
 
       // Include your extra field
@@ -122,14 +152,14 @@ export default function SuppliersRoutes() {
         // Update existing record
         const { error } = await SupplierService.updatePost(editingId, values);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
         const { error } = await SupplierService.createPost(allValues);
 
-        if (error) throw error;
+        if (error) throw message.error(error.message);
         message.success("Record created successfully");
       }
 
@@ -141,14 +171,6 @@ export default function SuppliersRoutes() {
     } catch (error) {
       message.error("Error");
     }
-  };
-
-  // Edit record
-  const editRecord = (record: Supplier) => {
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    console.log("Record", record.id);
   };
 
   const columns: TableColumnsType<Supplier> = [
@@ -202,13 +224,13 @@ export default function SuppliersRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record?.id === 1) {
+        if (record.id === 1) {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record?.id === 2) {
+        } else if (record.id === 2) {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -226,7 +248,7 @@ export default function SuppliersRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this user?"
+            description="Are you sure to update this department?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => editRecord(record)}
@@ -240,19 +262,30 @@ export default function SuppliersRoutes() {
             </Tag>
           </Popconfirm>
           <Popconfirm
-            title="Do you want to deactivate?"
-            description="Are you sure to deactivate this user?"
+            title="Do you want to delete?"
+            description="Are you sure to delete this supplier?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton(record)}
           >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-              color="#f50"
-            >
-              Deactivate
-            </Tag>
+            {record.status_labels.name === 'Active' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                Deactivate
+              </Tag>
+            )}
+            {record.status_labels.name === 'Inactive' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#1677ff"
+              >
+                Activate
+              </Tag>
+            )}
           </Popconfirm>
         </div>
       ),
@@ -298,7 +331,7 @@ export default function SuppliersRoutes() {
           <Modal
             style={{ top: 20 }}
             width={700}
-            title="Create User & Permissions"
+            title={isTitle}
             closable={{ "aria-label": "Custom Close Button" }}
             open={isModalOpen}
             onOk={handleOk}
@@ -411,27 +444,6 @@ export default function SuppliersRoutes() {
                     </Form.Item>
                   </Col>
 
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Department"
-                      name="department_id"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select department type!",
-                        },
-                      ]}
-                    >
-                      <Select placeholder="Select department">
-                        {dataDepartment.map((item: Supplier) => (
-                          <Option key={item.id} value={item.id}>
-                            {item.supplier}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-
                 </Row>
 
                 <Divider />
@@ -455,11 +467,11 @@ export default function SuppliersRoutes() {
                         {!loading && <AiOutlineSend />}
                       </>
                     }
-                    //   loading={loading}
                     className="w-full sm:w-auto"
                     size="large"
                   >
-                    Submit
+                    {isEditMode && <p>Update</p>}
+                    {!isEditMode && <p>Submit</p>}
                   </Button>
                 </Form.Item>
               </Form>
@@ -475,30 +487,30 @@ export default function SuppliersRoutes() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
+            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
           </Space.Compact>
           <Space wrap>
-            <Button icon={<FcRefresh />} type="default">
+            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
               Refresh
             </Button>
           </Space>
           <Space wrap>
-            <PrintDropdownComponent></PrintDropdownComponent>
+            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>
-      <Table<Supplier>
-        size="small"
-        columns={columns}
-        dataSource={data}
-        onChange={onChange}
-        className="pt-5"
-        bordered
-        scroll={{ x: "max-content" }}
-      />
+      {loading && <Spin></Spin>}
+      {!loading && (
+        <Table<Supplier>
+          size="small"
+          columns={columns}
+          dataSource={searchText ? filteredData : data}
+          onChange={onChange}
+          className="pt-5"
+          bordered
+          scroll={{ x: "max-content" }}
+        />
+      )}
     </div>
   );
 }

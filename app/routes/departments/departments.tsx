@@ -182,13 +182,13 @@ export default function DepartmentsRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record.status_labels.name === 'Active') {
+        if (record?.id === 1) {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record.status_labels.name === 'Inactive') {
+        } else if (record?.id === 2) {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive

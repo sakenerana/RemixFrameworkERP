@@ -6,7 +6,7 @@ export const ManufacturerService = {
   // Create
   async createPost(postData: Manufacturer) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const ManufacturerService = {
   // Read (single)
   async getPostById(id: Manufacturer) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const ManufacturerService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const ManufacturerService = {
   },
 
   // Update
-  async updatePost(id: Manufacturer, updates: Manufacturer) {
+  async updatePost(id: number, updates: Manufacturer) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Manufacturer) {
+    const { data, error } = await supabase
+      .from('manufacturers')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Manufacturer) {
+    const { data, error } = await supabase
+      .from('manufacturers')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const ManufacturerService = {
   // Delete
   async deletePost(id: Manufacturer) {
     const { error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const ManufacturerService = {
   // Custom query example
   async getPostsByDepartment(userId: Manufacturer) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('manufacturers')
       .select('*')
       .eq('user_id', userId)
     

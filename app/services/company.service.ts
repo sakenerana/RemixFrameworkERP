@@ -6,7 +6,7 @@ export const CompanyService = {
   // Create
   async createPost(postData: Company) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('companies')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const CompanyService = {
   // Read (single)
   async getPostById(id: Company) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('companies')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const CompanyService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('companies')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const CompanyService = {
   },
 
   // Update
-  async updatePost(id: Company, updates: Company) {
+  async updatePost(id: number, updates: Company) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('companies')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Company) {
+    const { data, error } = await supabase
+      .from('companies')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Company) {
+    const { data, error } = await supabase
+      .from('companies')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const CompanyService = {
   // Delete
   async deletePost(id: Company) {
     const { error } = await supabase
-      .from('posts')
+      .from('companies')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const CompanyService = {
   // Custom query example
   async getPostsByDepartment(userId: Company) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('companies')
       .select('*')
       .eq('user_id', userId)
     

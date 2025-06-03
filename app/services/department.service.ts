@@ -60,6 +60,8 @@ export const DepartmentService = {
     return data[0]
   },
 
+  
+
   // Activate
   async activateStatus(id: number, updates: Department) {
     const { data, error } = await supabase

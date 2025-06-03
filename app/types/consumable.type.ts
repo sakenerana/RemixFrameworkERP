@@ -1,5 +1,6 @@
 export interface Consumable {
     key: React.Key;
+    id: number;
     name: string;
     category: string;
     model_no: string;
@@ -12,5 +13,6 @@ export interface Consumable {
     purchase_date: string;
     purchase_cost: string;
     action: string;
+    status_labels: any;
     check_status: string;
 }

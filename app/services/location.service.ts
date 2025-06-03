@@ -6,7 +6,7 @@ export const LocationService = {
   // Create
   async createPost(postData: Location) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('locations')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const LocationService = {
   // Read (single)
   async getPostById(id: Location) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('locations')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const LocationService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('locations')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const LocationService = {
   },
 
   // Update
-  async updatePost(id: Location, updates: Location) {
+  async updatePost(id: number, updates: Location) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('locations')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+   // Activate
+  async activateStatus(id: number, updates: Location) {
+    const { data, error } = await supabase
+      .from('locations')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Location) {
+    const { data, error } = await supabase
+      .from('locations')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const LocationService = {
   // Delete
   async deletePost(id: Location) {
     const { error } = await supabase
-      .from('posts')
+      .from('locations')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const LocationService = {
   // Custom query example
   async getPostsByDepartment(userId: Location) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('locations')
       .select('*')
       .eq('user_id', userId)
     

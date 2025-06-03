@@ -1,5 +1,6 @@
 export interface Component {
     key: React.Key;
+    id: number;
     name: string;
     serial_no: string;
     category: string;
@@ -12,5 +13,6 @@ export interface Component {
     purchase_date: string;
     purchase_cost: number;
     action: string;
+    status_labels: any;
     check_status: string;
 }
