@@ -101,25 +101,30 @@ export default function InventoryLayoutIndex() {
     {
       key: "11",
       icon: <FcSalesPerformance />,
-      label: <Link to="/inventory/users">Assets</Link>,
-      children: [
-        {
-          key: "11.1",
-          icon: <FcInspection />,
-          label: <Link to="/inventory/assets/requested">Requested</Link>,
-        },
-        {
-          key: "11.2",
-          icon: <FcCancel />,
-          label: <Link to="/inventory/assets/deleted">Deleted</Link>,
-        },
-        {
-          key: "11.3",
-          icon: <FcPackage />,
-          label: <Link to="/inventory/assets/list-assets">Assets</Link>,
-        },
-      ],
+      label: <Link to="/inventory/assets">Assets</Link>,
     },
+    // {
+    //   key: "11",
+    //   icon: <FcSalesPerformance />,
+    //   label: <Link to="/inventory/users">Assets</Link>,
+    //   children: [
+    //     {
+    //       key: "11.1",
+    //       icon: <FcInspection />,
+    //       label: <Link to="/inventory/assets/requested">Requested</Link>,
+    //     },
+    //     {
+    //       key: "11.2",
+    //       icon: <FcCancel />,
+    //       label: <Link to="/inventory/assets/deleted">Deleted</Link>,
+    //     },
+    //     {
+    //       key: "11.3",
+    //       icon: <FcPackage />,
+    //       label: <Link to="/inventory/assets/list-assets">Assets</Link>,
+    //     },
+    //   ],
+    // },
     {
       key: "10",
       icon: <FcDiploma1 />,

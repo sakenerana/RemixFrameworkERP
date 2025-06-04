@@ -1,13 +1,16 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -25,26 +28,27 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineExport,
+  AiOutlineFileDone,
+  AiOutlineFileExclamation,
   AiOutlineImport,
   AiOutlinePlus,
   AiOutlineSend,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { AccessoryService } from "~/services/accessory.service";
-import { Accessories } from "~/types/accessories.type";
+import { AssetService } from "~/services/asset.service";
+import { Asset } from "~/types/asset.type";
 
-export default function AccesoriessRoute() {
-  const [data, setData] = useState<Accessories[]>([]);
+export default function AssetsRoute() {
+  const [data, setData] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(true);
   const [isTitle, setIsTitle] = useState('');
-  const [form] = Form.useForm<Accessories>();
+  const [form] = Form.useForm<Asset>();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState<Accessories[]>([]);
+  const [filteredData, setFilteredData] = useState<Asset[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -67,16 +71,16 @@ export default function AccesoriessRoute() {
     setIsModalOpen(true);
     setEditingId(null);
     form.resetFields();
-    setIsTitle('Create Accessory')
+    setIsTitle('Create Asset')
   };
 
   // Edit record
-  const editRecord = (record: Accessories) => {
+  const editRecord = (record: Asset) => {
     setIsEditMode(true);
     form.setFieldsValue(record);
     setEditingId(record.id);
     setIsModalOpen(true);
-    setIsTitle('Update Accessory')
+    setIsTitle('Update Asset')
   };
 
   const handleOk = () => {
@@ -87,9 +91,9 @@ export default function AccesoriessRoute() {
     setIsModalOpen(false);
   };
 
-  const handleDeleteButton = async (record: Accessories) => {
+  const handleDeleteButton = async (record: Asset) => {
     if (record.status_labels.name === 'Active') {
-      const { error } = await AccessoryService.deactivateStatus(
+      const { error } = await AssetService.deactivateStatus(
         record.id,
         record
       );
@@ -98,7 +102,7 @@ export default function AccesoriessRoute() {
       message.success("Record deactivated successfully");
       fetchData();
     } else if (record.status_labels.name === 'Inactive') {
-      const { error } = await AccessoryService.activateStatus(
+      const { error } = await AssetService.activateStatus(
         record.id,
         record
       );
@@ -113,7 +117,7 @@ export default function AccesoriessRoute() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await AccessoryService.getAllPosts();
+      const dataFetch = await AssetService.getAllPosts();
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -148,14 +152,14 @@ export default function AccesoriessRoute() {
 
       if (editingId) {
         // Update existing record
-        const { error } = await AccessoryService.updatePost(editingId, values);
+        const { error } = await AssetService.updatePost(editingId, values);
 
         if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
         // Create new record
         setLoading(true);
-        const { error } = await AccessoryService.createPost(allValues);
+        const { error } = await AssetService.createPost(allValues);
 
         if (error) throw message.error(error.message);
         message.success("Record created successfully");
@@ -175,25 +179,60 @@ export default function AccesoriessRoute() {
 
   const handleCheckoutButton = () => { };
 
-  const columns: TableColumnsType<Accessories> = [
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Asset Name": true,
+    "Device Image": false,
+    "Asset Tag": true,
+    "Serial": true,
+    "Model": true,
+    "Category": true,
+    "Checked Out To": true,
+    "Location": true,
+    "Purchase Cost": false,
+    "Current Value": false,
+    "Accounting Code": false,
+    "Installed": false,
+    "Size": false,
+    "Status": true,
+    "Actions": true,
+    "Checkout": true,
+  });
+
+  const columns: TableColumnsType<Asset> = [
     {
-      title: "Item Image",
-      dataIndex: "item_image",
-      width: 120,
-    },
-    {
-      title: "Name",
+      title: "Asset Name",
       dataIndex: "name",
       width: 120,
     },
     {
-      title: "Asset Category",
-      dataIndex: "asset_category",
+      title: "Device Image",
+      dataIndex: "device_image",
       width: 120,
     },
     {
-      title: "Model No.",
-      dataIndex: "model_no",
+      title: "Asset Tag",
+      dataIndex: "asset_tag",
+      width: 120,
+    },
+    {
+      title: "Serial",
+      dataIndex: "serial_no",
+      width: 120,
+    },
+    {
+      title: "Model",
+      dataIndex: "model",
+      width: 120,
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      width: 120,
+    },
+    {
+      title: "Checked Out To",
+      dataIndex: "checked_out_to",
       width: 120,
     },
     {
@@ -202,23 +241,28 @@ export default function AccesoriessRoute() {
       width: 120,
     },
     {
-      title: "Min. QTY",
-      dataIndex: "min_qty",
-      width: 120,
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      width: 120,
-    },
-    {
-      title: "Checked Out",
-      dataIndex: "checked_out",
-      width: 120,
-    },
-    {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
+      width: 120,
+    },
+    {
+      title: "Current Value",
+      dataIndex: "current_value",
+      width: 120,
+    },
+    {
+      title: "Accounting Code",
+      dataIndex: "accounting_code",
+      width: 120,
+    },
+    {
+      title: "Installed",
+      dataIndex: "installed",
+      width: 120,
+    },
+    {
+      title: "Size",
+      dataIndex: "size",
       width: 120,
     },
     {
@@ -302,7 +346,7 @@ export default function AccesoriessRoute() {
           {data.check_status == "checkin" ? (
             <Popconfirm
               title="Do you want to checkin?"
-              description="Are you sure to checkin this request?"
+              description="Are you sure to checkin this asset?"
               okText="Yes"
               cancelText="No"
               onConfirm={() => handleCheckinButton()}
@@ -318,7 +362,7 @@ export default function AccesoriessRoute() {
           ) : (
             <Popconfirm
               title="Do you want to checkout?"
-              description="Are you sure to checkout this request?"
+              description="Are you sure to checkout this asset?"
               okText="Yes"
               cancelText="No"
               onConfirm={() => handleCheckoutButton()}
@@ -337,7 +381,33 @@ export default function AccesoriessRoute() {
     },
   ];
 
-  const onChange: TableProps<Accessories>["onChange"] = (
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
+
+  const onChange: TableProps<Asset>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -356,14 +426,14 @@ export default function AccesoriessRoute() {
               title: <HomeOutlined />,
             },
             {
-              title: "Accessories",
+              title: "Assets",
             },
           ]}
         />
         <Space wrap>
-          <Link to={"deleted-accessories"}>
-            <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-              Show Deleted Accessories
+          <Link to={"/inventory/assets/deleted-assets"}>
+            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
+              Show Deleted Assets
             </Button>
           </Link>
           <Button
@@ -371,7 +441,7 @@ export default function AccesoriessRoute() {
             icon={<AiOutlinePlus />}
             type="primary"
           >
-            Create Accessory
+            Create Asset
           </Button>
         </Space>
         <Modal
@@ -446,7 +516,7 @@ export default function AccesoriessRoute() {
       </div>
       <div className="flex justify-between">
         <Alert
-          message="Note: This is the list of all accessories. Please check closely."
+          message="Note: This is the list of all licensed item. Please check closely."
           type="info"
           showIcon
         />
@@ -460,15 +530,22 @@ export default function AccesoriessRoute() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>
       {loading && <Spin></Spin>}
       {!loading && (
-        <Table<Accessories>
+        <Table<Asset>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

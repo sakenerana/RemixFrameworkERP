@@ -1,5 +1,6 @@
 export interface License {
     key: React.Key;
+    id: number;
     name: string;
     product_key: string;
     expiration_date: string;
@@ -10,5 +11,6 @@ export interface License {
     total: number;
     avail: string;
     action: string;
+    status_labels: any;
     check_status: string;
 }

@@ -1,6 +1,7 @@
 export interface Asset {
     key: React.Key;
-    asset_name: string;
+    id: number;
+    name: string;
     device_image: string;
     asset_tag: string;
     serial_no: string;
@@ -14,5 +15,6 @@ export interface Asset {
     installed: string;
     size: string;
     action: string;
+    status_labels: any;
     check_status: string;
 }

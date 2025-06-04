@@ -164,16 +164,11 @@ export default defineConfig({
                   );
                 }
               );
-              route(
-                "assets/requested",
-                "routes/requested/assets.requested.tsx",
-                { index: true }
-              );
               route("assets/deleted", "routes/deleted/assets.deleted.tsx", {
                 index: true,
               });
-              route("assets/list-assets", "routes/assets/route.tsx", () => {
-                route("", "routes/assets/assets.list_assets.tsx", {
+              route("assets", "routes/assets/route.tsx", () => {
+                route("", "routes/assets/assets.tsx", {
                   index: true,
                 });
                 route("audit-assets", "routes/assets/assets.audit.tsx", {

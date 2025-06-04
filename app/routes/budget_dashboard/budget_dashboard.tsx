@@ -3,25 +3,12 @@ import {
   Card,
   Col,
   Row,
-  Statistic,
   TableColumnsType,
   TableProps,
   Table,
-  Flex,
-  Progress,
-  Tag,
 } from "antd";
 import { useState } from "react";
 import { AiOutlineStock } from "react-icons/ai";
-import {
-  FcDiploma1,
-  FcInspection,
-  FcMultipleDevices,
-  FcMultipleSmartphones,
-  FcNews,
-  FcPackage,
-  FcPortraitMode,
-} from "react-icons/fc";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 

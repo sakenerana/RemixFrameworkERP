@@ -6,7 +6,7 @@ export const AssetService = {
   // Create
   async createPost(postData: Asset) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('assets')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const AssetService = {
   // Read (single)
   async getPostById(id: Asset) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('assets')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const AssetService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('assets')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -38,10 +38,34 @@ export const AssetService = {
   },
 
   // Update
-  async updatePost(id: Asset, updates: Asset) {
+  async updatePost(id: number, updates: Asset) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('assets')
       .update(updates)
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Activate
+  async activateStatus(id: number, updates: Asset) {
+    const { data, error } = await supabase
+      .from('assets')
+      .update({ status_id: 1 })
+      .eq('id', id)
+      .select()
+    
+    if (error) throw error
+    return data[0]
+  },
+
+  // Deactivate
+  async deactivateStatus(id: number, updates: Asset) {
+    const { data, error } = await supabase
+      .from('assets')
+      .update({ status_id: 2 })
       .eq('id', id)
       .select()
     
@@ -52,7 +76,7 @@ export const AssetService = {
   // Delete
   async deletePost(id: Asset) {
     const { error } = await supabase
-      .from('posts')
+      .from('assets')
       .delete()
       .eq('id', id)
     
@@ -63,7 +87,7 @@ export const AssetService = {
   // Custom query example
   async getPostsByUser(userId: Asset) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('assets')
       .select('*')
       .eq('user_id', userId)
     
