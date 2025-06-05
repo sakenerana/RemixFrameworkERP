@@ -2,15 +2,19 @@ import {
   CheckCircleOutlined,
   HomeOutlined,
   LoadingOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -171,6 +175,13 @@ export default function DepartmentsRoutes() {
     }
   };
 
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Department Name": true,
+    "Status": true,
+    "Actions": true,
+  });
+
   const columns: TableColumnsType<Department> = [
     {
       title: "Department Name",
@@ -182,13 +193,13 @@ export default function DepartmentsRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record?.id === 1) {
+        if (record.status_labels.name === 'Active') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record?.id === 2) {
+        } else if (record.status_labels.name === 'Inactive') {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -249,6 +260,32 @@ export default function DepartmentsRoutes() {
       ),
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<Department>["onChange"] = (
     pagination,
@@ -371,6 +408,13 @@ export default function DepartmentsRoutes() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -379,7 +423,7 @@ export default function DepartmentsRoutes() {
       {!loading && (
         <Table<Department>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

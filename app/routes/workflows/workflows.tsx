@@ -1,10 +1,13 @@
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
+  Dropdown,
   Input,
+  MenuProps,
   Popconfirm,
   Space,
   Spin,
@@ -64,6 +67,13 @@ export default function Workflows() {
     navigate("assigned/id?=" + value.id);
   };
 
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Name": true,
+    "Product Key": true,
+    "Actions": true,
+  });
+
   const columns: TableColumnsType<DataType> = [
     {
       title: "Name",
@@ -101,6 +111,32 @@ export default function Workflows() {
       ),
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,
@@ -145,7 +181,14 @@ export default function Workflows() {
             </Button>
           </Space>
           <Space wrap>
-            <PrintDropdownComponent></PrintDropdownComponent>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
+            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>
@@ -153,7 +196,7 @@ export default function Workflows() {
       {!loading && (
         <Table<DataType>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={data}
           onChange={onChange}
           className="pt-5"

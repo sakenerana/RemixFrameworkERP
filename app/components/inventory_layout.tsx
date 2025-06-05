@@ -234,11 +234,11 @@ export default function InventoryLayoutIndex() {
             </Link>
           ),
         },
-        {
-          key: "3.3",
-          icon: <FcComboChart />,
-          label: <Link to="/inventory/reports/audit-log">Audit Log</Link>,
-        },
+        // {
+        //   key: "3.3",
+        //   icon: <FcComboChart />,
+        //   label: <Link to="/inventory/reports/audit-log">Audit Log</Link>,
+        // },
         {
           key: "3.4",
           icon: <FcComboChart />,
@@ -266,15 +266,15 @@ export default function InventoryLayoutIndex() {
             </Link>
           ),
         },
-        {
-          key: "3.7",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/unaccepted-assets">
-              Unaccepted Assets
-            </Link>
-          ),
-        },
+        // {
+        //   key: "3.7",
+        //   icon: <FcComboChart />,
+        //   label: (
+        //     <Link to="/inventory/reports/unaccepted-assets">
+        //       Unaccepted Assets
+        //     </Link>
+        //   ),
+        // },
         {
           key: "3.8",
           icon: <FcComboChart />,

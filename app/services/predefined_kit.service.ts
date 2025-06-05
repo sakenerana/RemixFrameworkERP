@@ -6,7 +6,7 @@ export const PredefinedKitService = {
   // Create
   async createPost(postData: PredefinedKit) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('predefined')
       .insert(postData)
       .select()
     
@@ -17,7 +17,7 @@ export const PredefinedKitService = {
   // Read (single)
   async getPostById(id: PredefinedKit) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('predefined')
       .select('*')
       .eq('id', id)
       .single()
@@ -29,7 +29,7 @@ export const PredefinedKitService = {
   // Read (multiple)
   async getAllPosts() {
     const { data, error } = await supabase
-      .from('posts')
+      .from('predefined')
       .select('*')
       .order('created_at', { ascending: false })
     
@@ -40,7 +40,7 @@ export const PredefinedKitService = {
   // Update
   async updatePost(id: number, updates: PredefinedKit) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('predefined')
       .update(updates)
       .eq('id', id)
       .select()
@@ -52,7 +52,7 @@ export const PredefinedKitService = {
     // Activate
   async activateStatus(id: number, updates: PredefinedKit) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('predefined')
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
@@ -64,7 +64,7 @@ export const PredefinedKitService = {
   // Deactivate
   async deactivateStatus(id: number, updates: PredefinedKit) {
     const { data, error } = await supabase
-      .from('departments')
+      .from('predefined')
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
@@ -76,7 +76,7 @@ export const PredefinedKitService = {
   // Delete
   async deletePost(id: PredefinedKit) {
     const { error } = await supabase
-      .from('posts')
+      .from('predefined')
       .delete()
       .eq('id', id)
     
@@ -87,7 +87,7 @@ export const PredefinedKitService = {
   // Custom query example
   async getPostsByDepartment(userId: PredefinedKit) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('predefined')
       .select('*')
       .eq('user_id', userId)
     

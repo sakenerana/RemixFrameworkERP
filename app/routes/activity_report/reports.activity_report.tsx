@@ -1,81 +1,129 @@
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
+  Dropdown,
   Input,
+  MenuProps,
+  message,
   Space,
+  Spin,
   Table,
   TableColumnsType,
   TableProps,
 } from "antd";
+import { useEffect, useState } from "react";
 import { FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { ActivityReport } from "~/types/actiity_report.type";
+import { ActivityReport } from "~/types/activity_report.type";
 
 export default function ActivityReportRoutes() {
-  const data: ActivityReport[] = [
-    {
-      key: "1",
-      name: "John Brown",
-      product_key: "test",
-      expiration_date: "test",
-      licensed_to_email: "test",
-      licensed_to_name: "test",
-      manufacturer: "test",
-      min_qty: 12,
-      total: 2300,
-      avail: "test",
-    },
-  ];
+  const [data, setData] = useState<ActivityReport[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<ActivityReport[]>([]);
+
+  // Fetch data from Supabase
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      // const dataFetch = await AssetService.getAllPosts();
+      setData([]); // Works in React state
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+      if (searchText.trim() === '') {
+        fetchData();
+      } else {
+        // const filtered = data.filter(data =>
+        //   data.name?.toLowerCase().includes(searchText.toLowerCase())
+        // );
+        // setFilteredData(filtered);
+      }
+  
+    }, [searchText]); // Empty dependency array means this runs once on mount
+
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Date": true,
+    "Created By": true,
+    "Action Type": true,
+    "Type": true,
+    "Item": true,
+    "To": true,
+    "Notes": true,
+  });
 
   const columns: TableColumnsType<ActivityReport> = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Date",
+      dataIndex: "date",
       width: 120
     },
     {
-      title: "Product Key",
-      dataIndex: "product_key",
+      title: "Created By",
+      dataIndex: "created_by",
       width: 120
     },
     {
-      title: "Expiration Date",
-      dataIndex: "expiration_date",
+      title: "Action Type",
+      dataIndex: "action_type",
       width: 120
     },
     {
-      title: "Licensed to Email",
-      dataIndex: "licensed_to_email",
+      title: "Type",
+      dataIndex: "type",
       width: 120
     },
     {
-      title: "Licensed to Name",
-      dataIndex: "licensed_to_name",
+      title: "Item",
+      dataIndex: "item",
       width: 120
     },
     {
-      title: "Manufacturer",
-      dataIndex: "manufacturer",
+      title: "To",
+      dataIndex: "to",
       width: 120
     },
     {
-      title: "Min QTY",
-      dataIndex: "min_qty",
-      width: 120
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      width: 120
-    },
-    {
-      title: "Avail",
-      dataIndex: "avail",
+      title: "Notes",
+      dataIndex: "notes",
       width: 120
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<ActivityReport>["onChange"] = (
     pagination,
@@ -112,25 +160,32 @@ export default function ActivityReportRoutes() {
         />
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
+            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
           </Space.Compact>
           <Space wrap>
-            <PrintDropdownComponent></PrintDropdownComponent>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
+            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
       </div>
-      <Table<ActivityReport>
-        size="small"
-        columns={columns}
-        dataSource={data}
-        onChange={onChange}
-        className="pt-5"
-        bordered
-        scroll={{ x: 'max-content' }}
-      />
+      {loading && <Spin></Spin>}
+      {!loading && (
+        <Table<ActivityReport>
+          size="small"
+          columns={filteredColumns}
+          dataSource={searchText ? filteredData : data}
+          onChange={onChange}
+          className="pt-5"
+          bordered
+          scroll={{ x: "max-content" }}
+        />
+      )}
     </div>
   );
 }

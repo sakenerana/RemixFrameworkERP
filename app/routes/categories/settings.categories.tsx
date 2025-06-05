@@ -1,13 +1,16 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -171,6 +174,15 @@ export default function CategoriesRoutes() {
     }
   };
 
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Name": true,
+    "Type": true,
+    "Qty": true,
+    "Status": true,
+    "Actions": true,
+  });
+
   const columns: TableColumnsType<Category> = [
     {
       title: "Name",
@@ -183,7 +195,7 @@ export default function CategoriesRoutes() {
       width: 120,
     },
     {
-      title: "QTY",
+      title: "Qty",
       dataIndex: "qty",
       width: 120,
     },
@@ -259,6 +271,32 @@ export default function CategoriesRoutes() {
       ),
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<Category>["onChange"] = (
     pagination,
@@ -386,6 +424,13 @@ export default function CategoriesRoutes() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -394,7 +439,7 @@ export default function CategoriesRoutes() {
       {!loading && (
         <Table<Category>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

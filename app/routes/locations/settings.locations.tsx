@@ -1,13 +1,16 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -170,6 +173,19 @@ export default function LocationsRoutes() {
     }
   };
 
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Location Name": true,
+    "Image": false,
+    "Parent": true,
+    "Current Location": true,
+    "Address": true,
+    "City": true,
+    "State": true,
+    "Status": true,
+    "Actions": true,
+  });
+
   const columns: TableColumnsType<Location> = [
     {
       title: "Location Name",
@@ -278,6 +294,32 @@ export default function LocationsRoutes() {
       ),
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<Location>["onChange"] = (
     pagination,
@@ -405,6 +447,13 @@ export default function LocationsRoutes() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -413,7 +462,7 @@ export default function LocationsRoutes() {
       {!loading && (
         <Table<Location>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

@@ -1,13 +1,16 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -172,6 +175,18 @@ export default function PredefinedKitRoute() {
     }
   };
 
+  const handleCheckinButton = () => { };
+
+  const handleCheckoutButton = () => { };
+
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Name": true,
+    "Status": true,
+    "Actions": true,
+    "Checkout": true,
+  });
+
   const columns: TableColumnsType<PredefinedKit> = [
     {
       title: "Name",
@@ -249,7 +264,76 @@ export default function PredefinedKitRoute() {
         </div>
       ),
     },
+    {
+      title: "Checkout",
+      dataIndex: "checkout",
+      width: 120,
+      fixed: "right",
+      render: (_, data) => (
+        <div>
+          {data.check_status == "checkin" ? (
+            <Popconfirm
+              title="Do you want to checkin?"
+              description="Are you sure to checkin this asset?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckinButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
+                color="#108ee9"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Do you want to checkout?"
+              description="Are you sure to checkout this asset?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleCheckoutButton()}
+            >
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                {data.check_status}
+              </Tag>
+            </Popconfirm>
+          )}
+        </div>
+      ),
+    },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<PredefinedKit>["onChange"] = (
     pagination,
@@ -374,6 +458,13 @@ export default function PredefinedKitRoute() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -382,7 +473,7 @@ export default function PredefinedKitRoute() {
       {!loading && (
         <Table<PredefinedKit>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

@@ -2,6 +2,7 @@ import {
   CheckCircleOutlined,
   HomeOutlined,
   LoadingOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
@@ -11,9 +12,11 @@ import {
   CheckboxOptionType,
   Col,
   Divider,
+  Dropdown,
   Form,
   GetProp,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -206,7 +209,7 @@ export default function UsersRoutes() {
             status_id: 1,
             auth_id: data?.user?.id
           };
-          
+
           const { error } = await UserService.createPost(allValues);
           if (error) throw error;
         } catch (error) {
@@ -225,6 +228,16 @@ export default function UsersRoutes() {
       message.error("Error");
     }
   };
+
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Name": true,
+    "Email": true,
+    "Phone": true,
+    "Department": true,
+    "Status": true,
+    "Actions": true,
+  });
 
   const columns: TableColumnsType<User> = [
     {
@@ -327,6 +340,32 @@ export default function UsersRoutes() {
       ),
     },
   ];
+
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<User>["onChange"] = (
     pagination,
@@ -678,6 +717,13 @@ export default function UsersRoutes() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -686,7 +732,7 @@ export default function UsersRoutes() {
       {!loading && (
         <Table<User>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"

@@ -1,11 +1,14 @@
-import { CheckCircleOutlined, HomeOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Checkbox,
+  Dropdown,
   Form,
   Input,
+  MenuProps,
   message,
   Modal,
   Popconfirm,
@@ -166,6 +169,18 @@ export default function DepreciationRoutes() {
     }
   };
 
+  // State for column visibility
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    "Name": true,
+    "Term": true,
+    "Floor Value": true,
+    "Assets": true,
+    "Assets Models": true,
+    "Licenses": true,
+    "Status": true,
+    "Actions": true,
+  });
+
   const columns: TableColumnsType<Depreciation> = [
     {
       title: "Name",
@@ -270,6 +285,32 @@ export default function DepreciationRoutes() {
     },
   ];
 
+  // Toggle column visibility
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
+    }));
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
+
   const onChange: TableProps<Depreciation>["onChange"] = (
     pagination,
     filters,
@@ -330,6 +371,13 @@ export default function DepreciationRoutes() {
             </Button>
           </Space>
           <Space wrap>
+            <Dropdown
+              menu={{ items: columnMenuItems }}
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Button icon={<SettingOutlined />}>Columns</Button>
+            </Dropdown>
             <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
           </Space>
         </Space>
@@ -338,7 +386,7 @@ export default function DepreciationRoutes() {
       {!loading && (
         <Table<Depreciation>
           size="small"
-          columns={columns}
+          columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
           className="pt-5"
