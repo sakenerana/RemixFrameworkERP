@@ -43,11 +43,7 @@ import { Supplier } from "~/types/supplier.type";
 export default function SuppliersRoutes() {
   const [data, setData] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(true);
-  const [isTitle, setIsTitle] = useState('');
-  const [form] = Form.useForm<Supplier>();
-  const [editingId, setEditingId] = useState<number | null>(null);
+  
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Supplier[]>([]);
 
@@ -57,40 +53,22 @@ export default function SuppliersRoutes() {
     setLoading(false);
   };
 
-  const onReset = () => {
-    Modal.confirm({
-      title: "Confirm Reset",
-      content: "Are you sure you want to reset all form fields?",
-      okText: "Reset",
-      cancelText: "Cancel",
-      onOk: () => form.resetFields(),
-    });
-  };
-
-  const handleTrack = () => {
-    setIsEditMode(false);
-    setIsModalOpen(true);
-    setEditingId(null);
-    form.resetFields();
-    setIsTitle('Create Supplier')
-  };
+  // const handleTrack = () => {
+  //   setIsEditMode(false);
+  //   setIsModalOpen(true);
+  //   setEditingId(null);
+  //   // form.resetFields();
+  //   setIsTitle('Create Supplier')
+  // };
 
   // Edit record
-  const editRecord = (record: Supplier) => {
-    setIsEditMode(true);
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    setIsTitle('Update Supplier')
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+  // const editRecord = (record: Supplier) => {
+  //   setIsEditMode(true);
+  //   // form.setFieldsValue(record);
+  //   setEditingId(record.id);
+  //   setIsModalOpen(true);
+  //   setIsTitle('Update Supplier')
+  // };
 
   const handleDeleteButton = async (record: Supplier) => {
     if (record.status_labels.name === 'Active') {
@@ -139,54 +117,16 @@ export default function SuppliersRoutes() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  // Create or Update record
-  const onFinish = async () => {
-    try {
-
-      const values = await form.validateFields();
-
-      // Include your extra field
-      const allValues = {
-        ...values,
-        status_id: 1,
-      };
-
-      if (editingId) {
-        // Update existing record
-        const { error } = await SupplierService.updatePost(editingId, values);
-
-        if (error) throw message.error(error.message);
-        message.success("Record updated successfully");
-      } else {
-        // Create new record
-        setLoading(true);
-        const { error } = await SupplierService.createPost(allValues);
-
-        if (error) throw message.error(error.message);
-        message.success("Record created successfully");
-      }
-
-      setLoading(false);
-      setIsModalOpen(false);
-      form.resetFields();
-      setEditingId(null);
-      fetchData();
-    } catch (error) {
-      message.error("Error");
-    }
-  };
-
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Product Key": false,
-    "Expiration Date": true,
-    "Licensed to Email": true,
-    "Licensed to Name": true,
+    "Image": true,
+    "URL": true,
+    "Address": true,
+    "City": true,
     "Manufacturer": true,
     "Min QTY": true,
     "Total": true,
-    "Avail": false,
     "Status": true,
     "Actions": true,
   });
@@ -198,116 +138,116 @@ export default function SuppliersRoutes() {
       width: 120,
     },
     {
-      title: "Product Key",
-      dataIndex: "product_key",
+      title: "Image",
+      dataIndex: "image",
       width: 120,
     },
     {
-      title: "Expiration Date",
-      dataIndex: "expiration_date",
+      title: "URL",
+      dataIndex: "url",
       width: 120,
     },
     {
-      title: "Licensed to Email",
-      dataIndex: "licensed_to_email",
+      title: "Address",
+      dataIndex: "address",
       width: 120,
     },
     {
-      title: "Licensed to Name",
-      dataIndex: "licensed_to_name",
+      title: "City",
+      dataIndex: "city",
       width: 120,
     },
-    {
-      title: "Manufacturer",
-      dataIndex: "manufacturer",
-      width: 120,
-    },
-    {
-      title: "Min QTY",
-      dataIndex: "min_qty",
-      width: 120,
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      width: 120,
-    },
-    {
-      title: "Avail",
-      dataIndex: "avail",
-      width: 120,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      width: 120,
-      render: (_, record) => {
-        if (record.id === 1) {
-          return (
-            <Tag color="green">
-              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
-            </Tag>
-          );
-        } else if (record.id === 2) {
-          return (
-            <Tag color="red">
-              <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
-            </Tag>
-          );
-        }
-      },
-    },
-    {
-      title: "Actions",
-      dataIndex: "actions",
-      width: 120,
-      fixed: "right",
-      render: (_, record) => (
-        <div className="flex">
-          <Popconfirm
-            title="Do you want to update?"
-            description="Are you sure to update this department?"
-            okText="Yes"
-            cancelText="No"
-            onConfirm={() => editRecord(record)}
-          >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-              color="#f7b63e"
-            >
-              Update
-            </Tag>
-          </Popconfirm>
-          <Popconfirm
-            title="Do you want to delete?"
-            description="Are you sure to delete this supplier?"
-            okText="Yes"
-            cancelText="No"
-            onConfirm={() => handleDeleteButton(record)}
-          >
-            {record.status_labels.name === 'Active' && (
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-                color="#f50"
-              >
-                Deactivate
-              </Tag>
-            )}
-            {record.status_labels.name === 'Inactive' && (
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-                color="#1677ff"
-              >
-                Activate
-              </Tag>
-            )}
-          </Popconfirm>
-        </div>
-      ),
-    },
+    // {
+    //   title: "Manufacturer",
+    //   dataIndex: "manufacturer",
+    //   width: 120,
+    // },
+    // {
+    //   title: "Min QTY",
+    //   dataIndex: "min_qty",
+    //   width: 120,
+    // },
+    // {
+    //   title: "Total",
+    //   dataIndex: "total",
+    //   width: 120,
+    // },
+    // {
+    //   title: "Avail",
+    //   dataIndex: "avail",
+    //   width: 120,
+    // },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   width: 120,
+    //   render: (_, record) => {
+    //     if (record.id === 1) {
+    //       return (
+    //         <Tag color="green">
+    //           <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+    //         </Tag>
+    //       );
+    //     } else if (record.id === 2) {
+    //       return (
+    //         <Tag color="red">
+    //           <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
+    //         </Tag>
+    //       );
+    //     }
+    //   },
+    // },
+    // {
+    //   title: "Actions",
+    //   dataIndex: "actions",
+    //   width: 120,
+    //   fixed: "right",
+    //   render: (_, record) => (
+    //     <div className="flex">
+    //       <Popconfirm
+    //         title="Do you want to update?"
+    //         description="Are you sure to update this department?"
+    //         okText="Yes"
+    //         cancelText="No"
+    //         // onConfirm={() => editRecord(record)}
+    //       >
+    //         <Tag
+    //           className="cursor-pointer"
+    //           icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+    //           color="#f7b63e"
+    //         >
+    //           Update
+    //         </Tag>
+    //       </Popconfirm>
+    //       <Popconfirm
+    //         title="Do you want to delete?"
+    //         description="Are you sure to delete this supplier?"
+    //         okText="Yes"
+    //         cancelText="No"
+    //         onConfirm={() => handleDeleteButton(record)}
+    //       >
+    //         {record.status_labels.name === 'Active' && (
+    //           <Tag
+    //             className="cursor-pointer"
+    //             icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+    //             color="#f50"
+    //           >
+    //             Deactivate
+    //           </Tag>
+    //         )}
+    //         {record.status_labels.name === 'Inactive' && (
+    //           <Tag
+    //             className="cursor-pointer"
+    //             icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+    //             color="#1677ff"
+    //           >
+    //             Activate
+    //           </Tag>
+    //         )}
+    //       </Popconfirm>
+    //     </div>
+    //   ),
+    // },
   ];
 
   // Toggle column visibility
@@ -369,158 +309,11 @@ export default function SuppliersRoutes() {
             </Button>
           </Link>
 
-          <Button onClick={() => handleTrack()} icon={<AiOutlinePlus />} type="primary">
-            Create Supplier
-          </Button>
-          <Modal
-            style={{ top: 20 }}
-            width={700}
-            title={isTitle}
-            closable={{ "aria-label": "Custom Close Button" }}
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            footer=""
-          >
-            <div>
-              <Form
-                className="mt-5"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                  notification: true,
-                  interests: ["sports", "music"],
-                }}
-              >
-                <Row gutter={24}>
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      label="First Name"
-                      name="first_name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input account first name!",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="First Name" />
-                    </Form.Item>
-                  </Col>
-
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      label="Middle Name"
-                      name="middle_name"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Please input middle name!",
-                    //   },
-                    // ]}
-                    >
-                      <Input placeholder="Middle Name" />
-                    </Form.Item>
-                  </Col>
-
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      label="Last Name"
-                      name="last_name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input last name!",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Last Name" />
-                    </Form.Item>
-                  </Col>
-
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Email"
-                      name="email"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input email!",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Email" />
-                    </Form.Item>
-                  </Col>
-
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Password"
-                      name="password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input password!",
-                        },
-                      ]}
-                    >
-                      <Input.Password placeholder="Password" />
-                    </Form.Item>
-                  </Col>
-
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Phone No."
-                      name="phone"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input phone number!",
-                        },
-                      ]}
-                    >
-                      <Input
-                        type="number"
-                        prefix={<AiOutlinePhone />}
-                        placeholder="Phone"
-                      />
-                    </Form.Item>
-                  </Col>
-
-                </Row>
-
-                <Divider />
-
-                <Form.Item className="flex flex-wrap justify-end">
-                  <Button
-                    onClick={onReset}
-                    type="default"
-                    //   loading={loading}
-                    className="w-full sm:w-auto mr-4"
-                    size="large"
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={
-                      <>
-                        {loading && <LoadingOutlined className="animate-spin" />}
-                        {!loading && <AiOutlineSend />}
-                      </>
-                    }
-                    className="w-full sm:w-auto"
-                    size="large"
-                  >
-                    {isEditMode && <p>Update</p>}
-                    {!isEditMode && <p>Submit</p>}
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-          </Modal>
+          <Link to={"form-supplier"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create Supplier
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

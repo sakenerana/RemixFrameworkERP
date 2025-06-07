@@ -37,12 +37,12 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "create-supplier",
+                  "form-supplier",
                   "routes/suppliers/settings.create.tsx",
                   { index: true }
                 );
                 route(
-                  "update-supplier",
+                  "form-supplier/:id",
                   "routes/suppliers/settings.update.tsx",
                   { index: true }
                 );
