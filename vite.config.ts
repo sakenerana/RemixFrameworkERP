@@ -60,12 +60,12 @@ export default defineConfig({
                     index: true,
                   });
                   route(
-                    "create-category",
+                    "form-category",
                     "routes/categories/settings.create.tsx",
                     { index: true }
                   );
                   route(
-                    "update-category",
+                    "form-category/:id",
                     "routes/categories/settings.update.tsx",
                     { index: true }
                   );
@@ -84,12 +84,12 @@ export default defineConfig({
                     index: true,
                   });
                   route(
-                    "create-manufacturer",
+                    "form-manufacturer",
                     "routes/manufacturers/settings.create.tsx",
                     { index: true }
                   );
                   route(
-                    "update-manufacturer",
+                    "form-manufacturer/:id",
                     "routes/manufacturers/settings.update.tsx",
                     { index: true }
                   );
@@ -105,12 +105,12 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "create-location",
+                  "form-location",
                   "routes/locations/settings.create.tsx",
                   { index: true }
                 );
                 route(
-                  "update-location",
+                  "form-location/:id",
                   "routes/locations/settings.update.tsx",
                   { index: true }
                 );

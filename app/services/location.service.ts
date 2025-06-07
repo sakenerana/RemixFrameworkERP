@@ -30,9 +30,22 @@ export const LocationService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('locations')
-      .select('*')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
       .order('created_at', { ascending: false })
     
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsInactive() {
+    const { data, error } = await supabase
+      .from('locations')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 2)
+      .order('created_at', { ascending: false })
+
     if (error) throw error
     return data
   },

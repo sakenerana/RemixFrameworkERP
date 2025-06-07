@@ -1,21 +1,14 @@
 import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
-  Modal,
   Popconfirm,
-  Row,
-  Select,
   Space,
   Spin,
   Table,
@@ -29,9 +22,7 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineFileExclamation,
-  AiOutlinePhone,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
@@ -43,7 +34,7 @@ import { Supplier } from "~/types/supplier.type";
 export default function SuppliersRoutes() {
   const [data, setData] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Supplier[]>([]);
 
@@ -70,26 +61,15 @@ export default function SuppliersRoutes() {
   //   setIsTitle('Update Supplier')
   // };
 
-  const handleDeleteButton = async (record: Supplier) => {
-    if (record.status_labels.name === 'Active') {
-      const { error } = await SupplierService.deactivateStatus(
-        record.id,
-        record
-      );
+  const handleDeactivateButton = async (record: Supplier) => {
+    const { error } = await SupplierService.deactivateStatus(
+      record.id,
+      record
+    );
 
-      if (error) throw message.error(error.message);
-      message.success("Record deactivated successfully");
-      fetchData();
-    } else if (record.status_labels.name === 'Inactive') {
-      const { error } = await SupplierService.activateStatus(
-        record.id,
-        record
-      );
-
-      if (error) throw message.error(error.message);
-      message.success("Record activated successfully");
-      fetchData();
-    }
+    if (error) throw message.error(error.message);
+    message.success("Record deactivated successfully");
+    fetchData();
   };
 
   // Fetch data from Supabase
@@ -124,9 +104,12 @@ export default function SuppliersRoutes() {
     "URL": true,
     "Address": true,
     "City": true,
-    "Manufacturer": true,
-    "Min QTY": true,
-    "Total": true,
+    "State": true,
+    "Postal Code": false,
+    "Country": false,
+    "Phone": false,
+    "Fax": false,
+    "Notes": false,
     "Status": true,
     "Actions": true,
   });
@@ -157,97 +140,107 @@ export default function SuppliersRoutes() {
       dataIndex: "city",
       width: 120,
     },
-    // {
-    //   title: "Manufacturer",
-    //   dataIndex: "manufacturer",
-    //   width: 120,
-    // },
-    // {
-    //   title: "Min QTY",
-    //   dataIndex: "min_qty",
-    //   width: 120,
-    // },
-    // {
-    //   title: "Total",
-    //   dataIndex: "total",
-    //   width: 120,
-    // },
-    // {
-    //   title: "Avail",
-    //   dataIndex: "avail",
-    //   width: 120,
-    // },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   width: 120,
-    //   render: (_, record) => {
-    //     if (record.id === 1) {
-    //       return (
-    //         <Tag color="green">
-    //           <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
-    //         </Tag>
-    //       );
-    //     } else if (record.id === 2) {
-    //       return (
-    //         <Tag color="red">
-    //           <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
-    //         </Tag>
-    //       );
-    //     }
-    //   },
-    // },
-    // {
-    //   title: "Actions",
-    //   dataIndex: "actions",
-    //   width: 120,
-    //   fixed: "right",
-    //   render: (_, record) => (
-    //     <div className="flex">
-    //       <Popconfirm
-    //         title="Do you want to update?"
-    //         description="Are you sure to update this department?"
-    //         okText="Yes"
-    //         cancelText="No"
-    //         // onConfirm={() => editRecord(record)}
-    //       >
-    //         <Tag
-    //           className="cursor-pointer"
-    //           icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-    //           color="#f7b63e"
-    //         >
-    //           Update
-    //         </Tag>
-    //       </Popconfirm>
-    //       <Popconfirm
-    //         title="Do you want to delete?"
-    //         description="Are you sure to delete this supplier?"
-    //         okText="Yes"
-    //         cancelText="No"
-    //         onConfirm={() => handleDeleteButton(record)}
-    //       >
-    //         {record.status_labels.name === 'Active' && (
-    //           <Tag
-    //             className="cursor-pointer"
-    //             icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-    //             color="#f50"
-    //           >
-    //             Deactivate
-    //           </Tag>
-    //         )}
-    //         {record.status_labels.name === 'Inactive' && (
-    //           <Tag
-    //             className="cursor-pointer"
-    //             icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-    //             color="#1677ff"
-    //           >
-    //             Activate
-    //           </Tag>
-    //         )}
-    //       </Popconfirm>
-    //     </div>
-    //   ),
-    // },
+    {
+      title: "State",
+      dataIndex: "state",
+      width: 120,
+    },
+    {
+      title: "Postal Code",
+      dataIndex: "postal_code",
+      width: 120,
+    },
+    {
+      title: "Country",
+      dataIndex: "country",
+      width: 120,
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      width: 120,
+    },
+    {
+      title: "Fax",
+      dataIndex: "fax",
+      width: 120,
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      width: 120,
+      render: (_, record) => {
+        if (record.status_labels.name === 'Active') {
+          return (
+            <Tag color="green">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+            </Tag>
+          );
+        } else if (record.status_labels.name === 'Inactive') {
+          return (
+            <Tag color="red">
+              <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
+            </Tag>
+          );
+        }
+      },
+    },
+    {
+      title: "Actions",
+      dataIndex: "actions",
+      width: 120,
+      fixed: "right",
+      render: (_, record) => (
+        <div className="flex">
+          <Popconfirm
+            title="Do you want to update?"
+            description="Are you sure to update this department?"
+            okText="Yes"
+            cancelText="No"
+          // onConfirm={() => editRecord(record)}
+          >
+            <Tag
+              className="cursor-pointer"
+              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+              color="#f7b63e"
+            >
+              Update
+            </Tag>
+          </Popconfirm>
+          <Popconfirm
+            title="Do you want to delete?"
+            description="Are you sure to delete this supplier?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeactivateButton(record)}
+          >
+            {record.status_labels.name === 'Active' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#f50"
+              >
+                Deactivate
+              </Tag>
+            )}
+            {record.status_labels.name === 'Inactive' && (
+              <Tag
+                className="cursor-pointer"
+                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                color="#1677ff"
+              >
+                Activate
+              </Tag>
+            )}
+          </Popconfirm>
+        </div>
+      ),
+    },
   ];
 
   // Toggle column visibility
@@ -304,8 +297,8 @@ export default function SuppliersRoutes() {
         />
         <Space wrap>
           <Link to={"deleted-supplier"}>
-            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-              Show Deleted Suppliers
+            <Button icon={<AiOutlineFileExclamation />} danger>
+              Show Inactive Suppliers
             </Button>
           </Link>
 

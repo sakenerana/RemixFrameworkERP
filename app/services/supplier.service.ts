@@ -2,14 +2,14 @@ import { Supplier } from "~/types/supplier.type"
 import supabase from "~/utils/supabase.client"
 
 export const SupplierService = {
-    
+
   // Create
   async createPost(postData: Supplier) {
     const { data, error } = await supabase
       .from('suppliers')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -21,7 +21,7 @@ export const SupplierService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -30,9 +30,22 @@ export const SupplierService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('suppliers')
-      .select('*')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
       .order('created_at', { ascending: false })
-    
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsInactive() {
+    const { data, error } = await supabase
+      .from('suppliers')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 2)
+      .order('created_at', { ascending: false })
+
     if (error) throw error
     return data
   },
@@ -44,7 +57,7 @@ export const SupplierService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -79,7 +92,7 @@ export const SupplierService = {
       .from('suppliers')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -90,7 +103,7 @@ export const SupplierService = {
       .from('suppliers')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }
