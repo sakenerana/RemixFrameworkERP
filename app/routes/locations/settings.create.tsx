@@ -74,7 +74,7 @@ export default function CreateLocation() {
                             title: "Settings",
                         },
                         {
-                            title: "Locations",
+                            title: "Location",
                         },
                         {
                             title: "Form",

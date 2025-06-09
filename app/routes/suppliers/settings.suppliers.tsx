@@ -199,7 +199,7 @@ export default function SuppliersRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this department?"
+            description="Are you sure to update this supplier?"
             okText="Yes"
             cancelText="No"
           // onConfirm={() => editRecord(record)}
@@ -213,8 +213,8 @@ export default function SuppliersRoutes() {
             </Tag>
           </Popconfirm>
           <Popconfirm
-            title="Do you want to delete?"
-            description="Are you sure to delete this supplier?"
+            title="Do you want to deactivate?"
+            description="Are you sure to deactivate this supplier?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeactivateButton(record)}

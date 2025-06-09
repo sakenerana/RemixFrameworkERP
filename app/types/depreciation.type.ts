@@ -4,9 +4,9 @@ export interface Depreciation {
     name: string;
     term: string;
     floor_value: number;
-    assets: string;
-    assets_models: string;
-    licenses: string;
+    assets: number;
+    assets_models: number;
+    licenses: number;
     status_labels: any;
     action: string;
 }

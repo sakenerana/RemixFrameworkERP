@@ -74,7 +74,7 @@ export default function CreateManufacturer() {
                             title: "Settings",
                         },
                         {
-                            title: "Suppliers",
+                            title: "Manufacturer",
                         },
                         {
                             title: "Form",

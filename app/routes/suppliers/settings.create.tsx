@@ -74,7 +74,7 @@ export default function CreateSuppliers() {
                             title: "Settings",
                         },
                         {
-                            title: "Suppliers",
+                            title: "Supplier",
                         },
                         {
                             title: "Form",

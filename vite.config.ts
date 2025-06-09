@@ -125,12 +125,12 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "create-company",
+                  "form-company",
                   "routes/companies/settings.create.tsx",
                   { index: true }
                 );
                 route(
-                  "update-company",
+                  "form-company/:id",
                   "routes/companies/settings.update.tsx",
                   { index: true }
                 );
@@ -148,12 +148,12 @@ export default defineConfig({
                     index: true,
                   });
                   route(
-                    "create-depreciation",
+                    "form-depreciation",
                     "routes/depreciation/settings.create.tsx",
                     { index: true }
                   );
                   route(
-                    "update-depreciation",
+                    "form-depreciation/:id",
                     "routes/depreciation/settings.update.tsx",
                     { index: true }
                   );
@@ -174,10 +174,10 @@ export default defineConfig({
                 route("audit-assets", "routes/assets/assets.audit.tsx", {
                   index: true,
                 });
-                route("create-assets", "routes/assets/assets.create.tsx", {
+                route("form-assets", "routes/assets/assets.create.tsx", {
                   index: true,
                 });
-                route("update-assets", "routes/assets/assets.update.tsx", {
+                route("form-assets/:id", "routes/assets/assets.update.tsx", {
                   index: true,
                 });
                 route("deleted-assets", "routes/assets/assets.deleted.tsx", {
@@ -186,10 +186,10 @@ export default defineConfig({
               });
               route("licenses", "routes/licenses/route.tsx", () => {
                 route("", "routes/licenses/licenses.tsx", { index: true });
-                route("create-license", "routes/licenses/create.tsx", {
+                route("form-license", "routes/licenses/create.tsx", {
                   index: true,
                 });
-                route("update-license", "routes/licenses/update.tsx", {
+                route("form-license/:id", "routes/licenses/update.tsx", {
                   index: true,
                 });
                 route("deleted-license", "routes/licenses/deleted.tsx", {

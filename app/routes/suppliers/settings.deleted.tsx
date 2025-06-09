@@ -159,7 +159,7 @@ export default function DeleteSuppliers() {
                 <div className="flex">
                     <Popconfirm
                         title="Do you want to update?"
-                        description="Are you sure to update this department?"
+                        description="Are you sure to update this supplier?"
                         okText="Yes"
                         cancelText="No"
                     // onConfirm={() => editRecord(record)}
@@ -173,8 +173,8 @@ export default function DeleteSuppliers() {
                         </Tag>
                     </Popconfirm>
                     <Popconfirm
-                        title="Do you want to delete?"
-                        description="Are you sure to delete this supplier?"
+                        title="Do you want to activate?"
+                        description="Are you sure to activate this supplier?"
                         okText="Yes"
                         cancelText="No"
                         onConfirm={() => handleActivateButton(record)}

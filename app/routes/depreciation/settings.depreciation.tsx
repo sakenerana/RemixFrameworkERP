@@ -36,11 +36,7 @@ import { Depreciation } from "~/types/depreciation.type";
 export default function DepreciationRoutes() {
   const [data, setData] = useState<Depreciation[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(true);
-  const [isTitle, setIsTitle] = useState('');
-  const [form] = Form.useForm<Depreciation>();
-  const [editingId, setEditingId] = useState<number | null>(null);
+
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Depreciation[]>([]);
 
@@ -50,61 +46,32 @@ export default function DepreciationRoutes() {
     setLoading(false);
   };
 
-  const onReset = () => {
-    Modal.confirm({
-      title: "Confirm Reset",
-      content: "Are you sure you want to reset all form fields?",
-      okText: "Reset",
-      cancelText: "Cancel",
-      onOk: () => form.resetFields(),
-    });
-  };
+  // const handleTrack = () => {
+  //   setIsEditMode(false);
+  //   setIsModalOpen(true);
+  //   setEditingId(null);
+  //   form.resetFields();
+  //   setIsTitle('Create Depreciation')
+  // };
 
-  const handleTrack = () => {
-    setIsEditMode(false);
-    setIsModalOpen(true);
-    setEditingId(null);
-    form.resetFields();
-    setIsTitle('Create Depreciation')
-  };
+  // // Edit record
+  // const editRecord = (record: Depreciation) => {
+  //   setIsEditMode(true);
+  //   form.setFieldsValue(record);
+  //   setEditingId(record.id);
+  //   setIsModalOpen(true);
+  //   setIsTitle('Update Depreciation')
+  // };
 
-  // Edit record
-  const editRecord = (record: Depreciation) => {
-    setIsEditMode(true);
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    setIsTitle('Update Depreciation')
-  };
+  const handleDeactivateButton = async (record: Depreciation) => {
+    const { error } = await DepreciationService.deactivateStatus(
+      record.id,
+      record
+    );
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteButton = async (record: Depreciation) => {
-    if (record.status_labels.name === 'Active') {
-      const { error } = await DepreciationService.deactivateStatus(
-        record.id,
-        record
-      );
-
-      if (error) throw message.error(error.message);
-      message.success("Record deactivated successfully");
-      fetchData();
-    } else if (record.status_labels.name === 'Inactive') {
-      const { error } = await DepreciationService.activateStatus(
-        record.id,
-        record
-      );
-
-      if (error) throw message.error(error.message);
-      message.success("Record activated successfully");
-      fetchData();
-    }
+    if (error) throw message.error(error.message);
+    message.success("Record deactivated successfully");
+    fetchData();
   };
 
   // Fetch data from Supabase
@@ -132,50 +99,12 @@ export default function DepreciationRoutes() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  // Create or Update record
-  const onFinish = async () => {
-    try {
-
-      const values = await form.validateFields();
-
-      // Include your extra field
-      const allValues = {
-        ...values,
-        status_id: 1,
-      };
-
-      if (editingId) {
-        // Update existing record
-        const { error } = await DepreciationService.updatePost(editingId, values);
-
-        if (error) throw message.error(error.message);
-        message.success("Record updated successfully");
-      } else {
-        // Create new record
-        setLoading(true);
-        const { error } = await DepreciationService.createPost(allValues);
-
-        if (error) throw message.error(error.message);
-        message.success("Record created successfully");
-      }
-
-      setLoading(false);
-      setIsModalOpen(false);
-      form.resetFields();
-      setEditingId(null);
-      fetchData();
-    } catch (error) {
-      message.error("Error");
-    }
-  };
-
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
     "Term": true,
-    "Floor Value": true,
     "Assets": true,
-    "Assets Models": true,
+    "Asset Models": true,
     "Licenses": true,
     "Status": true,
     "Actions": true,
@@ -189,7 +118,7 @@ export default function DepreciationRoutes() {
     },
     {
       title: "Term",
-      dataIndex: "term",
+      dataIndex: "months",
       width: 120,
     },
     {
@@ -203,8 +132,8 @@ export default function DepreciationRoutes() {
       width: 120,
     },
     {
-      title: "Assets Models",
-      dataIndex: "assets_models",
+      title: "Asset Models",
+      dataIndex: "asset_models",
       width: 120,
     },
     {
@@ -217,13 +146,13 @@ export default function DepreciationRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record?.id === 1) {
+        if (record.status_labels.name === 'Active') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record?.id === 2) {
+        } else if (record.status_labels.name === 'Inactive') {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -241,10 +170,10 @@ export default function DepreciationRoutes() {
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this department?"
+            description="Are you sure to update this depreciation?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => editRecord(record)}
+          // onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -255,11 +184,11 @@ export default function DepreciationRoutes() {
             </Tag>
           </Popconfirm>
           <Popconfirm
-            title="Do you want to delete?"
-            description="Are you sure to delete this department?"
+            title="Do you want to deactivate?"
+            description="Are you sure to deactivate this depreciation?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleDeleteButton(record)}
+            onConfirm={() => handleDeactivateButton(record)}
           >
             {record.status_labels.name === 'Active' && (
               <Tag
@@ -339,17 +268,16 @@ export default function DepreciationRoutes() {
         />
         <Space wrap>
           <Link to={"deleted-depreciation"}>
-            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-              Show Deleted Depreciation
+            <Button icon={<AiOutlineFileExclamation />} danger>
+              Show Inactive Depreciation
             </Button>
           </Link>
-          <Button
-            onClick={() => handleTrack()}
-            icon={<AiOutlinePlus />}
-            type="primary"
-          >
-            Create Depreciation
-          </Button>
+
+          <Link to={"form-depreciation"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create Depreciation
+            </Button>
+          </Link>
         </Space>
       </div>
       <div className="flex justify-between">

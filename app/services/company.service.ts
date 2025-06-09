@@ -30,9 +30,22 @@ export const CompanyService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('companies')
-      .select('*')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
       .order('created_at', { ascending: false })
     
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsInactive() {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 2)
+      .order('created_at', { ascending: false })
+
     if (error) throw error
     return data
   },
