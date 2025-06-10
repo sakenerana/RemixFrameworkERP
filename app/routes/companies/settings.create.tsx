@@ -1,19 +1,28 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { CompanyService } from "~/services/company.service";
 import { Company } from "~/types/company.type";
+const { TextArea } = Input;
 
 export default function CreateCompanies() {
+    const { id } = useParams();
     const [form] = Form.useForm<Company>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<any | null>(id);
+    const [isTitle, setIsTitle] = useState('');
 
     useMemo(() => {
-        form.resetFields();
+        if (id) {
+            setIsTitle("Update Company");
+            setIsEditMode(true);
+        } else {
+            setIsTitle("Create Company");
+            setIsEditMode(false);
+        }
     }, []);
 
     const onReset = () => {
@@ -63,7 +72,7 @@ export default function CreateCompanies() {
 
     return (
         <div>
-            <div className="flex pb-5 justify-between">
+            <div className="flex justify-between">
                 <Breadcrumb
                     items={[
                         {
@@ -81,13 +90,14 @@ export default function CreateCompanies() {
                         },
                     ]}
                 />
+                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
                 <Link to={'/inventory/settings/companies'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
+                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
 
             <Form
-                className="p-5 bg-gray-50"
+                className="p-5 bg-gray-50 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -97,78 +107,18 @@ export default function CreateCompanies() {
                 }}
             >
                 <Row gutter={24}>
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="First Name"
-                            name="first_name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input account first name!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="First Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Middle Name"
-                            name="middle_name"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please input middle name!",
-                        //   },
-                        // ]}
-                        >
-                            <Input placeholder="Middle Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Last Name"
-                            name="last_name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input last name!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Last Name" />
-                        </Form.Item>
-                    </Col>
-
                     <Col xs={24} sm={12}>
                         <Form.Item
-                            label="Email"
-                            name="email"
+                            label="Company Name"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input email!",
+                                    message: "Please input company name!",
                                 },
                             ]}
                         >
-                            <Input placeholder="Email" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input password!",
-                                },
-                            ]}
-                        >
-                            <Input.Password placeholder="Password" />
+                            <Input placeholder="Company Name" />
                         </Form.Item>
                     </Col>
 
@@ -176,24 +126,43 @@ export default function CreateCompanies() {
                         <Form.Item
                             label="Phone No."
                             name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input phone number!",
-                                },
-                            ]}
                         >
                             <Input
                                 type="number"
                                 prefix={<AiOutlinePhone />}
-                                placeholder="Phone"
+                                placeholder="Phone (Optional)"
                             />
                         </Form.Item>
                     </Col>
 
-                </Row>
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Fax"
+                            name="fax"
+                        >
+                            <Input prefix={<AiOutlinePrinter />} placeholder="Fax (Optional)" />
+                        </Form.Item>
+                    </Col>
 
-                <Divider />
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                        >
+                            <Input prefix={<AiOutlineMail />} placeholder="Email (Optional)" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <Form.Item
+                            label="Notes"
+                            name="notes"
+                        >
+                            <TextArea rows={4} placeholder="(Optional)" />
+                        </Form.Item>
+                    </Col>
+
+                </Row>
 
                 <Form.Item className="flex flex-wrap justify-end">
                     <Button

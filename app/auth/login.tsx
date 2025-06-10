@@ -76,7 +76,7 @@ export default function LoginIndex() {
             name="email"
             rules={[{ required: true, message: "Please input your Email!" }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Username" />
+            <Input prefix={<UserOutlined />} placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="password"

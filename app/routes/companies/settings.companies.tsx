@@ -26,7 +26,7 @@ import {
   AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CompanyService } from "~/services/company.service";
 import { Company } from "~/types/company.type";
@@ -38,28 +38,18 @@ export default function CompaniesRoutes() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Company[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Company')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Company) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Company')
-  // };
+  // Edit record
+  const editRecord = (record: Company) => {
+    navigate(`form-company/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Company) => {
     const { error } = await CompanyService.deactivateStatus(
@@ -101,7 +91,6 @@ export default function CompaniesRoutes() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Company Name": true,
     "Email": true,
-    "Image": true,
     "Status": true,
     "Actions": true,
   });
@@ -115,11 +104,6 @@ export default function CompaniesRoutes() {
     {
       title: "Email",
       dataIndex: "email",
-      width: 120,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
       width: 120,
     },
     {
@@ -145,7 +129,7 @@ export default function CompaniesRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
@@ -154,7 +138,7 @@ export default function CompaniesRoutes() {
             description="Are you sure to update this company?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

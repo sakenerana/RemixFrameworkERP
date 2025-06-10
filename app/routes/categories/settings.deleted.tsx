@@ -60,7 +60,6 @@ export default function DeletedCategories() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Image": true,
         "Type": true,
         "Qty": true,
         "Notes": false,
@@ -72,11 +71,6 @@ export default function DeletedCategories() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 120,
-        },
-        {
-            title: "Image",
-            dataIndex: "image",
             width: 120,
         },
         {
@@ -117,7 +111,7 @@ export default function DeletedCategories() {
         {
             title: "Actions",
             dataIndex: "actions",
-            width: 120,
+            width: 190,
             fixed: "right",
             render: (_, record) => (
                 <div className="flex">

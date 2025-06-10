@@ -1,19 +1,29 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { AiOutlineEnvironment, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { Link, useParams } from "react-router-dom";
 import { LocationService } from "~/services/location.service";
 import { Location } from "~/types/location.type";
+import countries from '../../data/country.json';
+const { TextArea } = Input;
 
 export default function CreateLocation() {
+    const { id } = useParams();
     const [form] = Form.useForm<Location>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<any | null>(id);
+    const [isTitle, setIsTitle] = useState('');
 
     useMemo(() => {
-        form.resetFields();
+        if (id) {
+            setIsTitle("Update Location");
+            setIsEditMode(true);
+        } else {
+            setIsTitle("Create Location");
+            setIsEditMode(false);
+        }
     }, []);
 
     const onReset = () => {
@@ -63,7 +73,7 @@ export default function CreateLocation() {
 
     return (
         <div>
-            <div className="flex pb-5 justify-between">
+            <div className="flex justify-between">
                 <Breadcrumb
                     items={[
                         {
@@ -81,13 +91,14 @@ export default function CreateLocation() {
                         },
                     ]}
                 />
+                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
                 <Link to={'/inventory/settings/locations'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
+                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
 
             <Form
-                className="p-5 bg-gray-50"
+                className="p-5 bg-gray-50 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -99,95 +110,87 @@ export default function CreateLocation() {
                 <Row gutter={24}>
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="First Name"
-                            name="first_name"
+                            label="Location Name"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input account first name!",
+                                    message: "Please input location name!",
                                 },
                             ]}
                         >
-                            <Input placeholder="First Name" />
+                            <Input placeholder="Location Name" />
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Middle Name"
-                            name="middle_name"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please input middle name!",
-                        //   },
-                        // ]}
+                            label="Address"
+                            name="address"
                         >
-                            <Input placeholder="Middle Name" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address (Optional)" />
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Last Name"
-                            name="last_name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input last name!",
-                                },
-                            ]}
+                            label="Address2"
+                            name="address2"
                         >
-                            <Input placeholder="Last Name" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address2 (Optional)" />
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={12}>
+                    <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input email!",
-                                },
-                            ]}
+                            label="City"
+                            name="city"
                         >
-                            <Input placeholder="Email" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="city (Optional)" />
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={12}>
+                    <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input password!",
-                                },
-                            ]}
+                            label="State"
+                            name="state"
                         >
-                            <Input.Password placeholder="Password" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="State (Optional)" />
                         </Form.Item>
                     </Col>
 
-                    <Col xs={24} sm={12}>
+                    <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Phone No."
-                            name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input phone number!",
-                                },
-                            ]}
+                            label="Country"
+                            name="country"
                         >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                                placeholder="Phone"
+                            <Select
+                                prefix={<AiOutlineEnvironment />}
+                                showSearch
+                                placeholder="Select Country (Optional)"
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={countries}
                             />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Zip"
+                            name="zip"
+                        >
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000 (Optional)" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <Form.Item
+                            label="Notes"
+                            name="notes"
+                        >
+                            <TextArea rows={4} placeholder="(Optional)" />
                         </Form.Item>
                     </Col>
 

@@ -44,28 +44,18 @@ export default function LocationsRoutes() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Location[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Location')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Location) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Location')
-  // };
+  // Edit record
+  const editRecord = (record: Location) => {
+    navigate(`form-location/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Location) => {
     const { error } = await LocationService.deactivateStatus(
@@ -107,8 +97,6 @@ export default function LocationsRoutes() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Location Name": true,
-    "Image": true,
-    "Current Location": true,
     "Address": true,
     "City": true,
     "State": true,
@@ -123,16 +111,6 @@ export default function LocationsRoutes() {
     {
       title: "Location Name",
       dataIndex: "name",
-      width: 120,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
-      width: 120,
-    },
-    {
-      title: "Current Location",
-      dataIndex: "current_location",
       width: 120,
     },
     {
@@ -188,7 +166,7 @@ export default function LocationsRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
@@ -197,7 +175,7 @@ export default function LocationsRoutes() {
             description="Are you sure to update this location?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

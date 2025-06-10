@@ -37,13 +37,8 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "form-supplier",
+                  "form-supplier/:id?",
                   "routes/suppliers/settings.create.tsx",
-                  { index: true }
-                );
-                route(
-                  "form-supplier/:id",
-                  "routes/suppliers/settings.update.tsx",
                   { index: true }
                 );
                 route(
@@ -60,13 +55,8 @@ export default defineConfig({
                     index: true,
                   });
                   route(
-                    "form-category",
+                    "form-category/:id?",
                     "routes/categories/settings.create.tsx",
-                    { index: true }
-                  );
-                  route(
-                    "form-category/:id",
-                    "routes/categories/settings.update.tsx",
                     { index: true }
                   );
                   route(
@@ -84,13 +74,8 @@ export default defineConfig({
                     index: true,
                   });
                   route(
-                    "form-manufacturer",
+                    "form-manufacturer/:id?",
                     "routes/manufacturers/settings.create.tsx",
-                    { index: true }
-                  );
-                  route(
-                    "form-manufacturer/:id",
-                    "routes/manufacturers/settings.update.tsx",
                     { index: true }
                   );
                   route(
@@ -105,13 +90,8 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "form-location",
+                  "form-location/:id?",
                   "routes/locations/settings.create.tsx",
-                  { index: true }
-                );
-                route(
-                  "form-location/:id",
-                  "routes/locations/settings.update.tsx",
                   { index: true }
                 );
                 route(
@@ -125,13 +105,8 @@ export default defineConfig({
                   index: true,
                 });
                 route(
-                  "form-company",
+                  "form-company/:id?",
                   "routes/companies/settings.create.tsx",
-                  { index: true }
-                );
-                route(
-                  "form-company/:id",
-                  "routes/companies/settings.update.tsx",
                   { index: true }
                 );
                 route(
@@ -200,10 +175,10 @@ export default defineConfig({
                 route("", "routes/accessories/accessories.tsx", {
                   index: true,
                 });
-                route("create-accessory", "routes/accessories/create.tsx", {
+                route("form-accessory", "routes/accessories/create.tsx", {
                   index: true,
                 });
-                route("update-accessory", "routes/accessories/update.tsx", {
+                route("form-accessory/:id", "routes/accessories/update.tsx", {
                   index: true,
                 });
                 route("deleted-accessories", "routes/accessories/deleted.tsx", {
@@ -214,10 +189,10 @@ export default defineConfig({
                 route("", "routes/consumables/consumables.tsx", {
                   index: true,
                 });
-                route("create-consumable", "routes/consumables/create.tsx", {
+                route("form-consumable", "routes/consumables/create.tsx", {
                   index: true,
                 });
-                route("update-consumable", "routes/consumables/update.tsx", {
+                route("form-consumable/:id", "routes/consumables/update.tsx", {
                   index: true,
                 });
                 route("deleted-consumables", "routes/consumables/deleted.tsx", {
@@ -226,10 +201,10 @@ export default defineConfig({
               });
               route("components", "routes/components/route.tsx", () => {
                 route("", "routes/components/components.tsx", { index: true });
-                route("create-component", "routes/components/create.tsx", {
+                route("form-component", "routes/components/create.tsx", {
                   index: true,
                 });
-                route("update-component", "routes/components/update.tsx", {
+                route("form-component/:id", "routes/components/update.tsx", {
                   index: true,
                 });
                 route("deleted-components", "routes/components/deleted.tsx", {

@@ -6,6 +6,7 @@ export interface Location {
     parent: string;
     current_location: string;
     address: string;
+    address2: string;
     city: string;
     state: string;
     status_labels: any;

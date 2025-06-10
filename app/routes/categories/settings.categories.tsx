@@ -40,28 +40,18 @@ export default function CategoriesRoutes() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Category[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Category')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Category) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Category')
-  // };
+  // Edit record
+  const editRecord = (record: Category) => {
+    navigate(`form-category/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Category) => {
     const { error } = await CategoryService.deactivateStatus(
@@ -102,7 +92,6 @@ export default function CategoriesRoutes() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Image": true,
     "Type": true,
     "Qty": true,
     "Notes": false,
@@ -114,11 +103,6 @@ export default function CategoriesRoutes() {
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
       width: 120,
     },
     {
@@ -159,7 +143,7 @@ export default function CategoriesRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
@@ -168,7 +152,7 @@ export default function CategoriesRoutes() {
             description="Are you sure to update this category?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

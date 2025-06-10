@@ -60,7 +60,6 @@ export default function DeleteSuppliers() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Image": true,
         "URL": true,
         "Address": true,
         "City": true,
@@ -78,11 +77,6 @@ export default function DeleteSuppliers() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 120,
-        },
-        {
-            title: "Image",
-            dataIndex: "image",
             width: 120,
         },
         {
@@ -153,7 +147,7 @@ export default function DeleteSuppliers() {
         {
             title: "Actions",
             dataIndex: "actions",
-            width: 120,
+            width: 190,
             fixed: "right",
             render: (_, record) => (
                 <div className="flex">

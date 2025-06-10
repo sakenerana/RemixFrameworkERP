@@ -41,14 +41,10 @@ import { Component } from "~/types/component.type";
 
 export default function ComponentsRoute() {
   const [data, setData] = useState<Component[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(true);
-  const [isTitle, setIsTitle] = useState('');
-  const [form] = Form.useForm<Component>();
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState<Component[]>([]);
+    const [loading, setLoading] = useState(false);
+  
+    const [searchText, setSearchText] = useState('');
+    const [filteredData, setFilteredData] = useState<Component[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -56,66 +52,33 @@ export default function ComponentsRoute() {
     setLoading(false);
   };
 
-  const onReset = () => {
-    Modal.confirm({
-      title: "Confirm Reset",
-      content: "Are you sure you want to reset all form fields?",
-      okText: "Reset",
-      cancelText: "Cancel",
-      onOk: () => form.resetFields(),
-    });
-  };
+  // const handleTrack = () => {
+  //   setIsEditMode(false);
+  //   setIsModalOpen(true);
+  //   setEditingId(null);
+  //   form.resetFields();
+  //   setIsTitle('Create Component')
+  // };
 
-  const handleTrack = () => {
-    setIsEditMode(false);
-    setIsModalOpen(true);
-    setEditingId(null);
-    form.resetFields();
-    setIsTitle('Create Component')
-  };
+  // // Edit record
+  // const editRecord = (record: Component) => {
+  //   setIsEditMode(true);
+  //   form.setFieldsValue(record);
+  //   setEditingId(record.id);
+  //   setIsModalOpen(true);
+  //   setIsTitle('Update Component')
+  // };
 
-  // Edit record
-  const editRecord = (record: Component) => {
-    setIsEditMode(true);
-    form.setFieldsValue(record);
-    setEditingId(record.id);
-    setIsModalOpen(true);
-    setIsTitle('Update Component')
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteButton = async (record: Component) => {
-    if (record.status_labels.name === 'Active') {
+  const handleDeactivateButton = async (record: Component) => {
       const { error } = await ComponentService.deactivateStatus(
         record.id,
         record
       );
-
+  
       if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
-    } else if (record.status_labels.name === 'Inactive') {
-      const { error } = await ComponentService.activateStatus(
-        record.id,
-        record
-      );
-
-      if (error) throw message.error(error.message);
-      message.success("Record activated successfully");
-      fetchData();
-    }
-  };
-
-  const handleCheckinButton = () => { };
-
-  const handleCheckoutButton = () => { };
+    };
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -142,42 +105,9 @@ export default function ComponentsRoute() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  // Create or Update record
-  const onFinish = async () => {
-    try {
+  const handleCheckinButton = () => { };
 
-      const values = await form.validateFields();
-
-      // Include your extra field
-      const allValues = {
-        ...values,
-        status_id: 1,
-      };
-
-      if (editingId) {
-        // Update existing record
-        const { error } = await ComponentService.updatePost(editingId, values);
-
-        if (error) throw message.error(error.message);
-        message.success("Record updated successfully");
-      } else {
-        // Create new record
-        setLoading(true);
-        const { error } = await ComponentService.createPost(allValues);
-
-        if (error) throw message.error(error.message);
-        message.success("Record created successfully");
-      }
-
-      setLoading(false);
-      setIsModalOpen(false);
-      form.resetFields();
-      setEditingId(null);
-      fetchData();
-    } catch (error) {
-      message.error("Error");
-    }
-  };
+  const handleCheckoutButton = () => { };
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
@@ -255,13 +185,13 @@ export default function ComponentsRoute() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record?.id === 1) {
+        if (record.status_labels.name === 'Active') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
-        } else if (record?.id === 2) {
+        } else if (record.status_labels.name === 'Inactive') {
           return (
             <Tag color="red">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
@@ -273,16 +203,16 @@ export default function ComponentsRoute() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this department?"
+            description="Are you sure to update this component?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => editRecord(record)}
+          // onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -293,11 +223,11 @@ export default function ComponentsRoute() {
             </Tag>
           </Popconfirm>
           <Popconfirm
-            title="Do you want to delete?"
-            description="Are you sure to delete this department?"
+            title="Do you want to deactivate?"
+            description="Are you sure to deactivate this component?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleDeleteButton(record)}
+            onConfirm={() => handleDeactivateButton(record)}
           >
             {record.status_labels.name === 'Active' && (
               <Tag
@@ -417,87 +347,17 @@ export default function ComponentsRoute() {
         />
         <Space wrap>
           <Link to={"deleted-components"}>
-            <Button icon={<AiOutlineFileExclamation />} type="primary" danger>
-              Show Deleted Components
+            <Button icon={<AiOutlineFileExclamation />} danger>
+              Show Inactive Components
             </Button>
           </Link>
-          <Button
-            onClick={() => handleTrack()}
-            icon={<AiOutlinePlus />}
-            type="primary"
-          >
-            Create Component
-          </Button>
+
+          <Link to={"form-component"}>
+            <Button icon={<AiOutlinePlus />} type="primary">
+              Create Component
+            </Button>
+          </Link>
         </Space>
-        <Modal
-          style={{ top: 20 }}
-          width={420}
-          title={isTitle}
-          closable={{ "aria-label": "Custom Close Button" }}
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          footer=""
-        >
-          <div>
-            <Form
-              className="mt-5"
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                notification: true,
-                interests: ["sports", "music"],
-              }}
-            >
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Department"
-                    name="department"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input department!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Department Name" />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Divider />
-
-              <Form.Item className="flex flex-wrap justify-end">
-                <Button
-                  onClick={onReset}
-                  type="default"
-                  //   loading={loading}
-                  className="w-full sm:w-auto mr-4"
-                  size="large"
-                >
-                  Reset
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={
-                    <>
-                      {loading && <LoadingOutlined className="animate-spin" />}
-                      {!loading && <AiOutlineSend />}
-                    </>
-                  }
-                  className="w-full sm:w-auto"
-                  size="large"
-                >
-                  {isEditMode && <p>Update</p>}
-                  {!isEditMode && <p>Submit</p>}
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </Modal>
       </div>
       <div className="flex justify-between">
         <Alert

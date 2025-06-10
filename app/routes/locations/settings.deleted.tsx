@@ -60,8 +60,6 @@ export default function DeletedLocation() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Image": true,
-        "URL": true,
         "Address": true,
         "City": true,
         "State": true,
@@ -78,16 +76,6 @@ export default function DeletedLocation() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 120,
-        },
-        {
-            title: "Image",
-            dataIndex: "image",
-            width: 120,
-        },
-        {
-            title: "URL",
-            dataIndex: "url",
             width: 120,
         },
         {
@@ -153,7 +141,7 @@ export default function DeletedLocation() {
         {
             title: "Actions",
             dataIndex: "actions",
-            width: 120,
+            width: 190,
             fixed: "right",
             render: (_, record) => (
                 <div className="flex">

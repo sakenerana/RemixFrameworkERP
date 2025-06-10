@@ -61,7 +61,6 @@ export default function DeletedCompanies() {
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Company Name": true,
         "Email": true,
-        "Image": true,
         "Status": true,
         "Actions": true,
     });
@@ -75,11 +74,6 @@ export default function DeletedCompanies() {
         {
             title: "Email",
             dataIndex: "image",
-            width: 120,
-        },
-        {
-            title: "Image",
-            dataIndex: "url",
             width: 120,
         },
         {
@@ -105,7 +99,7 @@ export default function DeletedCompanies() {
         {
             title: "Actions",
             dataIndex: "actions",
-            width: 120,
+            width: 190,
             fixed: "right",
             render: (_, record) => (
                 <div className="flex">

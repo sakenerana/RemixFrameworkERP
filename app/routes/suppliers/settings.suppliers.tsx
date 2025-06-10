@@ -24,8 +24,8 @@ import {
   AiOutlineFileExclamation,
   AiOutlinePlus,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { FcRefresh } from "react-icons/fc";
+import { Link, useNavigate } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { SupplierService } from "~/services/supplier.service";
 import { Supplier } from "~/types/supplier.type";
@@ -38,28 +38,18 @@ export default function SuppliersRoutes() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Supplier[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   // form.resetFields();
-  //   setIsTitle('Create Supplier')
-  // };
-
   // Edit record
-  // const editRecord = (record: Supplier) => {
-  //   setIsEditMode(true);
-  //   // form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Supplier')
-  // };
+  const editRecord = (record: Supplier) => {
+    navigate(`form-supplier/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Supplier) => {
     const { error } = await SupplierService.deactivateStatus(
@@ -100,7 +90,6 @@ export default function SuppliersRoutes() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Image": true,
     "URL": true,
     "Address": true,
     "City": true,
@@ -118,11 +107,6 @@ export default function SuppliersRoutes() {
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
       width: 120,
     },
     {
@@ -193,7 +177,7 @@ export default function SuppliersRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
@@ -202,7 +186,7 @@ export default function SuppliersRoutes() {
             description="Are you sure to update this supplier?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -295,6 +279,7 @@ export default function SuppliersRoutes() {
             },
           ]}
         />
+        
         <Space wrap>
           <Link to={"deleted-supplier"}>
             <Button icon={<AiOutlineFileExclamation />} danger>
@@ -309,6 +294,7 @@ export default function SuppliersRoutes() {
           </Link>
         </Space>
       </div>
+      
       <div className="flex justify-between">
         <Alert
           message="Note: This is the list of all suppliers. Please check closely."

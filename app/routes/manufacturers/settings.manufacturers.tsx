@@ -25,51 +25,41 @@ import {
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ManufacturerService } from "~/services/manufacturer.service";
 import { Manufacturer } from "~/types/manufacturer.type";
 
 export default function ManufacturersRoutes() {
   const [data, setData] = useState<Manufacturer[]>([]);
-    const [loading, setLoading] = useState(false);
-  
-    const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<Manufacturer[]>([]);
-  
-    const handleRefetch = async () => {
-      setLoading(true);
-      await fetchData();
-      setLoading(false);
-    };
+  const [loading, setLoading] = useState(false);
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Manufacturer')
-  // };
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Manufacturer[]>([]);
 
-  // // Edit record
-  // const editRecord = (record: Manufacturer) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Manufacturer')
-  // };
+  const navigate = useNavigate();
+
+  const handleRefetch = async () => {
+    setLoading(true);
+    await fetchData();
+    setLoading(false);
+  };
+
+  // Edit record
+  const editRecord = (record: Manufacturer) => {
+    navigate(`form-manufacturer/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Manufacturer) => {
-      const { error } = await ManufacturerService.deactivateStatus(
-        record.id,
-        record
-      );
-  
-      if (error) throw message.error(error.message);
-      message.success("Record deactivated successfully");
-      fetchData();
-    };
+    const { error } = await ManufacturerService.deactivateStatus(
+      record.id,
+      record
+    );
+
+    if (error) throw message.error(error.message);
+    message.success("Record deactivated successfully");
+    fetchData();
+  };
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -99,7 +89,6 @@ export default function ManufacturersRoutes() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Image": true,
     "URL": true,
     "Support Phone": true,
     "Support Email": true,
@@ -112,11 +101,6 @@ export default function ManufacturersRoutes() {
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-    },
-    {
-      title: "Image",
-      dataIndex: "image",
       width: 120,
     },
     {
@@ -162,7 +146,7 @@ export default function ManufacturersRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
@@ -171,7 +155,7 @@ export default function ManufacturersRoutes() {
             description="Are you sure to update this manufacturer?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -213,30 +197,30 @@ export default function ManufacturersRoutes() {
   ];
 
   // Toggle column visibility
-    const toggleColumn = (columnTitle: string) => {
-      setColumnVisibility(prev => ({
-        ...prev,
-        [columnTitle]: !prev[columnTitle]
-      }));
-    };
-  
-    // Create dropdown menu items
-    const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
-      key: columnTitle,
-      label: (
-        <Checkbox
-          checked={columnVisibility[columnTitle]}
-          onClick={() => toggleColumn(columnTitle)}
-        >
-          {columnTitle}
-        </Checkbox>
-      ),
+  const toggleColumn = (columnTitle: string) => {
+    setColumnVisibility(prev => ({
+      ...prev,
+      [columnTitle]: !prev[columnTitle]
     }));
-  
-    // Filter columns based on visibility
-    const filteredColumns = columns.filter(column =>
-      column.title ? columnVisibility[column.title.toString()] : true
-    );
+  };
+
+  // Create dropdown menu items
+  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
+    key: columnTitle,
+    label: (
+      <Checkbox
+        checked={columnVisibility[columnTitle]}
+        onClick={() => toggleColumn(columnTitle)}
+      >
+        {columnTitle}
+      </Checkbox>
+    ),
+  }));
+
+  // Filter columns based on visibility
+  const filteredColumns = columns.filter(column =>
+    column.title ? columnVisibility[column.title.toString()] : true
+  );
 
   const onChange: TableProps<Manufacturer>["onChange"] = (
     pagination,

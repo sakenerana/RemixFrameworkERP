@@ -194,13 +194,13 @@ export default function LicensesRoute() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
         <div className="flex">
           <Popconfirm
             title="Do you want to update?"
-            description="Are you sure to update this supplier?"
+            description="Are you sure to update this license?"
             okText="Yes"
             cancelText="No"
           // onConfirm={() => editRecord(record)}
@@ -215,7 +215,7 @@ export default function LicensesRoute() {
           </Popconfirm>
           <Popconfirm
             title="Do you want to deactivate?"
-            description="Are you sure to deactivate this supplier?"
+            description="Are you sure to deactivate this license?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeactivateButton(record)}
@@ -337,15 +337,15 @@ export default function LicensesRoute() {
           ]}
         />
         <Space wrap>
-          <Link to={"deleted-licenses"}>
+          <Link to={"deleted-license"}>
             <Button icon={<AiOutlineFileExclamation />} danger>
-              Show Inactive Suppliers
+              Show Inactive Licenses
             </Button>
           </Link>
 
           <Link to={"form-license"}>
             <Button icon={<AiOutlinePlus />} type="primary">
-              Create Supplier
+              Create License
             </Button>
           </Link>
         </Space>

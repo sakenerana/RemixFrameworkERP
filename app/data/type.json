@@ -1,0 +1,22 @@
+[
+    {
+        "label": "Accessory",
+        "value": "Accessory"
+    },
+    {
+        "label": "Asset",
+        "value": "Asset"
+    },
+    {
+        "label": "Consumable",
+        "value": "Consumable"
+    },
+    {
+        "label": "Component",
+        "value": "Component"
+    },
+    {
+        "label": "License",
+        "value": "License"
+    }
+]
