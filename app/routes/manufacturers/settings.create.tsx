@@ -118,7 +118,7 @@ export default function CreateManufacturer() {
                                 },
                             ]}
                         >
-                            <Input placeholder="Manufacturer Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -127,7 +127,7 @@ export default function CreateManufacturer() {
                             label="URL"
                             name="url"
                         >
-                            <Input prefix={<AiOutlineLink />} placeholder="URL (Optional)" />
+                            <Input prefix={<AiOutlineLink />} />
                         </Form.Item>
                     </Col>
 
@@ -139,7 +139,6 @@ export default function CreateManufacturer() {
                             <Input
                                 type="number"
                                 prefix={<AiOutlinePhone />}
-                                placeholder="Phone (Optional)"
                             />
                         </Form.Item>
                     </Col>
@@ -149,7 +148,7 @@ export default function CreateManufacturer() {
                             label="Support Email"
                             name="email"
                         >
-                            <Input prefix={<AiOutlineMail />} placeholder="Email (Optional)" />
+                            <Input prefix={<AiOutlineMail />} />
                         </Form.Item>
                     </Col>
 

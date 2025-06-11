@@ -1,19 +1,27 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { DepreciationService } from "~/services/depreciation.service";
 import { Depreciation } from "~/types/depreciation.type";
 
 export default function CreateDepreciation() {
+    const { id } = useParams();
     const [form] = Form.useForm<Depreciation>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<any | null>(id);
+    const [isTitle, setIsTitle] = useState('');
 
     useMemo(() => {
-        form.resetFields();
+        if (id) {
+            setIsTitle("Update Depreciation");
+            setIsEditMode(true);
+        } else {
+            setIsTitle("Create Depreciation");
+            setIsEditMode(false);
+        }
     }, []);
 
     const onReset = () => {
@@ -63,7 +71,7 @@ export default function CreateDepreciation() {
 
     return (
         <div>
-            <div className="flex pb-5 justify-between">
+            <div className="flex justify-between">
                 <Breadcrumb
                     items={[
                         {
@@ -81,13 +89,14 @@ export default function CreateDepreciation() {
                         },
                     ]}
                 />
+                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
                 <Link to={'/inventory/settings/depreciation'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
+                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
 
             <Form
-                className="p-5 bg-gray-50"
+                className="p-5 bg-gray-50 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -99,101 +108,38 @@ export default function CreateDepreciation() {
                 <Row gutter={24}>
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="First Name"
-                            name="first_name"
+                            label="Name"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input account first name!",
+                                    message: "Please input name!",
                                 },
                             ]}
                         >
-                            <Input placeholder="First Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Middle Name"
-                            name="middle_name"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please input middle name!",
-                        //   },
-                        // ]}
-                        >
-                            <Input placeholder="Middle Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Last Name"
-                            name="last_name"
+                            label="Number of Months"
+                            name="term"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input last name!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Last Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input email!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Email" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input password!",
-                                },
-                            ]}
-                        >
-                            <Input.Password placeholder="Password" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Phone No."
-                            name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input phone number!",
+                                    message: "Please input term!",
                                 },
                             ]}
                         >
                             <Input
                                 type="number"
-                                prefix={<AiOutlinePhone />}
-                                placeholder="Phone"
+                                prefix={<AiOutlineCalendar />}
                             />
                         </Form.Item>
                     </Col>
 
                 </Row>
-
-                <Divider />
 
                 <Form.Item className="flex flex-wrap justify-end">
                     <Button

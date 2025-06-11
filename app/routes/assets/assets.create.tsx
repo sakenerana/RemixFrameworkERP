@@ -71,9 +71,6 @@ export default function CreateAssets() {
                             title: <HomeOutlined />,
                         },
                         {
-                            title: "Settings",
-                        },
-                        {
                             title: "Asset",
                         },
                         {

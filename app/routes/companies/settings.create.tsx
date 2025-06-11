@@ -118,7 +118,7 @@ export default function CreateCompanies() {
                                 },
                             ]}
                         >
-                            <Input placeholder="Company Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -130,7 +130,6 @@ export default function CreateCompanies() {
                             <Input
                                 type="number"
                                 prefix={<AiOutlinePhone />}
-                                placeholder="Phone (Optional)"
                             />
                         </Form.Item>
                     </Col>
@@ -140,7 +139,7 @@ export default function CreateCompanies() {
                             label="Fax"
                             name="fax"
                         >
-                            <Input prefix={<AiOutlinePrinter />} placeholder="Fax (Optional)" />
+                            <Input prefix={<AiOutlinePrinter />} />
                         </Form.Item>
                     </Col>
 
@@ -149,7 +148,7 @@ export default function CreateCompanies() {
                             label="Email"
                             name="email"
                         >
-                            <Input prefix={<AiOutlineMail />} placeholder="Email (Optional)" />
+                            <Input prefix={<AiOutlineMail />} />
                         </Form.Item>
                     </Col>
 

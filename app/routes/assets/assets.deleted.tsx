@@ -261,9 +261,6 @@ export default function DeletedAssets() {
                             title: <HomeOutlined />,
                         },
                         {
-                            title: "Settings",
-                        },
-                        {
                             title: "Suppliers",
                         },
                         {

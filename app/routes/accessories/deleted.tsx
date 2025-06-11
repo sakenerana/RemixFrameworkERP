@@ -236,9 +236,6 @@ export default function DeletedAccessory() {
                             title: <HomeOutlined />,
                         },
                         {
-                            title: "Settings",
-                        },
-                        {
                             title: "Accessories",
                         },
                         {

@@ -40,28 +40,18 @@ export default function DepreciationRoutes() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Depreciation[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Depreciation')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Depreciation) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Depreciation')
-  // };
+  // Edit record
+  const editRecord = (record: Depreciation) => {
+    navigate(`form-depreciation/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Depreciation) => {
     const { error } = await DepreciationService.deactivateStatus(
@@ -122,11 +112,6 @@ export default function DepreciationRoutes() {
       width: 120,
     },
     {
-      title: "Floor Value",
-      dataIndex: "floor_value",
-      width: 120,
-    },
-    {
       title: "Assets",
       dataIndex: "assets",
       width: 120,
@@ -173,7 +158,7 @@ export default function DepreciationRoutes() {
             description="Are you sure to update this depreciation?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

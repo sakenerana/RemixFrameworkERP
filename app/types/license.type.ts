@@ -2,6 +2,7 @@ export interface License {
     key: React.Key;
     id: number;
     name: string;
+    category_id: number;
     product_key: string;
     expiration_date: string;
     licensed_to_email: string;

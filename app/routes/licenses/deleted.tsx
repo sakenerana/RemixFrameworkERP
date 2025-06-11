@@ -247,9 +247,6 @@ export default function DeletedLicense() {
                             title: <HomeOutlined />,
                         },
                         {
-                            title: "Settings",
-                        },
-                        {
                             title: "Licenses",
                         },
                         {

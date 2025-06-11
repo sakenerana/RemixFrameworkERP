@@ -5,16 +5,11 @@ import {
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
-  Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
@@ -31,10 +26,8 @@ import {
   AiOutlineFileExclamation,
   AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineSend,
-  AiOutlineUserDelete,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
@@ -46,28 +39,18 @@ export default function AccesoriessRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Accessories[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Accessory')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Accessories) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Accessory')
-  // };
+  // Edit record
+  const editRecord = (record: Accessories) => {
+    navigate(`form-accessory/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Accessories) => {
     const { error } = await AccessoryService.deactivateStatus(
@@ -202,7 +185,7 @@ export default function AccesoriessRoute() {
             description="Are you sure to update this accessory?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

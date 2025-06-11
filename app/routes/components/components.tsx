@@ -41,10 +41,12 @@ import { Component } from "~/types/component.type";
 
 export default function ComponentsRoute() {
   const [data, setData] = useState<Component[]>([]);
-    const [loading, setLoading] = useState(false);
-  
-    const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<Component[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Component[]>([]);
+
+  const navigate = useNavigate();
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -52,33 +54,21 @@ export default function ComponentsRoute() {
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Component')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Component) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Component')
-  // };
+  // Edit record
+  const editRecord = (record: Component) => {
+    navigate(`form-component/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Component) => {
-      const { error } = await ComponentService.deactivateStatus(
-        record.id,
-        record
-      );
-  
-      if (error) throw message.error(error.message);
-      message.success("Record deactivated successfully");
-      fetchData();
-    };
+    const { error } = await ComponentService.deactivateStatus(
+      record.id,
+      record
+    );
+
+    if (error) throw message.error(error.message);
+    message.success("Record deactivated successfully");
+    fetchData();
+  };
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -212,7 +202,7 @@ export default function ComponentsRoute() {
             description="Are you sure to update this component?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

@@ -119,7 +119,7 @@ export default function CreateCategories() {
                                 },
                             ]}
                         >
-                            <Input placeholder="Category Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -136,7 +136,7 @@ export default function CreateCategories() {
                         >
                             <Select
                                 showSearch
-                                placeholder="Select Type (Optional)"
+                                placeholder="Select Type"
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }

@@ -119,7 +119,7 @@ export default function CreateLocation() {
                                 },
                             ]}
                         >
-                            <Input placeholder="Location Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -128,7 +128,7 @@ export default function CreateLocation() {
                             label="Address"
                             name="address"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -137,7 +137,7 @@ export default function CreateLocation() {
                             label="Address2"
                             name="address2"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address2 (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -146,7 +146,7 @@ export default function CreateLocation() {
                             label="City"
                             name="city"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="city (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -155,7 +155,7 @@ export default function CreateLocation() {
                             label="State"
                             name="state"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="State (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -167,7 +167,7 @@ export default function CreateLocation() {
                             <Select
                                 prefix={<AiOutlineEnvironment />}
                                 showSearch
-                                placeholder="Select Country (Optional)"
+                                placeholder="Select Country"
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
@@ -181,7 +181,7 @@ export default function CreateLocation() {
                             label="Zip"
                             name="zip"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000 (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
                         </Form.Item>
                     </Col>
 

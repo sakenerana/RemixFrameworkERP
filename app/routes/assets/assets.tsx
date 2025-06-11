@@ -5,16 +5,11 @@ import {
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
-  Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
@@ -28,13 +23,11 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineExport,
-  AiOutlineFileDone,
   AiOutlineFileExclamation,
   AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";

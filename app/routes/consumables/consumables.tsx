@@ -46,28 +46,18 @@ export default function ConsumablesRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Consumable[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Consumable')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Consumable) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Consumable')
-  // };
+  // Edit record
+  const editRecord = (record: Consumable) => {
+    navigate(`form-consumable/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Consumable) => {
     const { error } = await ConsumableService.deactivateStatus(
@@ -210,7 +200,7 @@ export default function ConsumablesRoute() {
             description="Are you sure to update this consumable?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

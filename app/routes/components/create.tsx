@@ -1,19 +1,28 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Link, useParams } from "@remix-run/react";
+import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { ComponentService } from "~/services/component.service";
 import { Component } from "~/types/component.type";
+const { TextArea } = Input;
 
 export default function CreateComponents() {
+    const { id } = useParams();
     const [form] = Form.useForm<Component>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<any | null>(id);
+    const [isTitle, setIsTitle] = useState('');
 
     useMemo(() => {
-        form.resetFields();
+        if (id) {
+            setIsTitle("Update Component");
+            setIsEditMode(true);
+        } else {
+            setIsTitle("Create Component");
+            setIsEditMode(false);
+        }
     }, []);
 
     const onReset = () => {
@@ -63,7 +72,7 @@ export default function CreateComponents() {
 
     return (
         <div>
-            <div className="flex pb-5 justify-between">
+            <div className="flex justify-between">
                 <Breadcrumb
                     items={[
                         {
@@ -81,13 +90,14 @@ export default function CreateComponents() {
                         },
                     ]}
                 />
+                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
                 <Link to={'/inventory/components'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
+                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
 
             <Form
-                className="p-5 bg-gray-50"
+                className="p-5 bg-gray-50 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -99,95 +109,149 @@ export default function CreateComponents() {
                 <Row gutter={24}>
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="First Name"
-                            name="first_name"
+                            label="Component Name"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input account first name!",
+                                    message: "Please input accessory name!",
                                 },
                             ]}
                         >
-                            <Input placeholder="First Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Middle Name"
-                            name="middle_name"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please input middle name!",
-                        //   },
-                        // ]}
-                        >
-                            <Input placeholder="Middle Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Last Name"
-                            name="last_name"
+                            label="Category"
+                            name="category_id"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input last name!",
+                                    message: "Please select category!",
                                 },
                             ]}
                         >
-                            <Input placeholder="Last Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input email!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Email" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input password!",
-                                },
-                            ]}
-                        >
-                            <Input.Password placeholder="Password" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Phone No."
-                            name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input phone number!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                                placeholder="Phone"
+                            <Select
+                                showSearch
+                                placeholder="Select Country"
+                            // filterOption={(input, option) =>
+                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            // }
+                            // options={[]}
                             />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Supplier"
+                            name="supplier_id"
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Select Supplier"
+                            // filterOption={(input, option) =>
+                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            // }
+                            // options={[]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Manufacturer"
+                            name="manufacturer_id"
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Select Manufacturer"
+                            // filterOption={(input, option) =>
+                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            // }
+                            // options={[]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Location"
+                            name="location_id"
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Select Location"
+                            // filterOption={(input, option) =>
+                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            // }
+                            // options={[]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Model No."
+                            name="model_no"
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Order Number"
+                            name="order_no"
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Purchase Date"
+                            name="purchase_date"
+                        >
+                            <DatePicker className="w-full" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Purchase Cost"
+                            name="purchase_cost"
+                        >
+                            <Input type="number" suffix="PHP" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Quantity"
+                            name="qty"
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Min QTY"
+                            name="min_qty"
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <Form.Item
+                            label="Notes"
+                            name="notes"
+                        >
+                            <TextArea rows={4} placeholder="(Optional)" />
                         </Form.Item>
                     </Col>
 

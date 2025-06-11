@@ -80,11 +80,6 @@ export default function DeletedDepreciation() {
             width: 120,
         },
         {
-            title: "Floor Value",
-            dataIndex: "floor_value",
-            width: 120,
-        },
-        {
             title: "Assets",
             dataIndex: "assets",
             width: 120,

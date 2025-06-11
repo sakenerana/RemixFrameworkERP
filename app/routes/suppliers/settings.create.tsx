@@ -8,7 +8,6 @@ import { Supplier } from "~/types/supplier.type";
 import countries from '../../data/country.json';
 const { TextArea } = Input;
 
-
 export default function CreateSuppliers() {
     const { id } = useParams();
     const [form] = Form.useForm<Supplier>();
@@ -120,7 +119,7 @@ export default function CreateSuppliers() {
                                 },
                             ]}
                         >
-                            <Input placeholder="Supplier Name" />
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -129,7 +128,7 @@ export default function CreateSuppliers() {
                             label="Address"
                             name="address"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -138,7 +137,7 @@ export default function CreateSuppliers() {
                             label="Address2"
                             name="address2"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="Address2 (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -147,7 +146,7 @@ export default function CreateSuppliers() {
                             label="City"
                             name="city"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="city (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -156,7 +155,7 @@ export default function CreateSuppliers() {
                             label="State"
                             name="state"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="State (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} />
                         </Form.Item>
                     </Col>
 
@@ -168,7 +167,7 @@ export default function CreateSuppliers() {
                             <Select
                                 prefix={<AiOutlineEnvironment />}
                                 showSearch
-                                placeholder="Select Country (Optional)"
+                                placeholder="Select Country"
                                 filterOption={(input, option) =>
                                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                 }
@@ -182,7 +181,7 @@ export default function CreateSuppliers() {
                             label="Zip"
                             name="zip"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000 (Optional)" />
+                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
                         </Form.Item>
                     </Col>
 
@@ -191,7 +190,7 @@ export default function CreateSuppliers() {
                             label="Contact Name"
                             name="contact_name"
                         >
-                            <Input prefix={<AiOutlineSolution />} placeholder="Contact Name (Optional)" />
+                            <Input prefix={<AiOutlineSolution />} />
                         </Form.Item>
                     </Col>
 
@@ -200,7 +199,7 @@ export default function CreateSuppliers() {
                             label="Email"
                             name="email"
                         >
-                            <Input prefix={<AiOutlineMail />} placeholder="Email (Optional)" />
+                            <Input prefix={<AiOutlineMail />} />
                         </Form.Item>
                     </Col>
 
@@ -212,7 +211,6 @@ export default function CreateSuppliers() {
                             <Input
                                 type="number"
                                 prefix={<AiOutlinePhone />}
-                                placeholder="Phone (Optional)"
                             />
                         </Form.Item>
                     </Col>
@@ -222,7 +220,7 @@ export default function CreateSuppliers() {
                             label="Fax"
                             name="fax"
                         >
-                            <Input prefix={<AiOutlinePrinter />} placeholder="Fax (Optional)" />
+                            <Input prefix={<AiOutlinePrinter />} />
                         </Form.Item>
                     </Col>
 
@@ -231,7 +229,7 @@ export default function CreateSuppliers() {
                             label="URL"
                             name="url"
                         >
-                            <Input prefix={<AiOutlineLink />} placeholder="URL (Optional)" />
+                            <Input prefix={<AiOutlineLink />} />
                         </Form.Item>
                     </Col>
 

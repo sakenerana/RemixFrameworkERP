@@ -46,28 +46,18 @@ export default function LicensesRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<License[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create License')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: License) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update License')
-  // };
+  // Edit record
+  const editRecord = (record: License) => {
+    navigate(`form-license/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: License) => {
     const { error } = await LicenseService.deactivateStatus(
@@ -203,7 +193,7 @@ export default function LicensesRoute() {
             description="Are you sure to update this license?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"

@@ -2,14 +2,14 @@ import { PredefinedKit } from "~/types/predefined_kit.type"
 import supabase from "~/utils/supabase.client"
 
 export const PredefinedKitService = {
-    
+
   // Create
   async createPost(postData: PredefinedKit) {
     const { data, error } = await supabase
       .from('predefined')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -21,7 +21,7 @@ export const PredefinedKitService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -30,9 +30,22 @@ export const PredefinedKitService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('predefined')
-      .select('*')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
       .order('created_at', { ascending: false })
-    
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsInactive() {
+    const { data, error } = await supabase
+      .from('predefined')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 2)
+      .order('created_at', { ascending: false })
+
     if (error) throw error
     return data
   },
@@ -44,19 +57,19 @@ export const PredefinedKitService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
 
-    // Activate
+  // Activate
   async activateStatus(id: number, updates: PredefinedKit) {
     const { data, error } = await supabase
       .from('predefined')
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -68,7 +81,7 @@ export const PredefinedKitService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -79,7 +92,7 @@ export const PredefinedKitService = {
       .from('predefined')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -90,7 +103,7 @@ export const PredefinedKitService = {
       .from('predefined')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }
