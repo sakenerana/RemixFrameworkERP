@@ -144,10 +144,7 @@ export default defineConfig({
                 route("audit-assets", "routes/assets/assets.audit.tsx", {
                   index: true,
                 });
-                route("form-assets", "routes/assets/assets.create.tsx", {
-                  index: true,
-                });
-                route("form-assets/:id", "routes/assets/assets.update.tsx", {
+                route("form-asset/:id?", "routes/assets/assets.create.tsx", {
                   index: true,
                 });
                 route("deleted-assets", "routes/assets/assets.deleted.tsx", {

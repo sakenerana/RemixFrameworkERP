@@ -138,7 +138,7 @@ export default function AdminLayoutIndex() {
                     className=""
                     style={{ top: 20 }}
                     width={600}
-                    title="Workflow Tracker"
+                    title={<p className="flex flex-wrap gap-2"><FcSettings className="mt-1" /> Settings</p> }
                     closable={{ "aria-label": "Custom Close Button" }}
                     open={isModalOpen}
                     onOk={handleOk}

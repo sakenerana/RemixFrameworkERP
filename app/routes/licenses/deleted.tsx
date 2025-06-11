@@ -157,21 +157,6 @@ export default function DeletedLicense() {
             render: (_, record) => (
                 <div className="flex">
                     <Popconfirm
-                        title="Do you want to update?"
-                        description="Are you sure to update this license?"
-                        okText="Yes"
-                        cancelText="No"
-                    // onConfirm={() => editRecord(record)}
-                    >
-                        <Tag
-                            className="cursor-pointer"
-                            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-                            color="#f7b63e"
-                        >
-                            Update
-                        </Tag>
-                    </Popconfirm>
-                    <Popconfirm
                         title="Do you want to activate?"
                         description="Are you sure to activate this license?"
                         okText="Yes"

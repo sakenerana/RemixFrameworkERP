@@ -1,5 +1,5 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
@@ -7,13 +7,21 @@ import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
 
 export default function CreateAssets() {
+    const { id } = useParams();
     const [form] = Form.useForm<Asset>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<any | null>(id);
+    const [isTitle, setIsTitle] = useState('');
 
     useMemo(() => {
-        form.resetFields();
+        if (id) {
+            setIsTitle("Update Asset");
+            setIsEditMode(true);
+        } else {
+            setIsTitle("Create Asset");
+            setIsEditMode(false);
+        }
     }, []);
 
     const onReset = () => {
@@ -63,7 +71,7 @@ export default function CreateAssets() {
 
     return (
         <div>
-            <div className="flex pb-5 justify-between">
+            <div className="flex justify-between">
                 <Breadcrumb
                     items={[
                         {
@@ -78,13 +86,14 @@ export default function CreateAssets() {
                         },
                     ]}
                 />
+                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
                 <Link to={'/inventory/assets'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
+                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
 
             <Form
-                className="p-5 bg-gray-50"
+                className="p-5 bg-gray-50 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}

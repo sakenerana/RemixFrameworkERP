@@ -2,8 +2,6 @@ import { useState } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined, SwapOutlined } from "@ant-design/icons";
 import {
   Button,
-  Dropdown,
-  Input,
   Layout,
   Menu,
   Space,
@@ -16,7 +14,6 @@ import {
   FcAutomatic,
   FcBearish,
   FcBullish,
-  FcCancel,
   FcComboChart,
   FcConferenceCall,
   FcDepartment,
@@ -24,12 +21,10 @@ import {
   FcFactory,
   FcFlowChart,
   FcGlobe,
-  FcInspection,
   FcLandscape,
   FcMultipleDevices,
   FcMultipleSmartphones,
   FcNews,
-  FcOk,
   FcPackage,
   FcPaid,
   FcSalesPerformance,
@@ -353,7 +348,7 @@ export default function InventoryLayoutIndex() {
                     className=""
                     style={{ top: 20 }}
                     width={600}
-                    title="Workflow Tracker"
+                    title={<p className="flex flex-wrap gap-2"><FcSettings className="mt-1" /> Settings</p> }
                     closable={{ "aria-label": "Custom Close Button" }}
                     open={isModalOpen}
                     onOk={handleOk}

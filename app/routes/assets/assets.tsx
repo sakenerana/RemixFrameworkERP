@@ -39,28 +39,18 @@ export default function AssetsRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Asset[]>([]);
 
+  const navigate = useNavigate();
+
   const handleRefetch = async () => {
     setLoading(true);
     await fetchData();
     setLoading(false);
   };
 
-  // const handleTrack = () => {
-  //   setIsEditMode(false);
-  //   setIsModalOpen(true);
-  //   setEditingId(null);
-  //   form.resetFields();
-  //   setIsTitle('Create Asset')
-  // };
-
-  // // Edit record
-  // const editRecord = (record: Asset) => {
-  //   setIsEditMode(true);
-  //   form.setFieldsValue(record);
-  //   setEditingId(record.id);
-  //   setIsModalOpen(true);
-  //   setIsTitle('Update Asset')
-  // };
+  // Edit record
+  const editRecord = (record: Asset) => {
+    navigate(`form-asset/${record.id}`);
+  };
 
   const handleDeactivateButton = async (record: Asset) => {
     const { error } = await AssetService.deactivateStatus(
@@ -220,7 +210,7 @@ export default function AssetsRoute() {
             description="Are you sure to update this asset?"
             okText="Yes"
             cancelText="No"
-          // onConfirm={() => editRecord(record)}
+            onConfirm={() => editRecord(record)}
           >
             <Tag
               className="cursor-pointer"
@@ -360,7 +350,7 @@ export default function AssetsRoute() {
             </Button>
           </Link>
 
-          <Link to={"form-assets"}>
+          <Link to={"form-asset"}>
             <Button icon={<AiOutlinePlus />} type="primary">
               Create Asset
             </Button>

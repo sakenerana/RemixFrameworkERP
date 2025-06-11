@@ -171,21 +171,6 @@ export default function DeletedAssets() {
             render: (_, record) => (
                 <div className="flex">
                     <Popconfirm
-                        title="Do you want to update?"
-                        description="Are you sure to update this asset?"
-                        okText="Yes"
-                        cancelText="No"
-                    // onConfirm={() => editRecord(record)}
-                    >
-                        <Tag
-                            className="cursor-pointer"
-                            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-                            color="#f7b63e"
-                        >
-                            Update
-                        </Tag>
-                    </Popconfirm>
-                    <Popconfirm
                         title="Do you want to activate?"
                         description="Are you sure to activate this asset?"
                         okText="Yes"
@@ -274,7 +259,7 @@ export default function DeletedAssets() {
             </div>
             <div className="flex justify-between">
                 <Alert
-                    message="Note: This is the list of all inactive suppliers. Please check closely."
+                    message="Note: This is the list of all inactive assets. Please check closely."
                     type="info"
                     showIcon
                 />
