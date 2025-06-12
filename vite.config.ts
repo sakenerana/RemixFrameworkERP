@@ -134,9 +134,25 @@ export default defineConfig({
                   );
                 }
               );
-              route("assets/deleted", "routes/deleted/assets.deleted.tsx", {
-                index: true,
-              });
+              route(
+                "settings/asset-model",
+                "routes/asset_model/route.tsx",
+                () => {
+                  route("", "routes/asset_model/settings.asset_model.tsx", {
+                    index: true,
+                  });
+                  route(
+                    "form-asset-model/:id?",
+                    "routes/asset_model/settings.create.tsx",
+                    { index: true }
+                  );
+                  route(
+                    "deleted-asset-model",
+                    "routes/asset_model/settings.deleted.tsx",
+                    { index: true }
+                  );
+                }
+              );
               route("assets", "routes/assets/route.tsx", () => {
                 route("", "routes/assets/assets.tsx", {
                   index: true,

@@ -6,11 +6,9 @@ import {
   Button,
   Checkbox,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
-  Modal,
   Popconfirm,
   Space,
   Spin,
@@ -274,9 +272,6 @@ export default function DepreciationRoutes() {
         <Space direction="horizontal">
           <Space.Compact style={{ width: "100%" }}>
             <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
           </Space.Compact>
           <Space wrap>
             <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">

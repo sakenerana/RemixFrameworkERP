@@ -1,19 +1,21 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineRollback } from "react-icons/ai";
-import { FcRefresh } from "react-icons/fc";
+import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlinePlus } from "react-icons/ai";
+import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetModelService } from "~/services/asset_model.service";
 import { AssetModel } from "~/types/asset_model.tpye";
 
-export default function DeletedAssetModel() {
+export default function AssetModelsRoutes() {
     const [data, setData] = useState<AssetModel[]>([]);
     const [loading, setLoading] = useState(false);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<AssetModel[]>([]);
+
+    const navigate = useNavigate();
 
     const handleRefetch = async () => {
         setLoading(true);
@@ -21,8 +23,13 @@ export default function DeletedAssetModel() {
         setLoading(false);
     };
 
-    const handleActivateButton = async (record: AssetModel) => {
-        const { error } = await AssetModelService.activateStatus(
+    // Edit record
+    const editRecord = (record: AssetModel) => {
+        navigate(`form-asset-model/${record.id}`);
+    };
+
+    const handleDeactivateButton = async (record: AssetModel) => {
+        const { error } = await AssetModelService.deactivateStatus(
             record.id,
             record
         );
@@ -36,7 +43,7 @@ export default function DeletedAssetModel() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await AssetModelService.getAllPostsInactive();
+            const dataFetch = await AssetModelService.getAllPosts();
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -128,11 +135,26 @@ export default function DeletedAssetModel() {
             render: (_, record) => (
                 <div className="flex">
                     <Popconfirm
-                        title="Do you want to activate?"
-                        description="Are you sure to activate this asset model?"
+                        title="Do you want to update?"
+                        description="Are you sure to update this asset model?"
                         okText="Yes"
                         cancelText="No"
-                        onConfirm={() => handleActivateButton(record)}
+                        onConfirm={() => editRecord(record)}
+                    >
+                        <Tag
+                            className="cursor-pointer"
+                            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
+                            color="#f7b63e"
+                        >
+                            Update
+                        </Tag>
+                    </Popconfirm>
+                    <Popconfirm
+                        title="Do you want to deactivate?"
+                        description="Are you sure to deactivate this asset model?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => handleDeactivateButton(record)}
                     >
                         {record.status_labels.name === 'Active' && (
                             <Tag
@@ -208,18 +230,25 @@ export default function DeletedAssetModel() {
                         {
                             title: "Asset Model",
                         },
-                        {
-                            title: "Inactive",
-                        },
                     ]}
                 />
-                <Link to={'/inventory/settings/asset-model'}>
-                    <Button icon={<AiOutlineRollback />}>Back</Button>
-                </Link>
+                <Space wrap>
+                    <Link to={"deleted-asset-model"}>
+                        <Button icon={<AiOutlineFileExclamation />} danger>
+                            Show Inactive Asset Model
+                        </Button>
+                    </Link>
+
+                    <Link to={"form-asset-model"}>
+                        <Button icon={<AiOutlinePlus />} type="primary">
+                            Create Asset Model
+                        </Button>
+                    </Link>
+                </Space>
             </div>
             <div className="flex justify-between">
                 <Alert
-                    message="Note: This is the list of all inactive asset model. Please check closely."
+                    message="Note: This is the list of all asset models. Please check closely."
                     type="info"
                     showIcon
                 />

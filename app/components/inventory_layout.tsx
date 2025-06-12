@@ -204,6 +204,13 @@ export default function InventoryLayoutIndex() {
             <Link to="/inventory/settings/depreciation">Depreciation</Link>
           ),
         },
+        {
+          key: "2.8",
+          icon: <FcMultipleDevices />,
+          label: (
+            <Link to="/inventory/settings/asset-model">Asset Model</Link>
+          ),
+        },
       ],
     },
     {
