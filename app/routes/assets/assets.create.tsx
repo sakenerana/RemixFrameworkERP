@@ -1,10 +1,12 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import AssetTag from "~/components/asset_tag";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
+const { TextArea } = Input;
 
 export default function CreateAssets() {
     const { id } = useParams();
@@ -105,101 +107,84 @@ export default function CreateAssets() {
                 <Row gutter={24}>
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="First Name"
-                            name="first_name"
+                            label="Model"
+                            name="model_id"
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input account first name!",
+                                    message: "Please select model!",
                                 },
                             ]}
                         >
-                            <Input placeholder="First Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Middle Name"
-                            name="middle_name"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please input middle name!",
-                        //   },
-                        // ]}
-                        >
-                            <Input placeholder="Middle Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Last Name"
-                            name="last_name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input last name!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Last Name" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input email!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Email" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input password!",
-                                },
-                            ]}
-                        >
-                            <Input.Password placeholder="Password" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Phone No."
-                            name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input phone number!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                                placeholder="Phone"
+                            <Select
+                                showSearch
+                                placeholder="Select Model"
+                                // filterOption={(input, option) =>
+                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                // }
+                                options={[]}
                             />
                         </Form.Item>
                     </Col>
 
-                </Row>
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Type"
+                            name="type"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please select type!",
+                                },
+                            ]}
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Select Type"
+                                // filterOption={(input, option) =>
+                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                // }
+                                options={[]}
+                            />
+                        </Form.Item>
+                    </Col>
 
-                <Divider />
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Location"
+                            name="location"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please select location!",
+                                },
+                            ]}
+                        >
+                            <Select
+                                showSearch
+                                placeholder="Select Location"
+                                // filterOption={(input, option) =>
+                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                // }
+                                options={[]}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <AssetTag></AssetTag>
+                    </Col>
+
+                    <Col xs={24} sm={24} className="mt-4">
+                        <Form.Item
+                            label="Notes"
+                            name="notes"
+                        >
+                            <TextArea rows={4} placeholder="(Optional)" />
+                        </Form.Item>
+                    </Col>
+
+                </Row>
 
                 <Form.Item className="flex flex-wrap justify-end">
                     <Button
