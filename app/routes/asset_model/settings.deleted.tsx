@@ -64,7 +64,10 @@ export default function DeletedAssetModel() {
         "Min Qty": true,
         "Assets": true,
         "Category": true,
-        "Fieldset": true,
+        "Manufacturer": true,
+        "EOL": false,
+        "Depreciation": false,
+        "Notes": false,
         "Status": true,
         "Actions": true,
     });
@@ -74,31 +77,55 @@ export default function DeletedAssetModel() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Model No",
             dataIndex: "model_no",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Min Qty",
             dataIndex: "min_qty",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Assets",
             dataIndex: "assets",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Category",
             dataIndex: "category_id",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Fieldset",
-            dataIndex: "fieldset",
+            title: "Manufacturer",
+            dataIndex: "manufacturer",
             width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "EOL",
+            dataIndex: "eol",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Depreciation",
+            dataIndex: "depreciation",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Notes",
+            dataIndex: "notes",
+            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

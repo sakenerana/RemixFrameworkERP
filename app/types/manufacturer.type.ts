@@ -6,6 +6,7 @@ export interface Manufacturer {
     url: string;
     support_phone: string;
     support_email: string;
+    notes: string;
     status_labels: any;
     action: string;
 }

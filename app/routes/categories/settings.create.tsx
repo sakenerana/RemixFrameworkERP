@@ -1,5 +1,5 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineEnvironment, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
@@ -13,17 +13,45 @@ export default function CreateCategories() {
     const [form] = Form.useForm<Category>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await CategoryService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            // Update all states at once
+            form.setFieldsValue(dataFetch);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading category data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Category");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Category");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     const onReset = () => {
@@ -46,11 +74,13 @@ export default function CreateCategories() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await CategoryService.updatePost(editingId, values);
+                const { error } = await CategoryService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -65,7 +95,7 @@ export default function CreateCategories() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/settings/categories");
         } catch (error) {
             message.error("Error");
         }

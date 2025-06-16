@@ -102,26 +102,31 @@ export default function ManufacturersRoutes() {
       title: "Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "URL",
       dataIndex: "url",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Support Phone",
       dataIndex: "support_phone",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Support Email",
       dataIndex: "support_email",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Notes",
       dataIndex: "notes",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

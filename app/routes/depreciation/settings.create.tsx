@@ -1,27 +1,56 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineCalendar, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { DepreciationService } from "~/services/depreciation.service";
 import { Depreciation } from "~/types/depreciation.type";
+const { TextArea } = Input;
 
 export default function CreateDepreciation() {
     const { id } = useParams();
     const [form] = Form.useForm<Depreciation>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await DepreciationService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            // Update all states at once
+            form.setFieldsValue(dataFetch);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Depreciation");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Depreciation");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     const onReset = () => {
@@ -44,11 +73,13 @@ export default function CreateDepreciation() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await DepreciationService.updatePost(editingId, values);
+                const { error } = await DepreciationService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -63,7 +94,7 @@ export default function CreateDepreciation() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/settings/depreciation");
         } catch (error) {
             message.error("Error");
         }
@@ -124,7 +155,7 @@ export default function CreateDepreciation() {
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Number of Months"
-                            name="term"
+                            name="months"
                             rules={[
                                 {
                                     required: true,
@@ -136,6 +167,15 @@ export default function CreateDepreciation() {
                                 type="number"
                                 prefix={<AiOutlineCalendar />}
                             />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <Form.Item
+                            label="Notes"
+                            name="notes"
+                        >
+                            <TextArea rows={4} placeholder="(Optional)" />
                         </Form.Item>
                     </Col>
 

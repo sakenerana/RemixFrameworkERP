@@ -72,21 +72,25 @@ export default function DeletedCategories() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Type",
             dataIndex: "type",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Qty",
             dataIndex: "qty",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Notes",
             dataIndex: "notes",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

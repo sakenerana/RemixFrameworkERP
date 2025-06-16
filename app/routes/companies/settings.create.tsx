@@ -1,5 +1,5 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
@@ -12,17 +12,45 @@ export default function CreateCompanies() {
     const [form] = Form.useForm<Company>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
-    const [isTitle, setIsTitle] = useState('');
+    const [isTitle, setIsTitle] = useState(''); 3
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await CompanyService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            // Update all states at once
+            form.setFieldsValue(dataFetch);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Company");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Company");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     const onReset = () => {
@@ -45,11 +73,13 @@ export default function CreateCompanies() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await CompanyService.updatePost(editingId, values);
+                const { error } = await CompanyService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -64,7 +94,7 @@ export default function CreateCompanies() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/settings/companies");
         } catch (error) {
             message.error("Error");
         }

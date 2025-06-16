@@ -91,6 +91,9 @@ export default function CompaniesRoutes() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Company Name": true,
     "Email": true,
+    "Phone": false,
+    "Fax": false,
+    "Notes": false,
     "Status": true,
     "Actions": true,
   });
@@ -100,11 +103,31 @@ export default function CompaniesRoutes() {
       title: "Company Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Email",
       dataIndex: "email",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Fax",
+      dataIndex: "fax",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

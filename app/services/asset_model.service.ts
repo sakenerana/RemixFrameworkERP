@@ -15,7 +15,7 @@ export const AssetModelService = {
   },
 
   // Read (single)
-  async getPostById(id: AssetModel) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('asset_model')
       .select('*')
@@ -30,7 +30,7 @@ export const AssetModelService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('asset_model')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), categories(*), manufacturers(*), depreciations(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
     

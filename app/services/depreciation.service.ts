@@ -15,7 +15,7 @@ export const DepreciationService = {
   },
 
   // Read (single)
-  async getPostById(id: Depreciation) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('depreciations')
       .select('*')

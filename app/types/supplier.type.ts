@@ -5,6 +5,7 @@ export interface Supplier {
   image: any;
   url: string;
   address: string;
+  address2: string;
   city: string;
   state: string;
   postal_code: string;

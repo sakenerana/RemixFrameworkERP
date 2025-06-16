@@ -15,7 +15,7 @@ export const CategoryService = {
   },
 
   // Read (single)
-  async getPostById(id: Category) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('categories')
       .select('*')

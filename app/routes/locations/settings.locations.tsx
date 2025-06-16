@@ -98,11 +98,13 @@ export default function LocationsRoutes() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Location Name": true,
     "Address": true,
+    "Address 2": false,
     "City": true,
     "State": true,
     "Postal Code": false,
     "Country": false,
-    "Fax": false,
+    "Zip": false,
+    "Notes": false,
     "Status": true,
     "Actions": true,
   });
@@ -112,36 +114,55 @@ export default function LocationsRoutes() {
       title: "Location Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Address",
       dataIndex: "address",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Address 2",
+      dataIndex: "address2",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "City",
       dataIndex: "city",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "State",
       dataIndex: "state",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Postal Code",
       dataIndex: "postal_code",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Country",
       dataIndex: "country",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
-      title: "Fax",
-      dataIndex: "fax",
+      title: "Zip",
+      dataIndex: "zip",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

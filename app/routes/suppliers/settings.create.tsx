@@ -1,5 +1,5 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineEnvironment, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
@@ -13,17 +13,45 @@ export default function CreateSuppliers() {
     const [form] = Form.useForm<Supplier>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await SupplierService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            // Update all states at once
+            form.setFieldsValue(dataFetch);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Supplier");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Supplier");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     const onReset = () => {
@@ -46,11 +74,13 @@ export default function CreateSuppliers() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await SupplierService.updatePost(editingId, values);
+                const { error } = await SupplierService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -65,7 +95,7 @@ export default function CreateSuppliers() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/settings/suppliers");
         } catch (error) {
             message.error("Error");
         }
@@ -188,7 +218,7 @@ export default function CreateSuppliers() {
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Contact Name"
-                            name="contact_name"
+                            name="contact"
                         >
                             <Input prefix={<AiOutlineSolution />} />
                         </Form.Item>

@@ -4,6 +4,7 @@ export interface Category {
   name: string;
   type: string;
   qty: number;
+  notes: string;
   status_labels: any;
   action: string;
 }

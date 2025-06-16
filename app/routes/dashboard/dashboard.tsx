@@ -17,10 +17,12 @@ import {
 } from "react-icons/fc";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
-import { DepartmentService } from "~/services/department.service";
-import { GroupService } from "~/services/groups.service";
-import { UserService } from "~/services/user.service";
-import { User } from "~/types/user.type";
+import { AccessoryService } from "~/services/accessory.service";
+import { AssetService } from "~/services/asset.service";
+import { ComponentService } from "~/services/component.service";
+import { ConsumableService } from "~/services/consumable.service";
+import { LicenseService } from "~/services/license.service";
+import { Asset } from "~/types/asset.type";
 
 interface DataType {
     key: React.Key;
@@ -31,35 +33,22 @@ interface DataType {
     item: string;
 }
 
-interface DataTypeLocation {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-}
-
-interface DataTypeAssetCategories {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-}
-
 export default function DashboardRoutes() {
-    const [dataUser, setDataUser] = useState<any>();
-    const [dataUserTable, setDataUserTable] = useState<User[]>([]);
-    const [dataDepartment, setDataDepartment] = useState<any>();
-    const [dataGroup, setDataGroup] = useState<any>();
-    const [dataInactiveUsers, setDataInactiveUsers] = useState<any>();
+    const [dataAsset, setDataAsset] = useState<any>();
+    const [dataAssetTable, setDataAssetTable] = useState<Asset[]>([]);
+    const [dataLicense, setDataLicense] = useState<any>();
+    const [dataAccessory, setDataAccessory] = useState<any>();
+    const [dataConsumable, setDataConsumable] = useState<any>();
+    const [dataComponent, setDataComponent] = useState<any>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // Fetch data from Supabase
-    const fetchDataUser = async () => {
+    const fetchDataAsset = async () => {
         try {
             setLoading(true);
-            const data = await UserService.getTableCounts();
-            setDataUser(data); // Works in React state
+            const data = await AssetService.getTableCounts();
+            setDataAsset(data); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -68,11 +57,11 @@ export default function DashboardRoutes() {
     };
 
     // Fetch data from Supabase
-    const fetchDataUserTable = async () => {
+    const fetchDataAssetTable = async () => {
         try {
             setLoading(true);
-            const dataFetch = await UserService.getActiveUsers();
-            setDataUserTable(dataFetch); // Works in React state
+            const dataFetch = await AssetService.getAllPosts();
+            setDataAssetTable(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -81,11 +70,11 @@ export default function DashboardRoutes() {
     };
 
     // Fetch data from Supabase
-    const fetchDataDepartment = async () => {
+    const fetchDataLicenses = async () => {
         try {
             setLoading(true);
-            const data = await DepartmentService.getTableCounts();
-            setDataDepartment(data); // Works in React state
+            const data = await LicenseService.getTableCounts();
+            setDataLicense(data); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -94,11 +83,11 @@ export default function DashboardRoutes() {
     };
 
     // Fetch data from Supabase
-    const fetchDataGroup = async () => {
+    const fetchDataAccessories = async () => {
         try {
             setLoading(true);
-            const data = await GroupService.getTableCounts();
-            setDataGroup(data); // Works in React state
+            const data = await AccessoryService.getTableCounts();
+            setDataAccessory(data); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -107,11 +96,24 @@ export default function DashboardRoutes() {
     };
 
     // Fetch data from Supabase
-    const fetchDataInactiveUsers = async () => {
+    const fetchDataConsumables = async () => {
         try {
             setLoading(true);
-            const data = await UserService.getTableCountsInactiveUsers();
-            setDataInactiveUsers(data); // Works in React state
+            const data = await ConsumableService.getTableCounts();
+            setDataConsumable(data); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataComponents = async () => {
+        try {
+            setLoading(true);
+            const data = await ComponentService.getTableCounts();
+            setDataComponent(data); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -120,11 +122,12 @@ export default function DashboardRoutes() {
     };
 
     useEffect(() => {
-        fetchDataUser();
-        fetchDataUserTable();
-        fetchDataDepartment();
-        fetchDataGroup();
-        fetchDataInactiveUsers();
+        fetchDataAsset();
+        fetchDataAssetTable();
+        fetchDataLicenses();
+        fetchDataAccessories();
+        fetchDataConsumables();
+        fetchDataComponents();
     }, []); // Empty dependency array means this runs once on mount
 
     const formatCurrency = (amount: number) => {
@@ -162,10 +165,10 @@ export default function DashboardRoutes() {
         console.log("params", pagination, filters, sorter, extra);
     };
 
-    const columnsUser: TableColumnsType<User> = [
+    const columnsAsset: TableColumnsType<Asset> = [
         {
-            title: "Email",
-            dataIndex: "email",
+            title: "Asset Name",
+            dataIndex: "name",
         },
         {
             title: "Status",
@@ -181,7 +184,7 @@ export default function DashboardRoutes() {
     ];
 
     const salesData = [
-        { category: "Jan", value: dataUser },
+        { category: "Jan", value: dataAsset },
         { category: "Feb", value: 200 },
         { category: "Mar", value: 150 },
         { category: "Apr", value: 80 },
@@ -216,7 +219,7 @@ export default function DashboardRoutes() {
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineSnippets className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
-                                {!loading && dataUser}
+                                {!loading && dataAsset}
                             </p>
                             <p>Your total assets of ERP System</p>
                         </div>
@@ -230,7 +233,7 @@ export default function DashboardRoutes() {
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineSchedule className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
-                                {!loading && dataDepartment}
+                                {!loading && dataLicense}
                             </p>
                             <p>Total licenses of ERP System</p>
                         </div>
@@ -244,7 +247,7 @@ export default function DashboardRoutes() {
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineMobile className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
-                                {!loading && dataGroup}
+                                {!loading && dataAccessory}
                             </p>
                             <p>Total accessories of ERP System</p>
                         </div>
@@ -258,7 +261,7 @@ export default function DashboardRoutes() {
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineShopping className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
-                                {!loading && dataInactiveUsers}
+                                {!loading && dataConsumable}
                             </p>
                             <p>Total Consumables of ERP System</p>
                         </div>
@@ -272,7 +275,7 @@ export default function DashboardRoutes() {
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineDesktop className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
-                                {!loading && dataInactiveUsers}
+                                {!loading && dataComponent}
                             </p>
                             <p>Total Components of ERP System</p>
                         </div>
@@ -297,11 +300,11 @@ export default function DashboardRoutes() {
                             {!loading &&
                                 <PieChart
                                     data={[
-                                        { type: "Assets", value: dataUser },
-                                        { type: "Licenses", value: dataDepartment },
-                                        { type: "Accessories", value: dataGroup },
-                                        { type: "Consumables", value: dataGroup },
-                                        { type: "Components", value: dataGroup },
+                                        { type: "Assets", value: dataAsset },
+                                        { type: "Licenses", value: dataLicense },
+                                        { type: "Accessories", value: dataAccessory },
+                                        { type: "Consumables", value: dataConsumable },
+                                        { type: "Components", value: dataComponent },
                                     ]}
                                     title=""
                                 />}
@@ -336,11 +339,11 @@ export default function DashboardRoutes() {
                         <Card title="Accounts Overview" variant="borderless">
                             {loading && <Spin></Spin>}
                             {!loading &&
-                                <Table<User>
+                                <Table<Asset>
                                     bordered
                                     size={"small"}
-                                    columns={columnsUser}
-                                    dataSource={dataUserTable}
+                                    columns={columnsAsset}
+                                    dataSource={dataAssetTable}
                                 />}
                         </Card>
                     </div>

@@ -2,26 +2,26 @@ import { Asset } from "~/types/asset.type"
 import supabase from "~/utils/supabase.client"
 
 export const AssetService = {
-    
+
   // Create
   async createPost(postData: Asset) {
     const { data, error } = await supabase
       .from('assets')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
 
   // Read (single)
-  async getPostById(id: Asset) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('assets')
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -33,7 +33,7 @@ export const AssetService = {
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
-    
+
     if (error) throw error
     return data
   },
@@ -50,6 +50,18 @@ export const AssetService = {
     return data
   },
 
+  async getTableCounts() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('assets') // Replace with your table name
+      .select('*', { count: 'exact', head: true })
+      .eq('status_id', 1);
+
+    if (error) throw error;
+
+    return count;
+  },
+
   // Update
   async updatePost(id: number, updates: Asset) {
     const { data, error } = await supabase
@@ -57,7 +69,7 @@ export const AssetService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -69,7 +81,7 @@ export const AssetService = {
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -81,7 +93,7 @@ export const AssetService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -92,7 +104,7 @@ export const AssetService = {
       .from('assets')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -103,7 +115,7 @@ export const AssetService = {
       .from('assets')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

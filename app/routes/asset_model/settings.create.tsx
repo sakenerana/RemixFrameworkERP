@@ -1,10 +1,16 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Form, Input, message, Modal, Row, Select } from "antd";
-import { useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { useEffect, useMemo, useState } from "react";
+import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { AssetModelService } from "~/services/asset_model.service";
+import { CategoryService } from "~/services/category.service";
+import { DepreciationService } from "~/services/depreciation.service";
+import { ManufacturerService } from "~/services/manufacturer.service";
 import { AssetModel } from "~/types/asset_model.tpye";
+import { Category } from "~/types/category.type";
+import { Depreciation } from "~/types/depreciation.type";
+import { Manufacturer } from "~/types/manufacturer.type";
 const { TextArea } = Input;
 
 export default function CreateAssetModel() {
@@ -12,18 +18,96 @@ export default function CreateAssetModel() {
     const [form] = Form.useForm<AssetModel>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    const [dataCategory, setDataCategory] = useState<Category[]>([]);
+    const [dataManufacturer, setDataManufacturer] = useState<Manufacturer[]>([]);
+    const [dataDepreciation, setDataDepreciation] = useState<Depreciation[]>([]);
+    const { Option } = Select;
+
+    // Fetch data from Supabase
+    const fetchDataCategory = async () => {
+        try {
+            setLoading(true);
+            const dataFetchGroup = await CategoryService.getAllPosts();
+            setDataCategory(dataFetchGroup); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataManufacturer = async () => {
+        try {
+            setLoading(true);
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            setDataManufacturer(dataFetchManufacturer); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataDepreciation = async () => {
+        try {
+            setLoading(true);
+            const dataFetchDepreciation = await DepreciationService.getAllPosts();
+            setDataDepreciation(dataFetchDepreciation); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await AssetModelService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            // Update all states at once
+            form.setFieldsValue(dataFetch);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Asset Model");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Asset Model");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
+
+    useEffect(() => {
+        fetchDataCategory();
+        fetchDataManufacturer();
+        fetchDataDepreciation();
+    }, []); // Empty dependency array means this runs once on mount
 
     const onReset = () => {
         Modal.confirm({
@@ -45,11 +129,13 @@ export default function CreateAssetModel() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await AssetModelService.updatePost(editingId, values);
+                const { error } = await AssetModelService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -64,7 +150,7 @@ export default function CreateAssetModel() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/settings/asset-model");
         } catch (error) {
             message.error("Error");
         }
@@ -133,30 +219,28 @@ export default function CreateAssetModel() {
                                 },
                             ]}
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Category"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Category">
+                                {dataCategory.map((item: Category) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Manufacturer"
-                            name="manufacturer"
+                            name="manufacturer_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Manufacturer"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Manufacturer">
+                                {dataManufacturer.map((item: Manufacturer) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -172,16 +256,15 @@ export default function CreateAssetModel() {
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Depreciation"
-                            name="depreciation"
+                            name="depreciation_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Depreciation"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Depreciation">
+                                {dataDepreciation.map((item: Depreciation) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -196,17 +279,10 @@ export default function CreateAssetModel() {
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Fieldset"
-                            name="fieldset"
+                            label="EOL"
+                            name="eol"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Fieldset"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Input suffix="MONTHS" type="number" />
                         </Form.Item>
                     </Col>
 

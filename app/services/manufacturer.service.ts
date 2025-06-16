@@ -15,7 +15,7 @@ export const ManufacturerService = {
   },
 
   // Read (single)
-  async getPostById(id: Manufacturer) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('manufacturers')
       .select('*')

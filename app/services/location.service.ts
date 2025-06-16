@@ -15,7 +15,7 @@ export const LocationService = {
   },
 
   // Read (single)
-  async getPostById(id: Location) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('locations')
       .select('*')

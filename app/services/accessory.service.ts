@@ -41,13 +41,25 @@ export const AccessoryService = {
   // Read (multiple)
   async getAllPostsInactive() {
     const { data, error } = await supabase
-      .from('suppliers')
+      .from('accessories')
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 2)
       .order('created_at', { ascending: false })
 
     if (error) throw error
     return data
+  },
+
+  async getTableCounts() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('accessories') // Replace with your table name
+      .select('*', { count: 'exact', head: true })
+      .eq('status_id', 1);
+
+    if (error) throw error;
+
+    return count;
   },
 
   // Update

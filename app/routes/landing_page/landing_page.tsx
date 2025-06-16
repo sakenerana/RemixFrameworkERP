@@ -44,8 +44,9 @@ export default function LandingPage() {
       setLoading(true);
       const dataFetch = await UserService.getByUuid(user.id);
       const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-      console.log("User Data", dataFetch.department_id)
+      // console.log("User Data", dataFetch.department_id)
       localStorage.setItem('userDept', dataFetch.department_id);
+      localStorage.setItem('userAuthID', dataFetch.id);
       // Update all states at once
       setData(dataFetch);
       setDataIventory(arr.includes(1));

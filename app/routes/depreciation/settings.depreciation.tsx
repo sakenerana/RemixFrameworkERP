@@ -94,6 +94,7 @@ export default function DepreciationRoutes() {
     "Assets": true,
     "Asset Models": true,
     "Licenses": true,
+    "Notes": false,
     "Status": true,
     "Actions": true,
   });
@@ -103,26 +104,37 @@ export default function DepreciationRoutes() {
       title: "Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Term",
       dataIndex: "months",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Assets",
       dataIndex: "assets",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Asset Models",
       dataIndex: "asset_models",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Licenses",
       dataIndex: "licenses",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

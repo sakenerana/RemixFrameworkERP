@@ -68,6 +68,7 @@ export default function DeleteSuppliers() {
         "Country": false,
         "Phone": false,
         "Fax": false,
+        "Email": false,
         "Notes": false,
         "Status": true,
         "Actions": true,
@@ -78,51 +79,67 @@ export default function DeleteSuppliers() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "URL",
             dataIndex: "url",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Address",
             dataIndex: "address",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "City",
             dataIndex: "city",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "State",
             dataIndex: "state",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Postal Code",
             dataIndex: "postal_code",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Country",
             dataIndex: "country",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Phone",
             dataIndex: "phone",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Fax",
             dataIndex: "fax",
             width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Email",
+            dataIndex: "email",
+            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Notes",
             dataIndex: "notes",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

@@ -9,6 +9,7 @@ export interface Location {
     address2: string;
     city: string;
     state: string;
+    notes: string;
     status_labels: any;
     action: string;
 }

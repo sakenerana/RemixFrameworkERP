@@ -4,14 +4,14 @@ import { License } from "~/types/license.type"
 import supabase from "~/utils/supabase.client"
 
 export const LicenseService = {
-    
+
   // Create
   async createPost(postData: License) {
     const { data, error } = await supabase
       .from('licenses')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -23,7 +23,7 @@ export const LicenseService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -35,7 +35,7 @@ export const LicenseService = {
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
-    
+
     if (error) throw error
     return data
   },
@@ -52,6 +52,18 @@ export const LicenseService = {
     return data
   },
 
+  async getTableCounts() {
+    // Get list of all tables (you'll need to know your table names)
+    const { count, error } = await supabase
+      .from('licenses') // Replace with your table name
+      .select('*', { count: 'exact', head: true })
+      .eq('status_id', 1);
+
+    if (error) throw error;
+
+    return count;
+  },
+
   // Update
   async updatePost(id: number, updates: License) {
     const { data, error } = await supabase
@@ -59,7 +71,7 @@ export const LicenseService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -71,7 +83,7 @@ export const LicenseService = {
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -83,7 +95,7 @@ export const LicenseService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -94,7 +106,7 @@ export const LicenseService = {
       .from('licenses')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -105,7 +117,7 @@ export const LicenseService = {
       .from('licenses')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

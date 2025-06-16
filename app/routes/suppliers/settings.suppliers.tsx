@@ -30,7 +30,6 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 import { SupplierService } from "~/services/supplier.service";
 import { Supplier } from "~/types/supplier.type";
 
-
 export default function SuppliersRoutes() {
   const [data, setData] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,12 +91,14 @@ export default function SuppliersRoutes() {
     "Name": true,
     "URL": true,
     "Address": true,
+    "Address 2": false,
     "City": true,
     "State": true,
     "Postal Code": false,
     "Country": false,
     "Phone": false,
     "Fax": false,
+    "Email": false,
     "Notes": false,
     "Status": true,
     "Actions": true,
@@ -108,51 +109,73 @@ export default function SuppliersRoutes() {
       title: "Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "URL",
       dataIndex: "url",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Address",
       dataIndex: "address",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Address 2",
+      dataIndex: "address2",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "City",
       dataIndex: "city",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "State",
       dataIndex: "state",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Postal Code",
       dataIndex: "postal_code",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Country",
       dataIndex: "country",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Phone",
       dataIndex: "phone",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Fax",
       dataIndex: "fax",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Notes",
       dataIndex: "notes",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",
@@ -279,7 +302,7 @@ export default function SuppliersRoutes() {
             },
           ]}
         />
-        
+
         <Space wrap>
           <Link to={"deleted-supplier"}>
             <Button icon={<AiOutlineFileExclamation />} danger>
@@ -294,7 +317,7 @@ export default function SuppliersRoutes() {
           </Link>
         </Space>
       </div>
-      
+
       <div className="flex justify-between">
         <Alert
           message="Note: This is the list of all suppliers. Please check closely."
