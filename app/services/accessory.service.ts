@@ -15,7 +15,7 @@ export const AccessoryService = {
   },
 
   // Read (single)
-  async getPostById(id: Accessories) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('accessories')
       .select('*')
@@ -30,7 +30,7 @@ export const AccessoryService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('accessories')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
 
@@ -42,7 +42,7 @@ export const AccessoryService = {
   async getAllPostsInactive() {
     const { data, error } = await supabase
       .from('accessories')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 2)
       .order('created_at', { ascending: false })
 

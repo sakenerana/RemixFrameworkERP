@@ -60,11 +60,21 @@ export default function DeletedConsumables() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Category": true,
+        "Asset Category": true,
+        "Company": false,
         "Model No.": true,
         "Item No.": true,
+        "Manufacturer": false,
+        "Supplier": false,
+        "Location": true,
         "Min. QTY": true,
         "Total": true,
+        "Avail": false,
+        "Checked Out": false,
+        "Purchase Date": false,
+        "Purchase Cost": true,
+        "Order Number": false,
+        "Notes": false,
         "Status": true,
         "Actions": true,
         "Checkout": true,
@@ -75,56 +85,97 @@ export default function DeletedConsumables() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Category",
-            dataIndex: "category",
+            title: "Asset Category",
+            dataIndex: "categories",
             width: 120,
+            render: (categories) => categories?.name || 'N/A'
+        },
+        {
+            title: "Company",
+            dataIndex: "companies",
+            width: 120,
+            render: (companies) => companies?.name || 'N/A'
         },
         {
             title: "Model No.",
             dataIndex: "model_no",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Item No.",
             dataIndex: "item_no",
             width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Manufacturer",
+            dataIndex: "manufacturers",
+            width: 120,
+            render: (manufacturers) => manufacturers?.name || 'N/A'
+        },
+        {
+            title: "Supplier",
+            dataIndex: "suppliers",
+            width: 120,
+            render: (suppliers) => suppliers?.name || 'N/A'
+        },
+        {
+            title: "Location",
+            dataIndex: "locations",
+            width: 120,
+            render: (locations) => locations?.name || 'N/A'
         },
         {
             title: "Min. QTY",
             dataIndex: "min_qty",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Total",
+            dataIndex: "qty",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Avail",
             dataIndex: "total",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Remaining",
-            dataIndex: "remaining",
+            title: "Checked Out",
+            dataIndex: "checked_out",
             width: 120,
-        },
-        {
-            title: "Location",
-            dataIndex: "location",
-            width: 120,
-        },
-        {
-            title: "Order No.",
-            dataIndex: "order_no",
-            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Purchase Cost",
             dataIndex: "purchase_cost",
             width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Order Number",
+            dataIndex: "order_no",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Notes",
+            dataIndex: "notes",
+            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",
@@ -193,17 +244,55 @@ export default function DeletedConsumables() {
     };
 
     // Create dropdown menu items
-    const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
-        key: columnTitle,
-        label: (
-            <Checkbox
-                checked={columnVisibility[columnTitle]}
-                onClick={() => toggleColumn(columnTitle)}
-            >
-                {columnTitle}
-            </Checkbox>
-        ),
-    }));
+    const columnMenuItems: MenuProps['items'] = [
+        {
+            type: 'group',
+            label: 'Select Column for Visibility',
+            children: [
+                // Split into two columns
+                {
+                    key: 'column-group-1',
+                    style: { display: 'inline-block', width: '50%' },
+                    label: (
+                        <div>
+                            {Object.keys(columnVisibility)
+                                .slice(0, Math.ceil(Object.keys(columnVisibility).length / 2))
+                                .map(columnTitle => (
+                                    <div key={columnTitle} style={{ padding: '4px 0' }}>
+                                        <Checkbox
+                                            checked={columnVisibility[columnTitle]}
+                                            onChange={() => toggleColumn(columnTitle)}
+                                        >
+                                            {columnTitle}
+                                        </Checkbox>
+                                    </div>
+                                ))}
+                        </div>
+                    ),
+                },
+                {
+                    key: 'column-group-2',
+                    style: { display: 'inline-block', width: '50%' },
+                    label: (
+                        <div>
+                            {Object.keys(columnVisibility)
+                                .slice(Math.ceil(Object.keys(columnVisibility).length / 2))
+                                .map(columnTitle => (
+                                    <div key={columnTitle} style={{ padding: '4px 0' }}>
+                                        <Checkbox
+                                            checked={columnVisibility[columnTitle]}
+                                            onChange={() => toggleColumn(columnTitle)}
+                                        >
+                                            {columnTitle}
+                                        </Checkbox>
+                                    </div>
+                                ))}
+                        </div>
+                    ),
+                },
+            ],
+        },
+    ];
 
     // Filter columns based on visibility
     const filteredColumns = columns.filter(column =>

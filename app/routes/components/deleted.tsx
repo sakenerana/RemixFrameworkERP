@@ -197,17 +197,55 @@ export default function DeletedComponents() {
     };
 
     // Create dropdown menu items
-    const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
-        key: columnTitle,
-        label: (
-            <Checkbox
-                checked={columnVisibility[columnTitle]}
-                onClick={() => toggleColumn(columnTitle)}
-            >
-                {columnTitle}
-            </Checkbox>
-        ),
-    }));
+    const columnMenuItems: MenuProps['items'] = [
+        {
+            type: 'group',
+            label: 'Select Column for Visibility',
+            children: [
+                // Split into two columns
+                {
+                    key: 'column-group-1',
+                    style: { display: 'inline-block', width: '50%' },
+                    label: (
+                        <div>
+                            {Object.keys(columnVisibility)
+                                .slice(0, Math.ceil(Object.keys(columnVisibility).length / 2))
+                                .map(columnTitle => (
+                                    <div key={columnTitle} style={{ padding: '4px 0' }}>
+                                        <Checkbox
+                                            checked={columnVisibility[columnTitle]}
+                                            onChange={() => toggleColumn(columnTitle)}
+                                        >
+                                            {columnTitle}
+                                        </Checkbox>
+                                    </div>
+                                ))}
+                        </div>
+                    ),
+                },
+                {
+                    key: 'column-group-2',
+                    style: { display: 'inline-block', width: '50%' },
+                    label: (
+                        <div>
+                            {Object.keys(columnVisibility)
+                                .slice(Math.ceil(Object.keys(columnVisibility).length / 2))
+                                .map(columnTitle => (
+                                    <div key={columnTitle} style={{ padding: '4px 0' }}>
+                                        <Checkbox
+                                            checked={columnVisibility[columnTitle]}
+                                            onChange={() => toggleColumn(columnTitle)}
+                                        >
+                                            {columnTitle}
+                                        </Checkbox>
+                                    </div>
+                                ))}
+                        </div>
+                    ),
+                },
+            ],
+        },
+    ];
 
     // Filter columns based on visibility
     const filteredColumns = columns.filter(column =>

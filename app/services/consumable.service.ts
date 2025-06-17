@@ -2,26 +2,26 @@ import { Consumable } from "~/types/consumable.type"
 import supabase from "~/utils/supabase.client"
 
 export const ConsumableService = {
-    
+
   // Create
   async createPost(postData: Consumable) {
     const { data, error } = await supabase
       .from('consumables')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
 
   // Read (single)
-  async getPostById(id: Consumable) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('consumables')
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -30,10 +30,10 @@ export const ConsumableService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('consumables')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
-    
+
     if (error) throw error
     return data
   },
@@ -42,7 +42,7 @@ export const ConsumableService = {
   async getAllPostsInactive() {
     const { data, error } = await supabase
       .from('consumables')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 2)
       .order('created_at', { ascending: false })
 
@@ -69,7 +69,7 @@ export const ConsumableService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -81,7 +81,7 @@ export const ConsumableService = {
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -93,7 +93,7 @@ export const ConsumableService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -104,7 +104,7 @@ export const ConsumableService = {
       .from('consumables')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -115,7 +115,7 @@ export const ConsumableService = {
       .from('consumables')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

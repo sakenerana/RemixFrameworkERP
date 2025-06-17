@@ -17,7 +17,7 @@ export const LicenseService = {
   },
 
   // Read (single)
-  async getPostById(id: License) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('licenses')
       .select('*')
@@ -32,7 +32,7 @@ export const LicenseService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('licenses')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
 
@@ -44,7 +44,7 @@ export const LicenseService = {
   async getAllPostsInactive() {
     const { data, error } = await supabase
       .from('licenses')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
       .eq('status_id', 2)
       .order('created_at', { ascending: false })
 
@@ -67,7 +67,7 @@ export const LicenseService = {
   // Update
   async updatePost(id: number, updates: License) {
     const { data, error } = await supabase
-      .from('posts')
+      .from('licenses')
       .update(updates)
       .eq('id', id)
       .select()

@@ -1,30 +1,153 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AccessoryService } from "~/services/accessory.service";
+import { CategoryService } from "~/services/category.service";
+import { CompanyService } from "~/services/company.service";
+import { ManufacturerService } from "~/services/manufacturer.service";
+import { SupplierService } from "~/services/supplier.service";
 import { Accessories } from "~/types/accessories.type";
+import { Category } from "~/types/category.type";
+import { Company } from "~/types/company.type";
+import { Manufacturer } from "~/types/manufacturer.type";
+import { Supplier } from "~/types/supplier.type";
 const { TextArea } = Input;
+import moment from 'moment';
+import { Location } from "~/types/location.type";
+import { LocationService } from "~/services/location.service";
 
 export default function CreateAccessory() {
     const { id } = useParams();
     const [form] = Form.useForm<Accessories>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    const [dataCategory, setDataCategory] = useState<Category[]>([]);
+    const [dataCompany, setDataCompany] = useState<Company[]>([]);
+    const [dataManufacturer, setDataManufacturer] = useState<Manufacturer[]>([]);
+    const [dataSupplier, setDataSupplier] = useState<Supplier[]>([]);
+    const [dataLocation, setDataLocation] = useState<Location[]>([]);
+    const { Option } = Select;
+
+    // Fetch data from Supabase
+    const fetchDataCategory = async () => {
+        try {
+            setLoading(true);
+            const dataFetchGroup = await CategoryService.getAllPosts();
+            setDataCategory(dataFetchGroup); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataCompany = async () => {
+        try {
+            setLoading(true);
+            const dataFetchCompany = await CompanyService.getAllPosts();
+            setDataCompany(dataFetchCompany); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataManufacturer = async () => {
+        try {
+            setLoading(true);
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            setDataManufacturer(dataFetchManufacturer); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataSupplier = async () => {
+        try {
+            setLoading(true);
+            const dataFetchSupplier = await SupplierService.getAllPosts();
+            setDataSupplier(dataFetchSupplier); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataLocation = async () => {
+        try {
+            setLoading(true);
+            const dataFetchLocation = await LocationService.getAllPosts();
+            setDataLocation(dataFetchLocation); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await AccessoryService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+
+            // Convert date strings to moment objects
+            const formattedData = {
+                ...dataFetch,
+                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
+            };
+
+            // Update all states at once
+            form.setFieldsValue(formattedData);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Accessory");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Accessory");
             setIsEditMode(false);
         }
     }, []);
+
+    useEffect(() => {
+        fetchDataCategory();
+        fetchDataCompany();
+        fetchDataManufacturer();
+        fetchDataSupplier();
+        fetchDataLocation();
+    }, []); // Empty dependency array means this runs once on mount
 
     const onReset = () => {
         Modal.confirm({
@@ -46,11 +169,13 @@ export default function CreateAccessory() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await AccessoryService.updatePost(editingId, values);
+                const { error } = await AccessoryService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -65,7 +190,7 @@ export default function CreateAccessory() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/accessories");
         } catch (error) {
             message.error("Error");
         }
@@ -131,14 +256,28 @@ export default function CreateAccessory() {
                                 },
                             ]}
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Country"
-                            // filterOption={(input, option) =>
-                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            // }
-                            // options={[]}
-                            />
+                            <Select placeholder="Select Category">
+                                {dataCategory.map((item: Category) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Company"
+                            name="company_id"
+                        >
+                            <Select placeholder="Select Company">
+                                {dataCompany.map((item: Company) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -147,14 +286,13 @@ export default function CreateAccessory() {
                             label="Supplier"
                             name="supplier_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Supplier"
-                            // filterOption={(input, option) =>
-                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            // }
-                            // options={[]}
-                            />
+                            <Select placeholder="Select Supplier">
+                                {dataSupplier.map((item: Supplier) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -163,14 +301,13 @@ export default function CreateAccessory() {
                             label="Manufacturer"
                             name="manufacturer_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Manufacturer"
-                            // filterOption={(input, option) =>
-                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            // }
-                            // options={[]}
-                            />
+                            <Select placeholder="Select Manufacturer">
+                                {dataManufacturer.map((item: Manufacturer) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -179,14 +316,13 @@ export default function CreateAccessory() {
                             label="Location"
                             name="location_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Location"
-                            // filterOption={(input, option) =>
-                            //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            // }
-                            // options={[]}
-                            />
+                            <Select placeholder="Select Location">
+                                {dataLocation.map((item: Location) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
@@ -230,6 +366,12 @@ export default function CreateAccessory() {
                         <Form.Item
                             label="Quantity"
                             name="qty"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input qty!",
+                                },
+                            ]}
                         >
                             <Input type="number" />
                         </Form.Item>

@@ -102,14 +102,24 @@ export default function LicensesRoute() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Product Key": false,
     "Expiration Date": true,
-    "Licensed to Email": true,
+    "Termination Date": false,
+    "Licensed to Email": false,
     "Licensed to Name": true,
     "Manufacturer": true,
+    "Company": false,
+    "Category": false,
+    "Supplier": false,
+    "Order Number": false,
+    "Purchase Cost": false,
+    "Purchase Date": false,
+    "Purchase Order": false,
+    "Purchase Order Number": false,
     "Min QTY": true,
     "Total": true,
-    "Avail": false,
+    "Avail": true,
+    "Depreciation": false,
+    "Notes": false,
     "Status": true,
     "Actions": true,
     "Checkout": true,
@@ -120,46 +130,115 @@ export default function LicensesRoute() {
       title: "Name",
       dataIndex: "name",
       width: 120,
-    },
-    {
-      title: "Product Key",
-      dataIndex: "product_key",
-      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Expiration Date",
       dataIndex: "expiration_date",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Termination Date",
+      dataIndex: "termination_date",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Licensed to Email",
-      dataIndex: "licensed_to_email",
+      dataIndex: "license_email",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Licensed to Name",
-      dataIndex: "licensed_to_name",
+      dataIndex: "license_name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Manufacturer",
-      dataIndex: "manufacturer",
+      dataIndex: "manufacturers",
       width: 120,
+      render: (manufacturers) => manufacturers?.name || 'N/A'
+    },
+    {
+      title: "Company",
+      dataIndex: "companies",
+      width: 120,
+      render: (companies) => companies?.name || 'N/A'
+    },
+    {
+      title: "Category",
+      dataIndex: "categories",
+      width: 120,
+      render: (categories) => categories?.name || 'N/A'
+    },
+    {
+      title: "Supplier",
+      dataIndex: "suppliers",
+      width: 120,
+      render: (suppliers) => suppliers?.name || 'N/A'
+    },
+    {
+      title: "Order Number",
+      dataIndex: "order_number",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Purchase Cost",
+      dataIndex: "purchase_cost",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Purchase Date",
+      dataIndex: "purchase_date",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Purchase Order",
+      dataIndex: "purchase_order",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Purchase Order Number",
+      dataIndex: "purchase_order_no",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Min QTY",
       dataIndex: "min_qty",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Total",
-      dataIndex: "total",
+      dataIndex: "seats",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Avail",
       dataIndex: "avail",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Depreciation",
+      dataIndex: "depreciations",
+      width: 120,
+      render: (depreciations) => depreciations?.name || 'N/A'
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",
@@ -286,17 +365,55 @@ export default function LicensesRoute() {
   };
 
   // Create dropdown menu items
-  const columnMenuItems: MenuProps['items'] = Object.keys(columnVisibility).map(columnTitle => ({
-    key: columnTitle,
-    label: (
-      <Checkbox
-        checked={columnVisibility[columnTitle]}
-        onClick={() => toggleColumn(columnTitle)}
-      >
-        {columnTitle}
-      </Checkbox>
-    ),
-  }));
+  const columnMenuItems: MenuProps['items'] = [
+    {
+      type: 'group',
+      label: 'Select Column for Visibility',
+      children: [
+        // Split into two columns
+        {
+          key: 'column-group-1',
+          style: { display: 'inline-block', width: '50%' },
+          label: (
+            <div>
+              {Object.keys(columnVisibility)
+                .slice(0, Math.ceil(Object.keys(columnVisibility).length / 2))
+                .map(columnTitle => (
+                  <div key={columnTitle} style={{ padding: '4px 0' }}>
+                    <Checkbox
+                      checked={columnVisibility[columnTitle]}
+                      onChange={() => toggleColumn(columnTitle)}
+                    >
+                      {columnTitle}
+                    </Checkbox>
+                  </div>
+                ))}
+            </div>
+          ),
+        },
+        {
+          key: 'column-group-2',
+          style: { display: 'inline-block', width: '50%' },
+          label: (
+            <div>
+              {Object.keys(columnVisibility)
+                .slice(Math.ceil(Object.keys(columnVisibility).length / 2))
+                .map(columnTitle => (
+                  <div key={columnTitle} style={{ padding: '4px 0' }}>
+                    <Checkbox
+                      checked={columnVisibility[columnTitle]}
+                      onChange={() => toggleColumn(columnTitle)}
+                    >
+                      {columnTitle}
+                    </Checkbox>
+                  </div>
+                ))}
+            </div>
+          ),
+        },
+      ],
+    },
+  ];
 
   // Filter columns based on visibility
   const filteredColumns = columns.filter(column =>

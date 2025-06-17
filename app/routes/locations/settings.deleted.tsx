@@ -28,7 +28,7 @@ export default function DeletedLocation() {
         );
 
         if (error) throw message.error(error.message);
-        message.success("Record deactivated successfully");
+        message.success("Record activated successfully");
         fetchData();
     };
 

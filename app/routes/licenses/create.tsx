@@ -1,29 +1,158 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, message, Modal, Row, Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import ProductKey from "~/components/product_key";
+import { CategoryService } from "~/services/category.service";
+import { DepreciationService } from "~/services/depreciation.service";
 import { LicenseService } from "~/services/license.service";
+import { ManufacturerService } from "~/services/manufacturer.service";
+import { SupplierService } from "~/services/supplier.service";
+import { Category } from "~/types/category.type";
+import { Depreciation } from "~/types/depreciation.type";
 import { License } from "~/types/license.type";
+import { Manufacturer } from "~/types/manufacturer.type";
+import { Supplier } from "~/types/supplier.type";
 const { TextArea } = Input;
+import moment from 'moment';
+import { Company } from "~/types/company.type";
+import { CompanyService } from "~/services/company.service";
 
 export default function CreateLicense() {
     const { id } = useParams();
     const [form] = Form.useForm<License>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    const [dataCategory, setDataCategory] = useState<Category[]>([]);
+    const [dataCompany, setDataCompany] = useState<Company[]>([]);
+    const [dataManufacturer, setDataManufacturer] = useState<Manufacturer[]>([]);
+    const [dataSupplier, setDataSupplier] = useState<Supplier[]>([]);
+    const [dataDepreciation, setDataDepreciation] = useState<Depreciation[]>([]);
+    const { Option } = Select;
+
+    // Fetch data from Supabase
+    const fetchDataCategory = async () => {
+        try {
+            setLoading(true);
+            const dataFetchGroup = await CategoryService.getAllPosts();
+            setDataCategory(dataFetchGroup); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataCompany = async () => {
+        try {
+            setLoading(true);
+            const dataFetchCompany = await CompanyService.getAllPosts();
+            setDataCompany(dataFetchCompany); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataManufacturer = async () => {
+        try {
+            setLoading(true);
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            setDataManufacturer(dataFetchManufacturer); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataSupplier = async () => {
+        try {
+            setLoading(true);
+            const dataFetchSupplier = await SupplierService.getAllPosts();
+            setDataSupplier(dataFetchSupplier); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataDepreciation = async () => {
+        try {
+            setLoading(true);
+            const dataFetchDepreciation = await DepreciationService.getAllPosts();
+            setDataDepreciation(dataFetchDepreciation); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await LicenseService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+
+            // Convert date strings to moment objects
+            const formattedData = {
+                ...dataFetch,
+                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
+                expiration_date: dataFetch.expiration_date ? moment(dataFetch.expiration_date) : null,
+                termination_date: dataFetch.termination_date ? moment(dataFetch.termination_date) : null,
+            };
+
+            // Update all states at once
+            form.setFieldsValue(formattedData);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update License");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create License");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
+
+    useEffect(() => {
+        fetchDataCategory();
+        fetchDataCompany();
+        fetchDataManufacturer();
+        fetchDataSupplier();
+        fetchDataDepreciation();
+    }, []); // Empty dependency array means this runs once on mount
 
     const onReset = () => {
         Modal.confirm({
@@ -45,12 +174,14 @@ export default function CreateLicense() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await LicenseService.updatePost(editingId, values);
-
+                const { error } = await LicenseService.updatePost(Number(id), values);
+                
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
             } else {
@@ -64,7 +195,7 @@ export default function CreateLicense() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/licenses");
         } catch (error) {
             message.error("Error");
         }
@@ -130,21 +261,20 @@ export default function CreateLicense() {
                                 },
                             ]}
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Category"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Category">
+                                {dataCategory.map((item: Category) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Seats"
-                            name="total"
+                            name="seats"
                             rules={[
                                 {
                                     required: true,
@@ -167,33 +297,38 @@ export default function CreateLicense() {
 
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Product Key"
-                            name="product_key"
+                            label="Company"
+                            name="company_id"
                         >
-                            <Input />
+                            <Select placeholder="Select Company">
+                                {dataCompany.map((item: Company) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Manufacturer"
-                            name="manufacturer"
+                            name="manufacturer_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Manufacturer"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Manufacturer">
+                                {dataManufacturer.map((item: Manufacturer) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Licensed to Name"
-                            name="licensed_to_name"
+                            name="license_name"
                         >
                             <Input />
                         </Form.Item>
@@ -202,7 +337,7 @@ export default function CreateLicense() {
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Licensed to Email"
-                            name="licensed_to_Email"
+                            name="license_email"
                         >
                             <Input />
                         </Form.Item>
@@ -211,23 +346,22 @@ export default function CreateLicense() {
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Supplier"
-                            name="supplier"
+                            name="supplier_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Supplier"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Supplier">
+                                {dataSupplier.map((item: Supplier) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Order Number"
-                            name="order_no"
+                            name="order_number"
                         >
                             <Input />
                         </Form.Item>
@@ -283,15 +417,18 @@ export default function CreateLicense() {
                             label="Depreciation"
                             name="depreciation_id"
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Depreciation"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Depreciation">
+                                {dataDepreciation.map((item: Depreciation) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={24}>
+                        <ProductKey></ProductKey>
                     </Col>
 
                     <Col xs={24} sm={24}>
