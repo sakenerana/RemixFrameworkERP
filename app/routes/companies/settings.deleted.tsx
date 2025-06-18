@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -11,6 +11,8 @@ import { Company } from "~/types/company.type";
 export default function DeletedCompanies() {
     const [data, setData] = useState<Company[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Company[]>([]);
@@ -36,7 +38,7 @@ export default function DeletedCompanies() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await CompanyService.getAllPostsInactive();
+            const dataFetch = await CompanyService.getAllPostsInactive(isDepartmentID);
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -44,6 +46,11 @@ export default function DeletedCompanies() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         if (searchText.trim() === '') {

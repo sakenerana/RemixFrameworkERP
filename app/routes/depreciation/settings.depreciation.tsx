@@ -17,7 +17,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -34,6 +34,8 @@ import { Depreciation } from "~/types/depreciation.type";
 export default function DepreciationRoutes() {
   const [data, setData] = useState<Depreciation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Depreciation[]>([]);
@@ -66,7 +68,7 @@ export default function DepreciationRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await DepreciationService.getAllPosts();
+      const dataFetch = await DepreciationService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -74,6 +76,11 @@ export default function DepreciationRoutes() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {
@@ -93,7 +100,6 @@ export default function DepreciationRoutes() {
     "Term": true,
     "Assets": true,
     "Asset Models": true,
-    "Licenses": true,
     "Notes": false,
     "Status": true,
     "Actions": true,
@@ -116,19 +122,13 @@ export default function DepreciationRoutes() {
       title: "Assets",
       dataIndex: "assets",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
       title: "Asset Models",
       dataIndex: "asset_models",
       width: 120,
-      render: (text) => text || 'N/A'
-    },
-    {
-      title: "Licenses",
-      dataIndex: "licenses",
-      width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
       title: "Notes",

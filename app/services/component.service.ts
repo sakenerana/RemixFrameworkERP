@@ -15,7 +15,7 @@ export const ComponentService = {
   },
 
   // Read (single)
-  async getPostById(id: Component) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('components')
       .select('*')
@@ -30,7 +30,7 @@ export const ComponentService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from('components')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 1)
       .order('created_at', { ascending: false })
 
@@ -42,7 +42,7 @@ export const ComponentService = {
   async getAllPostsInactive() {
     const { data, error } = await supabase
       .from('components')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
       .eq('status_id', 2)
       .order('created_at', { ascending: false })
 

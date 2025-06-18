@@ -2,14 +2,14 @@ import { Location } from "~/types/location.type"
 import supabase from "~/utils/supabase.client"
 
 export const LocationService = {
-    
+
   // Create
   async createPost(postData: Location) {
     const { data, error } = await supabase
       .from('locations')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -21,29 +21,31 @@ export const LocationService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
 
   // Read (multiple)
-  async getAllPosts() {
+  async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('locations')
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 1)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
-    
+
     if (error) throw error
     return data
   },
 
   // Read (multiple)
-  async getAllPostsInactive() {
+  async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('locations')
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 2)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -57,19 +59,19 @@ export const LocationService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
 
-   // Activate
+  // Activate
   async activateStatus(id: number, updates: Location) {
     const { data, error } = await supabase
       .from('locations')
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -81,7 +83,7 @@ export const LocationService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -92,7 +94,7 @@ export const LocationService = {
       .from('locations')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -103,7 +105,7 @@ export const LocationService = {
       .from('locations')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

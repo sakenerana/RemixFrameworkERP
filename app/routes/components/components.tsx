@@ -102,13 +102,20 @@ export default function ComponentsRoute() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Serial": false,
-    "Category": true,
-    "Model No.": true,
+    "Asset Category": true,
+    "Company": false,
+    "Model No.": false,
+    "Manufacturer": false,
+    "Supplier": false,
+    "Location": true,
     "Min. QTY": true,
     "Total": true,
-    "Remaining": true,
-    "Location": true,
+    "Avail": false,
+    "Checked Out": false,
+    "Purchase Date": false,
+    "Purchase Cost": true,
+    "Order Number": false,
+    "Notes": false,
     "Status": true,
     "Actions": true,
     "Checkout": true,
@@ -119,56 +126,91 @@ export default function ComponentsRoute() {
       title: "Name",
       dataIndex: "name",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
-      title: "Serial",
-      dataIndex: "serial_no",
+      title: "Asset Category",
+      dataIndex: "categories",
       width: 120,
+      render: (categories) => categories?.name || 'N/A'
     },
     {
-      title: "Category",
-      dataIndex: "category",
+      title: "Company",
+      dataIndex: "companies",
       width: 120,
+      render: (companies) => companies?.name || 'N/A'
     },
     {
       title: "Model No.",
       dataIndex: "model_no",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Manufacturer",
+      dataIndex: "manufacturers",
+      width: 120,
+      render: (manufacturers) => manufacturers?.name || 'N/A'
+    },
+    {
+      title: "Supplier",
+      dataIndex: "suppliers",
+      width: 120,
+      render: (suppliers) => suppliers?.name || 'N/A'
+    },
+    {
+      title: "Location",
+      dataIndex: "locations",
+      width: 120,
+      render: (locations) => locations?.name || 'N/A'
     },
     {
       title: "Min. QTY",
       dataIndex: "min_qty",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Total",
+      dataIndex: "qty",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Avail",
       dataIndex: "total",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
-      title: "Remaining",
-      dataIndex: "remaining",
+      title: "Checked Out",
+      dataIndex: "checked_out",
       width: 120,
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      width: 120,
-    },
-    {
-      title: "Order No.",
-      dataIndex: "order_no",
-      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Purchase Date",
       dataIndex: "purchase_date",
       width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
       width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Order Number",
+      dataIndex: "order_no",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

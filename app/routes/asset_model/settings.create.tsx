@@ -32,7 +32,7 @@ export default function CreateAssetModel() {
     const fetchDataCategory = async () => {
         try {
             setLoading(true);
-            const dataFetchGroup = await CategoryService.getAllPosts();
+            const dataFetchGroup = await CategoryService.getAllPosts(isDepartmentID);
             setDataCategory(dataFetchGroup); // Works in React state
         } catch (error) {
             message.error("error");
@@ -45,7 +45,7 @@ export default function CreateAssetModel() {
     const fetchDataManufacturer = async () => {
         try {
             setLoading(true);
-            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts(isDepartmentID);
             setDataManufacturer(dataFetchManufacturer); // Works in React state
         } catch (error) {
             message.error("error");
@@ -58,7 +58,7 @@ export default function CreateAssetModel() {
     const fetchDataDepreciation = async () => {
         try {
             setLoading(true);
-            const dataFetchDepreciation = await DepreciationService.getAllPosts();
+            const dataFetchDepreciation = await DepreciationService.getAllPosts(isDepartmentID);
             setDataDepreciation(dataFetchDepreciation); // Works in React state
         } catch (error) {
             message.error("error");

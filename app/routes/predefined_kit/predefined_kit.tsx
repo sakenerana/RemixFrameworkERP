@@ -102,6 +102,7 @@ export default function PredefinedKitRoute() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
+    "Checked Out To": true,
     "Status": true,
     "Actions": true,
     "Checkout": true,
@@ -112,6 +113,13 @@ export default function PredefinedKitRoute() {
       title: "Name",
       dataIndex: "name",
       width: 350,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Checked Out To",
+      dataIndex: "checkedout_to",
+      width: 350,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Status",

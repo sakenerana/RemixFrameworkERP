@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -11,6 +11,8 @@ import { Supplier } from "~/types/supplier.type";
 export default function DeleteSuppliers() {
     const [data, setData] = useState<Supplier[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Supplier[]>([]);
@@ -36,7 +38,7 @@ export default function DeleteSuppliers() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await SupplierService.getAllPostsInactive();
+            const dataFetch = await SupplierService.getAllPostsInactive(isDepartmentID);
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -44,6 +46,11 @@ export default function DeleteSuppliers() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         if (searchText.trim() === '') {

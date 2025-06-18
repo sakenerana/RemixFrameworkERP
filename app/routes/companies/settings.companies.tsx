@@ -16,16 +16,15 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineFileExclamation,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CompanyService } from "~/services/company.service";
@@ -34,6 +33,8 @@ import { Company } from "~/types/company.type";
 export default function CompaniesRoutes() {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Company[]>([]);
@@ -66,7 +67,7 @@ export default function CompaniesRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await CompanyService.getAllPosts();
+      const dataFetch = await CompanyService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -74,6 +75,11 @@ export default function CompaniesRoutes() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {

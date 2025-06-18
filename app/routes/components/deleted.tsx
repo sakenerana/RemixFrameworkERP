@@ -60,18 +60,23 @@ export default function DeletedComponents() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Image": true,
-        "URL": true,
-        "Address": true,
-        "City": true,
-        "State": true,
-        "Postal Code": false,
-        "Country": false,
-        "Phone": false,
-        "Fax": false,
+        "Asset Category": true,
+        "Company": false,
+        "Model No.": false,
+        "Manufacturer": false,
+        "Supplier": false,
+        "Location": true,
+        "Min. QTY": true,
+        "Total": true,
+        "Avail": false,
+        "Checked Out": false,
+        "Purchase Date": false,
+        "Purchase Cost": true,
+        "Order Number": false,
         "Notes": false,
         "Status": true,
         "Actions": true,
+        "Checkout": true,
     });
 
     const columns: TableColumnsType<Component> = [
@@ -79,56 +84,91 @@ export default function DeletedComponents() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Image",
-            dataIndex: "image",
+            title: "Asset Category",
+            dataIndex: "categories",
             width: 120,
+            render: (categories) => categories?.name || 'N/A'
         },
         {
-            title: "URL",
-            dataIndex: "url",
+            title: "Company",
+            dataIndex: "companies",
             width: 120,
+            render: (companies) => companies?.name || 'N/A'
         },
         {
-            title: "Address",
-            dataIndex: "address",
+            title: "Model No.",
+            dataIndex: "model_no",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "City",
-            dataIndex: "city",
+            title: "Manufacturer",
+            dataIndex: "manufacturers",
             width: 120,
+            render: (manufacturers) => manufacturers?.name || 'N/A'
         },
         {
-            title: "State",
-            dataIndex: "state",
+            title: "Supplier",
+            dataIndex: "suppliers",
             width: 120,
+            render: (suppliers) => suppliers?.name || 'N/A'
         },
         {
-            title: "Postal Code",
-            dataIndex: "postal_code",
+            title: "Location",
+            dataIndex: "locations",
             width: 120,
+            render: (locations) => locations?.name || 'N/A'
         },
         {
-            title: "Country",
-            dataIndex: "country",
+            title: "Min. QTY",
+            dataIndex: "min_qty",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Phone",
-            dataIndex: "phone",
+            title: "Total",
+            dataIndex: "qty",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
-            title: "Fax",
-            dataIndex: "fax",
+            title: "Avail",
+            dataIndex: "total",
             width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Checked Out",
+            dataIndex: "checked_out",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Purchase Date",
+            dataIndex: "purchase_date",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Purchase Cost",
+            dataIndex: "purchase_cost",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Order Number",
+            dataIndex: "order_no",
+            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Notes",
             dataIndex: "notes",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

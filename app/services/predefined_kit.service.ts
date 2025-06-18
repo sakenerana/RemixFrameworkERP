@@ -15,7 +15,7 @@ export const PredefinedKitService = {
   },
 
   // Read (single)
-  async getPostById(id: PredefinedKit) {
+  async getPostById(id: number) {
     const { data, error } = await supabase
       .from('predefined')
       .select('*')

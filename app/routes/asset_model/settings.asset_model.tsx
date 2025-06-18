@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlinePlus } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -11,6 +11,8 @@ import { AssetModel } from "~/types/asset_model.tpye";
 export default function AssetModelsRoutes() {
     const [data, setData] = useState<AssetModel[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<AssetModel[]>([]);
@@ -43,7 +45,7 @@ export default function AssetModelsRoutes() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await AssetModelService.getAllPosts();
+            const dataFetch = await AssetModelService.getAllPosts(isDepartmentID);
             console.log("cats", dataFetch)
             setData(dataFetch); // Works in React state
         } catch (error) {
@@ -52,6 +54,11 @@ export default function AssetModelsRoutes() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         if (searchText.trim() === '') {

@@ -145,7 +145,7 @@ export default function InventoryLayoutIndex() {
       icon: <FcPaid />,
       label: (
         <Link to="/inventory/predefined-kit">
-          Predefined Kits (Bundled)
+          Predefined Kits
         </Link>
       ),
     },

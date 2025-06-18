@@ -2,14 +2,14 @@ import { Company } from "~/types/company.type"
 import supabase from "~/utils/supabase.client"
 
 export const CompanyService = {
-    
+
   // Create
   async createPost(postData: Company) {
     const { data, error } = await supabase
       .from('companies')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -21,29 +21,31 @@ export const CompanyService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
 
   // Read (multiple)
-  async getAllPosts() {
+  async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('companies')
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 1)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
-    
+
     if (error) throw error
     return data
   },
 
   // Read (multiple)
-  async getAllPostsInactive() {
+  async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('companies')
       .select('*, status_labels(*), departments(*)')
       .eq('status_id', 2)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -57,7 +59,7 @@ export const CompanyService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -69,7 +71,7 @@ export const CompanyService = {
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -81,7 +83,7 @@ export const CompanyService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -92,7 +94,7 @@ export const CompanyService = {
       .from('companies')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -103,7 +105,7 @@ export const CompanyService = {
       .from('companies')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

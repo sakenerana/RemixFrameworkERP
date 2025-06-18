@@ -22,7 +22,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -40,6 +40,8 @@ import { Location } from "~/types/location.type";
 export default function LocationsRoutes() {
   const [data, setData] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Location[]>([]);
@@ -72,7 +74,7 @@ export default function LocationsRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await LocationService.getAllPosts();
+      const dataFetch = await LocationService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -80,6 +82,11 @@ export default function LocationsRoutes() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {

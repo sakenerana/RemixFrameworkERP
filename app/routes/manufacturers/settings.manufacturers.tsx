@@ -16,7 +16,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -33,6 +33,8 @@ import { Manufacturer } from "~/types/manufacturer.type";
 export default function ManufacturersRoutes() {
   const [data, setData] = useState<Manufacturer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Manufacturer[]>([]);
@@ -65,7 +67,7 @@ export default function ManufacturersRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await ManufacturerService.getAllPosts();
+      const dataFetch = await ManufacturerService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -73,6 +75,11 @@ export default function ManufacturersRoutes() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {

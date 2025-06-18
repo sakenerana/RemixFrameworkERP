@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -11,6 +11,8 @@ import { Depreciation } from "~/types/depreciation.type";
 export default function DeletedDepreciation() {
     const [data, setData] = useState<Depreciation[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Depreciation[]>([]);
@@ -36,7 +38,7 @@ export default function DeletedDepreciation() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await DepreciationService.getAllPostsInactive();
+            const dataFetch = await DepreciationService.getAllPostsInactive(isDepartmentID);
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -44,6 +46,11 @@ export default function DeletedDepreciation() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -63,7 +70,6 @@ export default function DeletedDepreciation() {
         "Term": true,
         "Assets": true,
         "Asset Models": true,
-        "Licenses": true,
         "Notes": false,
         "Status": true,
         "Actions": true,
@@ -91,12 +97,6 @@ export default function DeletedDepreciation() {
         {
             title: "Asset Models",
             dataIndex: "asset_models",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
-            title: "Licenses",
-            dataIndex: "licenses",
             width: 120,
             render: (text) => text || 'N/A'
         },

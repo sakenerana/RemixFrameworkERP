@@ -17,7 +17,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -36,6 +36,8 @@ import { Category } from "~/types/category.type";
 export default function CategoriesRoutes() {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Category[]>([]);
@@ -68,7 +70,7 @@ export default function CategoriesRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await CategoryService.getAllPosts();
+      const dataFetch = await CategoryService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -76,6 +78,11 @@ export default function CategoriesRoutes() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {
@@ -86,7 +93,6 @@ export default function CategoriesRoutes() {
       );
       setFilteredData(filtered);
     }
-
   }, [searchText]); // Empty dependency array means this runs once on mount
 
   // State for column visibility
@@ -116,7 +122,7 @@ export default function CategoriesRoutes() {
       title: "Qty",
       dataIndex: "qty",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
       title: "Notes",

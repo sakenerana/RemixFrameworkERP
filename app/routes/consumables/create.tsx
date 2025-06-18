@@ -138,6 +138,9 @@ export default function CreateConsumables() {
             setIsTitle("Create Consumable");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     useEffect(() => {

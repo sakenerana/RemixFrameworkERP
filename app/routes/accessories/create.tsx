@@ -139,6 +139,9 @@ export default function CreateAccessory() {
             setIsTitle("Create Accessory");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     useEffect(() => {

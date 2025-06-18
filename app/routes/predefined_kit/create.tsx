@@ -3,26 +3,62 @@ import { useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 import { PredefinedKit } from "~/types/predefined_kit.type";
+import moment from 'moment';
 
 export default function CreateManufacturer() {
     const { id } = useParams();
     const [form] = Form.useForm<PredefinedKit>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await PredefinedKitService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+
+            // Convert date strings to moment objects
+            const formattedData = {
+                ...dataFetch,
+                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
+            };
+
+            // Update all states at once
+            form.setFieldsValue(formattedData);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Predefined Kit");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Predefined Kit");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
 
     const onReset = () => {
@@ -45,11 +81,13 @@ export default function CreateManufacturer() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID)
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await PredefinedKitService.updatePost(editingId, values);
+                const { error } = await PredefinedKitService.updatePost(Number(id), values);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -64,7 +102,7 @@ export default function CreateManufacturer() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/predefined-kit");
         } catch (error) {
             message.error("Error");
         }
