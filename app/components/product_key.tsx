@@ -1,6 +1,7 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { GetRef, InputRef, TableProps } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
+import { License } from '~/types/license.type';
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
@@ -101,10 +102,36 @@ interface DataType {
 
 type ColumnTypes = Exclude<TableProps<DataType>['columns'], undefined>;
 
-const ProductKey: React.FC = () => {
+interface ProductKeyProps {
+  onDataChange?: (data: DataType[]) => void;
+  initialKeys?: any[];
+  hasID?: any;
+}
+
+const ProductKey: React.FC<ProductKeyProps> = ({ onDataChange, initialKeys = [], hasID }) => {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
+  // Use `initialKeys` to set the initial state
+  const [keys, setKeys] = useState<License[]>(initialKeys);
 
   const [count, setCount] = useState(1);
+
+  useEffect(() => {
+    if (hasID && initialKeys) {
+      setDataSource(initialKeys);
+      // Set count to avoid key collisions when adding new rows
+      if (initialKeys.length > 0) {
+        const maxKey = Math.max(...initialKeys.map(item => Number(item.key)));
+        setCount(maxKey + 1);
+      }
+    }
+  }, [hasID, initialKeys]);
+
+  // Add useEffect to notify parent when data changes
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange(dataSource);
+    }
+  }, [dataSource, onDataChange]);
 
   const handleDelete = (key: React.Key) => {
     const newData = dataSource.filter((item) => item.key !== key);
@@ -124,11 +151,12 @@ const ProductKey: React.FC = () => {
       render: (_, record) =>
         dataSource.length >= 1 ? (
           <Popconfirm key={record.key} title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
-            <button onClick={(e) => {
-              e.preventDefault(); // Prevent default behavior
-              e.stopPropagation(); // Also prevent event bubbling if needed
-            }}
-              className="text-red-600 hover:text-red-800 font-medium px-3 py-1 rounded-md hover:bg-red-50 transition-colors duration-200"
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-1 rounded-md transition-colors duration-200"
             >
               Remove
             </button>

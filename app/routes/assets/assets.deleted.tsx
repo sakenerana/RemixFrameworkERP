@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -11,6 +11,8 @@ import { Asset } from "~/types/asset.type";
 export default function DeletedAssets() {
     const [data, setData] = useState<Asset[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Asset[]>([]);
@@ -36,7 +38,7 @@ export default function DeletedAssets() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await AssetService.getAllPostsInactive();
+            const dataFetch = await AssetService.getAllPostsInactive(isDepartmentID);
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -44,6 +46,11 @@ export default function DeletedAssets() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -60,18 +67,11 @@ export default function DeletedAssets() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Asset Name": true,
-        "Device Image": false,
-        "Asset Tag": true,
-        "Serial": true,
         "Model": true,
-        "Category": true,
-        "Checked Out To": true,
         "Location": true,
         "Purchase Cost": false,
         "Current Value": false,
-        "Accounting Code": false,
-        "Installed": false,
-        "Size": false,
+        "Notes": false,
         "Status": true,
         "Actions": true,
         "Checkout": true,
@@ -82,66 +82,37 @@ export default function DeletedAssets() {
             title: "Asset Name",
             dataIndex: "name",
             width: 120,
-        },
-        {
-            title: "Device Image",
-            dataIndex: "device_image",
-            width: 120,
-        },
-        {
-            title: "Asset Tag",
-            dataIndex: "asset_tag",
-            width: 120,
-        },
-        {
-            title: "Serial",
-            dataIndex: "serial_no",
-            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Model",
-            dataIndex: "model",
+            dataIndex: "asset_model",
             width: 120,
-        },
-        {
-            title: "Category",
-            dataIndex: "category",
-            width: 120,
-        },
-        {
-            title: "Checked Out To",
-            dataIndex: "checked_out_to",
-            width: 120,
+            render: (asset_model) => asset_model?.name || 'N/A'
         },
         {
             title: "Location",
-            dataIndex: "location",
+            dataIndex: "locations",
             width: 120,
+            render: (locations) => locations?.name || 'N/A'
         },
         {
             title: "Purchase Cost",
             dataIndex: "purchase_cost",
             width: 120,
+            render: (text) => text || 0
         },
         {
             title: "Current Value",
             dataIndex: "current_value",
             width: 120,
+            render: (text) => text || 0
         },
         {
-            title: "Accounting Code",
-            dataIndex: "accounting_code",
+            title: "Notes",
+            dataIndex: "notes",
             width: 120,
-        },
-        {
-            title: "Installed",
-            dataIndex: "installed",
-            width: 120,
-        },
-        {
-            title: "Size",
-            dataIndex: "size",
-            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

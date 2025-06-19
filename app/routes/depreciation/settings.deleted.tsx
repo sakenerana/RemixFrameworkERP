@@ -92,13 +92,13 @@ export default function DeletedDepreciation() {
             title: "Assets",
             dataIndex: "assets",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) => text || 0
         },
         {
             title: "Asset Models",
             dataIndex: "asset_models",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) => text || 0
         },
         {
             title: "Notes",

@@ -39,7 +39,7 @@ export default function CreateComponents() {
     const fetchDataCategory = async () => {
         try {
             setLoading(true);
-            const dataFetchGroup = await CategoryService.getAllPosts();
+            const dataFetchGroup = await CategoryService.getAllPostsByComponents(isDepartmentID);
             setDataCategory(dataFetchGroup); // Works in React state
         } catch (error) {
             message.error("error");
@@ -52,7 +52,7 @@ export default function CreateComponents() {
     const fetchDataCompany = async () => {
         try {
             setLoading(true);
-            const dataFetchCompany = await CompanyService.getAllPosts();
+            const dataFetchCompany = await CompanyService.getAllPosts(isDepartmentID);
             setDataCompany(dataFetchCompany); // Works in React state
         } catch (error) {
             message.error("error");
@@ -65,7 +65,7 @@ export default function CreateComponents() {
     const fetchDataManufacturer = async () => {
         try {
             setLoading(true);
-            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts(isDepartmentID);
             setDataManufacturer(dataFetchManufacturer); // Works in React state
         } catch (error) {
             message.error("error");
@@ -78,7 +78,7 @@ export default function CreateComponents() {
     const fetchDataSupplier = async () => {
         try {
             setLoading(true);
-            const dataFetchSupplier = await SupplierService.getAllPosts();
+            const dataFetchSupplier = await SupplierService.getAllPosts(isDepartmentID);
             setDataSupplier(dataFetchSupplier); // Works in React state
         } catch (error) {
             message.error("error");
@@ -91,7 +91,7 @@ export default function CreateComponents() {
     const fetchDataLocation = async () => {
         try {
             setLoading(true);
-            const dataFetchLocation = await LocationService.getAllPosts();
+            const dataFetchLocation = await LocationService.getAllPosts(isDepartmentID);
             setDataLocation(dataFetchLocation); // Works in React state
         } catch (error) {
             message.error("error");

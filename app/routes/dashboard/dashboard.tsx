@@ -11,7 +11,7 @@ import {
     Tag,
     Spin,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets, AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import {
 } from "react-icons/fc";
@@ -43,6 +43,9 @@ export default function DashboardRoutes() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+
     // Fetch data from Supabase
     const fetchDataAsset = async () => {
         try {
@@ -60,7 +63,7 @@ export default function DashboardRoutes() {
     const fetchDataAssetTable = async () => {
         try {
             setLoading(true);
-            const dataFetch = await AssetService.getAllPosts();
+            const dataFetch = await AssetService.getAllPosts(isDepartmentID);
             setDataAssetTable(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -120,6 +123,11 @@ export default function DashboardRoutes() {
             setLoading(false);
         }
     };
+
+    useMemo(() => {
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
+    }, []);
 
     useEffect(() => {
         fetchDataAsset();

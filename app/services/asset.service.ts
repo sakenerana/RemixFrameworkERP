@@ -27,11 +27,12 @@ export const AssetService = {
   },
 
   // Read (multiple)
-  async getAllPosts() {
+  async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('assets')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), asset_model(*), locations(*)')
       .eq('status_id', 1)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -39,11 +40,12 @@ export const AssetService = {
   },
 
   // Read (multiple)
-  async getAllPostsInactive() {
+  async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('assets')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), asset_model(*), locations(*)')
       .eq('status_id', 2)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error

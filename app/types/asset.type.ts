@@ -3,7 +3,7 @@ export interface Asset {
     id: number;
     name: string;
     device_image: string;
-    asset_tag: string;
+    asset_tag: any[];
     serial_no: string;
     model: string;
     category: string;

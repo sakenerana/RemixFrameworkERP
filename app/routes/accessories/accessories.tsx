@@ -17,7 +17,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -35,6 +35,8 @@ import { Accessories } from "~/types/accessories.type";
 export default function AccesoriessRoute() {
   const [data, setData] = useState<Accessories[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Accessories[]>([]);
@@ -67,7 +69,7 @@ export default function AccesoriessRoute() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await AccessoryService.getAllPosts();
+      const dataFetch = await AccessoryService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -75,6 +77,11 @@ export default function AccesoriessRoute() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {

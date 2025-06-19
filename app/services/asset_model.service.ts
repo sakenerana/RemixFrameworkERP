@@ -40,6 +40,19 @@ export const AssetModelService = {
   },
 
   // Read (multiple)
+  async getAllPostsByAsset(departmentID: number) {
+    const { data, error } = await supabase
+      .from('asset_model')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('asset_model')

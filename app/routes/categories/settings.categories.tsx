@@ -24,9 +24,8 @@ import {
   AiOutlineEdit,
   AiOutlineFileExclamation,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CategoryService } from "~/services/category.service";

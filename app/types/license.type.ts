@@ -11,7 +11,7 @@ export interface License {
     purchase_cost: number;
     purchase_date: Date;
     purchase_order_no: number;
-    product_key: string;
+    product_key: any[];
     expiration_date: Date;
     termination_date: Date;
     license_email: string;

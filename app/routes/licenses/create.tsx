@@ -36,11 +36,13 @@ export default function CreateLicense() {
     const [dataDepreciation, setDataDepreciation] = useState<Depreciation[]>([]);
     const { Option } = Select;
 
+    const [productKeys, setProductKeys] = useState<License[]>([]);
+
     // Fetch data from Supabase
     const fetchDataCategory = async () => {
         try {
             setLoading(true);
-            const dataFetchGroup = await CategoryService.getAllPosts();
+            const dataFetchGroup = await CategoryService.getAllPostsByLicenses(isDepartmentID);
             setDataCategory(dataFetchGroup); // Works in React state
         } catch (error) {
             message.error("error");
@@ -53,7 +55,7 @@ export default function CreateLicense() {
     const fetchDataCompany = async () => {
         try {
             setLoading(true);
-            const dataFetchCompany = await CompanyService.getAllPosts();
+            const dataFetchCompany = await CompanyService.getAllPosts(isDepartmentID);
             setDataCompany(dataFetchCompany); // Works in React state
         } catch (error) {
             message.error("error");
@@ -66,7 +68,7 @@ export default function CreateLicense() {
     const fetchDataManufacturer = async () => {
         try {
             setLoading(true);
-            const dataFetchManufacturer = await ManufacturerService.getAllPosts();
+            const dataFetchManufacturer = await ManufacturerService.getAllPosts(isDepartmentID);
             setDataManufacturer(dataFetchManufacturer); // Works in React state
         } catch (error) {
             message.error("error");
@@ -79,7 +81,7 @@ export default function CreateLicense() {
     const fetchDataSupplier = async () => {
         try {
             setLoading(true);
-            const dataFetchSupplier = await SupplierService.getAllPosts();
+            const dataFetchSupplier = await SupplierService.getAllPosts(isDepartmentID);
             setDataSupplier(dataFetchSupplier); // Works in React state
         } catch (error) {
             message.error("error");
@@ -92,7 +94,7 @@ export default function CreateLicense() {
     const fetchDataDepreciation = async () => {
         try {
             setLoading(true);
-            const dataFetchDepreciation = await DepreciationService.getAllPosts();
+            const dataFetchDepreciation = await DepreciationService.getAllPosts(isDepartmentID);
             setDataDepreciation(dataFetchDepreciation); // Works in React state
         } catch (error) {
             message.error("error");
@@ -124,12 +126,20 @@ export default function CreateLicense() {
             // Update all states at once
             form.setFieldsValue(formattedData);
             //   setData(dataFetch);
+
+            // console.log("dataFetch", dataFetch.product_key)
         } catch (error) {
             // console.error("Error fetching data:", error);
             message.error("Error loading asset data");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleProductKeysChange = (newData: any[]) => {
+        setProductKeys(newData);
+        // You can also do other things with the data here
+        // console.log("Updated product keys:", newData);
     };
 
     useMemo(() => {
@@ -160,7 +170,18 @@ export default function CreateLicense() {
             content: "Are you sure you want to reset all form fields?",
             okText: "Reset",
             cancelText: "Cancel",
-            onOk: () => form.resetFields(),
+            onOk: () => {
+                // 1. Get the current value of the field you want to keep (e.g., `product_key`)
+                const productKeyValue = form.getFieldValue('product_key');
+
+                // 2. Reset all fields
+                form.resetFields();
+
+                // 3. Set the field back if it exists
+                if (productKeyValue !== undefined) {
+                    form.setFieldsValue({ product_key: productKeyValue });
+                }
+            },
         });
     };
 
@@ -175,12 +196,13 @@ export default function CreateLicense() {
                 ...values,
                 status_id: 1,
                 user_id: isUserID,
-                department_id: Number(isDepartmentID)
+                department_id: Number(isDepartmentID),
+                product_key: productKeys
             };
 
             if (id) {
                 // Update existing record
-                const { error } = await LicenseService.updatePost(Number(id), values);
+                const { error } = await LicenseService.updatePost(Number(id), allValues);
                 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -189,7 +211,7 @@ export default function CreateLicense() {
                 setLoading(true);
                 const { error } = await LicenseService.createPost(allValues);
 
-                if (error) throw message.error(error.message);
+                if (error) throw message.error('Error');
                 message.success("Record created successfully");
             }
 
@@ -428,7 +450,7 @@ export default function CreateLicense() {
                     </Col>
 
                     <Col xs={24} sm={24}>
-                        <ProductKey></ProductKey>
+                        <ProductKey onDataChange={handleProductKeysChange} initialKeys={form.getFieldValue('product_key') || []} hasID={id} ></ProductKey>
                     </Col>
 
                     <Col xs={24} sm={24}>

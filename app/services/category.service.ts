@@ -2,14 +2,14 @@ import { Category } from "~/types/category.type"
 import supabase from "~/utils/supabase.client"
 
 export const CategoryService = {
-    
+
   // Create
   async createPost(postData: Category) {
     const { data, error } = await supabase
       .from('categories')
       .insert(postData)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -21,7 +21,7 @@ export const CategoryService = {
       .select('*')
       .eq('id', id)
       .single()
-    
+
     if (error) throw error
     return data
   },
@@ -34,7 +34,63 @@ export const CategoryService = {
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
-    
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsByLicenses(departmentID: number) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('type', 'License')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsByAccessories(departmentID: number) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('type', 'Accessory')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsByConsumables(departmentID: number) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('type', 'Consumable')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsByComponents(departmentID: number) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*, status_labels(*), departments(*)')
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('type', 'Component')
+      .order('created_at', { ascending: false })
+
     if (error) throw error
     return data
   },
@@ -59,7 +115,7 @@ export const CategoryService = {
       .update(updates)
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -71,7 +127,7 @@ export const CategoryService = {
       .update({ status_id: 1 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -83,7 +139,7 @@ export const CategoryService = {
       .update({ status_id: 2 })
       .eq('id', id)
       .select()
-    
+
     if (error) throw error
     return data[0]
   },
@@ -94,7 +150,7 @@ export const CategoryService = {
       .from('categories')
       .delete()
       .eq('id', id)
-    
+
     if (error) throw error
     return true
   },
@@ -105,7 +161,7 @@ export const CategoryService = {
       .from('categories')
       .select('*')
       .eq('user_id', userId)
-    
+
     if (error) throw error
     return data
   }

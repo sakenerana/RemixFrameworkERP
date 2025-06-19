@@ -1,20 +1,15 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
-  Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
@@ -22,7 +17,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -33,7 +28,7 @@ import {
   AiOutlinePlus,
   AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
@@ -42,6 +37,8 @@ import { License } from "~/types/license.type";
 export default function LicensesRoute() {
   const [data, setData] = useState<License[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<License[]>([]);
@@ -74,7 +71,7 @@ export default function LicensesRoute() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await LicenseService.getAllPosts();
+      const dataFetch = await LicenseService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -82,6 +79,11 @@ export default function LicensesRoute() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {
@@ -113,7 +115,6 @@ export default function LicensesRoute() {
     "Order Number": false,
     "Purchase Cost": false,
     "Purchase Date": false,
-    "Purchase Order": false,
     "Purchase Order Number": false,
     "Min QTY": true,
     "Total": true,
@@ -199,12 +200,6 @@ export default function LicensesRoute() {
       render: (text) => text || 'N/A'
     },
     {
-      title: "Purchase Order",
-      dataIndex: "purchase_order",
-      width: 120,
-      render: (text) => text || 'N/A'
-    },
-    {
       title: "Purchase Order Number",
       dataIndex: "purchase_order_no",
       width: 120,
@@ -226,7 +221,7 @@ export default function LicensesRoute() {
       title: "Avail",
       dataIndex: "avail",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
       title: "Depreciation",

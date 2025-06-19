@@ -1,30 +1,113 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import AssetTag from "~/components/asset_tag";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
+import { Location } from "~/types/location.type";
 const { TextArea } = Input;
+import moment from 'moment';
+import { LocationService } from "~/services/location.service";
+import { AssetModel } from "~/types/asset_model.tpye";
+import { AssetModelService } from "~/services/asset_model.service";
 
 export default function CreateAssets() {
     const { id } = useParams();
     const [form] = Form.useForm<Asset>();
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
-    const [editingId, setEditingId] = useState<any | null>(id);
     const [isTitle, setIsTitle] = useState('');
+    const [isUserID, setUserID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const navigate = useNavigate();
+
+    const [dataAssetModel, setDataAssetModel] = useState<AssetModel[]>([]);
+    const [dataLocation, setDataLocation] = useState<Location[]>([]);
+    const { Option } = Select;
+
+    const [assetTag, setAssetTag] = useState<Asset[]>([]);
+
+    // Fetch data from Supabase
+    const fetchDataAssetModel = async () => {
+        try {
+            setLoading(true);
+            const dataFetchAssetModel = await AssetModelService.getAllPostsByAsset(isDepartmentID);
+            setDataAssetModel(dataFetchAssetModel); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataLocation = async () => {
+        try {
+            setLoading(true);
+            const dataFetchLocation = await LocationService.getAllPosts(isDepartmentID);
+            setDataLocation(dataFetchLocation); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!id) {
+            console.error("Data is not available");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const dataFetch = await AssetService.getPostById(Number(id));
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+
+            // Convert date strings to moment objects
+            const formattedData = {
+                ...dataFetch,
+                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
+            };
+
+            // Update all states at once
+            form.setFieldsValue(formattedData);
+            //   setData(dataFetch);
+        } catch (error) {
+            // console.error("Error fetching data:", error);
+            message.error("Error loading asset data");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAssetTagChange = (newData: any[]) => {
+        setAssetTag(newData);
+        // You can also do other things with the data here
+        // console.log("Updated product keys:", newData);
+    };
 
     useMemo(() => {
         if (id) {
             setIsTitle("Update Asset");
             setIsEditMode(true);
+            fetchDataByUUID();
         } else {
             setIsTitle("Create Asset");
             setIsEditMode(false);
         }
+
+        setUserID(localStorage.getItem('userAuthID'));
+        setDepartmentID(localStorage.getItem('userDept'));
     }, []);
+
+    useEffect(() => {
+        fetchDataAssetModel();
+        fetchDataLocation();
+    }, []); // Empty dependency array means this runs once on mount
 
     const onReset = () => {
         Modal.confirm({
@@ -32,7 +115,18 @@ export default function CreateAssets() {
             content: "Are you sure you want to reset all form fields?",
             okText: "Reset",
             cancelText: "Cancel",
-            onOk: () => form.resetFields(),
+            onOk: () => {
+                // 1. Get the current value of the field you want to keep (e.g., `product_key`)
+                const assetTagValue = form.getFieldValue('asset_tag');
+
+                // 2. Reset all fields
+                form.resetFields();
+
+                // 3. Set the field back if it exists
+                if (assetTagValue !== undefined) {
+                    form.setFieldsValue({ asset_tag: assetTagValue });
+                }
+            },
         });
     };
 
@@ -46,11 +140,14 @@ export default function CreateAssets() {
             const allValues = {
                 ...values,
                 status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID),
+                asset_tag: assetTag
             };
 
-            if (editingId) {
+            if (id) {
                 // Update existing record
-                const { error } = await AssetService.updatePost(editingId, values);
+                const { error } = await AssetService.updatePost(Number(id), allValues);
 
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
@@ -65,7 +162,7 @@ export default function CreateAssets() {
 
             setLoading(false);
             form.resetFields();
-            setEditingId(null);
+            navigate("/inventory/assets");
         } catch (error) {
             message.error("Error");
         }
@@ -107,8 +204,23 @@ export default function CreateAssets() {
                 <Row gutter={24}>
                     <Col xs={24} sm={8}>
                         <Form.Item
-                            label="Model"
-                            name="model_id"
+                            label="Asset Name"
+                            name="name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input asset name!",
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Asset Model"
+                            name="asset_model_id"
                             rules={[
                                 {
                                     required: true,
@@ -116,43 +228,20 @@ export default function CreateAssets() {
                                 },
                             ]}
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Model"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Type"
-                            name="type"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select type!",
-                                },
-                            ]}
-                        >
-                            <Select
-                                showSearch
-                                placeholder="Select Type"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Asset Model">
+                                {dataAssetModel.map((item: AssetModel) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={8}>
                         <Form.Item
                             label="Location"
-                            name="location"
+                            name="location_id"
                             rules={[
                                 {
                                     required: true,
@@ -160,19 +249,18 @@ export default function CreateAssets() {
                                 },
                             ]}
                         >
-                            <Select
-                                showSearch
-                                placeholder="Select Location"
-                                // filterOption={(input, option) =>
-                                //     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                // }
-                                options={[]}
-                            />
+                            <Select placeholder="Select Location">
+                                {dataLocation.map((item: Location) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                     </Col>
 
                     <Col xs={24} sm={24}>
-                        <AssetTag></AssetTag>
+                        <AssetTag onDataChange={handleAssetTagChange} initialKeys={form.getFieldValue('asset_tag') || []} hasID={id} ></AssetTag>
                     </Col>
 
                     <Col xs={24} sm={24} className="mt-4">

@@ -29,11 +29,12 @@ export const LicenseService = {
   },
 
   // Read (multiple)
-  async getAllPosts() {
+  async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('licenses')
       .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
       .eq('status_id', 1)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -41,11 +42,12 @@ export const LicenseService = {
   },
 
   // Read (multiple)
-  async getAllPostsInactive() {
+  async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('licenses')
       .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
       .eq('status_id', 2)
+      .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
 
     if (error) throw error

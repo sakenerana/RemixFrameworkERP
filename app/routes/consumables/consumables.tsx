@@ -22,7 +22,7 @@ import {
   TableProps,
   Tag,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -42,6 +42,8 @@ import { Consumable } from "~/types/consumable.type";
 export default function ConsumablesRoute() {
   const [data, setData] = useState<Consumable[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Consumable[]>([]);
@@ -74,7 +76,7 @@ export default function ConsumablesRoute() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const dataFetch = await ConsumableService.getAllPosts();
+      const dataFetch = await ConsumableService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
@@ -82,6 +84,11 @@ export default function ConsumablesRoute() {
       setLoading(false);
     }
   };
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
 
   useEffect(() => {
     if (searchText.trim() === '') {

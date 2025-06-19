@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { GetRef, InputRef, TableProps } from 'antd';
-import { Button, Form, Input, Popconfirm, Table } from 'antd';
+import { Button, Form, Input, Popconfirm, Select, Table } from 'antd';
+import { Asset } from '~/types/asset.type';
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
@@ -99,25 +100,50 @@ interface DataType {
   key: React.Key;
   asset_tag: string;
   serial: string;
+  status_type: string;
+}
+
+interface AssetTagProps {
+  onDataChange?: (data: DataType[]) => void;
+  initialKeys?: any[];
+  hasID?: any;
 }
 
 type ColumnTypes = Exclude<TableProps<DataType>['columns'], undefined>;
 
-const AssetTag: React.FC = () => {
-  const [dataSource, setDataSource] = useState<DataType[]>([
-    {
-      key: '0',
-      asset_tag: 'Edward King 0',
-      serial: 'London, Park Lane no. 0',
-    },
-    {
-      key: '1',
-      asset_tag: 'Edward King 1',
-      serial: 'London, Park Lane no. 1',
-    },
-  ]);
+const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], hasID }) => {
+  const [dataSource, setDataSource] = useState<DataType[]>([]);
+  // Use `initialKeys` to set the initial state
+  const [keys, setKeys] = useState<Asset[]>(initialKeys);
 
   const [count, setCount] = useState(2);
+  const { Option } = Select;
+
+  const handleStatusChange = (value: string, key: React.Key) => {
+    const newData = dataSource.map((item) =>
+      item.key === key ? { ...item, status_type: value } : item
+    );
+    setDataSource(newData);
+  };
+
+  useEffect(() => {
+    if (hasID && initialKeys) {
+      setDataSource(initialKeys);
+      // Set count to avoid key collisions when adding new rows
+      if (initialKeys.length > 0) {
+        const maxKey = Math.max(...initialKeys.map(item => Number(item.key)));
+        setCount(maxKey + 1);
+      }
+    }
+  }, [hasID, initialKeys]);
+
+  // Add useEffect to notify parent when data changes
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange(dataSource);
+      console.log("testing 2", dataSource)
+    }
+  }, [dataSource, onDataChange]);
 
   const handleDelete = (key: React.Key) => {
     const newData = dataSource.filter((item) => item.key !== key);
@@ -137,12 +163,40 @@ const AssetTag: React.FC = () => {
       editable: true,
     },
     {
+      title: 'Status Type',
+      dataIndex: 'status_type',
+      editable: false,
+      render: (_, record) => (
+        <Select
+          placeholder="Select Status"
+          className="w-full"
+          value={record.status_type} // Controlled component
+          onChange={(value) => handleStatusChange(value, record.key)}
+        >
+          <Option value="Pending">Pending</Option>
+          <Option value="Ready to Deploy">Ready to Deploy</Option>
+          <Option value="Archived">Archived</Option>
+          <Option value="Broken - Not Fixable">Broken - Not Fixable</Option>
+          <Option value="Lost/Stolen">Lost/Stolen</Option>
+          <Option value="Out for Repair">Out for Repair</Option>
+        </Select>
+      ),
+    },
+    {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, record) =>
         dataSource.length >= 1 ? (
           <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
-            <a>Delete</a>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-1 rounded-md transition-colors duration-200"
+            >
+              Remove
+            </button>
           </Popconfirm>
         ) : null,
     },
@@ -151,8 +205,9 @@ const AssetTag: React.FC = () => {
   const handleAdd = () => {
     const newData: DataType = {
       key: count,
-      asset_tag: `Edward King ${count}`,
-      serial: `London, Park Lane no. ${count}`,
+      asset_tag: `Input Asset Tag ${count}`,
+      serial: `Input Serial ${count}`,
+      status_type: ``,
     };
     setDataSource([...dataSource, newData]);
     setCount(count + 1);
@@ -166,6 +221,7 @@ const AssetTag: React.FC = () => {
       ...item,
       ...row,
     });
+    console.log("testing 1", newData)
     setDataSource(newData);
   };
 
