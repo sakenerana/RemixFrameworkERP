@@ -157,6 +157,30 @@ export default function CreateManufacturer() {
                         </Form.Item>
                     </Col>
 
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Qty"
+                            name="qty"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input predefined kit qty!",
+                                },
+                            ]}
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={12}>
+                        <Form.Item
+                            label="Min Qty"
+                            name="min_qty"
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+
                 </Row>
 
                 <Form.Item className="flex flex-wrap justify-end">

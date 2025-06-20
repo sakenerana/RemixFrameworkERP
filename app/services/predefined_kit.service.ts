@@ -14,6 +14,17 @@ export const PredefinedKitService = {
     return data[0]
   },
 
+  // Create
+  async createPostPredefinedCheck(postData: PredefinedKit) {
+    const { data, error } = await supabase
+      .from('predefined_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -30,20 +41,48 @@ export const PredefinedKitService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('predefined')
-      .select('*, status_labels(*), departments(*)')
+      .select(`
+      *, 
+      status_labels(*),
+      departments(*),
+      predefined_check:predefined_check!predefined_id(
+        count
+      )
+    `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
+  async getAllChecked(departmentID: number, predefined_id: number) {
+    const { data, error } = await supabase
+      .from('predefined_check')
+      .select(`*, predefined(*)`)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('predefined_id', predefined_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
   },
 
   // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('predefined')
-      .select('*, status_labels(*), departments(*)')
+      .select(`
+      *, 
+      status_labels(*),
+      departments(*),
+      predefined_check:predefined_check!predefined_id(
+        count
+      )
+    `)
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -89,9 +128,9 @@ export const PredefinedKitService = {
   },
 
   // Delete
-  async deletePost(id: PredefinedKit) {
+  async deletePredefinedCheck(id: number) {
     const { error } = await supabase
-      .from('predefined')
+      .from('predefined_check')
       .delete()
       .eq('id', id)
 

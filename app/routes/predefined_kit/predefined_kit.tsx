@@ -1,26 +1,23 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
   Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
   TableColumnsType,
   TableProps,
   Tag,
+  Tooltip,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -29,18 +26,19 @@ import {
   AiOutlineEdit,
   AiOutlineExport,
   AiOutlineFileExclamation,
-  AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 import { PredefinedKit } from "~/types/predefined_kit.type";
+import { TiWarning } from "react-icons/ti";
 
 export default function PredefinedKitRoute() {
   const [data, setData] = useState<PredefinedKit[]>([]);
+  const [dataRow, setDataRow] = useState<PredefinedKit>();
   const [loading, setLoading] = useState(false);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -48,7 +46,15 @@ export default function PredefinedKitRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<PredefinedKit[]>([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    setRefreshKey(prev => prev + 1); // Triggers data refresh
+  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -99,17 +105,29 @@ export default function PredefinedKitRoute() {
       );
       setFilteredData(filtered);
     }
-
   }, [searchText]); // Empty dependency array means this runs once on mount
 
   const handleCheckinButton = () => { };
 
-  const handleCheckoutButton = () => { };
+  const handleCheckoutButton = (data: PredefinedKit) => {
+    setIsModalOpen(true);
+    setDataRow(data);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Checked Out To": true,
+    "Min Qty": false,
+    "Qty": true,
+    "Checked Out No.": true,
     "Status": true,
     "Actions": true,
     "Checkout": true,
@@ -120,13 +138,43 @@ export default function PredefinedKitRoute() {
       title: "Name",
       dataIndex: "name",
       width: 350,
+      render: (_, data) => (
+        <Link to={`/inventory/predefined-kit/checkedout/${data.id}`}>
+          <a className="hover:underline">{data.name || 'N/A'}</a>
+        </Link>
+      )
+    },
+    {
+      title: "Min Qty",
+      dataIndex: "min_qty",
+      width: 120,
       render: (text) => text || 'N/A'
     },
     {
-      title: "Checked Out To",
-      dataIndex: "checkedout_to",
-      width: 350,
-      render: (text) => text || 'N/A'
+      title: "Qty",
+      dataIndex: "qty",
+      width: 120,
+      render: (text) => text || 0
+    },
+    {
+      title: "Checked Out No.",
+      dataIndex: "checkedout_no",
+      width: 120,
+      render: (_, data) => (
+        <div>
+          {data.predefined_check[0]?.count >= data.min_qty ? (
+            // If count meets or exceeds minimum quantity
+            <span className="flex flex-wrap text-green-600">
+              (<TiWarning className="mt-1 text-orange-500" />) {data.predefined_check[0].count}
+            </span>
+          ) : (
+            // If count is below minimum quantity
+            <span className="text-green-600">
+              {data.predefined_check[0]?.count || 0}
+            </span>
+          )}
+        </div>
+      )
     },
     {
       title: "Status",
@@ -204,43 +252,37 @@ export default function PredefinedKitRoute() {
       dataIndex: "checkout",
       width: 120,
       fixed: "right",
-      render: (_, data) => (
-        <div>
-          {data.check_status == "checkin" ? (
+      render: (_, data) => {
+        const currentCount = data?.predefined_check?.[0]?.count || 0;
+        const totalQty = data?.qty || 0;
+        const isDisabled = currentCount >= totalQty;
+
+        return (
+          <div>
             <Popconfirm
-              title="Do you want to checkin?"
-              description="Are you sure to checkin this asset?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckinButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
-                color="#108ee9"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
+              disabled={isDisabled}
               title="Do you want to checkout?"
-              description="Are you sure to checkout this asset?"
+              description="Are you sure to checkout this predefined kit?"
               okText="Yes"
               cancelText="No"
-              onConfirm={() => handleCheckoutButton()}
+              onConfirm={() => handleCheckoutButton(data)}
             >
               <Tag
-                className="cursor-pointer"
+                className={`cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-                color="#f50"
+                color={isDisabled ? "#d9d9d9" : "#3fd168"} // Gray when disabled, green when enabled
               >
-                {data.check_status}
+                {isDisabled ? 'Completed' : 'Check-out'}
               </Tag>
             </Popconfirm>
-          )}
-        </div>
-      ),
+            {isDisabled && (
+              <Tooltip title="All items have been checked out">
+                <InfoCircleOutlined className="ml-2 text-gray-400" />
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -281,6 +323,18 @@ export default function PredefinedKitRoute() {
 
   return (
     <div>
+      <Modal
+        style={{ top: 20 }}
+        width={420}
+        title="Check-out Predefined Kit"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer=""
+      >
+        <Checkout stateData={dataRow} onSuccess={handleSuccess} onClose={() => { setIsModalOpen(false), fetchData() }}></Checkout>
+      </Modal>
       <div className="flex pb-5 justify-between">
         <Breadcrumb
           items={[

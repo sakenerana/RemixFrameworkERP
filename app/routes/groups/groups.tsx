@@ -4,8 +4,6 @@ import {
   LoadingOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
-import { User } from "@supabase/supabase-js";
 import {
   Alert,
   Breadcrumb,
@@ -33,12 +31,10 @@ import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
-  AiOutlineFileExclamation,
   AiOutlinePlus,
   AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { GroupService } from "~/services/groups.service";
 import { Groups } from "~/types/groups.type";

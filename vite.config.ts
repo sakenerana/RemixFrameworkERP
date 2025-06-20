@@ -221,6 +221,11 @@ export default defineConfig({
                   "routes/predefined_kit/deleted.tsx",
                   { index: true }
                 );
+                route(
+                  "checkedout/:id",
+                  "routes/predefined_kit/checkedout.tsx",
+                  { index: true }
+                );
               });
               route(
                 "requestable-items",

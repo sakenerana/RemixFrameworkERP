@@ -67,7 +67,7 @@ export default function DeletedManufacturer() {
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
-        "Checked Out To": true,
+        "Checked Out No.": true,
         "Status": true,
         "Actions": true,
         "Checkout": true,
@@ -80,10 +80,12 @@ export default function DeletedManufacturer() {
             width: 350,
         },
         {
-            title: "Checked Out To",
-            dataIndex: "checkedout_to",
+            title: "Checked Out No.",
+            dataIndex: "checkedout_no",
             width: 350,
-            render: (text) => text || 'N/A'
+            render: (_, data) => (
+                <div>{data.predefined_check[0].count}</div>
+            )
         },
         {
             title: "Status",
