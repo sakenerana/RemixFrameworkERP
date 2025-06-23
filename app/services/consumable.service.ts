@@ -14,6 +14,17 @@ export const ConsumableService = {
     return data[0]
   },
 
+  // Create
+  async createPostConsumableCheck(postData: Consumable) {
+    const { data, error } = await supabase
+      .from('consumables_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -30,7 +41,18 @@ export const ConsumableService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('consumables')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        consumables_check:consumables_check!consumable_id(
+        count
+      )
+        `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -40,10 +62,35 @@ export const ConsumableService = {
   },
 
   // Read (multiple)
+  async getAllChecked(departmentID: number, consumable_id: number) {
+    const { data, error } = await supabase
+      .from('consumables_check')
+      .select(`*, consumables(*)`)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('consumable_id', consumable_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('consumables')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        consumables_check:consumables_check!consumable_id(
+        count
+      )
+        `)
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -101,9 +148,9 @@ export const ConsumableService = {
   },
 
   // Delete
-  async deletePost(id: Consumable) {
+  async deleteConsumableCheck(id: number) {
     const { error } = await supabase
-      .from('consumables')
+      .from('consumables_check')
       .delete()
       .eq('id', id)
 

@@ -14,6 +14,17 @@ export const ComponentService = {
     return data[0]
   },
 
+  // Create
+  async createPostComponentCheck(postData: Component) {
+    const { data, error } = await supabase
+      .from('components_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -30,7 +41,18 @@ export const ComponentService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('components')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        components_check:components_check!component_id(
+        count
+      )
+        `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -40,10 +62,35 @@ export const ComponentService = {
   },
 
   // Read (multiple)
+  async getAllChecked(departmentID: number, component_id: number) {
+    const { data, error } = await supabase
+      .from('components_check')
+      .select(`*, components(*)`)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('component_id', component_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('components')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        components_check:components_check!component_id(
+        count
+      )
+        `)
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -101,9 +148,9 @@ export const ComponentService = {
   },
 
   // Delete
-  async deletePost(id: Component) {
+  async deleteComponentCheck(id: number) {
     const { error } = await supabase
-      .from('components')
+      .from('components_check')
       .delete()
       .eq('id', id)
 

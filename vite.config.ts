@@ -186,6 +186,11 @@ export default defineConfig({
                 route("deleted-accessories", "routes/accessories/deleted.tsx", {
                   index: true,
                 });
+                route(
+                  "checkedout/:id",
+                  "routes/accessories/checkedout.tsx",
+                  { index: true }
+                );
               });
               route("consumables", "routes/consumables/route.tsx", () => {
                 route("", "routes/consumables/consumables.tsx", {
@@ -197,6 +202,11 @@ export default defineConfig({
                 route("deleted-consumables", "routes/consumables/deleted.tsx", {
                   index: true,
                 });
+                route(
+                  "checkedout/:id",
+                  "routes/consumables/checkedout.tsx",
+                  { index: true }
+                );
               });
               route("components", "routes/components/route.tsx", () => {
                 route("", "routes/components/components.tsx", { index: true });
@@ -206,6 +216,11 @@ export default defineConfig({
                 route("deleted-components", "routes/components/deleted.tsx", {
                   index: true,
                 });
+                route(
+                  "checkedout/:id",
+                  "routes/components/checkedout.tsx",
+                  { index: true }
+                );
               });
               route("predefined-kit", "routes/predefined_kit/route.tsx", () => {
                 route("", "routes/predefined_kit/predefined_kit.tsx", {

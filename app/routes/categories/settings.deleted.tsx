@@ -68,7 +68,6 @@ export default function DeletedCategories() {
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
         "Type": true,
-        "Qty": true,
         "Notes": false,
         "Status": true,
         "Actions": true,
@@ -84,12 +83,6 @@ export default function DeletedCategories() {
         {
             title: "Type",
             dataIndex: "type",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
-            title: "Qty",
-            dataIndex: "qty",
             width: 120,
             render: (text) => text || 'N/A'
         },

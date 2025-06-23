@@ -26,6 +26,7 @@ import {
   AiOutlineEdit,
   AiOutlineExport,
   AiOutlineFileExclamation,
+  AiOutlineForm,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
@@ -107,8 +108,6 @@ export default function PredefinedKitRoute() {
     }
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  const handleCheckinButton = () => { };
-
   const handleCheckoutButton = (data: PredefinedKit) => {
     setIsModalOpen(true);
     setDataRow(data);
@@ -139,7 +138,8 @@ export default function PredefinedKitRoute() {
       dataIndex: "name",
       width: 350,
       render: (_, data) => (
-        <Link to={`/inventory/predefined-kit/checkedout/${data.id}`}>
+        <Link to={`/inventory/predefined-kit/checkedout/${data.id}`} className="flex flex-wrap">
+          <AiOutlineForm className="mt-1 mr-2" />
           <a className="hover:underline">{data.name || 'N/A'}</a>
         </Link>
       )

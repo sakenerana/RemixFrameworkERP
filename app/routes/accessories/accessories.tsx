@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -9,6 +9,7 @@ import {
   Input,
   MenuProps,
   message,
+  Modal,
   Popconfirm,
   Space,
   Spin,
@@ -16,6 +17,7 @@ import {
   TableColumnsType,
   TableProps,
   Tag,
+  Tooltip,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -24,16 +26,20 @@ import {
   AiOutlineEdit,
   AiOutlineExport,
   AiOutlineFileExclamation,
+  AiOutlineForm,
   AiOutlineImport,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
+import { TiWarning } from "react-icons/ti";
+import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
 
 export default function AccesoriessRoute() {
   const [data, setData] = useState<Accessories[]>([]);
+  const [dataRow, setDataRow] = useState<Accessories>();
   const [loading, setLoading] = useState(false);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -41,7 +47,15 @@ export default function AccesoriessRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Accessories[]>([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    setRefreshKey(prev => prev + 1); // Triggers data refresh
+  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -95,23 +109,30 @@ export default function AccesoriessRoute() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  const handleCheckinButton = () => { };
+  const handleCheckoutButton = (data: Accessories) => {
+    setIsModalOpen(true);
+    setDataRow(data);
+  };
 
-  const handleCheckoutButton = () => { };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
     "Asset Category": true,
     "Company": false,
-    "Model No.": true,
     "Manufacturer": false,
     "Supplier": false,
-    "Location": true,
-    "Min. QTY": true,
-    "Total": true,
-    "Avail": false,
-    "Checked Out": false,
+    "Location": false,
+    "Min. QTY": false,
+    "Qty": true,
+    "Checked Out No.": true,
     "Purchase Date": false,
     "Purchase Cost": true,
     "Order Number": false,
@@ -125,8 +146,13 @@ export default function AccesoriessRoute() {
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-      render: (text) => text || 'N/A'
+      width: 350,
+      render: (_, data) => (
+        <Link to={`/inventory/accessories/checkedout/${data.id}`} className="flex flex-wrap">
+          <AiOutlineForm className="mt-1 mr-2" />
+          <a className="hover:underline">{data.name || 'N/A'}</a>
+        </Link>
+      )
     },
     {
       title: "Asset Category",
@@ -139,12 +165,6 @@ export default function AccesoriessRoute() {
       dataIndex: "companies",
       width: 120,
       render: (companies) => companies?.name || 'N/A'
-    },
-    {
-      title: "Model No.",
-      dataIndex: "model_no",
-      width: 120,
-      render: (text) => text || 'N/A'
     },
     {
       title: "Manufacturer",
@@ -168,25 +188,33 @@ export default function AccesoriessRoute() {
       title: "Min. QTY",
       dataIndex: "min_qty",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
-      title: "Total",
+      title: "Qty",
       dataIndex: "qty",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
-      title: "Avail",
-      dataIndex: "total",
+      title: "Checked Out No.",
+      dataIndex: "checkedout_no",
       width: 120,
-      render: (text) => text || 'N/A'
-    },
-    {
-      title: "Checked Out",
-      dataIndex: "checked_out",
-      width: 120,
-      render: (text) => text || 'N/A'
+      render: (_, data) => (
+        <div>
+          {data.accessories_check[0]?.count >= data.min_qty ? (
+            // If count meets or exceeds minimum quantity
+            <span className="flex flex-wrap text-green-600">
+              (<TiWarning className="mt-1 text-orange-500" />) {data.accessories_check[0].count}
+            </span>
+          ) : (
+            // If count is below minimum quantity
+            <span className="text-green-600">
+              {data.accessories_check[0]?.count || 0}
+            </span>
+          )}
+        </div>
+      )
     },
     {
       title: "Purchase Date",
@@ -198,7 +226,10 @@ export default function AccesoriessRoute() {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) =>
+        text !== null && text !== undefined
+          ? `₱${parseFloat(text).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : 'N/A'
     },
     {
       title: "Order Number",
@@ -288,43 +319,37 @@ export default function AccesoriessRoute() {
       dataIndex: "checkout",
       width: 120,
       fixed: "right",
-      render: (_, data) => (
-        <div>
-          {data.check_status == "checkin" ? (
+      render: (_, data) => {
+        const currentCount = data?.accessories_check?.[0]?.count || 0;
+        const totalQty = data?.qty || 0;
+        const isDisabled = currentCount >= totalQty;
+
+        return (
+          <div>
             <Popconfirm
-              title="Do you want to checkin?"
-              description="Are you sure to checkin this request?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckinButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
-                color="#108ee9"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
+              disabled={isDisabled}
               title="Do you want to checkout?"
-              description="Are you sure to checkout this request?"
+              description="Are you sure to checkout this accessories?"
               okText="Yes"
               cancelText="No"
-              onConfirm={() => handleCheckoutButton()}
+              onConfirm={() => handleCheckoutButton(data)}
             >
               <Tag
-                className="cursor-pointer"
+                className={`cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-                color="#f50"
+                color={isDisabled ? "#d9d9d9" : "#3fd168"} // Gray when disabled, green when enabled
               >
-                {data.check_status}
+                {isDisabled ? 'Completed' : 'Check-out'}
               </Tag>
             </Popconfirm>
-          )}
-        </div>
-      ),
+            {isDisabled && (
+              <Tooltip title="All items have been checked out">
+                <InfoCircleOutlined className="ml-2 text-gray-400" />
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -403,6 +428,18 @@ export default function AccesoriessRoute() {
 
   return (
     <div>
+      <Modal
+        style={{ top: 20 }}
+        width={420}
+        title="Check-out Accessory"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer=""
+      >
+        <Checkout stateData={dataRow} onSuccess={handleSuccess} onClose={() => { setIsModalOpen(false), fetchData() }}></Checkout>
+      </Modal>
       <div className="flex pb-5 justify-between">
         <Breadcrumb
           items={[

@@ -98,7 +98,6 @@ export default function CategoriesRoutes() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
     "Type": true,
-    "Qty": true,
     "Notes": false,
     "Status": true,
     "Actions": true,
@@ -116,12 +115,6 @@ export default function CategoriesRoutes() {
       dataIndex: "type",
       width: 120,
       render: (text) => text || 'N/A'
-    },
-    {
-      title: "Qty",
-      dataIndex: "qty",
-      width: 120,
-      render: (text) => text || 0
     },
     {
       title: "Notes",

@@ -72,11 +72,10 @@ export default function DeletedComponents() {
         "Model No.": false,
         "Manufacturer": false,
         "Supplier": false,
-        "Location": true,
-        "Min. QTY": true,
-        "Total": true,
-        "Avail": false,
-        "Checked Out": false,
+        "Location": false,
+        "Min. QTY": false,
+        "Qty": true,
+        "Checked Out No.": true,
         "Purchase Date": false,
         "Purchase Cost": true,
         "Order Number": false,
@@ -90,7 +89,7 @@ export default function DeletedComponents() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 120,
+            width: 350,
             render: (text) => text || 'N/A'
         },
         {
@@ -136,22 +135,18 @@ export default function DeletedComponents() {
             render: (text) => text || 'N/A'
         },
         {
-            title: "Total",
+            title: "Qty",
             dataIndex: "qty",
             width: 120,
             render: (text) => text || 'N/A'
         },
         {
-            title: "Avail",
-            dataIndex: "total",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
-            title: "Checked Out",
-            dataIndex: "checked_out",
-            width: 120,
-            render: (text) => text || 'N/A'
+            title: "Checked Out No.",
+            dataIndex: "checkedout_no",
+            width: 350,
+            render: (_, data) => (
+                <div>{data.components_check[0].count}</div>
+            )
         },
         {
             title: "Purchase Date",
@@ -163,7 +158,10 @@ export default function DeletedComponents() {
             title: "Purchase Cost",
             dataIndex: "purchase_cost",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) =>
+                text !== null && text !== undefined
+                    ? `₱${parseFloat(text).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    : 'N/A'
         },
         {
             title: "Order Number",

@@ -70,4 +70,17 @@ export interface PredefinedKit {
         deleted_at?: string | null;
         // Add other fields from your predefined_check table
     };
+
+    categories: {
+        created_at?: string;
+        updated_at?: string | null;
+        deleted_at?: string | null;
+        department_id?: number;
+        id: number;
+        name: string;
+        notes: string;
+        qty: number;
+        status_id: number;
+        type: string;
+    }
 }

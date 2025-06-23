@@ -241,33 +241,33 @@ export default function InventoryLayoutIndex() {
         //   icon: <FcComboChart />,
         //   label: <Link to="/inventory/reports/audit-log">Audit Log</Link>,
         // },
-        {
-          key: "3.4",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/depreciation-report">
-              Depreciation Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.5",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/licenses-report">
-              License Report
-            </Link>
-          ),
-        },
-        {
-          key: "3.6",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/asset-maintenance-report">
-              Asset Maitenance Report
-            </Link>
-          ),
-        },
+        // {
+        //   key: "3.4",
+        //   icon: <FcComboChart />,
+        //   label: (
+        //     <Link to="/inventory/reports/depreciation-report">
+        //       Depreciation Report
+        //     </Link>
+        //   ),
+        // },
+        // {
+        //   key: "3.5",
+        //   icon: <FcComboChart />,
+        //   label: (
+        //     <Link to="/inventory/reports/licenses-report">
+        //       License Report
+        //     </Link>
+        //   ),
+        // },
+        // {
+        //   key: "3.6",
+        //   icon: <FcComboChart />,
+        //   label: (
+        //     <Link to="/inventory/reports/asset-maintenance-report">
+        //       Asset Maitenance Report
+        //     </Link>
+        //   ),
+        // },
         // {
         //   key: "3.7",
         //   icon: <FcComboChart />,
@@ -277,15 +277,15 @@ export default function InventoryLayoutIndex() {
         //     </Link>
         //   ),
         // },
-        {
-          key: "3.8",
-          icon: <FcComboChart />,
-          label: (
-            <Link to="/inventory/reports/accessory-report">
-              Accessory Report
-            </Link>
-          ),
-        },
+        // {
+        //   key: "3.8",
+        //   icon: <FcComboChart />,
+        //   label: (
+        //     <Link to="/inventory/reports/accessory-report">
+        //       Accessory Report
+        //     </Link>
+        //   ),
+        // },
       ],
     },
     // {
@@ -355,7 +355,7 @@ export default function InventoryLayoutIndex() {
                     className=""
                     style={{ top: 20 }}
                     width={600}
-                    title={<p className="flex flex-wrap gap-2"><FcSettings className="mt-1" /> Settings</p> }
+                    title={<p className="flex flex-wrap gap-2"><FcSettings className="mt-1" /> Settings</p>}
                     closable={{ "aria-label": "Custom Close Button" }}
                     open={isModalOpen}
                     onOk={handleOk}

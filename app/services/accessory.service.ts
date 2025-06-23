@@ -14,6 +14,17 @@ export const AccessoryService = {
     return data[0]
   },
 
+  // Create
+  async createPostAccessoriesCheck(postData: Accessories) {
+    const { data, error } = await supabase
+      .from('accessories_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -30,7 +41,18 @@ export const AccessoryService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('accessories')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        accessories_check:accessories_check!accessory_id(
+        count
+      )
+        `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -40,10 +62,35 @@ export const AccessoryService = {
   },
 
   // Read (multiple)
+  async getAllChecked(departmentID: number, accessory_id: number) {
+    const { data, error } = await supabase
+      .from('accessories_check')
+      .select(`*, accessories(*)`)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('accessory_id', accessory_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('accessories')
-      .select('*, status_labels(*), departments(*), companies(*), manufacturers(*), suppliers(*), categories(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        companies(*), 
+        manufacturers(*), 
+        suppliers(*), 
+        categories(*), 
+        locations(*),
+        accessories_check:accessories_check!accessory_id(
+        count
+      )
+        `)
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -101,9 +148,9 @@ export const AccessoryService = {
   },
 
   // Delete
-  async deletePost(id: Accessories) {
+  async deleteAccessoriesCheck(id: number) {
     const { error } = await supabase
-      .from('accessories')
+      .from('accessories_check')
       .delete()
       .eq('id', id)
 

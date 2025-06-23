@@ -4,6 +4,7 @@ import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, messag
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
+import { TiWarning } from "react-icons/ti";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
@@ -69,14 +70,12 @@ export default function DeletedAccessory() {
         "Name": true,
         "Asset Category": true,
         "Company": false,
-        "Model No.": true,
         "Manufacturer": false,
         "Supplier": false,
-        "Location": true,
-        "Min. QTY": true,
-        "Total": true,
-        "Avail": false,
-        "Checked Out": false,
+        "Location": false,
+        "Min. QTY": false,
+        "Qty": true,
+        "Checked Out No.": true,
         "Purchase Date": false,
         "Purchase Cost": true,
         "Order Number": false,
@@ -106,12 +105,6 @@ export default function DeletedAccessory() {
             render: (companies) => companies?.name || 'N/A'
         },
         {
-            title: "Model No.",
-            dataIndex: "model_no",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
             title: "Manufacturer",
             dataIndex: "manufacturers",
             width: 120,
@@ -133,25 +126,33 @@ export default function DeletedAccessory() {
             title: "Min. QTY",
             dataIndex: "min_qty",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) => text || 0
         },
         {
-            title: "Total",
+            title: "Qty",
             dataIndex: "qty",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) => text || 0
         },
         {
-            title: "Avail",
-            dataIndex: "total",
+            title: "Checked Out No.",
+            dataIndex: "checkedout_no",
             width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
-            title: "Checked Out",
-            dataIndex: "checked_out",
-            width: 120,
-            render: (text) => text || 'N/A'
+            render: (_, data) => (
+                <div>
+                    {data.accessories_check[0]?.count >= data.min_qty ? (
+                        // If count meets or exceeds minimum quantity
+                        <span className="flex flex-wrap text-green-600">
+                            (<TiWarning className="mt-1 text-orange-500" />) {data.accessories_check[0].count}
+                        </span>
+                    ) : (
+                        // If count is below minimum quantity
+                        <span className="text-green-600">
+                            {data.accessories_check[0]?.count || 0}
+                        </span>
+                    )}
+                </div>
+            )
         },
         {
             title: "Purchase Date",
@@ -163,7 +164,10 @@ export default function DeletedAccessory() {
             title: "Purchase Cost",
             dataIndex: "purchase_cost",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) =>
+                text !== null && text !== undefined
+                    ? `₱${parseFloat(text).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    : 'N/A'
         },
         {
             title: "Order Number",

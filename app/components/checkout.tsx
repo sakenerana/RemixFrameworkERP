@@ -2,8 +2,10 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineSend } from "react-icons/ai";
+import { AccessoryService } from "~/services/accessory.service";
+import { ComponentService } from "~/services/component.service";
+import { ConsumableService } from "~/services/consumable.service";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
-import { PredefinedKit } from "~/types/predefined_kit.type";
 const { TextArea } = Input;
 
 interface CheckoutProps {
@@ -37,21 +39,73 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
         try {
             const values = await form.validateFields();
 
-            const allValues = {
-                ...values,
-                status_id: 1,
-                user_id: isUserID,
-                department_id: Number(isDepartmentID),
-                predefined_id: stateData.id
-            };
+
+            if (stateData.categories && stateData.categories.type === "Component") {
+                var allValues = {
+                    ...values,
+                    status_id: 1,
+                    user_id: isUserID,
+                    department_id: Number(isDepartmentID),
+                    component_id: stateData.id,
+                };
+            } else if (stateData.categories && stateData.categories.type === "Consumable") {
+                var allValues = {
+                    ...values,
+                    status_id: 1,
+                    user_id: isUserID,
+                    department_id: Number(isDepartmentID),
+                    consumable_id: stateData.id,
+                };
+            } else if (stateData.categories && stateData.categories.type === "Accessory") {
+                var allValues = {
+                    ...values,
+                    status_id: 1,
+                    user_id: isUserID,
+                    department_id: Number(isDepartmentID),
+                    accessory_id: stateData.id,
+                };
+            } else {
+                var allValues = {
+                    ...values,
+                    status_id: 1,
+                    user_id: isUserID,
+                    department_id: Number(isDepartmentID),
+                    predefined_id: stateData.id,
+                };
+                // Runs otherwise (including if categories is missing)
+            }
 
             setLoading(true);
-            const { error } = await PredefinedKitService.createPostPredefinedCheck(allValues);
 
-            if (error) throw new Error(error.message);
+            if (stateData.categories && stateData.categories.type === "Component") {
+                const { error } = await ComponentService.createPostComponentCheck(allValues);
 
-            message.success("Record checked out successfully");
-            form.resetFields();
+                if (error) throw new Error(error.message);
+
+                message.success("Record component checked out successfully");
+                form.resetFields();
+            } else if (stateData.categories && stateData.categories.type === "Consumable") {
+                const { error } = await ConsumableService.createPostConsumableCheck(allValues);
+
+                if (error) throw new Error(error.message);
+
+                message.success("Record consumable checked out successfully");
+                form.resetFields();
+            } else if (stateData.categories && stateData.categories.type === "Accessory") {
+                const { error } = await AccessoryService.createPostAccessoriesCheck(allValues);
+
+                if (error) throw new Error(error.message);
+
+                message.success("Record accessory checked out successfully");
+                form.resetFields();
+            } else {
+                const { error } = await PredefinedKitService.createPostPredefinedCheck(allValues);
+
+                if (error) throw new Error(error.message);
+
+                message.success("Record predefined checked out successfully");
+                form.resetFields();
+            }
 
             // Notify parent component
             if (onSuccess) onSuccess();
@@ -80,6 +134,26 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             >
                 <Row gutter={24}>
                     <Col xs={24} sm={24}>
+                        {stateData.categories && stateData.categories.type === "Consumable" && (
+                            <Form.Item
+                                label="Item No."
+                                name="item_no"
+                                rules={[{ required: true, message: "Please input item number!" }]}
+                            >
+                                <Input placeholder="Item No." />
+                            </Form.Item>
+                        )}
+
+                        {stateData.categories && stateData.categories.type === "Accessory" && (
+                            <Form.Item
+                                label="Model No."
+                                name="model_no"
+                                rules={[{ required: true, message: "Please input model number!" }]}
+                            >
+                                <Input placeholder="Model No." />
+                            </Form.Item>
+                        )}
+
                         <Form.Item
                             label="Name/Username"
                             name="name"

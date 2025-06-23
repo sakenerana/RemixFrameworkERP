@@ -68,8 +68,6 @@ export default function DeletedDepreciation() {
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
         "Term": true,
-        "Assets": true,
-        "Asset Models": true,
         "Notes": false,
         "Status": true,
         "Actions": true,
@@ -87,18 +85,6 @@ export default function DeletedDepreciation() {
             dataIndex: "months",
             width: 120,
             render: (text) => text || 'N/A'
-        },
-        {
-            title: "Assets",
-            dataIndex: "assets",
-            width: 120,
-            render: (text) => text || 0
-        },
-        {
-            title: "Asset Models",
-            dataIndex: "asset_models",
-            width: 120,
-            render: (text) => text || 0
         },
         {
             title: "Notes",
