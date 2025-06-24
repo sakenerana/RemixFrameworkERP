@@ -9,6 +9,7 @@ const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
 interface Item {
   key: string;
+  id: number;
   product_key: string;
 }
 
@@ -97,6 +98,7 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 
 interface DataType {
   key: React.Key;
+  id: number;
   product_key: string;
 }
 
@@ -168,6 +170,7 @@ const ProductKey: React.FC<ProductKeyProps> = ({ onDataChange, initialKeys = [],
   const handleAdd = () => {
     const newData: DataType = {
       key: count,
+      id: count,
       product_key: `Input Product Key ${count}`,
     };
     setDataSource([...dataSource, newData]);

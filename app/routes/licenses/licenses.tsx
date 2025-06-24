@@ -24,11 +24,13 @@ import {
   AiOutlineEdit,
   AiOutlineExport,
   AiOutlineFileExclamation,
+  AiOutlineForm,
   AiOutlineImport,
   AiOutlinePlus,
   AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
+import { TiWarning } from "react-icons/ti";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
@@ -36,6 +38,7 @@ import { License } from "~/types/license.type";
 
 export default function LicensesRoute() {
   const [data, setData] = useState<License[]>([]);
+  const [dataRow, setDataRow] = useState<License>();
   const [loading, setLoading] = useState(false);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -43,7 +46,15 @@ export default function LicensesRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<License[]>([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    setRefreshKey(prev => prev + 1); // Triggers data refresh
+  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -97,10 +108,6 @@ export default function LicensesRoute() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  const handleCheckinButton = () => { };
-
-  const handleCheckoutButton = () => { };
-
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
@@ -116,9 +123,9 @@ export default function LicensesRoute() {
     "Purchase Cost": false,
     "Purchase Date": false,
     "Purchase Order Number": false,
-    "Min QTY": true,
-    "Total": true,
-    "Avail": true,
+    "Min QTY": false,
+    "Qty": true,
+    "Checked Out No.": true,
     "Depreciation": false,
     "Notes": false,
     "Status": true,
@@ -130,8 +137,13 @@ export default function LicensesRoute() {
     {
       title: "Name",
       dataIndex: "name",
-      width: 120,
-      render: (text) => text || 'N/A'
+      width: 350,
+      render: (_, data) => (
+        <Link to={`/inventory/licenses/product-key/${data.id}`} className="flex flex-wrap">
+          <AiOutlineForm className="mt-1 mr-2" />
+          <a className="hover:underline">{data.name || 'N/A'}</a>
+        </Link>
+      )
     },
     {
       title: "Expiration Date",
@@ -209,19 +221,33 @@ export default function LicensesRoute() {
       title: "Min QTY",
       dataIndex: "min_qty",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
-      title: "Total",
+      title: "Qty",
       dataIndex: "seats",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text || 0
     },
     {
-      title: "Avail",
-      dataIndex: "avail",
+      title: "Checked Out No.",
+      dataIndex: "checkedout_no",
       width: 120,
-      render: (text) => text || 0
+      render: (_, data) => (
+        <div>
+          {data.license_check[0]?.count >= data.min_qty ? (
+            // If count meets or exceeds minimum quantity
+            <span className="flex flex-wrap text-green-600">
+              (<TiWarning className="mt-1 text-orange-500" />) {data.license_check[0].count}
+            </span>
+          ) : (
+            // If count is below minimum quantity
+            <span className="text-green-600">
+              {data.license_check[0]?.count || 0}
+            </span>
+          )}
+        </div>
+      )
     },
     {
       title: "Depreciation",
@@ -303,49 +329,6 @@ export default function LicensesRoute() {
               </Tag>
             )}
           </Popconfirm>
-        </div>
-      ),
-    },
-    {
-      title: "Checkout",
-      dataIndex: "checkout",
-      width: 120,
-      fixed: "right",
-      render: (_, data) => (
-        <div>
-          {data.check_status == "checkin" ? (
-            <Popconfirm
-              title="Do you want to checkin?"
-              description="Are you sure to checkin this request?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckinButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
-                color="#108ee9"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title="Do you want to checkout?"
-              description="Are you sure to checkout this request?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckoutButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-                color="#f50"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          )}
         </div>
       ),
     },

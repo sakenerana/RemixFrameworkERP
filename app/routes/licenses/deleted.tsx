@@ -4,6 +4,7 @@ import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, messag
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
+import { TiWarning } from "react-icons/ti";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
 import { License } from "~/types/license.type";
@@ -78,11 +79,10 @@ export default function DeletedLicense() {
         "Order Number": false,
         "Purchase Cost": false,
         "Purchase Date": false,
-        "Purchase Order": false,
         "Purchase Order Number": false,
-        "Min QTY": true,
-        "Total": true,
-        "Avail": true,
+        "Min QTY": false,
+        "Qty": true,
+        "Checked Out No.": true,
         "Depreciation": false,
         "Notes": false,
         "Status": true,
@@ -95,26 +95,31 @@ export default function DeletedLicense() {
             title: "Name",
             dataIndex: "name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Expiration Date",
             dataIndex: "expiration_date",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Termination Date",
             dataIndex: "termination_date",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Licensed to Email",
             dataIndex: "license_email",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Licensed to Name",
             dataIndex: "license_name",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Manufacturer",
@@ -144,41 +149,57 @@ export default function DeletedLicense() {
             title: "Order Number",
             dataIndex: "order_number",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Purchase Cost",
             dataIndex: "purchase_cost",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
             width: 120,
-        },
-        {
-            title: "Purchase Order",
-            dataIndex: "purchase_order",
-            width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Purchase Order Number",
             dataIndex: "purchase_order_no",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Min QTY",
             dataIndex: "min_qty",
             width: 120,
+            render: (text) => text || 0
         },
         {
-            title: "Total",
+            title: "Qty",
             dataIndex: "seats",
             width: 120,
+            render: (text) => text || 0
         },
         {
-            title: "Avail",
-            dataIndex: "avail",
+            title: "Checked Out No.",
+            dataIndex: "checkedout_no",
             width: 120,
+            render: (_, data) => (
+                <div>
+                    {data.license_check[0]?.count >= data.min_qty ? (
+                        // If count meets or exceeds minimum quantity
+                        <span className="flex flex-wrap text-green-600">
+                            (<TiWarning className="mt-1 text-orange-500" />) {data.license_check[0].count}
+                        </span>
+                    ) : (
+                        // If count is below minimum quantity
+                        <span className="text-green-600">
+                            {data.license_check[0]?.count || 0}
+                        </span>
+                    )}
+                </div>
+            )
         },
         {
             title: "Depreciation",
@@ -190,6 +211,7 @@ export default function DeletedLicense() {
             title: "Notes",
             dataIndex: "notes",
             width: 120,
+            render: (text) => text || 'N/A'
         },
         {
             title: "Status",

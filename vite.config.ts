@@ -175,6 +175,11 @@ export default defineConfig({
                 route("deleted-license", "routes/licenses/deleted.tsx", {
                   index: true,
                 });
+                route(
+                  "product-key/:id",
+                  "routes/licenses/product_key.tsx",
+                  { index: true }
+                );
               });
               route("accessories", "routes/accessories/route.tsx", () => {
                 route("", "routes/accessories/accessories.tsx", {

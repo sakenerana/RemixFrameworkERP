@@ -16,6 +16,17 @@ export const LicenseService = {
     return data[0]
   },
 
+  // Create
+  async createPostLicenseCheck(postData: License) {
+    const { data, error } = await supabase
+      .from('license_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -32,7 +43,18 @@ export const LicenseService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('licenses')
-      .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        manufacturers(*), 
+        depreciations(*), 
+        suppliers(*), 
+        companies(*), 
+        categories(*),
+        license_check:license_check!license_id(
+        count
+      )
+        `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -42,10 +64,60 @@ export const LicenseService = {
   },
 
   // Read (multiple)
+  async getAllChecked(departmentID: number, license_id: number) {
+    const { data, error } = await supabase
+      .from('license_check')
+      .select(`*, licenses(*)`)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('license_id', license_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
+  async getAllProductKeyByID(departmentID: number, license_id: number) {
+    const { data, error } = await supabase
+      .from('licenses')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        manufacturers(*), 
+        depreciations(*), 
+        suppliers(*), 
+        companies(*), 
+        categories(*),
+        license_check:license_check!license_id(
+        *
+      )
+        `)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('id', license_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('licenses')
-      .select('*, status_labels(*), departments(*), manufacturers(*), depreciations(*), suppliers(*), companies(*), categories(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        manufacturers(*), 
+        depreciations(*), 
+        suppliers(*), 
+        companies(*), 
+        categories(*),
+        license_check:license_check!license_id(
+        count
+      )
+        `)
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -103,9 +175,9 @@ export const LicenseService = {
   },
 
   // Delete
-  async deletePost(id: License) {
+  async deleteLicenseCheck(id: number) {
     const { error } = await supabase
-      .from('licenses')
+      .from('license_check')
       .delete()
       .eq('id', id)
 

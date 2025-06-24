@@ -67,7 +67,6 @@ export default function Checkedout() {
             setLoading(true);
             const dataFetch = await AccessoryService.getAllChecked(isDepartmentID, Number(id));
             setData(dataFetch); // Works in React state
-            console.log("fuck", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {

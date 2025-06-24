@@ -5,6 +5,7 @@ import { AiOutlineSend } from "react-icons/ai";
 import { AccessoryService } from "~/services/accessory.service";
 import { ComponentService } from "~/services/component.service";
 import { ConsumableService } from "~/services/consumable.service";
+import { LicenseService } from "~/services/license.service";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 const { TextArea } = Input;
 
@@ -64,6 +65,15 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
                     department_id: Number(isDepartmentID),
                     accessory_id: stateData.id,
                 };
+            } else if (stateData.categories && stateData.categories.type === "License") {
+                var allValues = {
+                    ...values,
+                    status_id: 1,
+                    user_id: isUserID,
+                    department_id: Number(isDepartmentID),
+                    license_id: stateData.license_id,
+                    product_key: stateData.product_key,
+                };
             } else {
                 var allValues = {
                     ...values,
@@ -98,6 +108,13 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
 
                 message.success("Record accessory checked out successfully");
                 form.resetFields();
+            } else if (stateData.categories && stateData.categories.type === "License") {
+                const { error } = await LicenseService.createPostLicenseCheck(allValues);
+
+                if (error) throw new Error(error.message);
+
+                message.success("Record license checked out successfully");
+                form.resetFields();
             } else {
                 const { error } = await PredefinedKitService.createPostPredefinedCheck(allValues);
 
@@ -121,6 +138,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
     return (
         <div>
             <p><span className="font-bold">Reference ID:</span> {stateData.id}</p>
+            {stateData.categories && stateData.categories.type === "License" && (
+                <p><span className="font-bold">Product Key:</span> {stateData.product_key}</p>
+            )}
             <p><span className="font-bold">Reference Name:</span> {stateData.name}</p>
             <Form
                 className="mt-5"
@@ -173,7 +193,7 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input name!",
+                                    message: "Please select checkout date!",
                                 },
                             ]}
                         >
