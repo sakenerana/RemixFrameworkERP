@@ -9,8 +9,10 @@ const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
 interface Item {
   key: string;
+  id: number;
   asset_tag: string;
   serial: string;
+  status_type: string;
 }
 
 interface EditableRowProps {
@@ -98,6 +100,7 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 
 interface DataType {
   key: React.Key;
+  id: number;
   asset_tag: string;
   serial: string;
   status_type: string;
@@ -170,6 +173,7 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
         <Select
           placeholder="Select Status"
           className="w-full"
+          // defaultValue={record.status_type || "Ready to Deploy"}
           value={record.status_type} // Controlled component
           onChange={(value) => handleStatusChange(value, record.key)}
         >
@@ -205,6 +209,7 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
   const handleAdd = () => {
     const newData: DataType = {
       key: count,
+      id: count,
       asset_tag: `Input Asset Tag ${count}`,
       serial: `Input Serial ${count}`,
       status_type: ``,

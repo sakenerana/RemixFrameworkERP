@@ -157,15 +157,17 @@ export default defineConfig({
                 route("", "routes/assets/assets.tsx", {
                   index: true,
                 });
-                route("audit-assets", "routes/assets/assets.audit.tsx", {
-                  index: true,
-                });
                 route("form-asset/:id?", "routes/assets/assets.create.tsx", {
                   index: true,
                 });
                 route("deleted-assets", "routes/assets/assets.deleted.tsx", {
                   index: true,
                 });
+                route(
+                  "asset-tag/:id",
+                  "routes/assets/asset_tag.tsx",
+                  { index: true }
+                );
               });
               route("licenses", "routes/licenses/route.tsx", () => {
                 route("", "routes/licenses/licenses.tsx", { index: true });

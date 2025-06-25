@@ -130,7 +130,6 @@ export default function LicensesRoute() {
     "Notes": false,
     "Status": true,
     "Actions": true,
-    "Checkout": true,
   });
 
   const columns: TableColumnsType<License> = [
@@ -203,7 +202,10 @@ export default function LicensesRoute() {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) =>
+        text !== null && text !== undefined
+          ? `₱${parseFloat(text).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : 'N/A'
     },
     {
       title: "Purchase Date",

@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -22,18 +22,19 @@ import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
-  AiOutlineExport,
   AiOutlineFileExclamation,
-  AiOutlineImport,
+  AiOutlineForm,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
+import { TiWarning } from "react-icons/ti";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
 
 export default function AssetsRoute() {
   const [data, setData] = useState<Asset[]>([]);
+  const [dataRow, setDataRow] = useState<Asset>();
   const [loading, setLoading] = useState(false);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -41,7 +42,15 @@ export default function AssetsRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Asset[]>([]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    setRefreshKey(prev => prev + 1); // Triggers data refresh
+  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -95,29 +104,34 @@ export default function AssetsRoute() {
 
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  const handleCheckinButton = () => { };
-
-  const handleCheckoutButton = () => { };
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Asset Name": true,
     "Model": true,
     "Location": true,
+    "Order Number": false,
     "Purchase Cost": false,
-    "Current Value": false,
+    "Purchase Date": false,
+    "Min QTY": false,
+    "Qty": true,
+    "Checked Out No.": true,
     "Notes": false,
     "Status": true,
     "Actions": true,
-    "Checkout": true,
   });
 
   const columns: TableColumnsType<Asset> = [
     {
       title: "Asset Name",
       dataIndex: "name",
-      width: 120,
-      render: (text) => text || 'N/A'
+      width: 350,
+      render: (_, data) => (
+        <Link to={`/inventory/assets/asset-tag/${data.id}`} className="flex flex-wrap">
+          <AiOutlineForm className="mt-1 mr-2" />
+          <a className="hover:underline">{data.name || 'N/A'}</a>
+        </Link>
+      )
     },
     {
       title: "Model",
@@ -132,8 +146,35 @@ export default function AssetsRoute() {
       render: (locations) => locations?.name || 'N/A'
     },
     {
+      title: "Order Number",
+      dataIndex: "order_no",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
       title: "Purchase Cost",
       dataIndex: "purchase_cost",
+      width: 120,
+      render: (text) =>
+        text !== null && text !== undefined
+          ? `₱${parseFloat(text).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : 'N/A'
+    },
+    {
+      title: "Purchase Date",
+      dataIndex: "purchase_date",
+      width: 120,
+      render: (text) => text || 'N/A'
+    },
+    {
+      title: "Min QTY",
+      dataIndex: "min_qty",
+      width: 120,
+      render: (text) => text || 0
+    },
+    {
+      title: "Qty",
+      dataIndex: "qty",
       width: 120,
       render: (text) => text || 0
     },
@@ -142,6 +183,26 @@ export default function AssetsRoute() {
       dataIndex: "current_value",
       width: 120,
       render: (text) => text || 0
+    },
+    {
+      title: "Checked Out No.",
+      dataIndex: "checkedout_no",
+      width: 120,
+      render: (_, data) => (
+        <div>
+          {data.assets_check[0]?.count >= data.min_qty ? (
+            // If count meets or exceeds minimum quantity
+            <span className="flex flex-wrap text-green-600">
+              (<TiWarning className="mt-1 text-orange-500" />) {data.assets_check[0].count}
+            </span>
+          ) : (
+            // If count is below minimum quantity
+            <span className="text-green-600">
+              {data.assets_check[0]?.count || 0}
+            </span>
+          )}
+        </div>
+      )
     },
     {
       title: "Notes",
@@ -217,49 +278,6 @@ export default function AssetsRoute() {
               </Tag>
             )}
           </Popconfirm>
-        </div>
-      ),
-    },
-    {
-      title: "Checkout",
-      dataIndex: "checkout",
-      width: 120,
-      fixed: "right",
-      render: (_, data) => (
-        <div>
-          {data.check_status == "checkin" ? (
-            <Popconfirm
-              title="Do you want to checkin?"
-              description="Are you sure to checkin this asset?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckinButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineImport className="float-left mt-1 mr-1" />}
-                color="#108ee9"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title="Do you want to checkout?"
-              description="Are you sure to checkout this asset?"
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => handleCheckoutButton()}
-            >
-              <Tag
-                className="cursor-pointer"
-                icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-                color="#f50"
-              >
-                {data.check_status}
-              </Tag>
-            </Popconfirm>
-          )}
         </div>
       ),
     },

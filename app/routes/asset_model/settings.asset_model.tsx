@@ -77,7 +77,6 @@ export default function AssetModelsRoutes() {
         "Name": true,
         "Model No": true,
         "Min Qty": true,
-        "Assets": true,
         "Category": true,
         "Manufacturer": true,
         "EOL": false,
@@ -105,12 +104,6 @@ export default function AssetModelsRoutes() {
             dataIndex: "min_qty",
             width: 120,
             render: (text) => text || 'N/A'
-        },
-        {
-            title: "Assets",
-            dataIndex: "assets",
-            width: 120,
-            render: (text) => text || 0
         },
         {
             title: "Category",

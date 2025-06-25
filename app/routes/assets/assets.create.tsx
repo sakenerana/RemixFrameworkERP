@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import AssetTag from "~/components/asset_tag";
@@ -87,7 +87,6 @@ export default function CreateAssets() {
     const handleAssetTagChange = (newData: any[]) => {
         setAssetTag(newData);
         // You can also do other things with the data here
-        // console.log("Updated product keys:", newData);
     };
 
     useMemo(() => {
@@ -256,6 +255,57 @@ export default function CreateAssets() {
                                     </Option>
                                 ))}
                             </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Order Number"
+                            name="order_no"
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Purchase Date"
+                            name="purchase_date"
+                        >
+                            <DatePicker className="w-full" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Purchase Cost"
+                            name="purchase_cost"
+                        >
+                            <Input type="number" suffix="PHP" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Qty"
+                            name="qty"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input seats!",
+                                },
+                            ]}
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Min QTY"
+                            name="min_qty"
+                        >
+                            <Input type="number" />
                         </Form.Item>
                     </Col>
 

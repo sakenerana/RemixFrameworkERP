@@ -344,7 +344,7 @@ export default function DashboardRoutes() {
             <Row gutter={16} className="pt-5">
                 <Col span={24}>
                     <div className="shadow-md">
-                        <Card title="Accounts Overview" variant="borderless">
+                        <Card title="Assets Overview" variant="borderless">
                             {loading && <Spin></Spin>}
                             {!loading &&
                                 <Table<Asset>

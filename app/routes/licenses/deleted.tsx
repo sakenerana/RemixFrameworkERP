@@ -87,7 +87,6 @@ export default function DeletedLicense() {
         "Notes": false,
         "Status": true,
         "Actions": true,
-        "Checkout": true,
     });
 
     const columns: TableColumnsType<License> = [

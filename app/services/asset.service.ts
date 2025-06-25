@@ -14,6 +14,17 @@ export const AssetService = {
     return data[0]
   },
 
+  // Create
+  async createPostAssetsCheck(postData: Asset) {
+    const { data, error } = await supabase
+      .from('assets_check')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
   // Read (single)
   async getPostById(id: number) {
     const { data, error } = await supabase
@@ -30,7 +41,15 @@ export const AssetService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('assets')
-      .select('*, status_labels(*), departments(*), asset_model(*), locations(*)')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        asset_model(*), 
+        locations(*),
+        assets_check:assets_check!assets_id(
+        count
+      )
+        `)
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -38,6 +57,37 @@ export const AssetService = {
     if (error) throw error
     return data
   },
+
+  // Read (multiple)
+  async getAllAssetTagByID(departmentID: number, assets_id: number) {
+    const { data, error } = await supabase
+      .from('assets')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        asset_model(
+        *,
+        manufacturers:manufacturers(*),
+        categories:categories(*),
+        depreciations:depreciations(*)
+      ),
+        assets_check:assets_check!assets_id(
+        *
+      )
+        `)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .eq('id', assets_id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+  // manufacturers(*), 
+  // depreciations(*), 
+  // suppliers(*), 
+  // companies(*), 
+  // categories(*),
 
   // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
@@ -101,9 +151,9 @@ export const AssetService = {
   },
 
   // Delete
-  async deletePost(id: Asset) {
+  async deleteAssetsCheck(id: number) {
     const { error } = await supabase
-      .from('assets')
+      .from('assets_check')
       .delete()
       .eq('id', id)
 

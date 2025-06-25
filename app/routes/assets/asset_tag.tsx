@@ -1,11 +1,10 @@
-import { HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { HomeOutlined, InfoCircleOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
     Button,
     Checkbox,
-    Col,
     Dropdown,
     Form,
     Input,
@@ -13,7 +12,6 @@ import {
     message,
     Modal,
     Popconfirm,
-    Row,
     Space,
     Spin,
     Table,
@@ -26,24 +24,24 @@ import { useEffect, useMemo, useState } from "react";
 import {
     AiOutlineExport,
     AiOutlineRollback,
-    AiOutlineSend,
 } from "react-icons/ai";
+import { RiCircleFill } from "react-icons/ri";
 import { FcRefresh } from "react-icons/fc";
 import { Link, useParams } from "react-router-dom";
 import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { LicenseService } from "~/services/license.service";
-import { License } from "~/types/license.type";
+import { AssetService } from "~/services/asset.service";
+import { Asset } from "~/types/asset.type";
 
-export default function ProductKey() {
+export default function AssetTag() {
     const { id } = useParams();
-    const [data, setData] = useState<License[]>([]);
-    const [dataRow, setDataRow] = useState<License>();
+    const [data, setData] = useState<Asset[]>([]);
+    const [dataRow, setDataRow] = useState<Asset>();
     const [loading, setLoading] = useState(false);
     const [isUserID, setUserID] = useState<any>();
     const [isDepartmentID, setDepartmentID] = useState<any>();
     const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<License[]>([]);
+    const [filteredData, setFilteredData] = useState<Asset[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -66,9 +64,8 @@ export default function ProductKey() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const dataFetch = await LicenseService.getAllProductKeyByID(isDepartmentID, Number(id));
+            const dataFetch = await AssetService.getAllAssetTagByID(isDepartmentID, Number(id));
             setData(dataFetch); // Works in React state
-            // console.log("FILTER", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -85,23 +82,22 @@ export default function ProductKey() {
         if (searchText.trim() === '') {
             fetchData();
         } else {
-            const filtered = data[0].product_key.filter((value: any) =>
-                // console.log("FILTER!!", value)
-                value.product_key.toLowerCase().includes(searchText.toLowerCase())
+            const filtered = data[0].asset_tag.filter((value: any) =>
+                value.asset_tag.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredData(filtered);
         }
     }, [searchText]); // Empty dependency array means this runs once on mount
 
-    const handleCheckoutButton = (values: License) => {
+    const handleCheckoutButton = (values: Asset) => {
         // Include your extra field
         const newValues = {
             ...values,
             status_id: 1,
             user_id: isUserID,
             department_id: Number(isDepartmentID),
-            categories: data[0].categories,
-            license_id: data[0].id,
+            categories: data[0].asset_model.categories,
+            assets_id: data[0].id,
             name: data[0].name
         };
 
@@ -120,26 +116,63 @@ export default function ProductKey() {
 
     // State for column visibility
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
-        "Product Key": true,
+        "Asset Tag": true,
+        "Serial": true,
+        "Status Type": true,
         "Checked Out To": true,
         "Checkout": true,
     });
 
-    const columns: TableColumnsType<License> = [
+    const columns: TableColumnsType<Asset> = [
         {
-            title: "Product Key",
-            dataIndex: "product_key",
-            width: 350,
+            title: "Asset Tag",
+            dataIndex: "asset_tag",
+            width: 120,
             render: (text) => text || 'N/A'
+        },
+        {
+            title: "Serial",
+            dataIndex: "serial",
+            width: 120,
+            render: (text) => text || 'N/A'
+        },
+        {
+            title: "Status Type",
+            dataIndex: "status_type",
+            width: 120,
+            render: (_, record, index) => {
+                return (
+                    <div>
+                        {record.status_type === 'Pending' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-orange-500 mt-1 mr-2" /> Pending</span>
+                        )}
+                        {record.status_type === 'Ready to Deploy' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-green-500 mt-1 mr-2" /> Ready to Deploy</span>
+                        )}
+                        {record.status_type === 'Archived' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-blue-500 mt-1 mr-2" /> Archived</span>
+                        )}
+                        {record.status_type === 'Broken - Not Fixable' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-red-500 mt-1 mr-2" /> Broken - Not Fixable</span>
+                        )}
+                        {record.status_type === 'Lost/Stolen' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-gray-500 mt-1 mr-2" /> Lost/Stolen</span>
+                        )}
+                        {record.status_type === 'Out for Repair' && (
+                            <span className="flex flex-wrap"><RiCircleFill className="text-yellow-500 mt-1 mr-2" /> Out for Repair</span>
+                        )}
+                    </div>
+                );
+            }
         },
         {
             title: "Checked Out To",
             dataIndex: "checkedout_to",
-            width: 350,
+            width: 120,
             render: (_, record) => {
-                // Find the corresponding item in data[0].license_check that matches this record
-                const checkedOutItem = data[0]?.license_check.find(
-                    item => item.product_key === record.product_key // or some other matching property
+                // Find the corresponding item in data[0].assets_check that matches this record
+                const checkedOutItem = data[0]?.assets_check.find(
+                    item => item.asset_tag === record.asset_tag // or some other matching property
                 );
                 return <div>{checkedOutItem?.name || 'N/A'}</div>;
             }
@@ -150,8 +183,8 @@ export default function ProductKey() {
             width: 120,
             fixed: "right",
             render: (_, record, index) => {
-                const currentName = data[0]?.license_check.find(
-                    item => item.product_key === record.product_key // or some other matching property
+                const currentName = data[0]?.assets_check.find(
+                    item => item.asset_tag === record.asset_tag // or some other matching property
                 );
                 const isDisabled = currentName !== undefined;
 
@@ -160,7 +193,7 @@ export default function ProductKey() {
                         <Popconfirm
                             disabled={isDisabled}
                             title="Do you want to checkout?"
-                            description="Are you sure to checkout this product key?"
+                            description="Are you sure to checkout this asset?"
                             okText="Yes"
                             cancelText="No"
                             onConfirm={() => handleCheckoutButton(record)}
@@ -210,7 +243,7 @@ export default function ProductKey() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<License>["onChange"] = (
+    const onChange: TableProps<Asset>["onChange"] = (
         pagination,
         filters,
         sorter,
@@ -224,7 +257,7 @@ export default function ProductKey() {
             <Modal
                 style={{ top: 20 }}
                 width={420}
-                title="Check-out License"
+                title="Check-out Asset"
                 closable={{ "aria-label": "Custom Close Button" }}
                 open={isModalOpen}
                 onOk={handleOk}
@@ -241,11 +274,11 @@ export default function ProductKey() {
                             title: <HomeOutlined />,
                         },
                         {
-                            title: "Licenses",
+                            title: "Assets",
                         },
                     ]}
                 />
-                <Link to={'/inventory/licenses'}>
+                <Link to={'/inventory/assets'}>
                     <Button icon={<AiOutlineRollback />}>Back</Button>
                 </Link>
             </div>
@@ -282,10 +315,10 @@ export default function ProductKey() {
             </div>
             {loading && <Spin></Spin>}
             {!loading && (
-                <Table<License>
+                <Table<Asset>
                     size="small"
                     columns={filteredColumns}
-                    dataSource={searchText ? filteredData : data[0]?.product_key}
+                    dataSource={searchText ? filteredData : data[0]?.asset_tag}
                     onChange={onChange}
                     className="pt-5"
                     bordered

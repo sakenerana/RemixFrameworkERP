@@ -2,7 +2,7 @@ import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetService } from "~/services/asset.service";
@@ -30,7 +30,7 @@ export default function DeletedAssets() {
         );
 
         if (error) throw message.error(error.message);
-        message.success("Record deactivated successfully");
+        message.success("Record activated successfully");
         fetchData();
     };
 
@@ -74,7 +74,6 @@ export default function DeletedAssets() {
         "Notes": false,
         "Status": true,
         "Actions": true,
-        "Checkout": true,
     });
 
     const columns: TableColumnsType<Asset> = [

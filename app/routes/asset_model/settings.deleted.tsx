@@ -69,7 +69,6 @@ export default function DeletedAssetModel() {
         "Name": true,
         "Model No": true,
         "Min Qty": true,
-        "Assets": true,
         "Category": true,
         "Manufacturer": true,
         "EOL": false,
@@ -95,12 +94,6 @@ export default function DeletedAssetModel() {
         {
             title: "Min Qty",
             dataIndex: "min_qty",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
-        {
-            title: "Assets",
-            dataIndex: "assets",
             width: 120,
             render: (text) => text || 'N/A'
         },
