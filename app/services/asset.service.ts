@@ -15,6 +15,17 @@ export const AssetService = {
   },
 
   // Create
+  async createReport(postData: any) {
+    const { data, error } = await supabase
+      .from('activity_report')
+      .insert(postData)
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
+  // Create
   async createPostAssetsCheck(postData: Asset) {
     const { data, error } = await supabase
       .from('assets_check')
@@ -53,6 +64,28 @@ export const AssetService = {
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Read (multiple)
+  async getAllPostsLimit(departmentID: number) {
+    const { data, error } = await supabase
+      .from('assets')
+      .select(`*, 
+        status_labels(*), 
+        departments(*), 
+        asset_model(*), 
+        locations(*),
+        assets_check:assets_check!assets_id(
+        count
+      )
+        `)
+      .eq('status_id', 1)
+      .eq('department_id', departmentID)
+      .order('created_at', { ascending: false })
+      .limit(5) // Add this line to limit to 500 records
 
     if (error) throw error
     return data

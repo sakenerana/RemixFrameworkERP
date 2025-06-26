@@ -1,4 +1,4 @@
-import { HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
@@ -13,15 +13,22 @@ import {
   Table,
   TableColumnsType,
   TableProps,
+  Tag,
 } from "antd";
-import { useEffect, useState } from "react";
-import { FcSearch } from "react-icons/fc";
+import { useEffect, useMemo, useState } from "react";
+import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlineUserAdd } from "react-icons/ai";
+import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { ActivityReportService } from "~/services/activity_report";
 import { ActivityReport } from "~/types/activity_report.type";
 
 export default function ActivityReportRoutes() {
   const [data, setData] = useState<ActivityReport[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
+
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<ActivityReport[]>([]);
 
@@ -29,8 +36,8 @@ export default function ActivityReportRoutes() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // const dataFetch = await AssetService.getAllPosts();
-      setData([]); // Works in React state
+      const dataFetch = await ActivityReportService.getAllPosts(isDepartmentID);
+      setData(dataFetch); // Works in React state
     } catch (error) {
       message.error("error");
     } finally {
@@ -38,64 +45,129 @@ export default function ActivityReportRoutes() {
     }
   };
 
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
+
   useEffect(() => {
-      if (searchText.trim() === '') {
-        fetchData();
-      } else {
-        // const filtered = data.filter(data =>
-        //   data.name?.toLowerCase().includes(searchText.toLowerCase())
-        // );
-        // setFilteredData(filtered);
-      }
-  
-    }, [searchText]); // Empty dependency array means this runs once on mount
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.item?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Date": true,
-    "Created By": true,
-    "Action Type": true,
+    "Name": true,
     "Type": true,
-    "Item": true,
-    "To": true,
-    "Notes": true,
+    "Action": true,
+    "Created By": true,
   });
 
   const columns: TableColumnsType<ActivityReport> = [
     {
       title: "Date",
-      dataIndex: "date",
-      width: 120
+      dataIndex: "created_at",
+      width: 120,
+      render: (text) => text ? new Date(text).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : 'N/A'
     },
     {
-      title: "Created By",
-      dataIndex: "created_by",
-      width: 120
-    },
-    {
-      title: "Action Type",
-      dataIndex: "action_type",
-      width: 120
+      title: "Name",
+      dataIndex: "item",
+      width: 120,
+      render: (text) => text || 'N/A'
     },
     {
       title: "Type",
       dataIndex: "type",
-      width: 120
+      width: 120,
+      render: (_, record) => {
+        return (
+          <>
+            {record.type === 'Assets' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-green-500 mt-1 mr-2" /> Assets</span>
+            )}
+            {record.type === 'Licenses' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-blue-900 mt-1 mr-2" /> Licenses</span>
+            )}
+            {record.type === 'Accessories' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-yellow-500 mt-1 mr-2" /> Accessories</span>
+            )}
+            {record.type === 'Consumables' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-orange-500 mt-1 mr-2" /> Consumables</span>
+            )}
+            {record.type === 'Components' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-blue-500 mt-1 mr-2" /> Components</span>
+            )}
+            {record.type === 'Predefined' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-gray-500 mt-1 mr-2" /> Predefined Kit</span>
+            )}
+          </>
+        );
+      }
     },
     {
-      title: "Item",
-      dataIndex: "item",
-      width: 120
+      title: "Action",
+      dataIndex: "actions",
+      width: 120,
+      render: (_, record) => {
+        return (
+          <>
+            {record.actions === 'Create' && (
+              <Tag color="blue">
+                <CheckCircleOutlined className="float-left mt-1 mr-1" /> Create
+              </Tag>
+            )}
+            {record.actions === 'Update' && (
+              <Tag color="orange">
+                <AiOutlineEdit className="float-left mt-1 mr-1" /> Update / Deactivate
+              </Tag>
+            )}
+            {record.actions === 'Delete' && (
+              <Tag color="red">
+                <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Deactivate
+              </Tag>
+            )}
+            {record.actions === 'Deactivate' && (
+              <Tag color="pink">
+                <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Deactivate
+              </Tag>
+            )}
+            {record.actions === 'Checkout' && (
+              <Tag color="green">
+                <CheckCircleOutlined className="float-left mt-1 mr-1" /> Checkout
+              </Tag>
+            )}
+            {record.actions === 'Checkin' && (
+              <Tag color="yellow">
+                <CheckCircleOutlined className="float-left mt-1 mr-1" /> Checkin
+              </Tag>
+            )}
+          </>
+        );
+      }
     },
     {
-      title: "To",
-      dataIndex: "to",
-      width: 120
-    },
-    {
-      title: "Notes",
-      dataIndex: "notes",
-      width: 120
+      title: "Created By",
+      dataIndex: "name",
+      width: 120,
+      render: (_, record) => {
+        return (
+          <span className="flex flex-wrap"><AiOutlineUserAdd className="mt-1 mr-2" /> {record.users.first_name} {record.users.last_name}</span>
+        );
+      }
     },
   ];
 

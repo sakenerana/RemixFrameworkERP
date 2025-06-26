@@ -21,6 +21,7 @@ import {
     TableProps,
     Tag,
     Tooltip,
+    Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -34,6 +35,7 @@ import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
 import { License } from "~/types/license.type";
+const { Paragraph, Text } = Typography;
 
 export default function ProductKey() {
     const { id } = useParams();
@@ -130,7 +132,13 @@ export default function ProductKey() {
             title: "Product Key",
             dataIndex: "product_key",
             width: 350,
-            render: (text) => text || 'N/A'
+            render: (_, record) => {
+                return (
+                    <>
+                        <Paragraph copyable>{record.product_key}</Paragraph>
+                    </>
+                );
+            }
         },
         {
             title: "Checked Out To",

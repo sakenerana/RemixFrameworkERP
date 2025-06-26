@@ -63,7 +63,7 @@ export default function DashboardRoutes() {
     const fetchDataAssetTable = async () => {
         try {
             setLoading(true);
-            const dataFetch = await AssetService.getAllPosts(isDepartmentID);
+            const dataFetch = await AssetService.getAllPostsLimit(isDepartmentID);
             setDataAssetTable(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -344,7 +344,7 @@ export default function DashboardRoutes() {
             <Row gutter={16} className="pt-5">
                 <Col span={24}>
                     <div className="shadow-md">
-                        <Card title="Assets Overview" variant="borderless">
+                        <Card title="LATEST (5) ASSETS OVERVIEW" variant="borderless">
                             {loading && <Spin></Spin>}
                             {!loading &&
                                 <Table<Asset>
@@ -352,6 +352,7 @@ export default function DashboardRoutes() {
                                     size={"small"}
                                     columns={columnsAsset}
                                     dataSource={dataAssetTable}
+                                    pagination={false}
                                 />}
                         </Card>
                     </div>

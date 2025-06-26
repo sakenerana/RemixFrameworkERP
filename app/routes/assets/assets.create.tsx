@@ -153,9 +153,11 @@ export default function CreateAssets() {
             } else {
                 // Create new record
                 setLoading(true);
+
                 const { error } = await AssetService.createPost(allValues);
 
                 if (error) throw message.error(error.message);
+
                 message.success("Record created successfully");
             }
 

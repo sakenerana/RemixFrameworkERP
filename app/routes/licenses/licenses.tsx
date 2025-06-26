@@ -148,7 +148,13 @@ export default function LicensesRoute() {
       title: "Expiration Date",
       dataIndex: "expiration_date",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text ? new Date(text).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : 'N/A'
     },
     {
       title: "Termination Date",
