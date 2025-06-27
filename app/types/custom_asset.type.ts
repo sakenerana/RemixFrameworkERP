@@ -1,13 +1,28 @@
 export interface CustomAsset {
     company_name?: string;
+    company_id?: number;
     location?: string;
+    location_id?: number;
     default_location?: string;
     department?: string;
+    department_id?: number;
     supplier?: string;
+    supplier_id?: number;
     model?: string;
+    asset_model_id?: number;
     manufacturer?: string;
+    manufacturer_id?: number;
     category?: string;
+    category_id?: number;
     status?: string;
+    status_id?: number;
+    status_name?: string;
+    status_created_at?: string;
+    status_labels?: {
+        created_at?: string;
+        id?: number;
+        name?: string;
+    }
     order_number?: string;
     pruchase_date_from?: string;
     pruchase_date_to?: string;

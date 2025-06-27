@@ -71,6 +71,7 @@ export default function DeletedAssetModel() {
         "Min Qty": true,
         "Category": true,
         "Manufacturer": true,
+        "Supplier": false,
         "EOL": false,
         "Depreciation": false,
         "Notes": false,
@@ -99,15 +100,21 @@ export default function DeletedAssetModel() {
         },
         {
             title: "Category",
-            dataIndex: "category_id",
+            dataIndex: "categories",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (categories) => categories?.name || 'N/A'
         },
         {
             title: "Manufacturer",
-            dataIndex: "manufacturer",
+            dataIndex: "manufacturers",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (manufacturers) => manufacturers?.name || 'N/A'
+        },
+        {
+            title: "Supplier",
+            dataIndex: "suppliers",
+            width: 120,
+            render: (suppliers) => suppliers?.name || 'N/A'
         },
         {
             title: "EOL",

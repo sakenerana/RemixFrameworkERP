@@ -79,6 +79,7 @@ export default function AssetModelsRoutes() {
         "Min Qty": true,
         "Category": true,
         "Manufacturer": true,
+        "Supplier": false,
         "EOL": false,
         "Depreciation": false,
         "Notes": false,
@@ -116,6 +117,12 @@ export default function AssetModelsRoutes() {
             dataIndex: "manufacturers",
             width: 120,
             render: (manufacturers) => manufacturers?.name || 'N/A'
+        },
+        {
+            title: "Supplier",
+            dataIndex: "suppliers",
+            width: 120,
+            render: (suppliers) => suppliers?.name || 'N/A'
         },
         {
             title: "EOL",

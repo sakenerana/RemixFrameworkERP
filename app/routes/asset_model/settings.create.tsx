@@ -7,10 +7,12 @@ import { AssetModelService } from "~/services/asset_model.service";
 import { CategoryService } from "~/services/category.service";
 import { DepreciationService } from "~/services/depreciation.service";
 import { ManufacturerService } from "~/services/manufacturer.service";
+import { SupplierService } from "~/services/supplier.service";
 import { AssetModel } from "~/types/asset_model.tpye";
 import { Category } from "~/types/category.type";
 import { Depreciation } from "~/types/depreciation.type";
 import { Manufacturer } from "~/types/manufacturer.type";
+import { Supplier } from "~/types/supplier.type";
 const { TextArea } = Input;
 
 export default function CreateAssetModel() {
@@ -25,6 +27,7 @@ export default function CreateAssetModel() {
 
     const [dataCategory, setDataCategory] = useState<Category[]>([]);
     const [dataManufacturer, setDataManufacturer] = useState<Manufacturer[]>([]);
+    const [dataSupplier, setDataSupplier] = useState<Supplier[]>([]);
     const [dataDepreciation, setDataDepreciation] = useState<Depreciation[]>([]);
     const { Option } = Select;
 
@@ -47,6 +50,19 @@ export default function CreateAssetModel() {
             setLoading(true);
             const dataFetchManufacturer = await ManufacturerService.getAllPosts(isDepartmentID);
             setDataManufacturer(dataFetchManufacturer); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch data from Supabase
+    const fetchDataSupplier = async () => {
+        try {
+            setLoading(true);
+            const dataFetchSupplier = await SupplierService.getAllPosts(isDepartmentID);
+            setDataSupplier(dataFetchSupplier); // Works in React state
         } catch (error) {
             message.error("error");
         } finally {
@@ -106,6 +122,7 @@ export default function CreateAssetModel() {
     useEffect(() => {
         fetchDataCategory();
         fetchDataManufacturer();
+        fetchDataSupplier();
         fetchDataDepreciation();
     }, []); // Empty dependency array means this runs once on mount
 
@@ -236,6 +253,21 @@ export default function CreateAssetModel() {
                         >
                             <Select placeholder="Select Manufacturer">
                                 {dataManufacturer.map((item: Manufacturer) => (
+                                    <Option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            label="Supplier"
+                            name="supplier_id"
+                        >
+                            <Select placeholder="Select Supplier">
+                                {dataSupplier.map((item: Supplier) => (
                                     <Option key={item.id} value={item.id}>
                                         {item.name}
                                     </Option>

@@ -30,7 +30,7 @@ export const AssetModelService = {
   async getAllPosts(departmentID: number) {
     const { data, error } = await supabase
       .from('asset_model')
-      .select('*, status_labels(*), departments(*), categories(*), manufacturers(*), depreciations(*)')
+      .select('*, status_labels(*), departments(*), categories(*), manufacturers(*), depreciations(*), suppliers(*)')
       .eq('status_id', 1)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })
@@ -56,7 +56,7 @@ export const AssetModelService = {
   async getAllPostsInactive(departmentID: number) {
     const { data, error } = await supabase
       .from('asset_model')
-      .select('*, status_labels(*), departments(*)')
+      .select('*, status_labels(*), departments(*), categories(*), manufacturers(*), depreciations(*), suppliers(*)')
       .eq('status_id', 2)
       .eq('department_id', departmentID)
       .order('created_at', { ascending: false })

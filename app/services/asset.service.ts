@@ -1,4 +1,5 @@
 import { Asset } from "~/types/asset.type"
+import { CustomAsset } from "~/types/custom_asset.type"
 import supabase from "~/utils/supabase.client"
 
 export const AssetService = {
@@ -116,11 +117,6 @@ export const AssetService = {
     if (error) throw error;
     return data;
   },
-  // manufacturers(*), 
-  // depreciations(*), 
-  // suppliers(*), 
-  // companies(*), 
-  // categories(*),
 
   // Read (multiple)
   async getAllPostsInactive(departmentID: number) {
@@ -133,6 +129,45 @@ export const AssetService = {
 
     if (error) throw error
     return data
+  },
+
+  async getAllPostsReport(postData: CustomAsset) {
+    // Build the base query
+    let query = supabase
+      .from('assets')
+      .select(`
+    id, 
+    created_at,
+    status_id,
+    users(*),
+    departments(*),
+    asset_model(*),
+    locations(*)
+  `)
+      .order('created_at', { ascending: false });
+
+    // Add conditional filters only if values exist
+    if (postData.status_id != null) query = query.eq('status_id', postData.status_id);
+    if (postData.department_id != null) query = query.eq('department_id', postData.department_id);
+    if (postData.location_id != null) query = query.eq('location_id', postData.location_id);
+    if (postData.asset_model_id != null) query = query.eq('asset_model_id', postData.asset_model_id);
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // Filter out null/undefined values from the returned data
+    const filteredData = data?.map(asset => {
+      const filteredAsset: Record<string, any> = {};
+      Object.entries(asset).forEach(([key, value]) => {
+        if (value != null) {
+          filteredAsset[key] = value;
+        }
+      });
+      return filteredAsset;
+    });
+
+    return filteredData || [];
   },
 
   async getTableCounts() {
