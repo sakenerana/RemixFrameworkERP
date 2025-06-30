@@ -1,28 +1,95 @@
+// Define your interfaces
+interface User {
+    id: number;
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    email: string;
+    // other user properties
+}
+
+export interface StatusLabel {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface Department {
+    id: number;
+    department: string;
+    status_id?: number;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface Location {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface Supplier {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface Manufacturer {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
+export interface AssetModel {
+    category_id: number;
+    created_at: string;
+    department_id: number;
+    depreciation_id: number;
+    eol: number;
+    id: number;
+    manufacturer_id: number;
+    min_qty: number;
+    model_no: string;
+    name: string;
+    notes: string;
+    status_id: number;
+    supplier_id?: number;
+    user_id: number;
+    updated_at?: string | null;
+    deleted_at?: string | null;
+}
+
 export interface CustomAsset {
     company_name?: string;
     company_id?: number;
-    location?: string;
     location_id?: number;
     default_location?: string;
-    department?: string;
     department_id?: number;
-    supplier?: string;
     supplier_id?: number;
     model?: string;
     asset_model_id?: number;
-    manufacturer?: string;
     manufacturer_id?: number;
-    category?: string;
     category_id?: number;
-    status?: string;
     status_id?: number;
     status_name?: string;
     status_created_at?: string;
-    status_labels?: {
-        created_at?: string;
-        id?: number;
-        name?: string;
-    }
     order_number?: string;
     pruchase_date_from?: string;
     pruchase_date_to?: string;
@@ -42,4 +109,15 @@ export interface CustomAsset {
     next_audit_to?: string;
     archived_assets?: string;
     deleted_assets?: string;
+    notes?: string;
+
+    users: User;
+    status_labels: StatusLabel;
+    departments: Department;
+    asset_model: AssetModel;
+    locations: Location;
+    suppliers: Supplier;
+    manufacturers: Manufacturer;
+    categories: Category;
+
 }

@@ -225,7 +225,7 @@ export default function CreateComponents() {
             </div>
 
             <Form
-                className="p-5 bg-gray-50 border border-gray-200"
+                className="p-5 border border-gray-200"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}

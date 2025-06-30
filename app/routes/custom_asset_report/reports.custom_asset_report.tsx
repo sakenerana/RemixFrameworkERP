@@ -38,31 +38,30 @@ type CheckboxOption = {
 const CheckboxGroup = Checkbox.Group;
 
 const options: CheckboxOption[] = [
-  { label: "ID", value: "id" },
-  { label: "Asset Tag", value: "asset_tag" },
-  { label: "Asset Name", value: "name" },
-  { label: "Manufacturer", value: "manufacturer_id" },
-  { label: "Asset Models", value: "asset_model" },
-  { label: "Category", value: "category_id" },
-  { label: "Serial", value: "order_no" },
+  { label: "ID", value: "asset_id" },
+  { label: "Created At", value: "created_at" },
+  { label: "Asset Name", value: "asset_name" },
+  { label: "Order No", value: "order_no" },
   { label: "Purchase Date", value: "purchase_date" },
   { label: "Purchase Cost", value: "purchase_cost" },
-  { label: "Depreciation", value: "depreciation_id" },
-  { label: "Suppliers", value: "supplier_id" },
-  { label: "Location", value: "location_id" },
-  { label: "Status", value: "status_id" },
-  { label: "Checkout Date", value: "date_created" },
-  { label: "Created At", value: "created_at" },
-  { label: "Notes", value: "notes" },
-  { label: "Assigned To", value: "checkedout_to" },
-  { label: "Username", value: "username" },
-  { label: "Department", value: "department_id" },
-  { label: "Phone", value: "phone" },
-  { label: "Address", value: "address" },
-  { label: "City", value: "city" },
-  { label: "State", value: "state" },
-  { label: "Country", value: "country" },
-  { label: "Zip", value: "zip" },
+  { label: "Quantity", value: "qty" },
+  { label: "Min. Quantity", value: "min_qty" },
+  { label: "Notes", value: "asset_notes" },
+  { label: "Status", value: "asset_status" },
+  { label: "User ID", value: "user_id" },
+  { label: "User Firstname", value: "user_fname" },
+  { label: "User Middlename", value: "user_mname" },
+  { label: "User Lastname", value: "user_lname" },
+  { label: "User Email", value: "user_email" },
+  { label: "Department ID", value: "department_id" },
+  { label: "Department", value: "department_name" },
+  { label: "Model ID", value: "model_id" },
+  { label: "Model", value: "model" },
+  { label: "Location ID", value: "location_id" },
+  { label: "Location", value: "location_name" },
+  { label: "Location ID", value: "supplier_id" },
+  { label: "Location ID", value: "manufacturer_id" },
+  { label: "Location ID", value: "category_id" },
 ];
 
 export default function CustomAssetReportRoutes() {
@@ -99,7 +98,7 @@ export default function CustomAssetReportRoutes() {
   const fetchDataCategory = async () => {
     try {
       setLoading(true);
-      const dataFetchGroup = await CategoryService.getAllPostsByConsumables(isDepartmentID);
+      const dataFetchGroup = await CategoryService.getAllPosts(isDepartmentID);
       setDataCategory(dataFetchGroup); // Works in React state
     } catch (error) {
       message.error("error");
@@ -186,26 +185,25 @@ export default function CustomAssetReportRoutes() {
         department_id: Number(isDepartmentID),
         check_list: checkedList
       };
-      console.log("finish1", allValues)
+      
       // Create new record
       setLoading(true);
       const dataFetch = await AssetService.getAllPostsReport(allValues);
       setData(dataFetch);
-      console.log("value", dataFetch)
 
-      // if (dataFetch[0]) {
-      //   exportToExcel(dataFetch);
-      //   message.success("Record generated successfully");
-      // } else {
-      //   message.error("No Record Yet.");
-      // }
+      if (dataFetch[0]) {
+        exportToExcel(dataFetch, checkedList);
+        message.success("Record generated successfully");
+      } else {
+        message.error("No Record Yet.");
+      }
 
-      // if (!dataFetch) throw message.error("Error: No Record");
+      if (!dataFetch) throw message.error("Error: No Record");
 
-      // setLoading(false);
+      setLoading(false);
       // form.resetFields();
     } catch (error) {
-      message.error("Error");
+      message.error("Error: Data Not Found");
     }
   };
 
@@ -220,11 +218,35 @@ export default function CustomAssetReportRoutes() {
   };
 
   // EXPORT TO EXCEL
-  const exportToExcel = (data: any) => {
+  // const exportToExcel = (data: any) => {
+  //   const dateString = getFormattedDate();
+  //   const ws = XLSX.utils.json_to_sheet(data); //data []
+  //   const wb = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  //   XLSX.writeFile(wb, `custom-asset-report-${dateString}.xlsx`);
+  // };
+  const exportToExcel = (data: any[], checkedList: any[]) => {
     const dateString = getFormattedDate();
-    const ws = XLSX.utils.json_to_sheet(data); //data []
+    const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Get all headers
+    const headers = Object.keys(data[0] || {});
+    // Initialize !cols
+    ws['!cols'] = ws['!cols'] || [];
+    const cols = ws['!cols'] as XLSX.ColInfo[];
+
+    if (checkedList?.length) {
+      headers.forEach((header, index) => {
+        // Hide column if it's NOT in the visibleColumns list
+        if (!checkedList.includes(header)) {
+          cols[index] = cols[index] || {};
+          cols[index].hidden = true;
+        }
+      });
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, "Asset");
     XLSX.writeFile(wb, `custom-asset-report-${dateString}.xlsx`);
   };
 

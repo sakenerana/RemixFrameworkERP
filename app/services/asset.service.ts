@@ -131,44 +131,174 @@ export const AssetService = {
     return data
   },
 
+  // Read (multiple)
   async getAllPostsReport(postData: CustomAsset) {
-    // Build the base query
-    let query = supabase
+    const { data, error } = await supabase
       .from('assets')
       .select(`
-    id, 
+    id,
     created_at,
     status_id,
+    notes,
+    name,
+    order_no,
+    purchase_date,
+    purchase_cost,
+    qty,
+    min_qty,
+    status_labels(*),
     users(*),
     departments(*),
     asset_model(*),
     locations(*)
   `)
-      .order('created_at', { ascending: false });
+      .eq('status_id', postData.status_id)
+      .eq('department_id', postData.department_id)
+      .eq('location_id', postData.location_id)
+      .eq('asset_model_id', postData.asset_model_id)
+      .eq('asset_model.supplier_id', postData.supplier_id)
+      .eq('asset_model.manufacturer_id', postData.manufacturer_id)
+      .eq('asset_model.category_id', postData.category_id)
+      .order('created_at', { ascending: false })
 
-    // Add conditional filters only if values exist
-    if (postData.status_id != null) query = query.eq('status_id', postData.status_id);
-    if (postData.department_id != null) query = query.eq('department_id', postData.department_id);
-    if (postData.location_id != null) query = query.eq('location_id', postData.location_id);
-    if (postData.asset_model_id != null) query = query.eq('asset_model_id', postData.asset_model_id);
+    if (error) throw error
 
-    const { data, error } = await query;
+    // Flatten the data for Excel
+    const excelData = data.map((asset: any) => ({
+      asset_id: asset.id,
+      created_at: asset.created_at,
+      asset_name: asset.name,
+      order_no: asset.order_no,
+      purchase_date: asset.purchase_date,
+      purchase_cost: asset.purchase_cost,
+      qty: asset.qty,
+      min_qty: asset.min_qty,
+      asset_notes: asset.notes,
+      asset_status: asset.status_labels?.name,
 
-    if (error) throw error;
+      // // User data
+      user_id: asset.users.id,
+      user_fname: asset.users.first_name,
+      user_mname: asset.users.middle_name,
+      user_lname: asset.users.last_name,
+      user_email: asset.users.email,
 
-    // Filter out null/undefined values from the returned data
-    const filteredData = data?.map(asset => {
-      const filteredAsset: Record<string, any> = {};
-      Object.entries(asset).forEach(([key, value]) => {
-        if (value != null) {
-          filteredAsset[key] = value;
-        }
-      });
-      return filteredAsset;
-    });
+      // // Department data (flattened)
+      department_id: asset.departments.id,
+      department_name: asset.departments.department,
 
-    return filteredData || [];
+      // // Asset model data
+      model_id: asset.asset_model.id,
+      model_name: asset.asset_model?.name,
+
+      // // Location data
+      location_id: asset.locations.id,
+      location_name: asset.locations?.name,
+
+      // // Supplier data
+      supplier_id: asset.asset_model.supplier_id,
+
+      // // Manufacturer data
+      manufacturer_id: asset.asset_model.manufacturer_id,
+
+      // // Category data
+      category_id: asset.asset_model.category_id,
+    }));
+
+    return excelData
   },
+
+  // async getAllPostsReport(postData: CustomAsset) {
+  //   // Build the base query
+  //   let query = supabase
+  //     .from('assets')
+  //     .select(`
+  //   id,
+  //   created_at,
+  //   status_id,
+  //   notes,
+  //   name,
+  //   order_no,
+  //   purchase_date,
+  //   purchase_cost,
+  //   qty,
+  //   min_qty,
+  //   status_labels(*),
+  //   users(*),
+  //   departments(*),
+  //   asset_model(*),
+  //   locations(*)
+  // `)
+  //     .order('created_at', { ascending: false });
+
+  //   // Add conditional filters only if values exist
+  //   if (postData.status_id != null) query = query.eq('status_id', postData.status_id);
+  //   if (postData.department_id != null) query = query.eq('department_id', postData.department_id);
+  //   if (postData.location_id != null) query = query.eq('location_id', postData.location_id);
+  //   if (postData.asset_model_id != null) query = query.eq('asset_model_id', postData.asset_model_id);
+  //   if (postData.supplier_id != null) query = query.eq('asset_model.supplier_id', postData.supplier_id);
+  //   if (postData.manufacturer_id != null) query = query.eq('asset_model.manufacturer_id', postData.manufacturer_id);
+  //   if (postData.category_id != null) query = query.eq('asset_model.category_id', postData.category_id);
+
+  //   const { data, error } = await query;
+
+  //   if (error) throw error;
+
+  //   // Flatten the data for Excel
+  //   const excelData = data.map((asset: any) => ({
+  //     asset_id: asset.id,
+  //     created_at: asset.created_at,
+  //     asset_name: asset.name,
+  //     order_no: asset.order_no,
+  //     purchase_date: asset.purchase_date,
+  //     purchase_cost: asset.purchase_cost,
+  //     qty: asset.qty,
+  //     min_qty: asset.min_qty,
+  //     asset_notes: asset.notes,
+  //     asset_status: asset.status_labels?.name,
+
+  //     // // User data
+  //     user_id: asset.users.id,
+  //     user_fname: asset.users?.first_name,
+  //     user_mname: asset.users?.middle_name,
+  //     user_lname: asset.users?.last_name,
+  //     user_email: asset.users?.email,
+
+  //     // // Department data (flattened)
+  //     department_id: asset.departments?.id,
+  //     department_name: asset.departments?.department,
+
+  //     // // Asset model data
+  //     model_id: asset.asset_model?.id,
+  //     model_name: asset.asset_model?.name,
+
+  //     // // Location data
+  //     location_id: asset.locations?.id,
+  //     location_name: asset.locations?.name,
+
+  //     // // Supplier data
+  //     supplier_id: asset.asset_model?.supplier_id,
+
+  //     // // Manufacturer data
+  //     manufacturer_id: asset.asset_model?.manufacturer_id,
+
+  //     // // Category data
+  //     category_id: asset.asset_model?.category_id,
+  //   }));
+
+  //   // Filter out null/undefined values from the returned data
+  //   // const filteredData = data?.map(asset => {
+  //   //   const filteredAsset: Record<string, any> = {};
+  //   //   Object.entries(asset).forEach(([key, value]) => {
+  //   //     if (value != null) {
+  //   //       filteredAsset[key] = value;
+  //   //     }
+  //   //   });
+  //   //   return filteredAsset;
+  //   // });
+
+  //   return excelData;
+  // },
 
   async getTableCounts() {
     // Get list of all tables (you'll need to know your table names)

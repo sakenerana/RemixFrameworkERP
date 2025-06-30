@@ -81,7 +81,7 @@ const LineChart: React.FC<LineChartProps> = ({
   }, [data, xField, yField, seriesField, color, smooth, showPoints]);
 
   return (
-    <div className="line-chart-container p-4 bg-white rounded-lg shadow">
+    <div className="line-chart-container p-4 rounded-lg shadow">
       {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
       <div 
         ref={containerRef} 
