@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets, AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import {
 } from "react-icons/fc";
+import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 import { AccessoryService } from "~/services/accessory.service";
@@ -218,12 +219,11 @@ export default function DashboardRoutes() {
 
             <Row gutter={16} className="pt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-6 w-full">
-                    <div
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">Assets</h2>
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Assets</h2>
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineSnippets className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
@@ -231,13 +231,12 @@ export default function DashboardRoutes() {
                             </p>
                             <p>Your total assets of ERP System</p>
                         </div>
-                    </div>
-                    <div
+                    </Card>
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">Licenses</h2>
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Licenses</h2>
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineSchedule className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
@@ -245,13 +244,12 @@ export default function DashboardRoutes() {
                             </p>
                             <p>Total licenses of ERP System</p>
                         </div>
-                    </div>
-                    <div
+                    </Card>
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">Accessories</h2>
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Accessories</h2>
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineMobile className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
@@ -259,13 +257,12 @@ export default function DashboardRoutes() {
                             </p>
                             <p>Total accessories of ERP System</p>
                         </div>
-                    </div>
-                    <div
+                    </Card>
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">Consumables</h2>
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Consumables</h2>
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineShopping className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
@@ -273,13 +270,12 @@ export default function DashboardRoutes() {
                             </p>
                             <p>Total Consumables of ERP System</p>
                         </div>
-                    </div>
-                    <div
+                    </Card>
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">Components</h2>
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Components</h2>
                             <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                                 <AiOutlineDesktop className="mt-1 mr-2" />{" "}
                                 {loading && <Spin></Spin>}
@@ -287,7 +283,7 @@ export default function DashboardRoutes() {
                             </p>
                             <p>Total Components of ERP System</p>
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </Row>
 
@@ -295,13 +291,12 @@ export default function DashboardRoutes() {
 
             <Row gutter={16} className="pt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-                    <div
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">
-                                Inventory By Category
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Inventory By Category
                             </h2>
                             <p className="flex flex-wrap">Current month breakdown</p>
                             {loading && <Spin></Spin>}
@@ -318,14 +313,13 @@ export default function DashboardRoutes() {
                                 />}
 
                         </div>
-                    </div>
-                    <div
+                    </Card>
+                    <Card
                         className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-                        style={{ border: "1px solid #e1e3e1" }}
                     >
-                        <div className="p-4">
-                            <h2 className="text-sm font-semibold mb-2">
-                                Monthly Data Trend
+                        <div>
+                            <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Data Trend
                             </h2>
                             <p className="flex flex-wrap">Last current months</p>
                             <BarChart
@@ -335,16 +329,21 @@ export default function DashboardRoutes() {
                                 height={350}
                             />
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </Row>
 
             {/* THIS IS THE THIRD ROW OF DASHBOARD */}
 
-            <Row gutter={16} className="pt-5">
+            <Row gutter={16} className="pt-7">
                 <Col span={24}>
-                    <div className="shadow-md">
-                        <Card title="LATEST (5) ASSETS OVERVIEW" variant="borderless">
+                    <div className="shadow-lg m-[-5px]">
+                        <Card title={
+                            <div className="flex items-center">
+                                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
+                                Latest (5) Assets Overview
+                            </div>
+                        }>
                             {loading && <Spin></Spin>}
                             {!loading &&
                                 <Table<Asset>

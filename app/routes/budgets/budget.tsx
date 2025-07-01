@@ -4,6 +4,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Col,
   DatePicker,
   Divider,
@@ -19,7 +20,7 @@ import {
   Spin,
 } from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
 import LineChart from "~/components/line_chart";
 
@@ -34,7 +35,12 @@ export default function Budgets() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
+
   const navigate = useNavigate();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<DataType>();
   const { RangePicker } = DatePicker;
@@ -106,6 +112,11 @@ export default function Budgets() {
     fetchData();
   }, []); // Empty dependency array means this runs once on mount+
 
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
+
   const budget = [
     {
       title: "Requisition",
@@ -129,14 +140,40 @@ export default function Budgets() {
     { date: "2023-11", value: 49 },
   ];
 
-  const onFinish = (values: DataType) => {
-    setLoading(true);
-    console.log("Form values:", values);
-    // Simulate API call
-    setTimeout(() => {
-      message.success("Form submitted successfully!");
+  const onFinish = async () => {
+    try {
+
+      const values = await form.validateFields();
+
+      // Include your extra field
+      const allValues = {
+        ...values,
+        status_id: isUserID,
+        department_id: isDepartmentID
+      };
+      console.log("Form Values", allValues)
+      // if (editingId) {
+      //   // Update existing record
+      //   const { error } = await GroupService.updatePost(editingId, values);
+
+      //   if (error) throw message.error(error.message);
+      //   message.success("Record updated successfully");
+      // } else {
+      //   // Create new record
+      //   setLoading(true);
+      //   const { error } = await GroupService.createPost(allValues);
+
+      //   if (error) throw message.error(error.message);
+      //   message.success("Record created successfully");
+      // }
+
       setLoading(false);
-    }, 1500);
+      setIsModalOpen(false);
+      form.resetFields();
+      fetchData();
+    } catch (error) {
+      message.error("Error");
+    }
   };
 
   return (
@@ -203,43 +240,6 @@ export default function Budgets() {
                     <RangePicker className="w-full" />
                   </Form.Item>
                 </Col>
-
-                {/* <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Account Name"
-                    name="account_name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input account name!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="e.g. Checking Account" />
-                  </Form.Item>
-                </Col> */}
-
-                {/* <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Account Type"
-                    name="account_type"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select account type!",
-                      },
-                    ]}
-                  >
-                    <Select
-                      placeholder="Select gender"
-                      options={[
-                        { value: "jack", label: "Jack" },
-                        { value: "lucy", label: "Lucy" },
-                        { value: "Yiminghe", label: "yiminghe" },
-                      ]}
-                    />
-                  </Form.Item>
-                </Col> */}
               </Row>
 
               <Row gutter={24}>
@@ -310,9 +310,8 @@ export default function Budgets() {
             <>
               {loading && <Spin></Spin>}
               {!loading && (
-                <div
-                  className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm p-6"
-                  style={{ border: "1px solid #e1e3e1" }}
+                <Card
+                  className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm"
                 >
                   <div className="flex flex-wrap justify-between">
                     <h2 className="text-sm font-semibold mb-2">{data.title}</h2>
@@ -333,7 +332,7 @@ export default function Budgets() {
                     status="active"
                   /> */}
                   {/* <p>Categories: </p> */}
-                </div>
+                </Card>
               )}
             </>
           ))}
@@ -341,9 +340,8 @@ export default function Budgets() {
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full mt-6">
           {loading && <Spin></Spin>}
           {!loading && (
-            <div
-              className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm p-6"
-              style={{ border: "1px solid #e1e3e1" }}
+            <Card
+              className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm"
             >
               <div className="flex flex-wrap justify-between">
                 <h2 className="text-sm font-semibold mb-2">Overall Budget</h2>
@@ -360,7 +358,7 @@ export default function Budgets() {
               <span>Progress</span>
               <Progress percent={getBudgetProgress(75, 150)} status="active" />
               {/* <p>Categories: </p> */}
-            </div>
+            </Card>
           )}
         </div>
       </Row>
@@ -369,11 +367,10 @@ export default function Budgets() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
-          <div
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
+            <div>
               <h2 className="text-sm font-semibold mb-2">
                 Spending By Category
               </h2>
@@ -384,7 +381,7 @@ export default function Budgets() {
                 color="#6a5acd"
               />
             </div>
-          </div>
+          </Card>
         </div>
       </Row>
     </div>

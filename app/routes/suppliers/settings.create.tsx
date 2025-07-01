@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineEnvironment, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
 import { SupplierService } from "~/services/supplier.service";
@@ -127,180 +127,181 @@ export default function CreateSuppliers() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Supplier Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input supplier name!",
-                                },
-                            ]}
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Supplier Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input supplier name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Address"
+                                name="address"
+                            >
+                                <Input prefix={<AiOutlineEnvironment />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Address2"
+                                name="address2"
+                            >
+                                <Input prefix={<AiOutlineEnvironment />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="City"
+                                name="city"
+                            >
+                                <Input prefix={<AiOutlineEnvironment />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="State"
+                                name="state"
+                            >
+                                <Input prefix={<AiOutlineEnvironment />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Country"
+                                name="country"
+                            >
+                                <Select
+                                    prefix={<AiOutlineEnvironment />}
+                                    showSearch
+                                    placeholder="Select Country"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                    options={countries}
+                                />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Zip"
+                                name="zip"
+                            >
+                                <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Contact Name"
+                                name="contact"
+                            >
+                                <Input prefix={<AiOutlineSolution />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Email"
+                                name="email"
+                            >
+                                <Input prefix={<AiOutlineMail />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Phone No."
+                                name="phone"
+                            >
+                                <Input
+                                    type="number"
+                                    prefix={<AiOutlinePhone />}
+                                />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Fax"
+                                name="fax"
+                            >
+                                <Input prefix={<AiOutlinePrinter />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="URL"
+                                name="url"
+                            >
+                                <Input prefix={<AiOutlineLink />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={24}>
+                            <Form.Item
+                                label="Notes"
+                                name="notes"
+                            >
+                                <TextArea rows={4} placeholder="(Optional)" />
+                            </Form.Item>
+                        </Col>
+
+                    </Row>
+
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
                         >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Address"
-                            name="address"
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
                         >
-                            <Input prefix={<AiOutlineEnvironment />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Address2"
-                            name="address2"
-                        >
-                            <Input prefix={<AiOutlineEnvironment />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="City"
-                            name="city"
-                        >
-                            <Input prefix={<AiOutlineEnvironment />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="State"
-                            name="state"
-                        >
-                            <Input prefix={<AiOutlineEnvironment />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Country"
-                            name="country"
-                        >
-                            <Select
-                                prefix={<AiOutlineEnvironment />}
-                                showSearch
-                                placeholder="Select Country"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={countries}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Zip"
-                            name="zip"
-                        >
-                            <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Contact Name"
-                            name="contact"
-                        >
-                            <Input prefix={<AiOutlineSolution />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                        >
-                            <Input prefix={<AiOutlineMail />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Phone No."
-                            name="phone"
-                        >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Fax"
-                            name="fax"
-                        >
-                            <Input prefix={<AiOutlinePrinter />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="URL"
-                            name="url"
-                        >
-                            <Input prefix={<AiOutlineLink />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24}>
-                        <Form.Item
-                            label="Notes"
-                            name="notes"
-                        >
-                            <TextArea rows={4} placeholder="(Optional)" />
-                        </Form.Item>
-                    </Col>
-
-                </Row>
-
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

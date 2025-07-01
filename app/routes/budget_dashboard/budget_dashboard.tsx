@@ -9,6 +9,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import { AiOutlineStock } from "react-icons/ai";
+import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 
@@ -192,58 +193,54 @@ export default function BudgetRoutes() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
-          <div
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Net Worth</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Net Worth</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
                 {formatCurrency(123141)}
               </p>
               <p>Your total assets minus liabilities</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Monthly Income</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Income</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
                 {formatCurrency(123141)}
               </p>
               <p>Total income this month</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Monthly Expenses</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Expenses</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
                 {formatCurrency(123141)}
               </p>
               <p>Total expenses this month</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">Savings Rate</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Savings Rate</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineStock className="mt-1 mr-2" />{" "}
                 {formatCurrency(123141)}
               </p>
               <p>Percentage of income saved</p>
             </div>
-          </div>
+          </Card>
         </div>
       </Row>
 
@@ -251,13 +248,12 @@ export default function BudgetRoutes() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          <div
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">
-                Spending By Category
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
               </h2>
               <p className="flex flex-wrap">Current month breakdown</p>
               <PieChart
@@ -269,14 +265,13 @@ export default function BudgetRoutes() {
                 title=""
               />
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-6">
-              <h2 className="text-sm font-semibold mb-2">
-                Monthly Spending Trend
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Spending Trend
               </h2>
               <p className="flex flex-wrap">Last current months</p>
               <BarChart
@@ -286,16 +281,21 @@ export default function BudgetRoutes() {
                 height={350}
               />
             </div>
-          </div>
+          </Card>
         </div>
       </Row>
 
       {/* THIS IS THE THIRD ROW OF DASHBOARD */}
 
-      <Row gutter={16} className="pt-5">
+      <Row gutter={32} className="pt-7">
         <Col span={12}>
-          <div className="shadow-md">
-            <Card title="Accounts Overview" variant="borderless">
+          <div className="shadow-lg m-[-5px]">
+            <Card title={
+              <div className="flex items-center">
+                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
+                Accounts Overview
+              </div>
+            }>
               <Table<DataTypeLocation>
                 bordered
                 size={"small"}
@@ -306,8 +306,13 @@ export default function BudgetRoutes() {
           </div>
         </Col>
         <Col span={12}>
-          <div className="shadow-md">
-            <Card title="Recent Transactions" variant="borderless">
+          <div className="shadow-lg m-[-5px]">
+            <Card title={
+              <div className="flex items-center">
+                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
+                Recent Transactions
+              </div>
+            }>
               <Table<DataTypeAssetCategories>
                 bordered
                 size={"small"}

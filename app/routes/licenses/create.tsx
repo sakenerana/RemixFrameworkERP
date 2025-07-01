@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, DatePicker, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Col, DatePicker, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import ProductKey from "~/components/product_key";
@@ -203,7 +203,7 @@ export default function CreateLicense() {
             if (id) {
                 // Update existing record
                 const { error } = await LicenseService.updatePost(Number(id), allValues);
-                
+
                 if (error) throw message.error(error.message);
                 message.success("Record updated successfully");
             } else {
@@ -246,251 +246,252 @@ export default function CreateLicense() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Software Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input software name!",
-                                },
-                            ]}
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Software Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input software name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Category"
+                                name="category_id"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please select category!",
+                                    },
+                                ]}
+                            >
+                                <Select placeholder="Select Category">
+                                    {dataCategory.map((item: Category) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Seats"
+                                name="seats"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input seats!",
+                                    },
+                                ]}
+                            >
+                                <Input type="number" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Min QTY"
+                                name="min_qty"
+                            >
+                                <Input type="number" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Company"
+                                name="company_id"
+                            >
+                                <Select placeholder="Select Company">
+                                    {dataCompany.map((item: Company) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Manufacturer"
+                                name="manufacturer_id"
+                            >
+                                <Select placeholder="Select Manufacturer">
+                                    {dataManufacturer.map((item: Manufacturer) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Licensed to Name"
+                                name="license_name"
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Licensed to Email"
+                                name="license_email"
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Supplier"
+                                name="supplier_id"
+                            >
+                                <Select placeholder="Select Supplier">
+                                    {dataSupplier.map((item: Supplier) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Order Number"
+                                name="order_number"
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Purchase Cost"
+                                name="purchase_cost"
+                            >
+                                <Input type="number" suffix="PHP" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Purchase Date"
+                                name="purchase_date"
+                            >
+                                <DatePicker className="w-full" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Expiration Date"
+                                name="expiration_date"
+                            >
+                                <DatePicker className="w-full" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Termination Date"
+                                name="termination_date"
+                            >
+                                <DatePicker className="w-full" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Purchase Order Number"
+                                name="purchase_order_no"
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label="Depreciation"
+                                name="depreciation_id"
+                            >
+                                <Select placeholder="Select Depreciation">
+                                    {dataDepreciation.map((item: Depreciation) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={24}>
+                            <ProductKey onDataChange={handleProductKeysChange} initialKeys={form.getFieldValue('product_key') || []} hasID={id} ></ProductKey>
+                        </Col>
+
+                        <Col xs={24} sm={24}>
+                            <Form.Item
+                                label="Notes"
+                                name="notes"
+                            >
+                                <TextArea rows={4} placeholder="(Optional)" />
+                            </Form.Item>
+                        </Col>
+
+                    </Row>
+
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
                         >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Category"
-                            name="category_id"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select category!",
-                                },
-                            ]}
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
                         >
-                            <Select placeholder="Select Category">
-                                {dataCategory.map((item: Category) => (
-                                    <Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Seats"
-                            name="seats"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input seats!",
-                                },
-                            ]}
-                        >
-                            <Input type="number" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Min QTY"
-                            name="min_qty"
-                        >
-                            <Input type="number" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Company"
-                            name="company_id"
-                        >
-                            <Select placeholder="Select Company">
-                                {dataCompany.map((item: Company) => (
-                                    <Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Manufacturer"
-                            name="manufacturer_id"
-                        >
-                            <Select placeholder="Select Manufacturer">
-                                {dataManufacturer.map((item: Manufacturer) => (
-                                    <Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Licensed to Name"
-                            name="license_name"
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Licensed to Email"
-                            name="license_email"
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Supplier"
-                            name="supplier_id"
-                        >
-                            <Select placeholder="Select Supplier">
-                                {dataSupplier.map((item: Supplier) => (
-                                    <Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Order Number"
-                            name="order_number"
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Purchase Cost"
-                            name="purchase_cost"
-                        >
-                            <Input type="number" suffix="PHP" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Purchase Date"
-                            name="purchase_date"
-                        >
-                            <DatePicker className="w-full" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Expiration Date"
-                            name="expiration_date"
-                        >
-                            <DatePicker className="w-full" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Termination Date"
-                            name="termination_date"
-                        >
-                            <DatePicker className="w-full" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Purchase Order Number"
-                            name="purchase_order_no"
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={8}>
-                        <Form.Item
-                            label="Depreciation"
-                            name="depreciation_id"
-                        >
-                            <Select placeholder="Select Depreciation">
-                                {dataDepreciation.map((item: Depreciation) => (
-                                    <Option key={item.id} value={item.id}>
-                                        {item.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24}>
-                        <ProductKey onDataChange={handleProductKeysChange} initialKeys={form.getFieldValue('product_key') || []} hasID={id} ></ProductKey>
-                    </Col>
-
-                    <Col xs={24} sm={24}>
-                        <Form.Item
-                            label="Notes"
-                            name="notes"
-                        >
-                            <TextArea rows={4} placeholder="(Optional)" />
-                        </Form.Item>
-                    </Col>
-
-                </Row>
-
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

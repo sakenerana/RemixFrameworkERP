@@ -22,6 +22,7 @@ import {
   FcNews,
   FcPackage,
 } from "react-icons/fc";
+import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 
 interface DataType {
   id: number;
@@ -74,15 +75,18 @@ export default function WorkflowDashboard() {
       />
 
       {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
-      <Row gutter={16} className="pt-5">
+      <Row gutter={16} className="pt-5 pb-3">
         <Col span={24}>
-          <div className="shadow-md">
+          <div className="shadow-lg m-[-7px]">
             {loading && <Spin></Spin>}
             {!loading && (
               <Card
-                style={{ border: "1px solid #e1e3e1" }}
-                title="Most Requested Workflows"
-                variant="borderless"
+                title={
+                  <div className="flex items-center">
+                    <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
+                    Most Requested Workflows
+                  </div>
+                }
               >
                 <Flex gap="4px 0" wrap>
                   <Tag color="#87d068">Ready to Deploy</Tag>
@@ -110,17 +114,16 @@ export default function WorkflowDashboard() {
             <>
               {loading && <Spin></Spin>}
               {!loading && (
-                <div
+                <Card
                   className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                  style={{ border: "1px solid #e1e3e1" }}
                 >
-                  <div className="p-6">
-                    <h2 className="text-sm font-semibold mb-2">{data.title}</h2>
-                    <p className="flex flex-wrap justify-end text-lg text-gray-600">
+                  <div>
+                    <h2 className="text-sm font-semibold mb-2"><RiCircleFill className="float-left text-[5px] text-green-500 mt-2 mr-2" /> {data.title}</h2>
+                    <p className="flex flex-wrap justify-end text-lg text-green-600">
                       <FcInspection className="mt-1 mr-2" /> {data.userId}
                     </p>
                   </div>
-                </div>
+                </Card>
               )}
             </>
           ))}

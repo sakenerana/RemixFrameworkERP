@@ -12,9 +12,10 @@ import {
   Spin,
 } from "antd";
 import { useEffect, useState } from "react";
-import { AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
+import { AiOutlineSolution, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
 import {
 } from "react-icons/fc";
+import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 import { DepartmentService } from "~/services/department.service";
@@ -207,12 +208,11 @@ export default function BudgetRoutes() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
-          <div
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">Users</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Users</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineUserAdd className="mt-1 mr-2" />{" "}
                 {loading && <Spin></Spin>}
@@ -220,13 +220,12 @@ export default function BudgetRoutes() {
               </p>
               <p>Your total user's of ERP System</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">Departments</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Departments</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineSolution className="mt-1 mr-2" />{" "}
                 {loading && <Spin></Spin>}
@@ -234,13 +233,12 @@ export default function BudgetRoutes() {
               </p>
               <p>Total department's of ERP System</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">Groups</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Groups</h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                 <AiOutlineUsergroupAdd className="mt-1 mr-2" />{" "}
                 {loading && <Spin></Spin>}
@@ -248,13 +246,12 @@ export default function BudgetRoutes() {
               </p>
               <p>Total group's of ERP System</p>
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">Inactive Users</h2>
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Inactive Users</h2>
               <p className="flex flex-wrap text-red-600 text-2xl font-bold">
                 <AiOutlineUserDelete className="mt-1 mr-2" />{" "}
                 {loading && <Spin></Spin>}
@@ -262,7 +259,7 @@ export default function BudgetRoutes() {
               </p>
               <p>Percentage of income saved</p>
             </div>
-          </div>
+          </Card>
         </div>
       </Row>
 
@@ -270,13 +267,12 @@ export default function BudgetRoutes() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          <div
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">
-                Added By Category
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Added By Category
               </h2>
               <p className="flex flex-wrap">Current month breakdown</p>
               {loading && <Spin></Spin>}
@@ -292,14 +288,13 @@ export default function BudgetRoutes() {
                 />}
 
             </div>
-          </div>
-          <div
+          </Card>
+          <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            style={{ border: "1px solid #e1e3e1" }}
           >
-            <div className="p-4">
-              <h2 className="text-sm font-semibold mb-2">
-                Monthly Data Trend
+            <div>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Data Trend
               </h2>
               <p className="flex flex-wrap">Last current months</p>
               <BarChart
@@ -309,16 +304,21 @@ export default function BudgetRoutes() {
                 height={350}
               />
             </div>
-          </div>
+          </Card>
         </div>
       </Row>
 
       {/* THIS IS THE THIRD ROW OF DASHBOARD */}
 
-      <Row gutter={16} className="pt-5">
+      <Row gutter={16} className="pt-7">
         <Col span={24}>
-          <div className="shadow-md">
-            <Card title="Accounts Overview" variant="borderless">
+          <div className="shadow-lg m-[-5px]">
+            <Card title={
+              <div className="flex items-center">
+                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
+                Accounts Overview
+              </div>
+            }>
               {loading && <Spin></Spin>}
               {!loading &&
                 <Table<User>

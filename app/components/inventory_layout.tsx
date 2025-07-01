@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined, SwapOutlined } from "@ant-design/icons";
+import { FullscreenExitOutlined, FullscreenOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined, SwapOutlined } from "@ant-design/icons";
 import {
   Button,
   Layout,
@@ -53,6 +53,22 @@ export default function InventoryLayoutIndex() {
     // Optional: Update body class for global styles
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
   }, [isDarkMode]);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          setIsFullscreen(false);
+        });
+      }
+    }
+  };
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -382,7 +398,9 @@ export default function InventoryLayoutIndex() {
                 background: isDarkMode ? '#141414' : '#ffffff',
                 borderRight: 'none'
               }}
-              className="h-[calc(100vh-64px)] overflow-y-auto"
+              className={`h-[calc(100vh-64px)] overflow-y-auto ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
+                }`}
+            // className="h-[calc(100vh-64px)] overflow-y-auto"
             />
           </Sider>
           <Layout>
@@ -418,7 +436,7 @@ export default function InventoryLayoutIndex() {
 
               <div className="flex-1">
                 <div className="flex justify-end items-center h-full pr-4">
-                  <Space className="gap-3">
+                  <Space className="gap-0">
                     <Switch
                       checkedChildren={<MoonOutlined className="text-white" />}
                       unCheckedChildren={<SunOutlined className="text-yellow-500" />}
@@ -426,6 +444,16 @@ export default function InventoryLayoutIndex() {
                       onChange={() => setIsDarkMode(prev => !prev)}
                       className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
                     />
+
+                    <Button
+                      icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                      type="text"
+                      className="text-white hover:bg-[rgba(255,255,255,0.1)]"
+                      style={{
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
+                      }}
+                      onClick={toggleFullscreen}
+                    >Screen</Button>
 
                     <Link to="/landing-page">
                       <Button
@@ -435,7 +463,7 @@ export default function InventoryLayoutIndex() {
                         style={{
                           color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
                         }}
-                      />
+                      >Switch</Button>
                     </Link>
 
                     <Button
@@ -482,12 +510,13 @@ export default function InventoryLayoutIndex() {
               </Modal>
             </Header>
             <Content
-              className="flex flex-col h-full overflow-auto"
+              className={`flex flex-col h-full overflow-auto themed-scrollbar ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
+                }`}
               style={{
                 margin: "24px 16px",
                 padding: 24,
-                background: isDarkMode ? '#141414' : '#ffffff',  // Dark: dark gray, Light: white
-                borderRadius: 8,  // Using standard border radius
+                background: isDarkMode ? '#141414' : '#ffffff',
+                borderRadius: 8,
                 color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
               }}
             >
@@ -495,8 +524,7 @@ export default function InventoryLayoutIndex() {
             </Content>
             <div className="flex justify-between">
               <div className="w-fit pl-5 pb-5">
-                Ant Design using Remix <b>©{new Date().getFullYear()}</b> Inspired
-                by <b>SnipeIT</b>
+                Ant Design using Remix <b>©{new Date().getFullYear()}</b>
               </div>
               <div className="pr-5">
                 <b>Developed by:</b> CFI IT Department

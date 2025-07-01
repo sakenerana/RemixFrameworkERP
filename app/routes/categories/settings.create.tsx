@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineEnvironment, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { CategoryService } from "~/services/category.service";
@@ -127,91 +127,92 @@ export default function CreateCategories() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Category Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input category name!",
-                                },
-                            ]}
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Category Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input category name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
 
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Type"
-                            name="type"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select category type!",
-                                },
-                            ]}
-                        >
-                            <Select
-                                showSearch
-                                placeholder="Select Type"
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                                options={categoryType}
-                            />
-                        </Form.Item>
-                    </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Type"
+                                name="type"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please select category type!",
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    showSearch
+                                    placeholder="Select Type"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                    options={categoryType}
+                                />
+                            </Form.Item>
+                        </Col>
 
-                    <Col xs={24} sm={24}>
-                        <Form.Item
-                            label="Notes"
-                            name="notes"
-                        >
-                            <TextArea rows={4} placeholder="(Optional)" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                        <Col xs={24} sm={24}>
+                            <Form.Item
+                                label="Notes"
+                                name="notes"
+                            >
+                                <TextArea rows={4} placeholder="(Optional)" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
+                        >
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
+                        >
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

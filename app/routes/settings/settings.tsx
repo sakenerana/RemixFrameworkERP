@@ -97,42 +97,7 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
 
       <Col span={24}>
         <div className="flex flex-wrap gap-6">
-          {/* <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClick}
-            style={{
-              width: 160,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <MenuUnfoldOutlined
-                style={{ fontSize: "32px", color: "#1890ff" }}
-              />
-              <p>General Settings</p>
-            </Space>
-          </Card>
-
           <Card
-            className="border-gray-300"
-            hoverable // Adds a hover effect
-            onClick={handleClick}
-            style={{
-              width: 160,
-              textAlign: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Space direction="vertical" size={16}>
-              <UserOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
-              <p>User Info</p>
-            </Space>
-          </Card> */}
-
-          <Card
-            className="border-gray-300"
             hoverable // Adds a hover effect
             onClick={showDrawer}
             style={{
@@ -219,23 +184,11 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
                   </Button>
                 </Form.Item>
 
-                {/* Render Props */}
-                {/* <Form.Item noStyle dependencies={['password2']}>
-                  {() => (
-                    <Typography>
-                      <p>
-                        Only Update when <code>password2</code> updated:
-                      </p>
-                      <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>
-                    </Typography>
-                  )}
-                </Form.Item> */}
               </Form>
             </Drawer>
           </Card>
 
           <Card
-            className="border-gray-300"
             hoverable // Adds a hover effect
             onClick={handleLandingPage}
             style={{
@@ -251,7 +204,6 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
           </Card>
 
           <Card
-            className="border-gray-300"
             hoverable // Adds a hover effect
             onClick={handleSignout}
             style={{

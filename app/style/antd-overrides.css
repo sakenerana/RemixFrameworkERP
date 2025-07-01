@@ -1,0 +1,11 @@
+/* Nuclear option - overrides even the most specific antd selectors */
+:root .ant-row,
+:root .ant-row * {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Alternative approach - targets all antd components */
+[class^="ant-"],
+[class*=" ant-"] {
+    font-family: 'Poppins', sans-serif !important;
+}

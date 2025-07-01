@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
@@ -131,85 +131,86 @@ export default function CreateManufacturer() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Predefined Kit Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input predefined kit name!",
-                                },
-                            ]}
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Predefined Kit Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input predefined kit name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Qty"
+                                name="qty"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input predefined kit qty!",
+                                    },
+                                ]}
+                            >
+                                <Input type="number" />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Min Qty"
+                                name="min_qty"
+                            >
+                                <Input type="number" />
+                            </Form.Item>
+                        </Col>
+
+                    </Row>
+
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
                         >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Qty"
-                            name="qty"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input predefined kit qty!",
-                                },
-                            ]}
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
                         >
-                            <Input type="number" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Min Qty"
-                            name="min_qty"
-                        >
-                            <Input type="number" />
-                        </Form.Item>
-                    </Col>
-
-                </Row>
-
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

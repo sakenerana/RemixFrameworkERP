@@ -3,6 +3,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   CheckboxProps,
   Col,
@@ -58,10 +59,10 @@ const options: CheckboxOption[] = [
   { label: "Model ID", value: "model_id" },
   { label: "Model", value: "model" },
   { label: "Location ID", value: "location_id" },
-  { label: "Location", value: "location_name" },
-  { label: "Location ID", value: "supplier_id" },
-  { label: "Location ID", value: "manufacturer_id" },
-  { label: "Location ID", value: "category_id" },
+  { label: "Location Name", value: "location_name" },
+  { label: "Supplier ID", value: "supplier_id" },
+  { label: "Manufacturer ID", value: "manufacturer_id" },
+  { label: "Category ID", value: "category_id" },
 ];
 
 export default function CustomAssetReportRoutes() {
@@ -185,7 +186,7 @@ export default function CustomAssetReportRoutes() {
         department_id: Number(isDepartmentID),
         check_list: checkedList
       };
-      
+
       // Create new record
       setLoading(true);
       const dataFetch = await AssetService.getAllPostsReport(allValues);
@@ -204,6 +205,7 @@ export default function CustomAssetReportRoutes() {
       // form.resetFields();
     } catch (error) {
       message.error("Error: Data Not Found");
+      setLoading(false);
     }
   };
 
@@ -275,41 +277,44 @@ export default function CustomAssetReportRoutes() {
       />
 
       <Row gutter={16} className="pt-5">
-        <Col span={8} className="border border-gray-200 p-5">
-          <Checkbox
-            indeterminate={indeterminate}
-            onChange={onCheckAllChange}
-            checked={checkAll}
-          >
-            Select all columns
-          </Checkbox>
-          <Divider />
-          <CheckboxGroup
-            options={options}
-            value={checkedList}
-            onChange={onChange}
-            style={{ display: 'flex', flexDirection: 'column' }}
-          />
+        <Col span={8}>
+          <Card>
+            <Checkbox
+              indeterminate={indeterminate}
+              onChange={onCheckAllChange}
+              checked={checkAll}
+            >
+              Select all columns
+            </Checkbox>
+            <Divider />
+            <CheckboxGroup
+              options={options}
+              value={checkedList}
+              onChange={onChange}
+              style={{ display: 'flex', flexDirection: 'column' }}
+            />
+          </Card>
         </Col>
-        <Col span={16} className="border border-gray-200 p-5">
-          <p className="p-2">
-            Select the fields you would like to include in your custom report,
-            and click Generate. The file (custom-asset-report-YYYY-mm-dd.csv)
-            will download automatically, and you can open it in Excel. If you
-            would like to export only certain assets, use the options below to
-            fine-tune your results.
-          </p>
-          <Form
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 16 }}
-            autoComplete="off"
-            labelAlign="right"
-            className="mt-5"
-            form={form}
-            onFinish={onFinish}
-          >
+        <Col span={16}>
+          <Card>
+            <p className="p-2">
+              Select the fields you would like to include in your custom report,
+              and click Generate. The file (custom-asset-report-YYYY-mm-dd.csv)
+              will download automatically, and you can open it in Excel. If you
+              would like to export only certain assets, use the options below to
+              fine-tune your results.
+            </p>
+            <Form
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 16 }}
+              autoComplete="off"
+              labelAlign="right"
+              className="mt-5"
+              form={form}
+              onFinish={onFinish}
+            >
 
-            {/* <Form.Item<CustomAsset>
+              {/* <Form.Item<CustomAsset>
               label="Company"
               name="company_id"
               rules={[{ required: true, message: "Please select company!" }]}
@@ -330,151 +335,152 @@ export default function CustomAssetReportRoutes() {
                 ))}
               </Select>
             </Form.Item> */}
-            <Form.Item<CustomAsset>
-              label="Location"
-              name="location_id"
-              rules={[{ required: true, message: "Please select location!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select Location"
-                optionFilterProp="children"
-                filterOption={(input, option) => {
-                  if (!option || !option.children) return false;
-                  return String(option.children).toLowerCase().includes(input.toLowerCase());
-                }}
+              <Form.Item<CustomAsset>
+                label="Location"
+                name="location_id"
+                rules={[{ required: true, message: "Please select location!" }]}
               >
-                {dataLocation.map((item: Location) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item<CustomAsset>
-              label="Model"
-              name="asset_model_id"
-              rules={[{ required: true, message: "Please select model!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select Asset Model"
-                optionFilterProp="children"
-                filterOption={(input, option) => {
-                  if (!option || !option.children) return false;
-                  return String(option.children).toLowerCase().includes(input.toLowerCase());
-                }}
+                <Select
+                  showSearch
+                  placeholder="Select Location"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false;
+                    return String(option.children).toLowerCase().includes(input.toLowerCase());
+                  }}
+                >
+                  {dataLocation.map((item: Location) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item<CustomAsset>
+                label="Model"
+                name="asset_model_id"
+                rules={[{ required: true, message: "Please select model!" }]}
               >
-                {dataAssetModel.map((item: AssetModel) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item<CustomAsset>
-              label="Supplier"
-              name="supplier_id"
-              rules={[{ required: true, message: "Please select supplier!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select Supplier"
-                optionFilterProp="children"
-                filterOption={(input, option) => {
-                  if (!option || !option.children) return false;
-                  return String(option.children).toLowerCase().includes(input.toLowerCase());
-                }}
+                <Select
+                  showSearch
+                  placeholder="Select Asset Model"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false;
+                    return String(option.children).toLowerCase().includes(input.toLowerCase());
+                  }}
+                >
+                  {dataAssetModel.map((item: AssetModel) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item<CustomAsset>
+                label="Supplier"
+                name="supplier_id"
+                rules={[{ required: true, message: "Please select supplier!" }]}
               >
-                {dataSupplier.map((item: Supplier) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item<CustomAsset>
-              label="Manufacturer"
-              name="manufacturer_id"
-              rules={[{ required: true, message: "Please select manufacturer!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select Manufacturer"
-                optionFilterProp="children"
-                filterOption={(input, option) => {
-                  if (!option || !option.children) return false;
-                  return String(option.children).toLowerCase().includes(input.toLowerCase());
-                }}
+                <Select
+                  showSearch
+                  placeholder="Select Supplier"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false;
+                    return String(option.children).toLowerCase().includes(input.toLowerCase());
+                  }}
+                >
+                  {dataSupplier.map((item: Supplier) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item<CustomAsset>
+                label="Manufacturer"
+                name="manufacturer_id"
+                rules={[{ required: true, message: "Please select manufacturer!" }]}
               >
-                {dataManufacturer.map((item: Manufacturer) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item<CustomAsset>
-              label="Category"
-              name="category_id"
-              rules={[{ required: true, message: "Please select category!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select Category"
-                optionFilterProp="children"
-                filterOption={(input, option) => {
-                  if (!option || !option.children) return false;
-                  return String(option.children).toLowerCase().includes(input.toLowerCase());
-                }}
+                <Select
+                  showSearch
+                  placeholder="Select Manufacturer"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false;
+                    return String(option.children).toLowerCase().includes(input.toLowerCase());
+                  }}
+                >
+                  {dataManufacturer.map((item: Manufacturer) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item<CustomAsset>
+                label="Category"
+                name="category_id"
+                rules={[{ required: true, message: "Please select category!" }]}
               >
-                {dataCategory.map((item: Category) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item<CustomAsset>
-              label="Status"
-              name="status_id"
-              rules={[{ required: true, message: "Please select status!" }]}
-            >
-              <Select
-                showSearch
-                placeholder="Select a status"
-                optionFilterProp="label"
-                options={[
-                  {
-                    value: "1",
-                    label: "Active",
-                  },
-                  {
-                    value: "2",
-                    label: "Inactive",
-                  },
-                ]}
-              />
-            </Form.Item>
+                <Select
+                  showSearch
+                  placeholder="Select Category"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => {
+                    if (!option || !option.children) return false;
+                    return String(option.children).toLowerCase().includes(input.toLowerCase());
+                  }}
+                >
+                  {dataCategory.map((item: Category) => (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item<CustomAsset>
+                label="Status"
+                name="status_id"
+                rules={[{ required: true, message: "Please select status!" }]}
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a status"
+                  optionFilterProp="label"
+                  options={[
+                    {
+                      value: "1",
+                      label: "Active",
+                    },
+                    {
+                      value: "2",
+                      label: "Inactive",
+                    },
+                  ]}
+                />
+              </Form.Item>
 
-            <Form.Item className="flex flex-wrap justify-center">
-              <Button
-                type="primary"
-                htmlType="submit"
-                icon={
-                  <>
-                    {loading && <LoadingOutlined className="animate-spin" />}
-                    {!loading && <AiOutlineSave />}
-                  </>
-                }
-                className="w-full sm:w-auto"
-                size="large"
-              >
-                <p>Generate</p>
-              </Button>
-            </Form.Item>
+              <Form.Item className="flex flex-wrap justify-center">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={
+                    <>
+                      {loading && <LoadingOutlined className="animate-spin" />}
+                      {!loading && <AiOutlineSave />}
+                    </>
+                  }
+                  className="w-full sm:w-auto"
+                  size="large"
+                >
+                  <p>Generate</p>
+                </Button>
+              </Form.Item>
 
-          </Form>
+            </Form>
+          </Card>
 
         </Col>
       </Row>

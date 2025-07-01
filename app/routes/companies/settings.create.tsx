@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { CompanyService } from "~/services/company.service";
@@ -126,100 +126,101 @@ export default function CreateCompanies() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Company Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input company name!",
-                                },
-                            ]}
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Company Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input company name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Phone No."
+                                name="phone"
+                            >
+                                <Input
+                                    type="number"
+                                    prefix={<AiOutlinePhone />}
+                                />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Fax"
+                                name="fax"
+                            >
+                                <Input prefix={<AiOutlinePrinter />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Email"
+                                name="email"
+                            >
+                                <Input prefix={<AiOutlineMail />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={24}>
+                            <Form.Item
+                                label="Notes"
+                                name="notes"
+                            >
+                                <TextArea rows={4} placeholder="(Optional)" />
+                            </Form.Item>
+                        </Col>
+
+                    </Row>
+
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
                         >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Phone No."
-                            name="phone"
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
                         >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Fax"
-                            name="fax"
-                        >
-                            <Input prefix={<AiOutlinePrinter />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                        >
-                            <Input prefix={<AiOutlineMail />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24}>
-                        <Form.Item
-                            label="Notes"
-                            name="notes"
-                        >
-                            <TextArea rows={4} placeholder="(Optional)" />
-                        </Form.Item>
-                    </Col>
-
-                </Row>
-
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
 import { AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
 import { ManufacturerService } from "~/services/manufacturer.service";
@@ -126,100 +126,101 @@ export default function CreateManufacturer() {
                 </Link>
             </div>
 
-            <Form
-                className="p-5 border border-gray-200"
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    notification: true,
-                    interests: ["sports", "music"],
-                }}
-            >
-                <Row gutter={24}>
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Manufacturer Name"
-                            name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input manufacturer name!",
-                                },
-                            ]}
+            <Card>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    initialValues={{
+                        notification: true,
+                        interests: ["sports", "music"],
+                    }}
+                >
+                    <Row gutter={24}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Manufacturer Name"
+                                name="name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input manufacturer name!",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="URL"
+                                name="url"
+                            >
+                                <Input prefix={<AiOutlineLink />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Support Phone No."
+                                name="support_phone"
+                            >
+                                <Input
+                                    type="number"
+                                    prefix={<AiOutlinePhone />}
+                                />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                label="Support Email"
+                                name="support_email"
+                            >
+                                <Input prefix={<AiOutlineMail />} />
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} sm={24}>
+                            <Form.Item
+                                label="Notes"
+                                name="notes"
+                            >
+                                <TextArea rows={4} placeholder="(Optional)" />
+                            </Form.Item>
+                        </Col>
+
+                    </Row>
+
+                    <Form.Item className="flex flex-wrap justify-end">
+                        <Button
+                            onClick={onReset}
+                            type="default"
+                            //   loading={loading}
+                            className="w-full sm:w-auto mr-4"
+                            size="large"
                         >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="URL"
-                            name="url"
+                            Reset
+                        </Button>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={
+                                <>
+                                    {loading && <LoadingOutlined className="animate-spin" />}
+                                    {!loading && <AiOutlineSend />}
+                                </>
+                            }
+                            className="w-full sm:w-auto"
+                            size="large"
                         >
-                            <Input prefix={<AiOutlineLink />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Support Phone No."
-                            name="support_phone"
-                        >
-                            <Input
-                                type="number"
-                                prefix={<AiOutlinePhone />}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={12}>
-                        <Form.Item
-                            label="Support Email"
-                            name="support_email"
-                        >
-                            <Input prefix={<AiOutlineMail />} />
-                        </Form.Item>
-                    </Col>
-
-                    <Col xs={24} sm={24}>
-                        <Form.Item
-                            label="Notes"
-                            name="notes"
-                        >
-                            <TextArea rows={4} placeholder="(Optional)" />
-                        </Form.Item>
-                    </Col>
-
-                </Row>
-
-                <Form.Item className="flex flex-wrap justify-end">
-                    <Button
-                        onClick={onReset}
-                        type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
-                        size="large"
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto"
-                        size="large"
-                    >
-                        {isEditMode && <p>Update</p>}
-                        {!isEditMode && <p>Submit</p>}
-                    </Button>
-                </Form.Item>
-            </Form>
+                            {isEditMode && <p>Update</p>}
+                            {!isEditMode && <p>Submit</p>}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
         </div>
     );
 }

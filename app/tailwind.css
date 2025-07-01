@@ -20,4 +20,88 @@ body {
     transition: all 0.3s ease;
   }
 
+  /* Custom scrollbar styles */
+  .dark-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .light-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .light-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .light-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  .light-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* Scrollbar styles that work with both light and dark modes */
+  .themed-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .themed-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .themed-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  /* Light mode scrollbar */
+  .light .themed-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  /* Horizontal Sider Styles */
+  .horizontal-sider {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: auto !important;
+  }
+
+  .horizontal-menu {
+    line-height: 46px;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: auto !important;
+  }
+
+  .horizontal-menu .ant-menu-item {
+    padding: 0 16px;
+  }
+
+  /* Hide scrollbar in horizontal mode */
+  .horizontal-menu::-webkit-scrollbar {
+    display: none;
+  }
+
 }
