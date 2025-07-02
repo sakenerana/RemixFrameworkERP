@@ -2,7 +2,7 @@ import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Col, Form, Input, message, Modal, Row, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineBarcode, AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineForm, AiOutlineNumber, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineSetting, AiOutlineShop, AiOutlineTag } from "react-icons/ai";
 import { AssetModelService } from "~/services/asset_model.service";
 import { CategoryService } from "~/services/category.service";
 import { DepreciationService } from "~/services/depreciation.service";
@@ -174,32 +174,47 @@ export default function CreateAssetModel() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
+        <div className="w-full px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
                     items={[
                         {
                             href: "/inventory",
-                            title: <HomeOutlined />,
+                            title: <HomeOutlined className="text-gray-500" />,
                         },
                         {
-                            title: "Settings",
+                            title: <span className="text-gray-500">Settings</span>,
                         },
                         {
-                            title: "Asset Model",
+                            title: <span className="text-gray-500">Asset Model</span>,
                         },
                         {
-                            title: "Form",
+                            title: <span className="text-blue-600 font-medium">Form</span>,
                         },
                     ]}
+                    className="text-sm"
                 />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/settings/asset-model'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
+
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                    {isTitle}
+                </h1>
+
+                <Link to="/inventory/settings/asset-model">
+                    <Button
+                        icon={<AiOutlineRollback />}
+                        className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                    >
+                        Back to Models
+                    </Button>
                 </Link>
             </div>
 
-            <Card>
+            {/* Form Card */}
+            <Card
+                className="w-full border-0 shadow-sm rounded-lg"
+                bodyStyle={{ padding: '24px' }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -209,34 +224,36 @@ export default function CreateAssetModel() {
                         interests: ["sports", "music"],
                     }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Asset Model Name"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input name!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Basic Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineForm className="text-blue-500" />
+                                Basic Information
+                            </h3>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Category"
-                                name="category_id"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please select category!",
-                                    },
-                                ]}
+                                label={<span className="font-medium">Model Name <span className="text-red-500">*</span></span>}
+                                name="name"
+                                rules={[{ required: true, message: "Please input name!" }]}
                             >
-                                <Select placeholder="Select Category">
+                                <Input
+                                    placeholder="Enter model name"
+                                    className="h-10 w-full"
+                                    prefix={<AiOutlineTag className="text-gray-400" />}
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label={<span className="font-medium">Category <span className="text-red-500">*</span></span>}
+                                name="category_id"
+                                rules={[{ required: true, message: "Please select category!" }]}
+                            >
+                                <Select
+                                    placeholder="Select Category"
+                                    className="h-10 w-full"
+                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                >
                                     {dataCategory.map((item: Category) => (
                                         <Option key={item.id} value={item.id}>
                                             {item.name}
@@ -244,14 +261,35 @@ export default function CreateAssetModel() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Manufacturer"
+                                label={<span className="font-medium">Model Number</span>}
+                                name="model_no"
+                            >
+                                <Input
+                                    placeholder="Enter model number"
+                                    className="h-10 w-full"
+                                    prefix={<AiOutlineBarcode className="text-gray-400" />}
+                                />
+                            </Form.Item>
+                        </div>
+
+                        {/* Vendor Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineShop className="text-blue-500" />
+                                Vendor Information
+                            </h3>
+
+                            <Form.Item
+                                label={<span className="font-medium">Manufacturer</span>}
                                 name="manufacturer_id"
                             >
-                                <Select placeholder="Select Manufacturer">
+                                <Select
+                                    placeholder="Select Manufacturer"
+                                    className="h-10 w-full"
+                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                >
                                     {dataManufacturer.map((item: Manufacturer) => (
                                         <Option key={item.id} value={item.id}>
                                             {item.name}
@@ -259,14 +297,16 @@ export default function CreateAssetModel() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Supplier"
+                                label={<span className="font-medium">Supplier</span>}
                                 name="supplier_id"
                             >
-                                <Select placeholder="Select Supplier">
+                                <Select
+                                    placeholder="Select Supplier"
+                                    className="h-10 w-full"
+                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                >
                                     {dataSupplier.map((item: Supplier) => (
                                         <Option key={item.id} value={item.id}>
                                             {item.name}
@@ -274,23 +314,24 @@ export default function CreateAssetModel() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                        </Col>
+                        </div>
 
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Model No."
-                                name="model_no"
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                        {/* Inventory Settings */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineSetting className="text-blue-500" />
+                                Inventory Settings
+                            </h3>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Depreciation"
+                                label={<span className="font-medium">Depreciation</span>}
                                 name="depreciation_id"
                             >
-                                <Select placeholder="Select Depreciation">
+                                <Select
+                                    placeholder="Select Depreciation"
+                                    className="h-10 w-full"
+                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                >
                                     {dataDepreciation.map((item: Depreciation) => (
                                         <Option key={item.id} value={item.id}>
                                             {item.name}
@@ -298,63 +339,72 @@ export default function CreateAssetModel() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Min QTY"
+                                label={<span className="font-medium">Minimum Quantity</span>}
                                 name="min_qty"
                             >
-                                <Input type="number" />
+                                <Input
+                                    type="number"
+                                    placeholder="Enter minimum quantity"
+                                    className="h-10 w-full"
+                                    prefix={<AiOutlineNumber className="text-gray-400" />}
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="EOL"
+                                label={<span className="font-medium">End of Life (EOL)</span>}
                                 name="eol"
                             >
-                                <Input suffix="MONTHS" type="number" />
+                                <Input
+                                    type="number"
+                                    placeholder="Enter months"
+                                    className="h-10 w-full"
+                                    prefix={<AiOutlineCalendar className="text-gray-400" />}
+                                    suffix={<span className="text-gray-500">MONTHS</span>}
+                                />
                             </Form.Item>
-                        </Col>
+                        </div>
+                    </div>
 
-                        <Col xs={24} sm={24}>
-                            <Form.Item
-                                label="Notes"
-                                name="notes"
-                            >
-                                <TextArea rows={4} placeholder="(Optional)" />
-                            </Form.Item>
-                        </Col>
+                    {/* Full Width Notes Section */}
+                    <div className="mt-6 w-full">
+                        <Form.Item
+                            label={<span className="font-medium">Notes</span>}
+                            name="notes"
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder="Additional notes about this asset model (optional)"
+                                className="rounded-lg w-full"
+                                maxLength={500}
+                                showCount
+                            />
+                        </Form.Item>
+                    </div>
 
-                    </Row>
-
-                    <Form.Item className="flex flex-wrap justify-end">
+                    {/* Form Actions */}
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
                         <Button
                             onClick={onReset}
                             type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
                             size="large"
+                            className="w-full sm:w-auto h-11"
+                            icon={<AiOutlineClear />}
                         >
-                            Reset
+                            Reset Form
                         </Button>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
                             size="large"
+                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            loading={loading}
+                            icon={!loading && <AiOutlineSave />}
                         >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
+                            {isEditMode ? 'Update Asset Model' : 'Create Asset Model'}
                         </Button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </Card>
         </div>

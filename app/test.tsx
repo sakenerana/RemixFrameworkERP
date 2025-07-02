@@ -94,21 +94,8 @@ export default function BudgetRoutes() {
     }
   };
 
-  const fetchDataUserTable = async () => {
-    try {
-      setLoading(true);
-      const dataFetch = await UserService.getActiveUsers();
-      setDataUserTable(dataFetch); // Works in React state
-    } catch (error) {
-      message.error("error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchDashboardData();
-    fetchDataUserTable();
   }, []);
 
   const dashboardMetrics: DashboardMetric[] = [
@@ -240,6 +227,7 @@ export default function BudgetRoutes() {
         />
 
         {/* Metrics Section */}
+        <Title level={4}>Key Metrics</Title>
         <Row gutter={[16, 16]}>
           {dashboardMetrics.map((metric, index) => (
             <Col key={index} xs={24} sm={12} md={12} lg={6}>
@@ -281,7 +269,7 @@ export default function BudgetRoutes() {
 
         {/* THIS IS THE SECOND ROW OF DASHBOARD */}
 
-        <Row>
+        <Row gutter={[16, 16]}>
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
             <Card
               className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
@@ -326,9 +314,9 @@ export default function BudgetRoutes() {
 
         {/* THIS IS THE THIRD ROW OF DASHBOARD */}
 
-        <Row>
+        <Row gutter={16} className="pt-7">
           <Col span={24}>
-            <div className="shadow-lg">
+            <div className="shadow-lg m-[-5px]">
               <Card title={
                 <div className="flex items-center">
                   <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
@@ -351,3 +339,23 @@ export default function BudgetRoutes() {
     </div>
   );
 }
+
+// const fetchDataUserTable = async () => {
+//     try {
+//       setLoading(true);
+//       const dataFetch = await UserService.getActiveUsers();
+//       setDataUserTable(dataFetch); // Works in React state
+//     } catch (error) {
+//       message.error("error");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchDataUser();
+//     fetchDataUserTable();
+//     fetchDataDepartment();
+//     fetchDataGroup();
+//     fetchDataInactiveUsers();
+//   }, []); // Empty dependency array means this runs once on mount

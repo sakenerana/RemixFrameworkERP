@@ -1,8 +1,8 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, DatePicker, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineClear, AiOutlineDropbox, AiOutlinePlusCircle, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineStock, AiOutlineTags } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 import { PredefinedKit } from "~/types/predefined_kit.type";
@@ -109,108 +109,145 @@ export default function CreateManufacturer() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
-                <Breadcrumb
-                    items={[
-                        {
-                            href: "/inventory",
-                            title: <HomeOutlined />,
-                        },
-                        {
-                            title: "Accessories",
-                        },
-                        {
-                            title: "Form",
-                        },
-                    ]}
-                />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/predefined-kit'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
-                </Link>
+        <div className="w-full">
+            {/* Header Section - Full Width */}
+            <div className="px-6 py-4 shadow-sm">
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <Breadcrumb
+                        items={[
+                            {
+                                href: "/inventory",
+                                title: <HomeOutlined className="text-gray-500" />,
+                            },
+                            {
+                                title: <span className="text-gray-500">Accessories</span>,
+                            },
+                            {
+                                title: <span className="text-blue-600 font-medium">Predefined Kit</span>,
+                            },
+                        ]}
+                        className="text-sm"
+                    />
+
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                        {isTitle}
+                    </h1>
+
+                    <Link to="/inventory/predefined-kit">
+                        <Button
+                            icon={<AiOutlineRollback />}
+                            className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                        >
+                            Back to Kits
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
-            <Card>
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    initialValues={{
-                        notification: true,
-                        interests: ["sports", "music"],
-                    }}
+            {/* Form Card - Full Width */}
+            <div className="p-5">
+                <Card
+                    className="w-full border-0 shadow-none"
+                    bodyStyle={{ padding: '24px' }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                label="Predefined Kit Name"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input predefined kit name!",
-                                    },
-                                ]}
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={onFinish}
+                        initialValues={{
+                            notification: true,
+                            interests: ["sports", "music"],
+                        }}
+                    >
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/* Kit Information */}
+                            <div className="space-y-4 md:col-span-2 lg:col-span-1">
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineDropbox className="text-blue-500" />
+                                    Kit Details
+                                </h3>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Kit Name <span className="text-red-500">*</span></span>}
+                                    name="name"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <Input
+                                        placeholder="Enter kit name"
+                                        prefix={<AiOutlineTags className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </div>
+
+                            {/* Quantity Information */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineStock className="text-blue-500" />
+                                    Quantity Details
+                                </h3>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Quantity <span className="text-red-500">*</span></span>}
+                                    name="qty"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={1}
+                                        placeholder="1"
+                                    />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Minimum Quantity</span>}
+                                    name="min_qty"
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={0}
+                                        placeholder="0"
+                                    />
+                                </Form.Item>
+                            </div>
+
+                            {/* <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                                    <AiOutlinePlusCircle className="text-blue-500" />
+                                    Additional Details
+                                </h3>
+
+                                <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                    <span className="text-gray-400">Additional fields can be added here</span>
+                                </div>
+                            </div> */}
+                        </div>
+
+                        {/* Form Actions - Full Width */}
+                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
+                            <Button
+                                onClick={onReset}
+                                type="default"
+                                size="large"
+                                className="w-full sm:w-auto h-11"
+                                icon={<AiOutlineClear />}
                             >
-                                <Input />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                label="Qty"
-                                name="qty"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input predefined kit qty!",
-                                    },
-                                ]}
+                                Clear Form
+                            </Button>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="large"
+                                className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                                loading={loading}
+                                icon={!loading && <AiOutlineSave />}
                             >
-                                <Input type="number" />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                label="Min Qty"
-                                name="min_qty"
-                            >
-                                <Input type="number" />
-                            </Form.Item>
-                        </Col>
-
-                    </Row>
-
-                    <Form.Item className="flex flex-wrap justify-end">
-                        <Button
-                            onClick={onReset}
-                            type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
-                            size="large"
-                        >
-                            Reset
-                        </Button>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
-                            size="large"
-                        >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </Card>
+                                {isEditMode ? 'Update Kit' : 'Create Kit'}
+                            </Button>
+                        </div>
+                    </Form>
+                </Card>
+            </div>
         </div>
     );
 }

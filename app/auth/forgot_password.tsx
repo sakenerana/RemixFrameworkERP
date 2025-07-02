@@ -24,66 +24,110 @@ export default function ForgotPasswordIndex() {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfionline.jpg)] bg-cover bg-no-repeat">
-      <Card className="shadow-2xl">
-        <div className="flex flex-col items-center mb-5">
-          <Image width={290} src="./img/cficoop.svg" />
-        </div>
-        <h1 className="flex flex-col items-center">
-          <b>FORGOT PASSWORD</b>
-        </h1>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[url(/img/cfionline.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
+      <Card className="w-full max-w-md shadow-xl rounded-lg overflow-hidden backdrop-blur-sm bg-white/90">
+        <div className="px-8 py-8">
+          {/* Logo Section */}
+          <div className="flex flex-col items-center mb-8">
+            <Image
+              width={250}
+              src="./img/cficoop.svg"
+              alt="CFI Cooperative Logo"
+              className="transition-all duration-300 hover:scale-105"
+            />
+          </div>
 
-        <Form
-          name="login"
-          initialValues={{ remember: true }}
-          style={{ maxWidth: 360, width: 360 }}
-          onFinish={onFinish}
-        >
+          {/* Title */}
+          <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Reset Your Password
+          </h1>
+
+          {/* Info Alert */}
           <Alert
-            className="mb-5 mt-5"
-            message="Please enter your active email to reset password."
+            className="mb-6 rounded-lg"
+            message="Password Reset Instructions"
+            description="Please enter your registered email address to receive a password reset link."
             type="info"
             showIcon
+            closable
           />
 
-          <Form.Item
-            name="email"
-            rules={[
-              {
-                type: "email",
-                message: "The input is not valid E-mail!",
-              },
-              {
-                required: true,
-                message: "Please input your E-mail!",
-              },
-            ]}
+          {/* Reset Form */}
+          <Form
+            name="forgot-password"
+            onFinish={onFinish}
+            layout="vertical"
           >
-            <Input prefix={<MailOutlined />} placeholder="Email" />
-          </Form.Item>
-          <p>
-            <b>
-              Accounts without an associated email address will not be emailed
-              a password reset link.
-            </b>
-          </p>
-          <br />
-          {/* <p className="pb-5">
-            If you cannot remember your username, contact your administrator.
-          </p> */}
-          <Form.Item>
-            <Button block type="primary" htmlType="submit">
-              {loading && <LoadingOutlined className="animate-spin" />}
-              {!loading && <p>Email Password Reset</p>}
-            </Button>
-            <p className="flex flex-col items-center pt-5 pb-5">or</p>
+            {/* Email Field */}
+            <Form.Item
+              name="email"
+              label="Email Address"
+              rules={[
+                {
+                  type: "email",
+                  message: "Please enter a valid email address",
+                },
+                {
+                  required: true,
+                  message: "Please enter your email address",
+                },
+              ]}
+              className="mb-4"
+            >
+              <Input
+                prefix={<MailOutlined className="text-gray-400" />}
+                placeholder="your.email@example.com"
+                size="large"
+                className="py-2"
+              />
+            </Form.Item>
+
+            {/* Information Text */}
+            <p className="text-sm text-gray-600 mb-6">
+              <span className="font-semibold">Note:</span> Accounts without a verified email address
+              will not receive a password reset link. Please contact support if you need assistance.
+            </p>
+
+            {/* Submit Button */}
+            <Form.Item className="mb-4">
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                size="large"
+                className="h-12 font-medium text-base"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <LoadingOutlined className="animate-spin mr-2" />
+                    Sending Reset Link...
+                  </span>
+                ) : (
+                  "Send Reset Link"
+                )}
+              </Button>
+            </Form.Item>
+
+            {/* Divider */}
+            <div className="flex items-center mb-4">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-3 text-gray-500">or</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            {/* Back to Login */}
             <Link to="/">
-              <Button block type="default">
-                Go to Login
+              <Button
+                block
+                size="large"
+                className="h-12 font-medium"
+              >
+                Return to Login
               </Button>
             </Link>
-          </Form.Item>
-        </Form>
+          </Form>
+        </div>
       </Card>
     </div>
   );

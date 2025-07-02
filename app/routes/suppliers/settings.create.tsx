@@ -2,7 +2,7 @@ import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineEnvironment, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
+import { AiOutlineClear, AiOutlineContacts, AiOutlineEnvironment, AiOutlineHome, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineShop, AiOutlineSolution, AiOutlineUser } from "react-icons/ai";
 import { SupplierService } from "~/services/supplier.service";
 import { Supplier } from "~/types/supplier.type";
 import countries from '../../data/country.json';
@@ -102,32 +102,47 @@ export default function CreateSuppliers() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
+        <div className="w-full px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
                     items={[
                         {
                             href: "/inventory",
-                            title: <HomeOutlined />,
+                            title: <HomeOutlined className="text-gray-500" />,
                         },
                         {
-                            title: "Settings",
+                            title: <span className="text-gray-500">Settings</span>,
                         },
                         {
-                            title: "Supplier",
+                            title: <span className="text-gray-500">Supplier</span>,
                         },
                         {
-                            title: "Form",
+                            title: <span className="text-blue-600 font-medium">Form</span>,
                         },
                     ]}
+                    className="text-sm"
                 />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/settings/suppliers'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
+
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                    {isTitle}
+                </h1>
+
+                <Link to="/inventory/settings/suppliers">
+                    <Button
+                        icon={<AiOutlineRollback />}
+                        className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                    >
+                        Back to Suppliers
+                    </Button>
                 </Link>
             </div>
 
-            <Card>
+            {/* Form Card */}
+            <Card
+                className="w-full border-0 shadow-sm rounded-lg"
+                bodyStyle={{ padding: '24px' }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -137,169 +152,209 @@ export default function CreateSuppliers() {
                         interests: ["sports", "music"],
                     }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={8}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Supplier Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineShop className="text-blue-500" />
+                                Supplier Details
+                            </h3>
+
                             <Form.Item
-                                label="Supplier Name"
+                                label={<span className="font-medium">Supplier Name <span className="text-red-500">*</span></span>}
                                 name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input supplier name!",
-                                    },
-                                ]}
+                                rules={[{ required: true, message: "Required field" }]}
                             >
-                                <Input />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Address"
-                                name="address"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Address2"
-                                name="address2"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="City"
-                                name="city"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="State"
-                                name="state"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Country"
-                                name="country"
-                            >
-                                <Select
-                                    prefix={<AiOutlineEnvironment />}
-                                    showSearch
-                                    placeholder="Select Country"
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={countries}
+                                <Input
+                                    placeholder="Enter supplier name"
+                                    prefix={<AiOutlineSolution className="text-gray-400" />}
+                                    className="h-10 w-full"
                                 />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Zip"
-                                name="zip"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Contact Name"
+                                label={<span className="font-medium">Contact Name</span>}
                                 name="contact"
                             >
-                                <Input prefix={<AiOutlineSolution />} />
+                                <Input
+                                    placeholder="Primary contact person"
+                                    prefix={<AiOutlineUser className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Email"
+                                label={<span className="font-medium">Email</span>}
                                 name="email"
+                                rules={[{ type: 'email', message: 'Invalid email format' }]}
                             >
-                                <Input prefix={<AiOutlineMail />} />
+                                <Input
+                                    placeholder="contact@example.com"
+                                    prefix={<AiOutlineMail className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
+                        </div>
 
-                        <Col xs={24} sm={8}>
+                        {/* Contact Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineContacts className="text-blue-500" />
+                                Contact Details
+                            </h3>
+
                             <Form.Item
-                                label="Phone No."
+                                label={<span className="font-medium">Phone Number</span>}
                                 name="phone"
                             >
                                 <Input
-                                    type="number"
-                                    prefix={<AiOutlinePhone />}
+                                    placeholder="+1 (555) 123-4567"
+                                    prefix={<AiOutlinePhone className="text-gray-400" />}
+                                    className="h-10 w-full"
                                 />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Fax"
+                                label={<span className="font-medium">Fax</span>}
                                 name="fax"
                             >
-                                <Input prefix={<AiOutlinePrinter />} />
+                                <Input
+                                    placeholder="Fax number"
+                                    prefix={<AiOutlinePrinter className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="URL"
+                                label={<span className="font-medium">Website URL</span>}
                                 name="url"
                             >
-                                <Input prefix={<AiOutlineLink />} />
+                                <Input
+                                    placeholder="https://example.com"
+                                    prefix={<AiOutlineLink className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
+                        </div>
 
-                        <Col xs={24} sm={24}>
+                        {/* Address Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineEnvironment className="text-blue-500" />
+                                Address Details
+                            </h3>
+
                             <Form.Item
-                                label="Notes"
-                                name="notes"
+                                label={<span className="font-medium">Address Line 1</span>}
+                                name="address"
                             >
-                                <TextArea rows={4} placeholder="(Optional)" />
+                                <Input
+                                    placeholder="Street address"
+                                    prefix={<AiOutlineHome className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                    </Row>
+                            <Form.Item
+                                label={<span className="font-medium">Address Line 2</span>}
+                                name="address2"
+                            >
+                                <Input
+                                    placeholder="Apt, suite, etc."
+                                    className="h-10 w-full"
+                                />
+                            </Form.Item>
 
-                    <Form.Item className="flex flex-wrap justify-end">
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item
+                                    label={<span className="font-medium">City</span>}
+                                    name="city"
+                                >
+                                    <Input
+                                        placeholder="City"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="font-medium">State</span>}
+                                    name="state"
+                                >
+                                    <Input
+                                        placeholder="State/Province"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item
+                                    label={<span className="font-medium">Zip Code</span>}
+                                    name="zip"
+                                >
+                                    <Input
+                                        placeholder="Postal code"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Country</span>}
+                                    name="country"
+                                >
+                                    <Select
+                                        className="h-10 w-full"
+                                        showSearch
+                                        placeholder="Select country"
+                                        optionFilterProp="children"
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
+                                        options={countries}
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Full Width Notes Section */}
+                    <div className="mt-6 w-full">
+                        <Form.Item
+                            label={<span className="font-medium">Notes</span>}
+                            name="notes"
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder="Additional notes about this supplier (optional)"
+                                className="rounded-lg w-full"
+                                maxLength={500}
+                                showCount
+                            />
+                        </Form.Item>
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
                         <Button
                             onClick={onReset}
                             type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
                             size="large"
+                            className="w-full sm:w-auto h-11"
+                            icon={<AiOutlineClear />}
                         >
-                            Reset
+                            Clear Form
                         </Button>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
                             size="large"
+                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            loading={loading}
+                            icon={!loading && <AiOutlineSave />}
                         >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
+                            {isEditMode ? 'Update Supplier' : 'Create Supplier'}
                         </Button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </Card>
         </div>

@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { ApiOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -427,82 +427,182 @@ export default function AccesoriessRoute() {
   };
 
   return (
-    <div>
+    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+      {/* Checkout Modal */}
       <Modal
-        style={{ top: 20 }}
-        width={420}
-        title="Check-out Accessory"
-        closable={{ "aria-label": "Custom Close Button" }}
+        width={480}
+        title={
+          <div className="flex items-center gap-2">
+            <ApiOutlined className="text-blue-500" />
+            <span className="font-medium">Check-out Accessory</span>
+          </div>
+        }
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
-        footer=""
+        footer={null}
+        centered
+        styles={{
+          header: {
+            borderBottom: '1px solid #f0f0f0',
+            padding: '16px 24px'
+          },
+          body: {
+            padding: '24px'
+          }
+        }}
       >
-        <Checkout stateData={dataRow} onSuccess={handleSuccess} onClose={() => { setIsModalOpen(false), fetchData() }}></Checkout>
-      </Modal>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/inventory",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Accessories",
-            },
-          ]}
+        <Checkout
+          stateData={dataRow}
+          onSuccess={handleSuccess}
+          onClose={() => {
+            setIsModalOpen(false);
+            fetchData();
+          }}
         />
-        <Space wrap>
-          <Link to={"deleted-accessories"}>
-            <Button icon={<AiOutlineFileExclamation />} danger>
-              Show Inactive Accessories
+      </Modal>
+
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/inventory",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Accessories Inventory</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
+
+        <Space wrap className="mt-2 sm:mt-0">
+          <Link to="deleted-accessories">
+            <Button
+              icon={<AiOutlineFileExclamation />}
+              danger
+              className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50"
+            >
+              Archived Accessories
             </Button>
           </Link>
-
-          <Link to={"form-accessory"}>
-            <Button icon={<AiOutlinePlus />} type="primary">
-              Create Accessory
+          <Link to="form-accessory">
+            <Button
+              icon={<AiOutlinePlus />}
+              type="primary"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              New Accessory
             </Button>
           </Link>
         </Space>
       </div>
-      <div className="flex justify-between">
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all accessories. Please check closely."
+          message="Accessories Catalog: Manage supplementary items that complement your primary assets."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search accessories..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[220px]"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading accessories..."
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 36,
+                  color: '#1890ff'
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      ) : (
         <Table<Accessories>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} accessories`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <ApiOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500 mb-4">No accessories found</p>
+                <Button
+                  type="primary"
+                  className="mt-2"
+                  onClick={() => navigate('/inventory/accessories/form-accessory')}
+                  icon={<AiOutlinePlus />}
+                >
+                  Add First Accessory
+                </Button>
+              </div>
+            )
+          }}
         />
       )}
     </div>

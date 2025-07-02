@@ -22,21 +22,21 @@ body {
 
   /* Custom scrollbar styles */
   .dark-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 8px !important;
+    height: 8px !important;
   }
 
   .dark-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05) !important;
   }
 
   .dark-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 4px !important;
   }
 
   .dark-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3) !important;
   }
 
   .light-scrollbar::-webkit-scrollbar {

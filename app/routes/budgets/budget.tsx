@@ -21,7 +21,7 @@ import {
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
 import LineChart from "~/components/line_chart";
 
 interface DataType {
@@ -65,6 +65,7 @@ export default function Budgets() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    form.resetFields();
   };
 
   const formatCurrency = (amount: number) => {
@@ -205,95 +206,125 @@ export default function Budgets() {
           </Space>
         </Space>
         <Modal
-          style={{ top: 20 }}
-          width={400}
-          title="Create Budget"
-          closable={{ "aria-label": "Custom Close Button" }}
+          width={460}
+          title={
+            <div className="flex items-center gap-3">
+              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
+              <span className="text-xl font-semibold">Create Budget</span>
+            </div>
+          }
           open={isModalOpen}
-          onOk={handleOk}
           onCancel={handleCancel}
-          footer=""
+          footer={null}
+          centered
+          destroyOnClose
+          styles={{
+            header: {
+              borderBottom: '1px solid #f0f0f0',
+              padding: '20px 24px'
+            },
+            body: {
+              padding: '24px'
+            }
+          }}
+          className="budget-modal"
         >
-          <div>
-            <Form
-              className="mt-6"
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                notification: true,
-                interests: ["sports", "music"],
-              }}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            className="budget-form"
+          >
+            {/* Date Range Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Budget Period <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="date"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select budget period'
+                }
+              ]}
+              className="mb-6"
             >
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Start of Date to End of Date"
-                    name="date"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input date!",
-                      },
-                    ]}
-                  >
-                    <RangePicker className="w-full" />
-                  </Form.Item>
-                </Col>
-              </Row>
+              <RangePicker
+                className="w-full h-10 rounded-lg"
+                suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                format="MMM D, YYYY"
+                placeholder={['Start date', 'End date']}
+              />
+            </Form.Item>
 
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Initial Balance"
-                    name="initial_balance"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter initial balance!",
-                      },
-                    ]}
-                  >
-                    <InputNumber
-                      type="number"
-                      className="w-full"
-                      addonBefore="₱"
-                      defaultValue={0}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
+            {/* Initial Balance Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Initial Balance <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="initial_balance"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter initial amount'
+                },
+                {
+                  type: 'number',
+                  min: 0,
+                  message: 'Amount must be positive'
+                }
+              ]}
+              className="mb-2"
+            >
+              <InputNumber
+                className="w-full h-10 rounded-lg"
+                min={0}
+                step={1000}
+                formatter={(value) => {
+                  if (value === undefined || value === null) return '₱ 0';
+                  // Format with commas and peso sign
+                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }}
+                parser={(value: any) => {
+                  // Remove all non-numeric characters
+                  return value ? value.replace(/[^\d]/g, '') : '';
+                }}
+                placeholder="Enter amount"
+              />
+            </Form.Item>
 
-              <Divider />
+            <div className="text-sm text-gray-500 mb-6">
+              <AiOutlineInfoCircle className="inline mr-2" />
+              Enter the starting balance for this budget period
+            </div>
 
-              <Form.Item className="flex flex-wrap justify-end">
-                <Button
-                  onClick={onReset}
-                  type="default"
-                  //   loading={loading}
-                  className="w-full sm:w-auto mr-4"
-                  size="large"
-                >
-                  Reset
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={
-                    <>
-                      {loading && <LoadingOutlined className="animate-spin" />}
-                      {!loading && <AiOutlineSend />}
-                    </>
-                  }
-                  //   loading={loading}
-                  className="w-full sm:w-auto"
-                  size="large"
-                >
-                  Submit
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
+            {/* Form Actions */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+              <Button
+                onClick={onReset}
+                type="default"
+                size="large"
+                className="w-full sm:w-auto h-11"
+                icon={<AiOutlineClear className="text-gray-600" />}
+              >
+                Clear
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                loading={loading}
+                icon={!loading && <AiOutlineCheck />}
+              >
+                {loading ? 'Creating...' : 'Create Budget'}
+              </Button>
+            </div>
+          </Form>
         </Modal>
       </div>
       <Alert

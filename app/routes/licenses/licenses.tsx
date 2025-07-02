@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SafetyCertificateOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -416,70 +416,149 @@ export default function LicensesRoute() {
   };
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/inventory",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Licenses",
-            },
-          ]}
-        />
-        <Space wrap>
-          <Link to={"deleted-license"}>
-            <Button icon={<AiOutlineFileExclamation />} danger>
-              Show Inactive Licenses
+    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/inventory",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Software Licenses</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
+
+        <Space wrap className="mt-2 sm:mt-0">
+          <Link to="deleted-license">
+            <Button
+              icon={<AiOutlineFileExclamation />}
+              danger
+              className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50"
+            >
+              Expired Licenses
             </Button>
           </Link>
-
-          <Link to={"form-license"}>
-            <Button icon={<AiOutlinePlus />} type="primary">
-              Create License
+          <Link to="form-license">
+            <Button
+              icon={<AiOutlinePlus />}
+              type="primary"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              Add License
             </Button>
           </Link>
         </Space>
       </div>
-      <div className="flex justify-between">
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all licensed item. Please check closely."
+          message="License Compliance: Track and manage all software licenses to ensure compliance."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search licenses..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[220px]"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading license data..."
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 36,
+                  color: '#1890ff'
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      ) : (
         <Table<License>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} licenses`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <SafetyCertificateOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500 mb-4">No software licenses found</p>
+                <Button
+                  type="primary"
+                  className="mt-2"
+                  onClick={() => navigate('/inventory/licenses/form-license')}
+                  icon={<AiOutlinePlus />}
+                >
+                  Register First License
+                </Button>
+              </div>
+            )
+          }}
         />
       )}
     </div>

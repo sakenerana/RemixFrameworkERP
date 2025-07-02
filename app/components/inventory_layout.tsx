@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FullscreenExitOutlined, FullscreenOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined, SwapOutlined } from "@ant-design/icons";
+import { FullscreenExitOutlined, FullscreenOutlined, MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined, SwapOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
 import {
   Button,
   Layout,
@@ -39,6 +39,9 @@ const { Header, Sider, Content } = Layout;
 export default function InventoryLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHorizontal, setIsHorizontal] = useState(false);
+  const [isFname, setIsFname] = useState('');
+  const [isLname, setIsLname] = useState('');
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage or system preference
@@ -49,7 +52,10 @@ export default function InventoryLayoutIndex() {
   useEffect(() => {
     // Save preference to localStorage
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-
+    const fname = localStorage.getItem('fname');
+    const lname = localStorage.getItem('lname');
+    setIsFname(fname || ''); // Provide fallback for null
+    setIsLname(lname || ''); // Provide fallback for null
     // Optional: Update body class for global styles
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
   }, [isDarkMode]);
@@ -369,40 +375,48 @@ export default function InventoryLayoutIndex() {
         }}
       >
         <Layout className="flex flex-col h-screen">
-          <Sider
-            className="h-screen sticky top-0"
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            width={250}
-            theme={isDarkMode ? "dark" : "light"}
-            style={{
-              background: isDarkMode ? '#141414' : '#ffffff',
-              borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
-            }}
-          >
-            <div
-              className="demo-logo-vertical"
-              style={{
-                background: isDarkMode ? '#1f1f1f' : '#fafafa',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
-              }}
-            />
-
-            <Menu
-              theme={isDarkMode ? 'dark' : 'light'}
-              mode="inline"
-              defaultSelectedKeys={["1"]}
-              items={menuItems}
+          {!isHorizontal && (
+            <Sider
+              trigger={null}
+              collapsible
+              collapsed={collapsed}
+              width={250}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
-                borderRight: 'none'
+                borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
+                height: '100vh',
+                position: 'sticky',
+                top: 0,
+                left: 0,
               }}
-              className={`h-[calc(100vh-64px)] overflow-y-auto ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
-                }`}
-            // className="h-[calc(100vh-64px)] overflow-y-auto"
-            />
-          </Sider>
+            >
+              <div style={{
+                height: 64,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: isDarkMode ? '#1f1f1f' : '#fafafa',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+              }}>
+                {collapsed ? <img src="./img/user.png" alt="User" width={50} /> :
+                  <div className="flex flex-wrap">
+                    <img src="./img/user.png" alt="User" width={30} />
+                    <span className="mt-1 ml-4 font-medium">{isFname} {isLname}</span>
+                  </div>}
+              </div>
+              <Menu
+                theme={isDarkMode ? 'dark' : 'light'}
+                mode="inline"
+                defaultSelectedKeys={['1']}
+                items={menuItems}
+                style={{
+                  background: isDarkMode ? '#141414' : '#ffffff',
+                  height: 'calc(100vh - 64px)',
+                  overflowY: 'auto',
+                }}
+              />
+            </Sider>
+          )}
           <Layout>
             <Header
               style={{
@@ -412,31 +426,36 @@ export default function InventoryLayoutIndex() {
               }}
               className="flex items-center"
             >
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  fontSize: "16px",
-                  width: 64,
-                  height: 64,
-                  color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
-                }}
-                className="hover:bg-[rgba(255,255,255,0.1)]"
-              />
 
-              <div className="ml-4">
-                <Image
-                  width={270}
-                  src={isDarkMode ? './img/cficoop-white.png' : './img/cficoop.svg'}
-                  preview={false}
-                  className="mt-5"
-                />
-              </div>
+              <Space style={{ marginLeft: 16 }}>
+                {!isHorizontal && (
+                  <Button
+                    type="text"
+                    icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    onClick={() => setCollapsed(!collapsed)}
+                    style={{
+                      fontSize: "16px",
+                      width: 64,
+                      height: 64,
+                      color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
+                    }}
+                    className="hover:bg-[rgba(255,255,255,0.1)]"
+                  />
+                )}
+                <div className="ml-4">
+                  <Image
+                    width={270}
+                    src={isDarkMode ? './img/cficoop-white.png' : './img/cficoop.svg'}
+                    preview={false}
+                    className="mt-5"
+                  />
+                </div>
+              </Space>
 
               <div className="flex-1">
                 <div className="flex justify-end items-center h-full pr-4">
-                  <Space className="gap-0">
+                  <Space className="gap-2">
+
                     <Switch
                       checkedChildren={<MoonOutlined className="text-white" />}
                       unCheckedChildren={<SunOutlined className="text-yellow-500" />}
@@ -444,6 +463,17 @@ export default function InventoryLayoutIndex() {
                       onChange={() => setIsDarkMode(prev => !prev)}
                       className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
                     />
+
+                    <Button
+                      type="text"
+                      icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
+                      onClick={() => setIsHorizontal(!isHorizontal)}
+                      style={{
+                        color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
+                      }}
+                    >
+                      {isHorizontal ? 'Vertical' : 'Horizontal'}
+                    </Button>
 
                     <Button
                       icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
@@ -509,6 +539,24 @@ export default function InventoryLayoutIndex() {
                 <Setting onSendData={(data: any) => setIsModalOpen(data)} />
               </Modal>
             </Header>
+            {/* Horizontal Menu (when in horizontal mode) */}
+            {isHorizontal && (
+              <Header className="p-0">
+                <Menu
+                  theme={isDarkMode ? 'dark' : 'light'}
+                  mode="horizontal"
+                  defaultSelectedKeys={['1']}
+                  items={menuItems}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                    lineHeight: '64px',
+                  }}
+                />
+
+              </Header>
+            )}
             <Content
               className={`flex flex-col h-full overflow-auto themed-scrollbar ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
                 }`}
@@ -522,11 +570,16 @@ export default function InventoryLayoutIndex() {
             >
               <Outlet />
             </Content>
-            <div className="flex justify-between">
-              <div className="w-fit pl-5 pb-5">
+            <div className={`
+      flex justify-between items-center
+      ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
+      border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
+      py-4 px-5
+    `}>
+              <div className="text-sm">
                 Ant Design using Remix <b>©{new Date().getFullYear()}</b>
               </div>
-              <div className="pr-5">
+              <div className="text-sm">
                 <b>Developed by:</b> CFI IT Department
               </div>
             </div>

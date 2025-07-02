@@ -3,11 +3,13 @@ import {
   HomeOutlined,
   LoadingOutlined,
   SettingOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   CheckboxOptionType,
   Col,
@@ -33,12 +35,20 @@ import {
 import { useEffect, useState } from "react";
 import {
   AiOutlineCloseCircle,
+  AiOutlineContacts,
   AiOutlineDelete,
+  AiOutlineDown,
   AiOutlineEdit,
+  AiOutlineInfoCircle,
+  AiOutlineLock,
   AiOutlineMail,
   AiOutlinePhone,
   AiOutlinePlus,
+  AiOutlineSafetyCertificate,
+  AiOutlineSave,
   AiOutlineSend,
+  AiOutlineTeam,
+  AiOutlineUndo,
   AiOutlineUser,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
@@ -402,345 +412,452 @@ export default function UsersRoutes() {
   ];
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/admin",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Admin",
-            },
-            {
-              title: "Users",
-            },
-          ]}
-        />
-        <Space wrap>
-          {/* <Link to={"deleted-user"}>
-            <Button icon={<AiOutlineUserDelete />} type="primary" danger>
-              Show Inactive Users
-            </Button>
-          </Link> */}
+    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/admin",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-gray-500">Admin</span>,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">User Management</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
+
+        <Space wrap className="mt-2 sm:mt-0">
           <Button
             onClick={() => handleTrack()}
             icon={<AiOutlinePlus />}
             type="primary"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
           >
-            Create User
+            Add User
           </Button>
         </Space>
-        <Modal
-          style={{ top: 20 }}
-          width={900}
-          title={isTitle}
-          closable={{ "aria-label": "Custom Close Button" }}
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          footer=""
+      </div>
+
+      {/* User Creation/Edit Modal */}
+      <Modal
+        width={900}
+        title={
+          <div className="flex items-center gap-2">
+            <AiOutlineUser className="text-blue-500 text-xl" />
+            <span className="text-lg font-semibold">{isTitle}</span>
+          </div>
+        }
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+        centered
+        destroyOnClose
+        styles={{
+          header: { borderBottom: '1px solid #f0f0f0', padding: '16px 24px' },
+          body: { padding: '24px' }
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          className="space-y-6"
         >
-          <div>
-            <Form
-              className="mt-5"
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                notification: true,
-                interests: ["sports", "music"],
-              }}
+          {/* Personal Information Section */}
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                <AiOutlineInfoCircle className="text-blue-500" />
+                <span>Personal Information</span>
+              </div>
+            }
+            className="shadow-none"
+            headStyle={{ borderBottom: '1px solid #f0f0f0' }}
+          >
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">First Name <span className="text-red-500">*</span></span>}
+                  name="first_name"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Input
+                    placeholder="John"
+                    prefix={<AiOutlineUser className="text-gray-400" />}
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label="Middle Name"
+                  name="middle_name"
+                >
+                  <Input
+                    placeholder="Michael"
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Last Name <span className="text-red-500">*</span></span>}
+                  name="last_name"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Input
+                    placeholder="Doe"
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Contact Information Section */}
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                <AiOutlineContacts className="text-blue-500" />
+                <span>Contact Information</span>
+              </div>
+            }
+            className="shadow-none"
+            headStyle={{ borderBottom: '1px solid #f0f0f0' }}
+          >
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Email <span className="text-red-500">*</span></span>}
+                  name="email"
+                  rules={[
+                    { required: true, message: "Required field" },
+                    { type: 'email', message: 'Invalid email format' }
+                  ]}
+                >
+                  <Input
+                    placeholder="john.doe@example.com"
+                    prefix={<AiOutlineMail className="text-gray-400" />}
+                    disabled={isEditMode}
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Phone <span className="text-red-500">*</span></span>}
+                  name="phone"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Input
+                    type="tel"
+                    placeholder="+1 (555) 123-4567"
+                    prefix={<AiOutlinePhone className="text-gray-400" />}
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Username <span className="text-red-500">*</span></span>}
+                  name="username"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Input
+                    placeholder="johndoe"
+                    prefix={<AiOutlineUser className="text-gray-400" />}
+                    className="h-10"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Security Section */}
+          {!isEditMode && (
+            <Card
+              title={
+                <div className="flex items-center gap-2">
+                  <AiOutlineLock className="text-blue-500" />
+                  <span>Security</span>
+                </div>
+              }
+              className="shadow-none"
+              headStyle={{ borderBottom: '1px solid #f0f0f0' }}
             >
-              <Row gutter={24}>
-                <Col xs={24} sm={8}>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
                   <Form.Item
-                    label="First Name"
-                    name="first_name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input account first name!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="First Name" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Middle Name"
-                    name="middle_name"
-                  // rules={[
-                  //   {
-                  //     required: true,
-                  //     message: "Please input middle name!",
-                  //   },
-                  // ]}
-                  >
-                    <Input placeholder="Middle Name" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Last Name"
-                    name="last_name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input last name!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Last Name" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input email!",
-                      },
-                    ]}
-                  >
-                    <Input prefix={<AiOutlineMail />} disabled={isEditMode} placeholder="Email" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Password"
+                    label={<span className="font-medium">Password <span className="text-red-500">*</span></span>}
                     name="password"
                     rules={[
-                      {
-                        required: true,
-                        message: "Please input password!",
-                      },
+                      { required: true, message: "Required field" },
+                      { min: 8, message: "Minimum 8 characters" }
                     ]}
+                    help="Minimum 8 characters with at least 1 number and special character"
                   >
-                    <Input.Password disabled={isEditMode} placeholder="Password" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Phone No."
-                    name="phone"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input phone number!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      type="number"
-                      prefix={<AiOutlinePhone />}
-                      placeholder="Phone"
-                    />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Username"
-                    name="username"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select username!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      prefix={<AiOutlineUser />}
-                      placeholder="Username"
-                    />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Department"
-                    name="department_id"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select department type!",
-                      },
-                    ]}
-                  >
-                    <Select placeholder="Select department">
-                      {dataDepartment.map((item: Department) => (
-                        <Option key={item.id} value={item.id}>
-                          {item.department}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={8}>
-                  <Form.Item
-                    label="Group"
-                    name="group_id"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select group type!",
-                      },
-                    ]}
-                  >
-                    <Select placeholder="Select group">
-                      {dataGroup.map((item: Groups) => (
-                        <Option key={item.id} value={item.id}>
-                          {item.group}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Divider />
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Office"
-                    name="office_id"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select branch office!",
-                      },
-                    ]}
-                  >
-                    <Radio.Group
-                      options={optionsOffice}
+                    <Input.Password
+                      placeholder="••••••••"
+                      className="h-10"
                     />
                   </Form.Item>
                 </Col>
               </Row>
+            </Card>
+          )}
 
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="User Access"
-                    name="access"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select user access!",
-                      },
-                    ]}
-                  >
-                    <Checkbox.Group
-                      options={options}
-                      onChange={onChangeAccess}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Permission"
-                    name="permissions"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select user access!",
-                      },
-                    ]}
-                  >
-                    <Checkbox.Group
-                      options={optionsPermission}
-                      onChange={onChangeAccess}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Divider />
-
-              <Form.Item className="flex flex-wrap justify-end">
-                <Button
-                  onClick={onReset}
-                  type="default"
-                  //   loading={loading}
-                  className="w-full sm:w-auto mr-4"
-                  size="large"
+          {/* Organizational Information Section */}
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                <AiOutlineTeam className="text-blue-500" />
+                <span>Organizational Information</span>
+              </div>
+            }
+            className="shadow-none"
+            headStyle={{ borderBottom: '1px solid #f0f0f0' }}
+          >
+            <Row gutter={16}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Department <span className="text-red-500">*</span></span>}
+                  name="department_id"
+                  rules={[{ required: true, message: "Required field" }]}
                 >
-                  Reset
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={
-                    <>
-                      {loading && <LoadingOutlined className="animate-spin" />}
-                      {!loading && <AiOutlineSend />}
-                    </>
-                  }
-                  //   loading={loading}
-                  className="w-full sm:w-auto"
-                  size="large"
+                  <Select
+                    placeholder="Select department"
+                    className="h-10"
+                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                  >
+                    {dataDepartment.map((item: Department) => (
+                      <Option key={item.id} value={item.id}>
+                        {item.department}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Group <span className="text-red-500">*</span></span>}
+                  name="group_id"
+                  rules={[{ required: true, message: "Required field" }]}
                 >
-                  {isEditMode && <p>Update</p>}
-                  {!isEditMode && <p>Submit</p>}
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Select
+                    placeholder="Select group"
+                    className="h-10"
+                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                  >
+                    {dataGroup.map((item: Groups) => (
+                      <Option key={item.id} value={item.id}>
+                        {item.group}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={<span className="font-medium">Office <span className="text-red-500">*</span></span>}
+                  name="office_id"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Radio.Group
+                    options={optionsOffice}
+                    optionType="button"
+                    buttonStyle="solid"
+                    className="flex flex-wrap gap-2"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Permissions Section */}
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                <AiOutlineSafetyCertificate className="text-blue-500" />
+                <span>Permissions</span>
+              </div>
+            }
+            className="shadow-none"
+            headStyle={{ borderBottom: '1px solid #f0f0f0' }}
+          >
+            <Row gutter={16}>
+              <Col xs={24}>
+                <Form.Item
+                  label={<span className="font-medium">User Access <span className="text-red-500">*</span></span>}
+                  name="access"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Checkbox.Group
+                    options={options}
+                    onChange={onChangeAccess}
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24}>
+                <Form.Item
+                  label={<span className="font-medium">Detailed Permissions <span className="text-red-500">*</span></span>}
+                  name="permissions"
+                  rules={[{ required: true, message: "Required field" }]}
+                >
+                  <Checkbox.Group
+                    options={optionsPermission}
+                    onChange={onChangeAccess}
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Form Actions */}
+          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+            <Button
+              onClick={onReset}
+              type="default"
+              size="large"
+              className="w-full sm:w-auto h-11"
+              icon={<AiOutlineUndo />}
+            >
+              Reset Form
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+              loading={loading}
+              icon={!loading && <AiOutlineSave />}
+            >
+              {isEditMode ? 'Update User' : 'Create User'}
+            </Button>
           </div>
-        </Modal>
-      </div>
-      <div className="flex justify-between">
+        </Form>
+      </Modal>
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all users. Please check closely."
+          message="User Management: View and manage all user accounts and permissions."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search users..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[220px]"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading user data..."
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 36,
+                  color: '#1890ff'
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      ) : (
         <Table<User>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} users`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <UserOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500 mb-4">No users found</p>
+                <Button
+                  type="primary"
+                  className="mt-2"
+                  onClick={() => handleTrack()}
+                  icon={<AiOutlinePlus />}
+                >
+                  Add First User
+                </Button>
+              </div>
+            )
+          }}
         />
       )}
-
     </div>
   );
 }

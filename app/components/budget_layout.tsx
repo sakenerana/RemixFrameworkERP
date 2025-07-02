@@ -40,6 +40,8 @@ export default function BudgetLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
+  const [isFname, setIsFname] = useState('');
+  const [isLname, setIsLname] = useState('');
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage or system preference
@@ -50,7 +52,10 @@ export default function BudgetLayoutIndex() {
   useEffect(() => {
     // Save preference to localStorage
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-
+    const fname = localStorage.getItem('fname');
+    const lname = localStorage.getItem('lname');
+    setIsFname(fname || ''); // Provide fallback for null
+    setIsLname(lname || ''); // Provide fallback for null
     // Optional: Update body class for global styles
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
   }, [isDarkMode]);
@@ -235,7 +240,7 @@ export default function BudgetLayoutIndex() {
                 {collapsed ? <img src="./img/user.png" alt="User" width={50} /> :
                   <div className="flex flex-wrap">
                     <img src="./img/user.png" alt="User" width={30} />
-                    <span className="mt-1 ml-4">Charls Dave Erana</span>
+                    <span className="mt-1 ml-4 font-medium">{isFname} {isLname}</span>
                   </div>}
               </div>
               <Menu
@@ -403,11 +408,16 @@ export default function BudgetLayoutIndex() {
             >
               <Outlet />
             </Content>
-            <div className="flex justify-between">
-              <div className="w-fit pl-5 pb-5">
+            <div className={`
+      flex justify-between items-center
+      ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
+      border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
+      py-4 px-5
+    `}>
+              <div className="text-sm">
                 Ant Design using Remix <b>©{new Date().getFullYear()}</b>
               </div>
-              <div className="pr-5">
+              <div className="text-sm">
                 <b>Developed by:</b> CFI IT Department
               </div>
             </div>

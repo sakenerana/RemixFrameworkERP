@@ -1,4 +1,5 @@
 import {
+  CloseOutlined,
   LoadingOutlined,
   LogoutOutlined,
   QuestionOutlined,
@@ -27,10 +28,14 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
   const onCancel = () => {
     Modal.confirm({
       title: "Cancel Change Password",
-      content: "Are you sure you want to cancel this transcation?",
+      content: "Are you sure you want to cancel this transaction?",
       okText: "Yes",
       cancelText: "Cancel",
-      onOk: () => setOpen(false),
+      onOk: () => {
+        setLoading(false);
+        setOpen(false);
+        form.resetFields();
+      },
     });
   };
 
@@ -87,6 +92,7 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
       setOpen(false);
       form.resetFields();
     } catch (error) {
+      setLoading(false);
       message.error("Error");
     }
   }
@@ -110,80 +116,96 @@ const ChildComponent: React.FC<ChildComponentProps> = ({ onSendData }) => {
               <UnlockOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <p>Change Password</p>
             </Space>
+
+            {/* Password Change Drawer */}
             <Drawer
-              title="Create a new password"
+              title={
+                <div className="flex items-center">
+                  <AiOutlineUnlock className="mr-2" />
+                  <span>Create a new password</span>
+                </div>
+              }
               width={420}
               open={open}
-              closeIcon={<AiOutlineUnlock />}
+              onClose={onCancel}
+              closeIcon={<CloseOutlined />}
               styles={{
                 body: {
                   paddingBottom: 80,
+                  paddingTop: 20,
                 },
+                header: {
+                  padding: '16px 24px',
+                  borderBottom: '1px solid #f0f0f0',
+                }
               }}
             >
               <Form
                 form={form}
-                name="dependencies"
+                name="passwordChange"
                 autoComplete="off"
-                style={{ maxWidth: 600 }}
                 layout="vertical"
                 onFinish={onFinish}
               >
-                <Alert className="mb-6" message="Input your new password and confirm password." type="info" showIcon />
+                <Alert
+                  className="mb-6"
+                  message="Password Requirements"
+                  description="Input your new password and confirm password. Minimum 8 characters with at least one number and special character."
+                  type="info"
+                  showIcon
+                />
 
-                <Form.Item label="New Password" name="password" rules={[{ required: true }]}>
-                  <Input.Password />
+                <Form.Item
+                  label="New Password"
+                  name="password"
+                  rules={[
+                    { required: true, message: 'Please input your new password' },
+                    { min: 8, message: 'Password must be at least 8 characters' },
+                    { pattern: /^(?=.*[0-9])(?=.*[!@#$%^&*])/, message: 'Include at least one number and special character' }
+                  ]}
+                >
+                  <Input.Password placeholder="Enter new password" />
                 </Form.Item>
 
-                {/* Field */}
                 <Form.Item
                   label="Confirm Password"
                   name="password2"
                   dependencies={['password']}
                   rules={[
-                    {
-                      required: true,
-                    },
+                    { required: true, message: 'Please confirm your password' },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
                         if (!value || getFieldValue('password') === value) {
                           return Promise.resolve();
                         }
-                        return Promise.reject(new Error('The new password that you entered do not match!'));
+                        return Promise.reject(new Error('The passwords do not match!'));
                       },
                     }),
                   ]}
                 >
-                  <Input.Password />
+                  <Input.Password placeholder="Confirm new password" />
                 </Form.Item>
 
-                <Form.Item className="flex flex-wrap justify-end">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
                   <Button
                     onClick={onCancel}
                     type="default"
-                    //   loading={loading}
-                    className="w-full sm:w-auto mr-4"
                     size="large"
+                    className="w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    icon={
-                      <>
-                        {loading && <LoadingOutlined className="animate-spin" />}
-                        {!loading && <AiOutlineSend />}
-                      </>
-                    }
-                    //   loading={loading}
-                    className="w-full sm:w-auto"
                     size="large"
+                    className="w-full sm:w-auto"
+                    loading={loading}
+                    icon={!loading && <AiOutlineSend className="ml-1" />}
                   >
-                    Submit
+                    {loading ? 'Updating...' : 'Update Password'}
                   </Button>
-                </Form.Item>
-
+                </div>
               </Form>
             </Drawer>
           </Card>

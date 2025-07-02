@@ -16,6 +16,12 @@ export default {
           "Noto Color Emoji",
         ],
       },
+      backdropBlur: {
+        xs: '2px',
+      },
+      backdropBrightness: {
+        95: '0.95',
+      }
     },
   },
   plugins: [],

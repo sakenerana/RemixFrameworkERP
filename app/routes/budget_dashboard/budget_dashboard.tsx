@@ -204,6 +204,10 @@ export default function BudgetRoutes() {
               </p>
               <p>Your total assets minus liabilities</p>
             </div>
+            <div
+              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
+              TBD
+            </div>
           </Card>
           <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
@@ -215,6 +219,10 @@ export default function BudgetRoutes() {
                 {formatCurrency(123141)}
               </p>
               <p>Total income this month</p>
+            </div>
+            <div
+              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
+              TBD
             </div>
           </Card>
           <Card
@@ -228,6 +236,10 @@ export default function BudgetRoutes() {
               </p>
               <p>Total expenses this month</p>
             </div>
+            <div
+              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
+              TBD
+            </div>
           </Card>
           <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
@@ -239,6 +251,10 @@ export default function BudgetRoutes() {
                 {formatCurrency(123141)}
               </p>
               <p>Percentage of income saved</p>
+            </div>
+            <div
+              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
+              TBD
             </div>
           </Card>
         </div>

@@ -42,69 +42,119 @@ export default function LoginIndex() {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center pt-40 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-no-repeat">
-      <Card className="shadow-2xl">
-        {/* {loading && (
-          <div className="flex justify-center">
-            <Spin />
-          </div>
-        )} */}
-        <div className="flex flex-col items-center mb-6">
-          <Image width={290} src="./img/cficoop.svg" />
-        </div>
-        <h1 className="flex flex-col items-center">
-          <b>LOGIN</b>
-        </h1>
-
-        {errorAlert && (
-          <Alert
-            className="mt-2"
-            message="Invalid email or password.."
-            type="error"
-            showIcon
-          />
-        )}
-
-        <Form
-          name="login"
-          initialValues={{ remember: true }}
-          style={{ maxWidth: 360, width: 360 }}
-          onFinish={onFinish}
-          className="p-7"
-        >
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: "Please input your Email!" }]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Email" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your Password!" }]}
-          >
-            <Input.Password
-              prefix={<LockOutlined />}
-              type="password"
-              placeholder="Password"
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
+      <Card className="w-full max-w-md shadow-xl rounded-lg overflow-hidden backdrop-blur-sm bg-white/90">
+        <div className="px-8 py-6">
+          {/* Logo Section */}
+          <div className="flex flex-col items-center mb-8">
+            <Image
+              width={250}
+              src="./img/cficoop.svg"
+              alt="CFI Cooperative Logo"
+              className="transition-all duration-300 hover:scale-105"
             />
-          </Form.Item>
-          <Form.Item>
-            <Flex justify="space-between" align="center">
-              <a href="/forgot-password">Forgot password</a>
-            </Flex>
-          </Form.Item>
+          </div>
 
-          <Form.Item>
-            <Button block type="primary" htmlType="submit">
-              {loading && <LoadingOutlined className="animate-spin" />}
-              {!loading && <p>Log in</p>}
-            </Button>
-            {/* or <a href="">Register now!</a> */}
-          </Form.Item>
-        </Form>
-        {/* <div className="flex justify-center">
-          <a href="/signup">Register Now</a>
-        </div> */}
+          {/* Error Message */}
+          {errorAlert && (
+            <Alert
+              className="mb-6 rounded-lg"
+              message="Invalid credentials"
+              description="The email or password you entered is incorrect. Please try again."
+              type="error"
+              showIcon
+              closable
+            />
+          )}
+
+          {/* Login Form */}
+          <Form
+            name="login"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            layout="vertical"
+          >
+            {/* Email Field */}
+            <Form.Item
+              name="email"
+              label="Email Address"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your email address"
+                },
+                {
+                  type: 'email',
+                  message: 'Please enter a valid email address'
+                }
+              ]}
+              className="mb-4"
+            >
+              <Input
+                prefix={<UserOutlined className="text-gray-400" />}
+                placeholder="your.email@example.com"
+                size="large"
+                className="py-2"
+              />
+            </Form.Item>
+
+            {/* Password Field */}
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: "Please enter your password" }]}
+              className="mb-1"
+            >
+              <Input.Password
+                prefix={<LockOutlined className="text-gray-400" />}
+                placeholder="••••••••"
+                size="large"
+                className="py-2"
+              />
+            </Form.Item>
+
+            {/* Forgot Password Link */}
+            <div className="flex justify-end mb-6">
+              <a
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Submit Button */}
+            <Form.Item className="mb-0">
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                size="large"
+                className="h-12 font-medium text-base"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <LoadingOutlined className="animate-spin mr-2" />
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </Form.Item>
+          </Form>
+
+          {/* Optional: Registration Link */}
+          <div className="mt-6 text-center text-sm text-gray-600">
+            Don't have an account?{' '}
+            <span
+              className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              Contact Administrator
+            </span>
+          </div>
+        </div>
       </Card>
     </div>
   );

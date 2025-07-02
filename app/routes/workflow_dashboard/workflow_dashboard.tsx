@@ -119,9 +119,13 @@ export default function WorkflowDashboard() {
                 >
                   <div>
                     <h2 className="text-sm font-semibold mb-2"><RiCircleFill className="float-left text-[5px] text-green-500 mt-2 mr-2" /> {data.title}</h2>
-                    <p className="flex flex-wrap justify-end text-lg text-green-600">
+                    {/* <p className="flex flex-wrap justify-end text-lg text-green-600">
                       <FcInspection className="mt-1 mr-2" /> {data.userId}
-                    </p>
+                    </p> */}
+                  </div>
+                  <div
+                    className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
+                    TBD
                   </div>
                 </Card>
               )}

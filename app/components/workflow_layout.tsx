@@ -29,6 +29,8 @@ export default function WorkflowLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
+  const [isFname, setIsFname] = useState('');
+  const [isLname, setIsLname] = useState('');
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage or system preference
@@ -39,7 +41,10 @@ export default function WorkflowLayoutIndex() {
   useEffect(() => {
     // Save preference to localStorage
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-
+    const fname = localStorage.getItem('fname');
+    const lname = localStorage.getItem('lname');
+    setIsFname(fname || ''); // Provide fallback for null
+    setIsLname(lname || ''); // Provide fallback for null
     // Optional: Update body class for global styles
     document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
   }, [isDarkMode]);
@@ -160,7 +165,7 @@ export default function WorkflowLayoutIndex() {
                 {collapsed ? <img src="./img/user.png" alt="User" width={50} /> :
                   <div className="flex flex-wrap">
                     <img src="./img/user.png" alt="User" width={30} />
-                    <span className="mt-1 ml-4">Charls Dave Erana</span>
+                    <span className="mt-1 ml-4 font-medium">{isFname} {isLname}</span>
                   </div>}
               </div>
               <Menu
@@ -187,49 +192,29 @@ export default function WorkflowLayoutIndex() {
             >
 
               <Space style={{ marginLeft: 16 }}>
-                {isHorizontal ? null : (
-                  <>
-                    <Button
-                      type="text"
-                      icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                      onClick={() => setCollapsed(!collapsed)}
-                      style={{
-                        fontSize: "16px",
-                        width: 64,
-                        height: 64,
-                        color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
-                      }}
-                      className="hover:bg-[rgba(255,255,255,0.1)]"
-                    />
-
-                    <div className="ml-4">
-                      <Image
-                        width={270}
-                        src={isDarkMode ? './img/cficoop-white.png' : './img/cficoop.svg'}
-                        preview={false}
-                        className="mt-5"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Horizontal Menu (when in horizontal mode) */}
-                {isHorizontal && (
-                  <Menu
-                    theme={isDarkMode ? 'dark' : 'light'}
-                    mode="horizontal"
-                    defaultSelectedKeys={['1']}
-                    items={menuItems}
+                {!isHorizontal && (
+                  <Button
+                    type="text"
+                    icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    onClick={() => setCollapsed(!collapsed)}
                     style={{
-                      flex: 1,
-                      minWidth: 0,
-                      background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                      lineHeight: '64px',
+                      fontSize: "16px",
+                      width: 64,
+                      height: 64,
+                      color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
                     }}
+                    className="hover:bg-[rgba(255,255,255,0.1)]"
                   />
                 )}
+                <div className="ml-4">
+                  <Image
+                    width={270}
+                    src={isDarkMode ? './img/cficoop-white.png' : './img/cficoop.svg'}
+                    preview={false}
+                    className="mt-5"
+                  />
+                </div>
               </Space>
-
 
               <div className="flex-1">
                 <div className="flex justify-end items-center h-full pr-4">
@@ -318,6 +303,24 @@ export default function WorkflowLayoutIndex() {
                 <Setting onSendData={(data: any) => setIsModalOpen(data)} />
               </Modal>
             </Header>
+            {/* Horizontal Menu (when in horizontal mode) */}
+            {isHorizontal && (
+              <Header className="p-0">
+                <Menu
+                  theme={isDarkMode ? 'dark' : 'light'}
+                  mode="horizontal"
+                  defaultSelectedKeys={['1']}
+                  items={menuItems}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                    lineHeight: '64px',
+                  }}
+                />
+
+              </Header>
+            )}
             <Content
               className={`flex flex-col h-full overflow-auto themed-scrollbar ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
                 }`}
@@ -331,11 +334,16 @@ export default function WorkflowLayoutIndex() {
             >
               <Outlet />
             </Content>
-            <div className="flex justify-between">
-              <div className="w-fit pl-5 pb-5">
+            <div className={`
+      flex justify-between items-center
+      ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
+      border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
+      py-4 px-5
+    `}>
+              <div className="text-sm">
                 Ant Design using Remix <b>©{new Date().getFullYear()}</b>
               </div>
-              <div className="pr-5">
+              <div className="text-sm">
                 <b>Developed by:</b> CFI IT Department
               </div>
             </div>

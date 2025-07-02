@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
@@ -16,7 +16,7 @@ import {
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlinePlus, AiOutlineUserAdd } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ActivityReportService } from "~/services/activity_report";
@@ -207,55 +207,102 @@ export default function ActivityReportRoutes() {
   };
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
+    <div className="w-full px-4">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
         <Breadcrumb
           items={[
             {
               href: "/inventory",
-              title: <HomeOutlined />,
+              title: <HomeOutlined className="text-gray-500" />,
             },
             {
-              title: "Reports",
+              title: <span className="text-gray-500">Reports</span>,
             },
             {
-              title: "Activity Report",
+              title: <span className="text-blue-600 font-medium">Activity Log</span>,
             },
           ]}
+          className="text-sm"
         />
       </div>
-      <div className="flex justify-between">
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all activity report. Please check closely."
+          message="Activity Log Report: View all system activities and filter results as needed."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search activities..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
             <Dropdown
               menu={{ items: columnMenuItems }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading activity report data..."
+            indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+          />
+        </div>
+      ) : (
         <Table<ActivityReport>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} activities`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <FileSearchOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500">No activity found</p>
+              </div>
+            )
+          }}
         />
       )}
     </div>

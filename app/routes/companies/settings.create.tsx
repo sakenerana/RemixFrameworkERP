@@ -2,7 +2,7 @@ import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineBank, AiOutlineClear, AiOutlineContacts, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
 import { CompanyService } from "~/services/company.service";
 import { Company } from "~/types/company.type";
 const { TextArea } = Input;
@@ -101,32 +101,47 @@ export default function CreateCompanies() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
+        <div className="w-full px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
                     items={[
                         {
                             href: "/inventory",
-                            title: <HomeOutlined />,
+                            title: <HomeOutlined className="text-gray-500" />,
                         },
                         {
-                            title: "Settings",
+                            title: <span className="text-gray-500">Settings</span>,
                         },
                         {
-                            title: "Companies",
+                            title: <span className="text-gray-500">Companies</span>,
                         },
                         {
-                            title: "Form",
+                            title: <span className="text-blue-600 font-medium">Form</span>,
                         },
                     ]}
+                    className="text-sm"
                 />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/settings/companies'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
+
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                    {isTitle}
+                </h1>
+
+                <Link to="/inventory/settings/companies">
+                    <Button
+                        icon={<AiOutlineRollback />}
+                        className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                    >
+                        Back to Companies
+                    </Button>
                 </Link>
             </div>
 
-            <Card>
+            {/* Form Card */}
+            <Card
+                className="w-full border-0 shadow-sm rounded-lg"
+                bodyStyle={{ padding: '24px' }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -136,89 +151,114 @@ export default function CreateCompanies() {
                         interests: ["sports", "music"],
                     }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                label="Company Name"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input company name!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Company Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineBank className="text-blue-500" />
+                                Company Details
+                            </h3>
 
-                        <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Phone No."
+                                label={<span className="font-medium">Company Name <span className="text-red-500">*</span></span>}
+                                name="name"
+                                rules={[{
+                                    required: true,
+                                    message: "Company name is required"
+                                }]}
+                            >
+                                <Input
+                                    placeholder="Enter company name"
+                                    prefix={<AiOutlineSolution className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
+                            </Form.Item>
+                        </div>
+
+                        {/* Contact Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineContacts className="text-blue-500" />
+                                Contact Details
+                            </h3>
+
+                            <Form.Item
+                                label={<span className="font-medium">Phone Number</span>}
                                 name="phone"
                             >
                                 <Input
-                                    type="number"
-                                    prefix={<AiOutlinePhone />}
+                                    placeholder="+1 (555) 123-4567"
+                                    prefix={<AiOutlinePhone className="text-gray-400" />}
+                                    className="h-10 w-full"
                                 />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Fax"
+                                label={<span className="font-medium">Fax</span>}
                                 name="fax"
                             >
-                                <Input prefix={<AiOutlinePrinter />} />
+                                <Input
+                                    placeholder="Fax number"
+                                    prefix={<AiOutlinePrinter className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Email"
+                                label={<span className="font-medium">Email</span>}
                                 name="email"
+                                rules={[{
+                                    type: 'email',
+                                    message: 'Please enter a valid email address'
+                                }]}
                             >
-                                <Input prefix={<AiOutlineMail />} />
+                                <Input
+                                    placeholder="contact@example.com"
+                                    prefix={<AiOutlineMail className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
+                        </div>
+                    </div>
 
-                        <Col xs={24} sm={24}>
-                            <Form.Item
-                                label="Notes"
-                                name="notes"
-                            >
-                                <TextArea rows={4} placeholder="(Optional)" />
-                            </Form.Item>
-                        </Col>
+                    {/* Full Width Notes Section */}
+                    <div className="mt-6 w-full">
+                        <Form.Item
+                            label={<span className="font-medium">Notes</span>}
+                            name="notes"
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder="Additional notes about this company (optional)"
+                                className="rounded-lg w-full"
+                                maxLength={500}
+                                showCount
+                            />
+                        </Form.Item>
+                    </div>
 
-                    </Row>
-
-                    <Form.Item className="flex flex-wrap justify-end">
+                    {/* Form Actions */}
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
                         <Button
                             onClick={onReset}
                             type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
                             size="large"
+                            className="w-full sm:w-auto h-11"
+                            icon={<AiOutlineClear />}
                         >
-                            Reset
+                            Clear Form
                         </Button>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
                             size="large"
+                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            loading={loading}
+                            icon={!loading && <AiOutlineSave />}
                         >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
+                            {isEditMode ? 'Update Company' : 'Create Company'}
                         </Button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </Card>
         </div>

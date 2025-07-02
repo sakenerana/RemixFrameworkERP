@@ -2,7 +2,7 @@ import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCalculator, AiOutlineCalendar, AiOutlineClear, AiOutlineDollar, AiOutlineInfoCircle, AiOutlinePercentage, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
 import { DepreciationService } from "~/services/depreciation.service";
 import { Depreciation } from "~/types/depreciation.type";
 const { TextArea } = Input;
@@ -101,32 +101,47 @@ export default function CreateDepreciation() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
+        <div className="w-full px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
                     items={[
                         {
                             href: "/inventory",
-                            title: <HomeOutlined />,
+                            title: <HomeOutlined className="text-gray-500" />,
                         },
                         {
-                            title: "Settings",
+                            title: <span className="text-gray-500">Settings</span>,
                         },
                         {
-                            title: "Depreciation",
+                            title: <span className="text-gray-500">Depreciation</span>,
                         },
                         {
-                            title: "Form",
+                            title: <span className="text-blue-600 font-medium">Form</span>,
                         },
                     ]}
+                    className="text-sm"
                 />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/settings/depreciation'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
+
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                    {isTitle}
+                </h1>
+
+                <Link to="/inventory/settings/depreciation">
+                    <Button
+                        icon={<AiOutlineRollback />}
+                        className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                    >
+                        Back to Depreciation
+                    </Button>
                 </Link>
             </div>
 
-            <Card>
+            {/* Form Card */}
+            <Card
+                className="w-full border-0 shadow-sm rounded-lg"
+                bodyStyle={{ padding: '24px' }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -136,77 +151,118 @@ export default function CreateDepreciation() {
                         interests: ["sports", "music"],
                     }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Name"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input name!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Depreciation Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineCalculator className="text-blue-500" />
+                                Depreciation Details
+                            </h3>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Number of Months"
+                                label={<span className="font-medium">Name <span className="text-red-500">*</span></span>}
+                                name="name"
+                                rules={[{
+                                    required: true,
+                                    message: "Depreciation name is required"
+                                }]}
+                            >
+                                <Input
+                                    placeholder="Enter depreciation method name"
+                                    prefix={<AiOutlineSolution className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label={<span className="font-medium">Number of Months <span className="text-red-500">*</span></span>}
                                 name="months"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input term!",
-                                    },
-                                ]}
+                                rules={[{
+                                    required: true,
+                                    message: "Number of months is required"
+                                }]}
                             >
                                 <Input
                                     type="number"
-                                    prefix={<AiOutlineCalendar />}
+                                    placeholder="Enter number of months"
+                                    prefix={<AiOutlineCalendar className="text-gray-400" />}
+                                    className="h-10 w-full"
                                 />
                             </Form.Item>
-                        </Col>
+                        </div>
 
-                        <Col xs={24} sm={24}>
+                        {/* Additional Information */}
+                        {/* <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineInfoCircle className="text-blue-500" />
+                                Additional Information
+                            </h3>
+
                             <Form.Item
-                                label="Notes"
-                                name="notes"
+                                label={<span className="font-medium">Depreciation Rate (%)</span>}
+                                name="rate"
                             >
-                                <TextArea rows={4} placeholder="(Optional)" />
+                                <Input
+                                    type="number"
+                                    placeholder="Enter annual rate"
+                                    prefix={<AiOutlinePercentage className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                    suffix="%"
+                                />
                             </Form.Item>
-                        </Col>
 
-                    </Row>
+                            <Form.Item
+                                label={<span className="font-medium">Residual Value</span>}
+                                name="residual"
+                            >
+                                <Input
+                                    type="number"
+                                    placeholder="Enter residual value"
+                                    prefix={<AiOutlineDollar className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
+                            </Form.Item>
+                        </div> */}
+                    </div>
 
-                    <Form.Item className="flex flex-wrap justify-end">
+                    {/* Full Width Notes Section */}
+                    <div className="mt-6 w-full">
+                        <Form.Item
+                            label={<span className="font-medium">Notes</span>}
+                            name="notes"
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder="Additional notes about this depreciation method (optional)"
+                                className="rounded-lg w-full"
+                                maxLength={500}
+                                showCount
+                            />
+                        </Form.Item>
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
                         <Button
                             onClick={onReset}
                             type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
                             size="large"
+                            className="w-full sm:w-auto h-11"
+                            icon={<AiOutlineClear />}
                         >
-                            Reset
+                            Clear Form
                         </Button>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
                             size="large"
+                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            loading={loading}
+                            icon={!loading && <AiOutlineSave />}
                         >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
+                            {isEditMode ? 'Update Depreciation' : 'Create Depreciation'}
                         </Button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </Card>
         </div>

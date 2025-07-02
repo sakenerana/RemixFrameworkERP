@@ -1,4 +1,5 @@
 import {
+  ApartmentOutlined,
   CheckCircleOutlined,
   HomeOutlined,
   LoadingOutlined,
@@ -8,6 +9,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Col,
   Divider,
@@ -28,11 +30,15 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import {
+  AiOutlineApartment,
+  AiOutlineBuild,
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlinePlus,
+  AiOutlineSave,
   AiOutlineSend,
+  AiOutlineUndo,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -297,138 +303,229 @@ export default function DepartmentsRoutes() {
   };
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/inventory",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Settings",
-            },
-            {
-              title: "Departments",
-            },
-          ]}
-        />
-        <Space wrap>
+    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/inventory",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-gray-500">Settings</span>,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Departments</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
+
+        <Space wrap className="mt-2 sm:mt-0">
           <Button
             onClick={() => handleTrack()}
             icon={<AiOutlinePlus />}
             type="primary"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
           >
-            Create Department
+            New Department
           </Button>
         </Space>
-        <Modal
-          style={{ top: 20 }}
-          width={420}
-          title={isTitle}
-          closable={{ "aria-label": "Custom Close Button" }}
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          footer=""
-        >
-          <div>
-            <Form
-              className="mt-5"
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                notification: true,
-                interests: ["sports", "music"],
-              }}
-            >
-              <Row gutter={24}>
-                <Col xs={24} sm={24}>
-                  <Form.Item
-                    label="Department"
-                    name="department"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input department!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Department Name" />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Divider />
-
-              <Form.Item className="flex flex-wrap justify-end">
-                <Button
-                  onClick={onReset}
-                  type="default"
-                  //   loading={loading}
-                  className="w-full sm:w-auto mr-4"
-                  size="large"
-                >
-                  Reset
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={
-                    <>
-                      {loading && <LoadingOutlined className="animate-spin" />}
-                      {!loading && <AiOutlineSend />}
-                    </>
-                  }
-                  className="w-full sm:w-auto"
-                  size="large"
-                >
-                  {isEditMode && <p>Update</p>}
-                  {!isEditMode && <p>Submit</p>}
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </Modal>
       </div>
-      <div className="flex justify-between">
+
+      {/* Department Creation/Edit Modal */}
+      <Modal
+        width={500}
+        title={
+          <div className="flex items-center gap-2">
+            <AiOutlineBuild className="text-blue-500 text-xl" />
+            <span className="text-lg font-semibold">{isTitle}</span>
+          </div>
+        }
+        open={isModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+        centered
+        destroyOnClose
+        styles={{
+          header: {
+            borderBottom: '1px solid #f0f0f0',
+            padding: '16px 24px'
+          },
+          body: {
+            padding: '24px'
+          }
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          className="space-y-6"
+        >
+
+          <Form.Item
+            label={
+              <span className="font-medium">
+                Department Name <span className="text-red-500">*</span>
+              </span>
+            }
+            name="department"
+            rules={[
+              {
+                required: true,
+                message: 'Department name is required',
+              },
+              {
+                min: 3,
+                message: 'Minimum 3 characters',
+              },
+              {
+                max: 50,
+                message: 'Maximum 50 characters',
+              }
+            ]}
+            validateTrigger="onBlur"
+          >
+            <Input
+              placeholder="Enter department name (e.g., Finance, IT, HR)"
+              prefix={<AiOutlineApartment className="text-gray-400" />}
+              className="h-10"
+              allowClear
+            />
+          </Form.Item>
+
+          {/* Form Actions */}
+          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+            <Button
+              onClick={onReset}
+              type="default"
+              size="large"
+              className="w-full sm:w-auto h-11"
+              icon={<AiOutlineUndo />}
+            >
+              Reset Form
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+              loading={loading}
+              icon={!loading && <AiOutlineSave />}
+            >
+              {isEditMode ? 'Update Department' : 'Create Department'}
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all departments. Please check closely."
+          message="Department Structure: Organize your company's departments and reporting structure."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search departments..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[220px]"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading department data..."
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 36,
+                  color: '#1890ff'
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      ) : (
         <Table<Department>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} departments`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <ApartmentOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500 mb-4">No departments found</p>
+                <Button
+                  type="primary"
+                  className="mt-2"
+                  onClick={() => handleTrack()}
+                  icon={<AiOutlinePlus />}
+                >
+                  Create First Department
+                </Button>
+              </div>
+            )
+          }}
         />
       )}
     </div>

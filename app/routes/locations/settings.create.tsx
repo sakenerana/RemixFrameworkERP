@@ -1,7 +1,7 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineEnvironment, AiOutlinePhone, AiOutlineRollback, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineClear, AiOutlineDown, AiOutlineEnvironment, AiOutlineFlag, AiOutlineGlobal, AiOutlineHome, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSend } from "react-icons/ai";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LocationService } from "~/services/location.service";
 import { Location } from "~/types/location.type";
@@ -102,32 +102,47 @@ export default function CreateLocation() {
     };
 
     return (
-        <div>
-            <div className="flex justify-between">
+        <div className="w-full px-4">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
                     items={[
                         {
                             href: "/inventory",
-                            title: <HomeOutlined />,
+                            title: <HomeOutlined className="text-gray-500" />,
                         },
                         {
-                            title: "Settings",
+                            title: <span className="text-gray-500">Settings</span>,
                         },
                         {
-                            title: "Location",
+                            title: <span className="text-gray-500">Location</span>,
                         },
                         {
-                            title: "Form",
+                            title: <span className="text-blue-600 font-medium">Form</span>,
                         },
                     ]}
+                    className="text-sm"
                 />
-                <p className="text-1xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-950 text-transparent bg-clip-text tracking-wide uppercase drop-shadow-lg">{isTitle}</p>
-                <Link to={'/inventory/settings/locations'}>
-                    <Button className="mb-2" icon={<AiOutlineRollback />}>Back</Button>
+
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 text-transparent bg-clip-text">
+                    {isTitle}
+                </h1>
+
+                <Link to="/inventory/settings/locations">
+                    <Button
+                        icon={<AiOutlineRollback />}
+                        className="flex items-center gap-2 border border-gray-300 hover:border-blue-500"
+                    >
+                        Back to Locations
+                    </Button>
                 </Link>
             </div>
 
-            <Card>
+            {/* Form Card */}
+            <Card
+                className="w-full border-0 shadow-sm rounded-lg"
+                bodyStyle={{ padding: '24px' }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -137,123 +152,160 @@ export default function CreateLocation() {
                         interests: ["sports", "music"],
                     }}
                 >
-                    <Row gutter={24}>
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Location Name"
-                                name="name"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input location name!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Location Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineEnvironment className="text-blue-500" />
+                                Location Details
+                            </h3>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Address"
+                                label={<span className="font-medium">Location Name <span className="text-red-500">*</span></span>}
+                                name="name"
+                                rules={[{ required: true, message: "Required field" }]}
+                            >
+                                <Input
+                                    placeholder="Enter location name"
+                                    prefix={<AiOutlineHome className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
+                            </Form.Item>
+                        </div>
+
+                        {/* Address Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineHome className="text-blue-500" />
+                                Address
+                            </h3>
+
+                            <Form.Item
+                                label={<span className="font-medium">Address Line 1</span>}
                                 name="address"
                             >
-                                <Input prefix={<AiOutlineEnvironment />} />
+                                <Input
+                                    placeholder="Street address"
+                                    prefix={<AiOutlineEnvironment className="text-gray-400" />}
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
                             <Form.Item
-                                label="Address2"
+                                label={<span className="font-medium">Address Line 2</span>}
                                 name="address2"
                             >
-                                <Input prefix={<AiOutlineEnvironment />} />
+                                <Input
+                                    placeholder="Apt, suite, etc."
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
+                        </div>
 
-                        <Col xs={24} sm={8}>
+                        {/* City/State/Zip */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineFlag className="text-blue-500" />
+                                Region
+                            </h3>
+
                             <Form.Item
-                                label="City"
+                                label={<span className="font-medium">City</span>}
                                 name="city"
                             >
-                                <Input prefix={<AiOutlineEnvironment />} />
+                                <Input
+                                    placeholder="City"
+                                    className="h-10 w-full"
+                                />
                             </Form.Item>
-                        </Col>
 
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="State"
-                                name="state"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} />
-                            </Form.Item>
-                        </Col>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Form.Item
+                                    label={<span className="font-medium">State</span>}
+                                    name="state"
+                                >
+                                    <Input
+                                        placeholder="State/Province"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                        <Col xs={24} sm={8}>
+                                <Form.Item
+                                    label={<span className="font-medium">Zip</span>}
+                                    name="zip"
+                                >
+                                    <Input
+                                        placeholder="Postal code"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
+
+                        {/* Country Selection */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <AiOutlineGlobal className="text-blue-500" />
+                                Country
+                            </h3>
+
                             <Form.Item
-                                label="Country"
+                                label={<span className="font-medium">Country</span>}
                                 name="country"
                             >
                                 <Select
-                                    prefix={<AiOutlineEnvironment />}
+                                    className="h-10 w-full"
                                     showSearch
-                                    placeholder="Select Country"
+                                    placeholder="Select country"
+                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                    optionFilterProp="children"
                                     filterOption={(input, option) =>
                                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                                     }
                                     options={countries}
                                 />
                             </Form.Item>
-                        </Col>
+                        </div>
+                    </div>
 
-                        <Col xs={24} sm={8}>
-                            <Form.Item
-                                label="Zip"
-                                name="zip"
-                            >
-                                <Input prefix={<AiOutlineEnvironment />} placeholder="ex. 6000" />
-                            </Form.Item>
-                        </Col>
+                    {/* Full Width Notes Section */}
+                    <div className="mt-6 w-full">
+                        <Form.Item
+                            label={<span className="font-medium">Notes</span>}
+                            name="notes"
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder="Additional notes about this location (optional)"
+                                className="rounded-lg w-full"
+                                maxLength={500}
+                                showCount
+                            />
+                        </Form.Item>
+                    </div>
 
-                        <Col xs={24} sm={24}>
-                            <Form.Item
-                                label="Notes"
-                                name="notes"
-                            >
-                                <TextArea rows={4} placeholder="(Optional)" />
-                            </Form.Item>
-                        </Col>
-
-                    </Row>
-
-                    <Divider />
-
-                    <Form.Item className="flex flex-wrap justify-end">
+                    {/* Form Actions */}
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t pt-6 mt-8 w-full">
                         <Button
                             onClick={onReset}
                             type="default"
-                            //   loading={loading}
-                            className="w-full sm:w-auto mr-4"
                             size="large"
+                            className="w-full sm:w-auto h-11"
+                            icon={<AiOutlineClear />}
                         >
-                            Reset
+                            Clear Form
                         </Button>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            icon={
-                                <>
-                                    {loading && <LoadingOutlined className="animate-spin" />}
-                                    {!loading && <AiOutlineSend />}
-                                </>
-                            }
-                            className="w-full sm:w-auto"
                             size="large"
+                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            loading={loading}
+                            icon={!loading && <AiOutlineSave />}
                         >
-                            {isEditMode && <p>Update</p>}
-                            {!isEditMode && <p>Submit</p>}
+                            {isEditMode ? 'Update Location' : 'Create Location'}
                         </Button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </Card>
         </div>

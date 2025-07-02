@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DesktopOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -357,70 +357,149 @@ export default function AssetsRoute() {
   };
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/inventory",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Assets",
-            },
-          ]}
-        />
-        <Space wrap>
-          <Link to={"deleted-assets"}>
-            <Button icon={<AiOutlineFileExclamation />} danger>
-              Show Inactive Assets
+    <div className="w-full px-6 rounded-lg shadow-sm">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/inventory",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Asset Inventory</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
+
+        <Space wrap className="mt-2 sm:mt-0">
+          <Link to="deleted-assets">
+            <Button
+              icon={<AiOutlineFileExclamation />}
+              danger
+              className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-50"
+            >
+              Archived Assets
             </Button>
           </Link>
-
-          <Link to={"form-asset"}>
-            <Button icon={<AiOutlinePlus />} type="primary">
-              Create Asset
+          <Link to="form-asset">
+            <Button
+              icon={<AiOutlinePlus />}
+              type="primary"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              New Asset
             </Button>
           </Link>
         </Space>
       </div>
-      <div className="flex justify-between">
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
         <Alert
-          message="Note: This is the list of all assets. Please check closely."
+          message="Asset Tracking: Manage all physical assets in your organization's inventory."
           type="info"
           showIcon
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input.Search onChange={(e) => setSearchText(e.target.value)} placeholder="Search" />
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search assets..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[220px]"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading asset data..."
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 36,
+                  color: '#1890ff'
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      ) : (
         <Table<Asset>
-          size="small"
+          size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2",
+            showTotal: (total) => `Total ${total} assets`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-8 flex flex-col items-center">
+                <DesktopOutlined className="text-3xl text-gray-400 mb-2" />
+                <p className="text-gray-500 mb-4">No assets found in inventory</p>
+                <Button
+                  type="primary"
+                  className="mt-2"
+                  onClick={() => navigate('/inventory/assets/form-asset')}
+                  icon={<AiOutlinePlus />}
+                >
+                  Add First Asset
+                </Button>
+              </div>
+            )
+          }}
         />
       )}
     </div>
