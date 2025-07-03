@@ -18,10 +18,12 @@ import {
   Select,
   Space,
   Spin,
+  Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
+import { RiCircleFill } from "react-icons/ri";
 import LineChart from "~/components/line_chart";
 
 interface DataType {
@@ -183,7 +185,7 @@ export default function Budgets() {
         <Breadcrumb
           items={[
             {
-              href: "/workflow",
+              href: "/budget",
               title: <HomeOutlined />,
             },
             {
@@ -336,74 +338,116 @@ export default function Budgets() {
       {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
 
       <Row gutter={16} className="pt-5">
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          {budget.map((data) => (
-            <>
-              {loading && <Spin></Spin>}
-              {!loading && (
-                <Card
-                  className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm"
-                >
-                  <div className="flex flex-wrap justify-between">
-                    <h2 className="text-sm font-semibold mb-2">{data.title}</h2>
-                    <div className="text-red-500">
-                      {/* <div className={getBudgetStatusColor(12, 150)}> */}
-                      <span className="text-lg font-bold">
-                        {formatCurrency(12)}
-                      </span>
-                      {/* <span className="text-sm font-normal text-muted-foreground text-gray-600">
-                        {" "}
-                        / {formatCurrency(150)}
-                      </span> */}
-                    </div>
-                  </div>
-                  {/* <span>Progress</span> */}
-                  {/* <Progress
-                    percent={getBudgetProgress(75, 150)}
-                    status="active"
-                  /> */}
-                  {/* <p>Categories: </p> */}
-                </Card>
-              )}
-            </>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full mt-6">
-          {loading && <Spin></Spin>}
-          {!loading && (
+        {/* Summary Cards - Top Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
+          {budget.map((data: any) => (
             <Card
-              className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:shadow-sm"
+              key={data.title}
+              loading={loading}
+              className="rounded-lg hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
             >
-              <div className="flex flex-wrap justify-between">
-                <h2 className="text-sm font-semibold mb-2">Overall Budget</h2>
-                <div className={getBudgetStatusColor(12, 150)}>
-                  <span className="text-lg font-bold">
-                    {formatCurrency(12)}
-                  </span>
-                  <span className="text-sm font-normal text-muted-foreground text-gray-600">
-                    {" "}
-                    / {formatCurrency(150)}
-                  </span>
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="flex flex-wrap text-sm font-medium"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {data.title}</span>
+                  {!loading && (
+                    <Tag color={data.value > data.limit ? "red" : "green"} className="text-xs">
+                      {data.value > data.limit ? "Over" : "Under"}
+                    </Tag>
+                  )}
+                </div>
+                <div className="mt-auto">
+                  {!loading && (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold">
+                        {formatCurrency(data.value)}
+                      </span>
+                      <span className="text-sm">
+                        of {formatCurrency(data.limit)}
+                      </span>
+                    </div>
+                  )}
+                  <Progress
+                    percent={Math.min(100, (data.value / data.limit) * 100)}
+                    strokeColor={data.value > data.limit ? "#f5222d" : "#52c41a"}
+                    showInfo={false}
+                    className="mt-3"
+                  />
                 </div>
               </div>
-              <span>Progress</span>
-              <Progress percent={getBudgetProgress(75, 150)} status="active" />
-              {/* <p>Categories: </p> */}
             </Card>
-          )}
+          ))}
+        </div>
+
+
+      </Row>
+      <Row gutter={16} className="pt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
+          {/* Overall Budget Card */}
+          <Card
+            loading={loading}
+            className="rounded-lg mb-6 shadow-sm"
+          >
+            <div className="flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="flex flex-wrap text-lg font-semibold"><RiCircleFill className="text-[5px] text-green-500 mt-3 mr-2" /> Overall Budget Status</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Current Period:</span>
+                  <DatePicker.RangePicker
+                    size="small"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <div className="text-sm">Total Budget</div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(15000)}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm">Amount Spent</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatCurrency(7500)}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm">Remaining</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatCurrency(7500)}
+                  </div>
+                </div>
+              </div>
+
+              <Progress
+                percent={50}
+                strokeColor="#1890ff"
+                status="active"
+                className="mt-6"
+              />
+
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </Card>
         </div>
       </Row>
 
       {/* THIS IS THE BUDGET DASHBOARD */}
 
-      <Row gutter={16} className="pt-5">
+      <Row gutter={16}>
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
           <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
           >
             <div>
-              <h2 className="text-sm font-semibold mb-2">
-                Spending By Category
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
               </h2>
               <p className="flex flex-wrap">Current month breakdown</p>
               <LineChart

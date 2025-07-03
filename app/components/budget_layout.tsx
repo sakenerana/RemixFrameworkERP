@@ -180,40 +180,6 @@ export default function BudgetLayoutIndex() {
         }}
       >
         <Layout className="flex flex-col h-screen">
-          {/* <Sider
-            className="h-screen sticky top-0"
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            width={250}
-            theme={isDarkMode ? "dark" : "light"}
-            style={{
-              background: isDarkMode ? '#141414' : '#ffffff',
-              borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
-            }}
-          >
-            <div
-              className="demo-logo-vertical"
-              style={{
-                background: isDarkMode ? '#1f1f1f' : '#fafafa',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
-              }}
-            />
-
-            <Menu
-              theme={isDarkMode ? 'dark' : 'light'}
-              mode="inline"
-              defaultSelectedKeys={["1"]}
-              items={menuItems}
-              style={{
-                background: isDarkMode ? '#141414' : '#ffffff',
-                borderRight: 'none'
-              }}
-              className={`h-[calc(100vh-64px)] overflow-y-auto ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'
-                }`}
-            // className="h-[calc(100vh-64px)] overflow-y-auto"
-            />
-          </Sider> */}
           {!isHorizontal && (
             <Sider
               trigger={null}
@@ -237,9 +203,9 @@ export default function BudgetLayoutIndex() {
                 background: isDarkMode ? '#1f1f1f' : '#fafafa',
                 color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
               }}>
-                {collapsed ? <img src="./img/user.png" alt="User" width={50} /> :
+                {collapsed ? <img src="/img/user.png" alt="User" width={50} /> :
                   <div className="flex flex-wrap">
-                    <img src="./img/user.png" alt="User" width={30} />
+                    <img src="/img/user.png" alt="User" width={30} />
                     <span className="mt-1 ml-4 font-medium">{isFname} {isLname}</span>
                   </div>}
               </div>
@@ -284,7 +250,7 @@ export default function BudgetLayoutIndex() {
                 <div className="ml-4">
                   <Image
                     width={270}
-                    src={isDarkMode ? './img/cficoop-white.png' : './img/cficoop.svg'}
+                    src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
                     preview={false}
                     className="mt-5"
                   />

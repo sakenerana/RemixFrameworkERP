@@ -1,4 +1,4 @@
-import { HomeOutlined, SettingOutlined, SmileOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, FileSearchOutlined, HistoryOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, SmileOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -19,7 +19,7 @@ import {
   Timeline,
 } from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AiFillProfile } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -35,6 +35,13 @@ export default function WorkflowTracker() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
+
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -61,9 +68,21 @@ export default function WorkflowTracker() {
     }
   };
 
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+  }, []);
+
   useEffect(() => {
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+    if (searchText.trim() === '') {
+      fetchData();
+    } else {
+      const filtered = data.filter(data =>
+        data.title?.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchText]); // Empty dependency array means this runs once on mount
 
   const handleTrack = () => {
     setIsModalOpen(true);
@@ -158,129 +177,244 @@ export default function WorkflowTracker() {
   };
 
   return (
-    <div>
-      <div className="flex pb-5 justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/workflow",
-              title: <HomeOutlined />,
-            },
-            {
-              title: "Tracker",
-            },
-          ]}
-        />
+    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Breadcrumb
+            items={[
+              {
+                href: "/workflow",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Workflow Tracker</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        </div>
       </div>
-      <div className="flex justify-between">
+
+      {/* Toolbar Section */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <Alert
-          message="Note: This is the list of all requested workflows. Please check closely."
+          message="Review all requested workflows. Monitor status and take action as needed."
           type="info"
           showIcon
+          className="w-full lg:w-auto rounded-lg"
         />
-        <Space direction="horizontal">
-          <Space.Compact style={{ width: "100%" }}>
-            <Input placeholder="Search" />
-            <Button icon={<FcSearch />} type="default">
-              Search
-            </Button>
-          </Space.Compact>
-          <Space wrap>
-            <Button onClick={handleRefetch} icon={<FcRefresh />} type="default">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+          <Input.Search
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search workflows..."
+            className="w-full sm:w-64"
+            size="middle"
+          />
+
+          <Space>
+            <Button
+              onClick={handleRefetch}
+              icon={<FcRefresh className="text-blue-500" />}
+              className="flex items-center gap-2 hover:border-blue-500"
+            >
               Refresh
             </Button>
-          </Space>
-          <Space wrap>
+
             <Dropdown
-              menu={{ items: columnMenuItems }}
+              menu={{
+                items: columnMenuItems,
+                className: "shadow-lg rounded-md min-w-[200px] py-2"
+              }}
               placement="bottomRight"
               trigger={['click']}
             >
-              <Button icon={<SettingOutlined />}>Columns</Button>
+              <Button
+                icon={<SettingOutlined />}
+                className="flex items-center gap-2 hover:border-blue-500"
+              >
+                Columns
+              </Button>
             </Dropdown>
-            <PrintDropdownComponent stateData={data}></PrintDropdownComponent>
+
+            <PrintDropdownComponent
+              stateData={data}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
+            />
           </Space>
-        </Space>
+        </div>
       </div>
-      {loading && <Spin></Spin>}
-      {!loading && (
+
+      {/* Table Section */}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading workflow requests..."
+            indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+          />
+        </div>
+      ) : (
         <Table<DataType>
-          size="small"
+          size="middle"
           columns={filteredColumns}
-          dataSource={data}
+          dataSource={searchText ? filteredData : data}
           onChange={onChange}
-          className="pt-5"
+          className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
+          rowKey="id"
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 20,
+            className: "px-4 py-2 rounded-b-lg",
+            showTotal: (total) => (
+              <span className="text-sm">
+                Total {data.length} of {total} requests
+              </span>
+            ),
+          }}
+          locale={{
+            emptyText: (
+              <div className="py-12 flex flex-col items-center">
+                <FileSearchOutlined className="text-3xl text-gray-400 mb-3" />
+                <p className="text-gray-500 mb-2 text-base">No workflow requests found</p>
+                <p className="text-gray-400 text-sm mb-4">Create new requests or check your filters</p>
+              </div>
+            )
+          }}
+        // onRow={(record) => ({
+        //   onClick: () => handleRowClick(record),
+        //   className: "cursor-pointer hover:bg-gray-50",
+        // })}
         />
       )}
+
+      {/* Workflow Tracking Modal */}
       <Modal
-        style={{ top: 20 }}
-        title="Workflow Tracker"
-        closable={{ "aria-label": "Custom Close Button" }}
+        width={680}
+        title={
+          <div className="flex items-center gap-3">
+            <HistoryOutlined className="text-blue-500 text-xl" />
+            <span className="text-xl font-semibold">Workflow Timeline</span>
+          </div>
+        }
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
-        footer=""
+        footer={null}
+        centered
+        styles={{
+          header: {
+            borderBottom: '1px solid #f0f0f0',
+            padding: '18px 22px'
+          },
+          body: {
+            padding: '10px',
+            maxHeight: '60vh',
+            overflowY: 'auto'
+          }
+        }}
+        className="workflow-modal"
       >
-        {loading && <Spin></Spin>}
-        {!loading && (
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Spin size="large" />
+          </div>
+        ) : (
           <Timeline
-            className="pt-4"
+            mode="right"
             items={[
               {
                 color: "green",
-                children: "Create a services site 2015-09-01",
+                label: "2023-11-01 09:30",
+                children: (
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Workflow Initiated</p>
+                    <p className="text-sm text-gray-600">Request created by John Doe</p>
+                  </div>
+                ),
               },
               {
                 color: "green",
-                children: "Create a services site 2015-09-01",
+                label: "2023-11-01 10:15",
+                children: (
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">First Approval</p>
+                    <p className="text-sm text-gray-600">Approved by Jane Smith</p>
+                  </div>
+                ),
               },
               {
                 color: "red",
+                label: "2023-11-02 14:20",
                 children: (
-                  <>
-                    <p>Solve initial network problems 1</p>
-                    <p>Solve initial network problems 2</p>
-                    <p>Solve initial network problems 3 2015-09-01</p>
-                  </>
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Revision Requested</p>
+                    <p className="text-sm text-gray-600">Needs additional documentation</p>
+                    <p className="text-sm text-gray-600 mt-1">Assigned to: Technical Team</p>
+                  </div>
                 ),
               },
               {
+                label: "2023-11-03 11:45",
                 children: (
-                  <>
-                    <p>Technical testing 1</p>
-                    <p>Technical testing 2</p>
-                    <p>Technical testing 3 2015-09-01</p>
-                  </>
-                ),
-              },
-              {
-                color: "gray",
-                children: (
-                  <>
-                    <p>Technical testing 1</p>
-                    <p>Technical testing 2</p>
-                    <p>Technical testing 3 2015-09-01</p>
-                  </>
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Documentation Updated</p>
+                    <p className="text-sm text-gray-600">Submitted by Alex Johnson</p>
+                  </div>
                 ),
               },
               {
                 color: "gray",
+                label: "2023-11-04 16:30",
                 children: (
-                  <>
-                    <p>Technical testing 1</p>
-                    <p>Technical testing 2</p>
-                    <p>Technical testing 3 2015-09-01</p>
-                  </>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Pending Final Review</p>
+                    <p className="text-sm text-gray-600">Waiting for QA approval</p>
+                  </div>
                 ),
               },
               {
                 color: "#00CCFF",
-                dot: <SmileOutlined />,
-                children: <p>Custom color testing</p>,
+                dot: <CheckCircleOutlined className="text-blue-400" />,
+                label: "2023-11-05 10:00",
+                children: (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Workflow Completed</p>
+                    <p className="text-sm text-gray-600">Closed by System</p>
+                  </div>
+                ),
+              },
+              {
+                color: "#00CCFF",
+                dot: <CheckCircleOutlined className="text-blue-400" />,
+                label: "2023-11-05 10:00",
+                children: (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Workflow Completed</p>
+                    <p className="text-sm text-gray-600">Closed by System</p>
+                  </div>
+                ),
+              },
+              {
+                color: "#00CCFF",
+                dot: <CheckCircleOutlined className="text-blue-400" />,
+                label: "2023-11-05 10:00",
+                children: (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="font-medium text-gray-700">Workflow Completed</p>
+                    <p className="text-sm text-gray-600">Closed by System</p>
+                  </div>
+                ),
               },
             ]}
+            className="workflow-timeline"
           />
         )}
       </Modal>
