@@ -2,6 +2,7 @@ import { ApiOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, Loa
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -150,7 +151,14 @@ export default function AccesoriessRoute() {
       render: (_, data) => (
         <Link to={`/inventory/accessories/checkedout/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
-          <a className="hover:underline">{data.name || 'N/A'}</a>
+          <div className="flex items-center">
+            <Avatar
+              src={"/img/picture.png"}
+              size="small"
+              className="mr-2"
+            />
+            <a className="hover:underline">{data.name || 'N/A'}</a>
+          </div>
         </Link>
       )
     },
@@ -443,11 +451,8 @@ export default function AccesoriessRoute() {
         centered
         styles={{
           header: {
-            borderBottom: '1px solid #f0f0f0',
-            padding: '16px 24px'
           },
           body: {
-            padding: '24px'
           }
         }}
       >

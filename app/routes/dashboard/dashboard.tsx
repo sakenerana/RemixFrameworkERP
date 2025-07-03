@@ -141,7 +141,7 @@ export default function DashboardRoutes() {
             color: "#1890ff",
             trend: 0,
             loading,
-            description: "Total licenses of ERP System"
+            description: "Total licenses"
         },
         {
             title: "Accessories",
@@ -150,7 +150,7 @@ export default function DashboardRoutes() {
             color: "#722ed1",
             trend: 5,
             loading,
-            description: "Total accessories of ERP System"
+            description: "Total accessories"
         },
         {
             title: "Consumables",
@@ -159,7 +159,7 @@ export default function DashboardRoutes() {
             color: "#f5222d",
             trend: -8,
             loading,
-            description: "Total consumables of ERP System"
+            description: "Total consumables"
         },
         {
             title: "Components",
@@ -168,7 +168,7 @@ export default function DashboardRoutes() {
             color: "#f4a540",
             trend: -8,
             loading,
-            description: "Total Components of ERP System"
+            description: "Total Components"
         }
     ];
 

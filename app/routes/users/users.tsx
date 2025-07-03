@@ -7,6 +7,8 @@ import {
 } from "@ant-design/icons";
 import {
   Alert,
+  Avatar,
+  Badge,
   Breadcrumb,
   Button,
   Card,
@@ -31,9 +33,11 @@ import {
   TableColumnsType,
   TableProps,
   Tag,
+  Tooltip,
 } from "antd";
 import { useEffect, useState } from "react";
 import {
+  AiOutlineCheckCircle,
   AiOutlineCloseCircle,
   AiOutlineContacts,
   AiOutlineDelete,
@@ -255,13 +259,39 @@ export default function UsersRoutes() {
       dataIndex: "name",
       width: 120,
       render: (_, record) => (
-        <p>{record.first_name} {record.middle_name} {record.last_name}</p>
+        <div className="flex items-center">
+          <Avatar
+            src={"/img/default-avatar.png"}
+            size="small"
+            className="mr-2"
+          />
+          <span className="font-medium">
+            {record.first_name} {record.middle_name} {record.last_name}
+          </span>
+        </div>
       ),
     },
     {
       title: "Email",
       dataIndex: "email",
       width: 120,
+      render: (email) => (
+        <a
+          href={`mailto:${email}?subject=Regarding Your Account`}
+          className="text-blue-600 hover:underline transition-colors duration-200"
+          onClick={(e) => {
+            if (!email) {
+              e.preventDefault();
+              // Optional: Show error toast
+              console.warn('No email address provided');
+            }
+          }}
+          aria-label={`Send email to ${email}`}
+          title={`Send email to ${email}`}
+        >
+          {email || 'N/A'}
+        </a>
+      ),
     },
     {
       title: "Phone",
@@ -317,7 +347,7 @@ export default function UsersRoutes() {
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
             >
-              Profile
+              Update
             </Tag>
           </Popconfirm>
           <Popconfirm

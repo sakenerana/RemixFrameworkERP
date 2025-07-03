@@ -456,11 +456,8 @@ export default function ComponentsRoute() {
         centered
         styles={{
           header: {
-            borderBottom: '1px solid #f0f0f0',
-            padding: '16px 24px'
           },
           body: {
-            padding: '24px'
           }
         }}
       >

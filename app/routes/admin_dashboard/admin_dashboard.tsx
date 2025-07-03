@@ -14,8 +14,7 @@ import {
   Progress,
   Typography,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { AiOutlineSolution, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
+import { useEffect, useState } from "react";
 import {
 } from "react-icons/fc";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";

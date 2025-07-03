@@ -2,6 +2,7 @@ import { CheckCircleOutlined, DesktopOutlined, HomeOutlined, LoadingOutlined, Se
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -129,7 +130,14 @@ export default function AssetsRoute() {
       render: (_, data) => (
         <Link to={`/inventory/assets/asset-tag/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
-          <a className="hover:underline">{data.name || 'N/A'}</a>
+          <div className="flex items-center">
+            <Avatar
+              src={"/img/picture.png"}
+              size="small"
+              className="mr-2"
+            />
+            <a className="hover:underline">{data.name || 'N/A'}</a>
+          </div>
         </Link>
       )
     },

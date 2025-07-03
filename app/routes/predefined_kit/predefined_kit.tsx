@@ -337,8 +337,8 @@ export default function PredefinedKitRoute() {
         footer={null}
         centered
         styles={{
-          header: { borderBottom: '1px solid #f0f0f0', paddingBottom: '16px' },
-          body: { paddingTop: '16px' }
+          header: {  },
+          body: {  }
         }}
       >
         <Checkout

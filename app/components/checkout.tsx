@@ -153,17 +153,38 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
     };
 
     return (
-        <div>
-            <p><span className="font-bold">Reference ID:</span> {stateData.id}</p>
-            {stateData.categories && stateData.categories.type === "License" && (
-                <p><span className="font-bold">Product Key:</span> {stateData.product_key}</p>
-            )}
-            {stateData.categories && stateData.categories.type === "Asset" && (
-                <p><span className="font-bold">Asset Tag:</span> {stateData.asset_tag}</p>
-            )}
-            <p><span className="font-bold">Reference Name:</span> {stateData.name}</p>
+        <div className="max-w-3xl mx-auto rounded-lg shadow-sm">
+            {/* Header Section */}
+            <div className="mb-6 border-b pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <p className="text-sm">Reference ID</p>
+                        <p className="font-medium">{stateData.id}</p>
+                    </div>
+
+                    {stateData.categories?.type === "License" && (
+                        <div>
+                            <p className="text-sm">Product Key</p>
+                            <p className="font-medium">{stateData.product_key}</p>
+                        </div>
+                    )}
+
+                    {stateData.categories?.type === "Asset" && (
+                        <div>
+                            <p className="text-sm">Asset Tag</p>
+                            <p className="font-medium">{stateData.asset_tag}</p>
+                        </div>
+                    )}
+
+                    <div className="md:col-span-2">
+                        <p className="text-sm">Reference Name</p>
+                        <p className="font-medium">{stateData.name}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Form Section */}
             <Form
-                className="mt-5"
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
@@ -174,87 +195,88 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             >
                 <Row gutter={24}>
                     <Col xs={24} sm={24}>
-                        {stateData.categories && stateData.categories.type === "Consumable" && (
+                        {stateData.categories?.type === "Consumable" && (
                             <Form.Item
-                                label="Item No."
+                                label={<span className="font-medium">Item No.</span>}
                                 name="item_no"
-                                rules={[{ required: true, message: "Please input item number!" }]}
+                                rules={[{ required: true, message: "Please input item number" }]}
                             >
-                                <Input placeholder="Item No." />
+                                <Input
+                                    placeholder="Enter item number"
+                                    className="py-2"
+                                />
                             </Form.Item>
                         )}
 
-                        {stateData.categories && stateData.categories.type === "Accessory" && (
+                        {stateData.categories?.type === "Accessory" && (
                             <Form.Item
-                                label="Model No."
+                                label={<span className="font-medium">Model No.</span>}
                                 name="model_no"
-                                rules={[{ required: true, message: "Please input model number!" }]}
+                                rules={[{ required: true, message: "Please input model number" }]}
                             >
-                                <Input placeholder="Model No." />
+                                <Input
+                                    placeholder="Enter model number"
+                                    className="py-2"
+                                />
                             </Form.Item>
                         )}
 
                         <Form.Item
-                            label="Name/Username"
+                            label={<span className="font-medium">Name/Username</span>}
                             name="name"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input name!",
-                                },
-                            ]}
+                            rules={[{ required: true, message: "Please input name" }]}
                         >
-                            <Input placeholder="Name" />
+                            <Input
+                                placeholder="Enter name or username"
+                                className="py-2"
+                            />
                         </Form.Item>
 
                         <Form.Item
-                            label="Checkout Date"
+                            label={<span className="font-medium">Checkout Date</span>}
                             name="checkout_date"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select checkout date!",
-                                },
-                            ]}
+                            rules={[{ required: true, message: "Please select checkout date" }]}
                         >
-                            <DatePicker className="w-full" />
+                            <DatePicker
+                                className="w-full py-2"
+                                style={{ height: 40 }}
+                            />
                         </Form.Item>
 
                         <Form.Item
-                            label="Notes"
+                            label={<span className="font-medium">Notes</span>}
                             name="notes"
                         >
-                            <TextArea rows={4} placeholder="(Optional)" />
+                            <TextArea
+                                rows={4}
+                                placeholder="Add any additional notes (optional)"
+                                className="py-2"
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
 
-                <Form.Item className="flex flex-wrap justify-end">
+                {/* Form Actions */}
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-4 border-t">
                     <Button
                         onClick={onReset}
                         type="default"
-                        //   loading={loading}
-                        className="w-full sm:w-auto mr-4"
                         size="large"
+                        className="w-full sm:w-auto h-11 px- hover:border-gray-400"
                     >
                         Reset
                     </Button>
                     <Button
                         type="primary"
                         htmlType="submit"
-                        icon={
-                            <>
-                                {loading && <LoadingOutlined className="animate-spin" />}
-                                {!loading && <AiOutlineSend />}
-                            </>
-                        }
-                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 focus:bg-green-700 border-green-600 hover:border-green-700 focus:border-green-700"
-                        style={{ backgroundColor: '#16a34a', borderColor: '#16a34a' }} // Alternative to Tailwind classes
                         size="large"
+                        className="w-full sm:w-auto h-11 px-6 bg-green-600 hover:bg-green-700 border-green-600 hover:border-green-700"
+                        loading={loading}
+                        icon={!loading && <AiOutlineSend className="text-lg" />}
                     >
-                        <p className="text-white">Checkout</p>
+                        Complete Checkout
                     </Button>
-                </Form.Item>
+                </div>
             </Form>
         </div>
     );
