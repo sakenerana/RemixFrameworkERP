@@ -13,6 +13,10 @@ import { AuthProvider } from "./auth/AuthContext";
 
 import { Provider } from 'react-redux';
 import { store } from "./state/store";
+import '@fontsource/montserrat/400.css'; // Regular (Normal)
+import '@fontsource/montserrat/500.css'; // Medium
+import '@fontsource/montserrat/600.css'; // Semi-Bold
+import '@fontsource/montserrat/700.css'; // Bold
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -103,7 +103,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[url(./img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat p-6">
+    <div className="min-h-screen bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat p-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header Section */}

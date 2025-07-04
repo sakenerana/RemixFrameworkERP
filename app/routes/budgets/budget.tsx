@@ -21,10 +21,13 @@ import {
   Tag,
 } from "antd";
 import axios from "axios";
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineSend } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import LineChart from "~/components/line_chart";
+import { BudgetService } from "~/services/budget.service";
+import { Budget } from "~/types/budget.type";
 
 interface DataType {
   id: number;
@@ -34,8 +37,9 @@ interface DataType {
 }
 
 export default function Budgets() {
-  const [data, setData] = useState<DataType[]>([]);
+  const [data, setData] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [error, setError] = useState(null);
 
   const [isUserID, setUserID] = useState<any>();
@@ -44,7 +48,7 @@ export default function Budgets() {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm<DataType>();
+  const [form] = Form.useForm<Budget>();
   const { RangePicker } = DatePicker;
 
   const onReset = () => {
@@ -96,18 +100,14 @@ export default function Budgets() {
 
   const fetchData = async () => {
     try {
-      const response = await axios
-        .get<DataType[]>("https://jsonplaceholder.typicode.com/posts") // Specify response type
-        .then((response) => {
-          setData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
-    } catch (err) {
-      console.error(err);
+      setLoading(true);
+      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      setData(dataFetch); // Works in React state
+      console.log("BUDGET DATA", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,6 +118,7 @@ export default function Budgets() {
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
     setDepartmentID(localStorage.getItem('userDept'));
+
   }, []);
 
   const budget = [
@@ -145,37 +146,49 @@ export default function Budgets() {
 
   const onFinish = async () => {
     try {
-
       const values = await form.validateFields();
+      const { date } = values;
 
-      // Include your extra field
+      // Validate date range
+      if (!date || date.length !== 2) {
+        throw new Error("Please select a valid budget period");
+      }
+
+      const [startDate, endDate] = date;
+      const currentDate = new Date(); // Get current date
+      const formattedDate = currentDate.toISOString().split('T')[0];
+
+      console.log("currentDate", currentDate)
+      // Check if data already exists for this department in current year
+      setLoading(true);
+      const existingData = await BudgetService.getAllPosts(isDepartmentID, formattedDate);
+
+      if (existingData && existingData.length > 0) {
+        throw new Error(`A budget record already exists for ${existingData[0].start_date} - ${existingData[0].end_date} in this department`);
+      }
+
+      // Prepare payload with formatted dates
       const allValues = {
         ...values,
-        status_id: isUserID,
-        department_id: isDepartmentID
+        start_date: startDate.format("YYYY-MM-DD"),
+        end_date: endDate.format("YYYY-MM-DD"),
+        status_id: 1,
+        department_id: isDepartmentID,
       };
-      console.log("Form Values", allValues)
-      // if (editingId) {
-      //   // Update existing record
-      //   const { error } = await GroupService.updatePost(editingId, values);
 
-      //   if (error) throw message.error(error.message);
-      //   message.success("Record updated successfully");
-      // } else {
-      //   // Create new record
-      //   setLoading(true);
-      //   const { error } = await GroupService.createPost(allValues);
+      // Create new record
+      const { error } = await BudgetService.createPost(allValues);
+      if (error) throw new Error(error.message);
 
-      //   if (error) throw message.error(error.message);
-      //   message.success("Record created successfully");
-      // }
-
-      setLoading(false);
+      message.success("Record created successfully");
       setIsModalOpen(false);
       form.resetFields();
       fetchData();
     } catch (error) {
-      message.error("Error");
+      console.error("Error:", error);
+      message.error(error instanceof Error ? error.message : "Failed to create record");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,6 +215,7 @@ export default function Budgets() {
               onClick={() => handleTrack()}
               icon={<AiOutlinePlus />}
               type="primary"
+              disabled={isDisabled}
             >
               Create Budget
             </Button>
@@ -258,6 +272,10 @@ export default function Budgets() {
                 suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                 format="MMM D, YYYY"
                 placeholder={['Start date', 'End date']}
+                disabledDate={(current) => {
+                  // Disable dates before today
+                  return current && current < moment().startOf('day');
+                }}
               />
             </Form.Item>
 
@@ -265,10 +283,10 @@ export default function Budgets() {
             <Form.Item
               label={
                 <span className="font-medium flex items-center">
-                  Initial Balance <span className="text-red-500 ml-1">*</span>
+                  Initial Budget <span className="text-red-500 ml-1">*</span>
                 </span>
               }
-              name="initial_balance"
+              name="budget"
               rules={[
                 {
                   required: true,
@@ -299,7 +317,7 @@ export default function Budgets() {
               />
             </Form.Item>
 
-            <div className="text-sm text-gray-500 mb-6">
+            <div className="text-sm mb-6">
               <AiOutlineInfoCircle className="inline mr-2" />
               Enter the starting balance for this budget period
             </div>
@@ -359,10 +377,10 @@ export default function Budgets() {
                   {!loading && (
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-bold">
-                        {formatCurrency(data.value)}
+                        {formatCurrency(data.value || 0)}
                       </span>
                       <span className="text-sm">
-                        of {formatCurrency(data.limit)}
+                        of {formatCurrency(data.limit || 0)}
                       </span>
                     </div>
                   )}
@@ -394,6 +412,8 @@ export default function Budgets() {
                   <span className="text-sm">Current Period:</span>
                   <DatePicker.RangePicker
                     size="small"
+                    placeholder={[data[0]?.start_date, data[0]?.end_date]}
+                    disabled
                   />
                 </div>
               </div>
@@ -402,7 +422,7 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Total Budget</div>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(15000)}
+                    {formatCurrency(data[0]?.budget || 0)}
                   </div>
                 </div>
 

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  ApartmentOutlined,
-  AuditOutlined,
   FullscreenExitOutlined,
   FullscreenOutlined,
   MenuFoldOutlined,
@@ -12,14 +10,13 @@ import {
   SwapOutlined,
   VerticalAlignTopOutlined,
 } from "@ant-design/icons";
-import { Button, Input, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown } from "antd";
+import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
   FcGlobe,
-  FcSearch,
-  FcSettings,
   FcTemplate,
   FcTreeStructure,
+  FcSettings,
 } from "react-icons/fc";
 import Setting from "~/routes/settings/settings";
 import ScrollingAttentionBanner from "./scrolling_attention";
@@ -41,7 +38,7 @@ export default function WorkflowLayoutIndex() {
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
-  // Improved dark mode initialization
+  // Dark mode state initialization with localStorage
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -51,12 +48,13 @@ export default function WorkflowLayoutIndex() {
     return false;
   });
 
-  // Responsive detection
+  // Responsive detection and automatic layout switching
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
       // Auto-collapse sidebar on mobile
-      if (window.innerWidth < 768) {
+      if (mobile) {
         setCollapsed(true);
       }
     };
@@ -66,6 +64,7 @@ export default function WorkflowLayoutIndex() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Apply theme and user data
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -96,9 +95,13 @@ export default function WorkflowLayoutIndex() {
 
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
   const toggleSidebar = () => setCollapsed(prev => !prev);
-  const toggleLayout = () => setIsHorizontal(prev => !prev);
+  const toggleLayout = () => {
+    // Only allow layout toggle on desktop
+    if (!isMobile) {
+      setIsHorizontal(prev => !prev);
+    }
+  };
   const handleTrack = () => setIsModalOpen(true);
-  const handleOk = () => setIsModalOpen(false);
   const handleCancel = () => setIsModalOpen(false);
 
   const menuItems: MenuItem[] = [
@@ -128,24 +131,18 @@ export default function WorkflowLayoutIndex() {
     },
     {
       key: '2',
-      label: isHorizontal ? 'Vertical Layout' : 'Horizontal Layout',
-      icon: isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />,
-      onClick: toggleLayout
-    },
-    {
-      key: '3',
       label: isFullscreen ? 'Exit Fullscreen' : 'Fullscreen',
       icon: isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
       onClick: toggleFullscreen
     },
     {
-      key: '4',
+      key: '3',
       label: 'Settings',
       icon: <FcSettings />,
       onClick: handleTrack
     },
     {
-      key: '5',
+      key: '4',
       label: 'Switch App',
       icon: <SwapOutlined />,
       onClick: () => window.location.href = '/landing-page'
@@ -160,28 +157,24 @@ export default function WorkflowLayoutIndex() {
           colorText: isDarkMode ? '#ffffff' : undefined,
           colorTextSecondary: isDarkMode ? '#e6e6e6' : undefined,
           colorTextTertiary: isDarkMode ? '#cccccc' : undefined,
-          colorTextQuaternary: isDarkMode ? '#b3b3b3' : undefined,
         },
         components: {
           Layout: {
-            headerBg: isDarkMode ? '#1f1f1f' : '#001529',
+            headerBg: isDarkMode ? '#1f1f1f' : '#ffffff',
             bodyBg: isDarkMode ? '#141414' : '#f5f5f5',
-            colorText: isDarkMode ? '#ffffff' : undefined,
           },
-          Typography: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Menu: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Button: { colorText: isDarkMode ? '#ffffff' : undefined },
+          Menu: {
+            colorItemBgSelected: isDarkMode ? '#1d1d1d' : '#f0f0f0',
+            colorItemBgHover: isDarkMode ? '#2a2a2a' : '#f5f5f5',
+          },
           Card: {
             colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
-            colorText: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
-            colorTextHeading: isDarkMode ? '#ffffff' : undefined,
-            colorTextDescription: isDarkMode ? 'rgba(255, 255, 255, 0.65)' : undefined,
-            colorBorderSecondary: isDarkMode ? '#424242' : '#f0f0f0',
           },
         },
       }}
     >
       <Layout className="min-h-screen">
+        {/* Mobile Header with Horizontal Menu */}
         {/* Mobile Header */}
         {isMobile && (
           <Header className="flex items-center justify-between p-0 px-4" style={{
@@ -212,23 +205,18 @@ export default function WorkflowLayoutIndex() {
         )}
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Hidden on mobile when collapsed */}
-          {!isHorizontal && (
+          {/* Desktop Sidebar - Only shown when not mobile */}
+          {!isMobile && !isHorizontal && (
             <Sider
               trigger={null}
               collapsible
               collapsed={collapsed}
-              collapsedWidth={isMobile ? 0 : 80}
+              collapsedWidth={80}
               width={250}
-              breakpoint="lg"
-              onBreakpoint={(broken) => {
-                setCollapsed(broken);
-              }}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
                 borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
               }}
-              className={`${isMobile && collapsed ? 'hidden' : 'block'}`}
             >
               <div className="h-16 flex items-center justify-center" style={{
                 background: isDarkMode ? '#1f1f1f' : '#fafafa',
@@ -281,6 +269,7 @@ export default function WorkflowLayoutIndex() {
                   )}
                   <div className="ml-4">
                     <Image
+                      className="mt-4"
                       width={200}
                       src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
                       preview={false}
@@ -298,13 +287,15 @@ export default function WorkflowLayoutIndex() {
                         onChange={toggleDarkMode}
                         className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
                       />
-                      <Button
-                        type="text"
-                        icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
-                        onClick={toggleLayout}
-                      >
-                        {isHorizontal ? 'Vertical' : 'Horizontal'}
-                      </Button>
+                      {!isMobile && (
+                        <Button
+                          type="text"
+                          icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
+                          onClick={toggleLayout}
+                        >
+                          {isHorizontal ? 'Vertical' : 'Horizontal'}
+                        </Button>
+                      )}
                       <Button
                         icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
                         onClick={toggleFullscreen}
@@ -326,20 +317,21 @@ export default function WorkflowLayoutIndex() {
               </Header>
             )}
 
-            {/* Horizontal Menu */}
-            {isHorizontal && !isMobile && (
-              <Header className="p-0">
+            {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
+            {(isMobile || isHorizontal) && (
+              <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
-                  mode="horizontal"
+                  mode={isMobile ? 'horizontal' : 'horizontal'}
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
                     flex: 1,
                     minWidth: 0,
                     background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                    lineHeight: '64px',
+                    lineHeight: '48px',
                   }}
+                  className={isMobile ? 'overflow-x-auto' : ''}
                 />
               </Header>
             )}
@@ -349,13 +341,14 @@ export default function WorkflowLayoutIndex() {
               className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
+                marginTop: isMobile ? 0 : 0
               }}
             >
-              {!isHorizontal && (
+              {!isMobile && (
                 <div className="mb-4">
                   <ScrollingAttentionBanner
-                    text="ATTENTION: Other features are still under maintenance."
+                    text="ATTENTION: Other features is still under maintenance."
                     speed={100}
                     backgroundColor={isDarkMode ? 'bg-gray-800' : 'bg-yellow-50'}
                     textColor={isDarkMode ? 'text-gray-300' : 'text-yellow-800'}

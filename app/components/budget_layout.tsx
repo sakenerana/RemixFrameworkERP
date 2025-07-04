@@ -50,6 +50,7 @@ export default function BudgetLayoutIndex() {
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
+  // Dark mode state initialization with localStorage
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -59,12 +60,13 @@ export default function BudgetLayoutIndex() {
     return false;
   });
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
+  // Responsive detection and automatic layout switching
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth < 768) {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Auto-collapse sidebar on mobile
+      if (mobile) {
         setCollapsed(true);
       }
     };
@@ -74,6 +76,7 @@ export default function BudgetLayoutIndex() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Apply theme and user data
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -85,6 +88,9 @@ export default function BudgetLayoutIndex() {
     }
   }, [isDarkMode]);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Toggle functions
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
@@ -101,7 +107,12 @@ export default function BudgetLayoutIndex() {
 
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
   const toggleSidebar = () => setCollapsed(prev => !prev);
-  const toggleLayout = () => setIsHorizontal(prev => !prev);
+  const toggleLayout = () => {
+    // Only allow layout toggle on desktop
+    if (!isMobile) {
+      setIsHorizontal(prev => !prev);
+    }
+  };
   const handleTrack = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
@@ -132,24 +143,18 @@ export default function BudgetLayoutIndex() {
     },
     {
       key: '2',
-      label: isHorizontal ? 'Vertical Layout' : 'Horizontal Layout',
-      icon: isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />,
-      onClick: toggleLayout
-    },
-    {
-      key: '3',
       label: isFullscreen ? 'Exit Fullscreen' : 'Fullscreen',
       icon: isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
       onClick: toggleFullscreen
     },
     {
-      key: '4',
+      key: '3',
       label: 'Settings',
       icon: <FcSettings />,
       onClick: handleTrack
     },
     {
-      key: '5',
+      key: '4',
       label: 'Switch App',
       icon: <SwapOutlined />,
       onClick: () => window.location.href = '/landing-page'
@@ -216,13 +221,13 @@ export default function BudgetLayoutIndex() {
         )}
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Hidden on mobile when collapsed */}
-          {!isHorizontal && (
+          {/* Sidebar - Only show vertical sidebar on desktop when not in horizontal mode */}
+          {!isMobile && !isHorizontal && (
             <Sider
               trigger={null}
               collapsible
               collapsed={collapsed}
-              collapsedWidth={isMobile ? 0 : 80}
+              collapsedWidth={80}
               width={250}
               breakpoint="lg"
               onBreakpoint={(broken) => {
@@ -232,7 +237,6 @@ export default function BudgetLayoutIndex() {
                 background: isDarkMode ? '#141414' : '#ffffff',
                 borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
               }}
-              className={`${isMobile && collapsed ? 'hidden' : 'block'}`}
             >
               <div className="h-16 flex items-center justify-center" style={{
                 background: isDarkMode ? '#1f1f1f' : '#fafafa',
@@ -285,6 +289,7 @@ export default function BudgetLayoutIndex() {
                   )}
                   <div className="ml-4">
                     <Image
+                      className="mt-4"
                       width={200}
                       src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
                       preview={false}
@@ -302,33 +307,27 @@ export default function BudgetLayoutIndex() {
                         onChange={toggleDarkMode}
                         className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
                       />
-                      <Button
-                        type="text"
-                        icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
-                        onClick={toggleLayout}
-                        style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
-                      >
-                        {isHorizontal ? 'Vertical' : 'Horizontal'}
-                      </Button>
+                      {!isMobile && (
+                        <Button
+                          type="text"
+                          icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
+                          onClick={toggleLayout}
+                        >
+                          {isHorizontal ? 'Vertical' : 'Horizontal'}
+                        </Button>
+                      )}
                       <Button
                         icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
                         onClick={toggleFullscreen}
-                        style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
                       >
                         Screen
                       </Button>
                       <Link to="/landing-page">
-                        <Button
-                          icon={<SwapOutlined />}
-                          style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
-                        >
-                          Switch
-                        </Button>
+                        <Button icon={<SwapOutlined />}>Switch</Button>
                       </Link>
                       <Button
                         onClick={handleTrack}
                         icon={<FcSettings />}
-                        style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
                       >
                         Settings
                       </Button>
@@ -338,20 +337,21 @@ export default function BudgetLayoutIndex() {
               </Header>
             )}
 
-            {/* Horizontal Menu */}
-            {isHorizontal && !isMobile && (
-              <Header className="p-0">
+            {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
+            {(isMobile || isHorizontal) && (
+              <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
-                  mode="horizontal"
+                  mode={isMobile ? 'horizontal' : 'horizontal'}
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
                     flex: 1,
                     minWidth: 0,
                     background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                    lineHeight: '64px',
+                    lineHeight: '48px',
                   }}
+                  className={isMobile ? 'overflow-x-auto' : ''}
                 />
               </Header>
             )}
@@ -361,13 +361,14 @@ export default function BudgetLayoutIndex() {
               className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
+                marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
               }}
             >
               {!isHorizontal && (
                 <div className="mb-4">
                   <ScrollingAttentionBanner
-                    text="ATTENTION: Other features are still under maintenance."
+                    text="ATTENTION: Other features is still under maintenance."
                     speed={100}
                     backgroundColor={isDarkMode ? 'bg-gray-800' : 'bg-yellow-50'}
                     textColor={isDarkMode ? 'text-gray-300' : 'text-yellow-800'}
@@ -385,7 +386,7 @@ export default function BudgetLayoutIndex() {
               border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
             `}>
               <div className="text-sm mb-2 md:mb-0">
-                Budget Management System <b>©{new Date().getFullYear()}</b>
+                Ant Design using Remix <b>©{new Date().getFullYear()}</b>
               </div>
               <div className="text-sm">
                 <b>Developed by:</b> CFI IT Department

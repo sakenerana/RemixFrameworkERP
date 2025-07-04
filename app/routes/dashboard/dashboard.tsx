@@ -132,7 +132,7 @@ export default function DashboardRoutes() {
             color: "#52c41a",
             trend: 12,
             loading,
-            description: "Your total assets of ERP System"
+            description: "Total assets"
         },
         {
             title: "Licenses",

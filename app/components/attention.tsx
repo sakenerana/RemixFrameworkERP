@@ -19,7 +19,7 @@ export default function MovingAttentionAlert () {
     return (
         <div className={`fixed top-14 right-0 z-50 transition-transform duration-1000 ease-in-out ${position}`}>
             <Alert
-                message="A warm welcome from IT Department."
+                message="A warm welcome from IT Department. Gcash # (09553713233)"
                 type="success"
                 showIcon
                 className="shadow-lg rounded-lg w-[300px]"

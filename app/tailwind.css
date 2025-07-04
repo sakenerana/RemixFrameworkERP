@@ -4,18 +4,6 @@
 
 html,
 body {
-  .ant-table-container {
-    /* border: 1px solid #e1e3e1 !important; */
-  }
-
-  /* .ant-modal-content {
-    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.08) !important;
-  } */
-
-  label {
-    font-weight: 500 !important;
-  }
-
   .app {
     transition: all 0.3s ease;
   }
@@ -104,6 +92,9 @@ body {
     display: none;
   }
 
+  .ant-picker-cell-inner {
+    color: green;
+  }
 }
 
 @keyframes infinite-scroll {
@@ -113,5 +104,48 @@ body {
 
   100% {
     transform: translateX(-50%);
+  }
+}
+
+/* In your main CSS file (e.g., index.css) */
+@layer base {
+
+  /* Apply to ALL text elements */
+  *:not(icon):not(svg):not(symbol):not(img):not([class*='icon']):not([class*='svg']) {
+    font-family: 'Montserrat', sans-serif !important;
+  }
+
+  /* Specific element reinforcement */
+  body,
+  input,
+  button,
+  textarea,
+  select,
+  pre,
+  code,
+  kbd,
+  samp,
+  div,
+  p,
+  span,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  label,
+  td,
+  th,
+  li {
+    font-family: 'Montserrat', sans-serif !important;
+  }
+
+  /* Ant Design specific overrides */
+  .ant-*,
+  [class^='ant-'],
+  [class*=' ant-'] {
+    font-family: 'Montserrat', sans-serif !important;
   }
 }

@@ -52,9 +52,12 @@ export default function AdminLayoutIndex() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Automatically switch to horizontal layout on mobile
+      setIsHorizontal(mobile);
       // Auto-collapse sidebar on mobile
-      if (window.innerWidth < 768) {
+      if (mobile) {
         setCollapsed(true);
       }
     };
@@ -101,7 +104,10 @@ export default function AdminLayoutIndex() {
   };
 
   const toggleLayout = () => {
-    setIsHorizontal(prev => !prev);
+    // Only allow layout toggle on desktop
+    if (!isMobile) {
+      setIsHorizontal(prev => !prev);
+    }
   };
 
   const {
@@ -141,12 +147,6 @@ export default function AdminLayoutIndex() {
       label: isDarkMode ? 'Light Mode' : 'Dark Mode',
       icon: isDarkMode ? <SunOutlined /> : <MoonOutlined />,
       onClick: toggleDarkMode
-    },
-    {
-      key: '2',
-      label: isHorizontal ? 'Vertical Layout' : 'Horizontal Layout',
-      icon: isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />,
-      onClick: toggleLayout
     },
     {
       key: '3',
@@ -228,13 +228,13 @@ export default function AdminLayoutIndex() {
         )}
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Hidden on mobile when collapsed */}
-          {!isHorizontal && (
+          {/* Sidebar - Only show vertical sidebar on desktop when not in horizontal mode */}
+          {!isMobile && !isHorizontal && (
             <Sider
               trigger={null}
               collapsible
               collapsed={collapsed}
-              collapsedWidth={isMobile ? 0 : 80}
+              collapsedWidth={80}
               width={250}
               breakpoint="lg"
               onBreakpoint={(broken) => {
@@ -244,7 +244,6 @@ export default function AdminLayoutIndex() {
                 background: isDarkMode ? '#141414' : '#ffffff',
                 borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
               }}
-              className={`${isMobile && collapsed ? 'hidden' : 'block'}`}
             >
               <div className="h-16 flex items-center justify-center" style={{
                 background: isDarkMode ? '#1f1f1f' : '#fafafa',
@@ -297,6 +296,7 @@ export default function AdminLayoutIndex() {
                   )}
                   <div className="ml-4">
                     <Image
+                      className="mt-4"
                       width={200}
                       src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
                       preview={false}
@@ -314,13 +314,15 @@ export default function AdminLayoutIndex() {
                         onChange={toggleDarkMode}
                         className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
                       />
-                      <Button
-                        type="text"
-                        icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
-                        onClick={toggleLayout}
-                      >
-                        {isHorizontal ? 'Vertical' : 'Horizontal'}
-                      </Button>
+                      {!isMobile && (
+                        <Button
+                          type="text"
+                          icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
+                          onClick={toggleLayout}
+                        >
+                          {isHorizontal ? 'Vertical' : 'Horizontal'}
+                        </Button>
+                      )}
                       <Button
                         icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
                         onClick={toggleFullscreen}
@@ -342,20 +344,21 @@ export default function AdminLayoutIndex() {
               </Header>
             )}
 
-            {/* Horizontal Menu */}
-            {isHorizontal && !isMobile && (
-              <Header className="p-0">
+            {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
+            {(isMobile || isHorizontal) && (
+              <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
-                  mode="horizontal"
+                  mode={isMobile ? 'horizontal' : 'horizontal'}
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
                     flex: 1,
                     minWidth: 0,
                     background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                    lineHeight: '64px',
+                    lineHeight: '48px',
                   }}
+                  className={isMobile ? 'overflow-x-auto' : ''}
                 />
               </Header>
             )}
@@ -365,13 +368,14 @@ export default function AdminLayoutIndex() {
               className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
+                marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
               }}
             >
               {!isHorizontal && (
                 <div className="mb-4">
                   <ScrollingAttentionBanner
-                    text="ATTENTION: Other features are still under maintenance."
+                    text="ATTENTION: Other features is still under maintenance."
                     speed={100}
                     backgroundColor={isDarkMode ? 'bg-gray-800' : 'bg-yellow-50'}
                     textColor={isDarkMode ? 'text-gray-300' : 'text-yellow-800'}

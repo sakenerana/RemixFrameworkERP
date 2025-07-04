@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
-    "dev": "remix vite:dev",
+    "dev": "remix vite:dev --host",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
@@ -14,6 +14,7 @@
     "@ant-design/dark-theme": "^2.0.2",
     "@ant-design/icons": "^6.0.0",
     "@antv/g2plot": "^2.4.33",
+    "@fontsource/montserrat": "^5.2.6",
     "@react-icons/all-files": "^4.1.0",
     "@react-pdf/renderer": "^4.3.0",
     "@reduxjs/toolkit": "^2.8.2",

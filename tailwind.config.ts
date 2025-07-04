@@ -8,16 +8,7 @@ export default {
         'infinite-scroll': 'infinite-scroll 25s linear infinite',
       },
       fontFamily: {
-        sans: [
-          "Inter",
-          "ui-sans-serif",
-          "system-ui",
-          "sans-serif",
-          "Apple Color Emoji",
-          "Segoe UI Emoji",
-          "Segoe UI Symbol",
-          "Noto Color Emoji",
-        ],
+        sans: ['Montserrat', 'sans-serif'], // This will make Montserrat the default font
       },
       backdropBlur: {
         xs: '2px',
