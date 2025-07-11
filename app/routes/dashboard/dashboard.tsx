@@ -1,6 +1,7 @@
 import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import {
     Alert,
+    Button,
     Card,
     Col,
     Row,
@@ -16,8 +17,6 @@ import {
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets, AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
-import {
-} from "react-icons/fc";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
@@ -48,6 +47,46 @@ interface DashboardMetric {
     description: string;
 }
 
+// Language content
+const translations = {
+    en: {
+        alertMessage: "You can see here all the status of overall inventory status. Please check closely.",
+        assets: "Assets",
+        licenses: "Licenses",
+        accessories: "Accessories",
+        consumables: "Consumables",
+        components: "Components",
+        totalDescription: "Total",
+        inventoryByCategory: "Inventory By Category",
+        currentMonthBreakdown: "Current month breakdown",
+        monthlyDataTrend: "Monthly Data Trend",
+        lastMonths: "Last current months",
+        latestAssets: "Latest (5) Assets Overview",
+        active: "Active",
+        dashboardTitle: "Inventory Dashboard",
+        switchToFilipino: "Switch to Filipino",
+        switchToEnglish: "Switch to English"
+    },
+    fil: {
+        alertMessage: "Maaari mong makita dito ang lahat ng status ng kabuuang inventory. Mangyaring suriin nang mabuti.",
+        assets: "Mga Asset",
+        licenses: "Mga Lisensya",
+        accessories: "Mga Aksesorya",
+        consumables: "Mga Consumable",
+        components: "Mga Komponente",
+        totalDescription: "Kabuuan",
+        inventoryByCategory: "Inventory Ayon sa Kategorya",
+        currentMonthBreakdown: "Pagbabalangkas ng kasalukuyang buwan",
+        monthlyDataTrend: "Trend ng Buwanang Data",
+        lastMonths: "Nakaraang mga buwan",
+        latestAssets: "Pangkalahatang-ideya ng Pinakabagong (5) Asset",
+        active: "Aktibo",
+        dashboardTitle: "Dashboard ng Inventory",
+        switchToFilipino: "Palitan sa Filipino",
+        switchToEnglish: "Palitan sa Ingles"
+    }
+};
+
 export default function DashboardRoutes() {
     const [dataAsset, setDataAsset] = useState<any>();
     const [dataAssetTable, setDataAssetTable] = useState<Asset[]>([]);
@@ -56,6 +95,8 @@ export default function DashboardRoutes() {
     const [dataConsumable, setDataConsumable] = useState<any>();
     const [dataComponent, setDataComponent] = useState<any>();
     const [loading, setLoading] = useState(true);
+    const [language, setLanguage] = useState<'en' | 'fil'>('en');
+    const [t, setT] = useState(translations.en);
 
     const [isUserID, setUserID] = useState<any>();
     const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -68,6 +109,13 @@ export default function DashboardRoutes() {
         consumable: 0,
         component: 0
     });
+
+    // Toggle language
+    const toggleLanguage = () => {
+        const newLanguage = language === 'en' ? 'fil' : 'en';
+        setLanguage(newLanguage);
+        setT(translations[newLanguage]);
+    };
 
     // Fetch all data in parallel
     const fetchDashboardData = async () => {
@@ -106,7 +154,7 @@ export default function DashboardRoutes() {
         try {
             setLoading(true);
             const dataFetch = await AssetService.getAllPostsLimit(isDepartmentID);
-            setDataAssetTable(dataFetch); // Works in React state
+            setDataAssetTable(dataFetch);
         } catch (error) {
             message.error("error");
         } finally {
@@ -122,53 +170,53 @@ export default function DashboardRoutes() {
     useEffect(() => {
         fetchDashboardData();
         fetchDataAssetTable();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     const dashboardMetrics: DashboardMetric[] = [
         {
-            title: "Assets",
+            title: t.assets,
             value: metrics.assets,
             icon: <AiOutlineSnippets />,
             color: "#52c41a",
             trend: 12,
             loading,
-            description: "Total assets"
+            description: `${t.totalDescription} ${t.assets.toLowerCase()}`
         },
         {
-            title: "Licenses",
+            title: t.licenses,
             value: metrics.licenses,
             icon: <AiOutlineSchedule />,
             color: "#1890ff",
             trend: 0,
             loading,
-            description: "Total licenses"
+            description: `${t.totalDescription} ${t.licenses.toLowerCase()}`
         },
         {
-            title: "Accessories",
+            title: t.accessories,
             value: metrics.accessory,
             icon: <AiOutlineMobile />,
             color: "#722ed1",
             trend: 5,
             loading,
-            description: "Total accessories"
+            description: `${t.totalDescription} ${t.accessories.toLowerCase()}`
         },
         {
-            title: "Consumables",
+            title: t.consumables,
             value: metrics.consumable,
             icon: <AiOutlineShopping />,
             color: "#f5222d",
             trend: -8,
             loading,
-            description: "Total consumables"
+            description: `${t.totalDescription} ${t.consumables.toLowerCase()}`
         },
         {
-            title: "Components",
+            title: t.components,
             value: metrics.component,
             icon: <AiOutlineDesktop />,
             color: "#f4a540",
             trend: -8,
             loading,
-            description: "Total Components"
+            description: `${t.totalDescription} ${t.components.toLowerCase()}`
         }
     ];
 
@@ -227,7 +275,7 @@ export default function DashboardRoutes() {
             render: () => (
                 <>
                     <Tag color="green">
-                        <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+                        <CheckCircleOutlined className="float-left mt-1 mr-1" /> {t.active}
                     </Tag>
                 </>
             )
@@ -251,13 +299,19 @@ export default function DashboardRoutes() {
 
     return (
         <div>
+            <div className="flex justify-between items-center mb-4">
+                <Title level={3}>{t.dashboardTitle}</Title>
+                <Button type="default" onClick={toggleLanguage}>
+                    {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+                </Button>
+            </div>
+
             <Alert
-                message="You can see here all the status of overall inventory status. Please check closely."
+                message={t.alertMessage}
                 type="info"
                 showIcon
             />
 
-            {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
             {/* Metrics Section */}
             <Row gutter={[16, 16]} justify="space-between" className="mt-4">
                 {dashboardMetrics.map((metric, index) => (
@@ -267,8 +321,8 @@ export default function DashboardRoutes() {
                         sm={12}
                         md={8}
                         lg={6}
-                        flex="1 1 0" // Force equal distribution
-                        style={{ minWidth: "200px", maxWidth: "100%" }} // Prevent overflow
+                        flex="1 1 0"
+                        style={{ minWidth: "200px", maxWidth: "100%" }}
                     >
                         <Card
                             hoverable
@@ -276,7 +330,6 @@ export default function DashboardRoutes() {
                             bodyStyle={{ padding: '16px' }}
                             className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
                         >
-                            {/* Card content remains the same */}
                             <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Text strong style={{ color: metric.color }}>
@@ -306,41 +359,35 @@ export default function DashboardRoutes() {
                 ))}
             </Row>
 
-            {/* THIS IS THE SECOND ROW OF DASHBOARD */}
-
+            {/* Charts Section */}
             <Row className="pt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-                    <Card
-                        className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-                    >
+                    <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
                         <div>
                             <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Inventory By Category
+                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.inventoryByCategory}
                             </h2>
-                            <p className="flex flex-wrap">Current month breakdown</p>
+                            <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
                             {loading && <Spin></Spin>}
                             {!loading &&
                                 <PieChart
                                     data={[
-                                        { type: "Assets", value: dataAsset },
-                                        { type: "Licenses", value: dataLicense },
-                                        { type: "Accessories", value: dataAccessory },
-                                        { type: "Consumables", value: dataConsumable },
-                                        { type: "Components", value: dataComponent },
+                                        { type: t.assets, value: dataAsset },
+                                        { type: t.licenses, value: dataLicense },
+                                        { type: t.accessories, value: dataAccessory },
+                                        { type: t.consumables, value: dataConsumable },
+                                        { type: t.components, value: dataComponent },
                                     ]}
                                     title=""
                                 />}
-
                         </div>
                     </Card>
-                    <Card
-                        className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-                    >
+                    <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
                         <div>
                             <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Data Trend
+                                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
                             </h2>
-                            <p className="flex flex-wrap">Last current months</p>
+                            <p className="flex flex-wrap">{t.lastMonths}</p>
                             <BarChart
                                 data={salesData}
                                 title=""
@@ -352,15 +399,14 @@ export default function DashboardRoutes() {
                 </div>
             </Row>
 
-            {/* THIS IS THE THIRD ROW OF DASHBOARD */}
-
+            {/* Latest Assets Table */}
             <Row gutter={16} className="pt-7">
                 <Col span={24}>
                     <div className="shadow-lg">
                         <Card title={
                             <div className="flex items-center">
-                                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
-                                Latest (5) Assets Overview
+                                <RiPieChart2Fill className="mr-2 text-green-500" />
+                                {t.latestAssets}
                             </div>
                         }>
                             {loading && <Spin></Spin>}

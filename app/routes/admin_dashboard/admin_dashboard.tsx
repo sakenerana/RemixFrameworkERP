@@ -1,6 +1,7 @@
 import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Alert,
+  Button,
   Card,
   Col,
   Row,
@@ -15,8 +16,6 @@ import {
   Typography,
 } from "antd";
 import { useEffect, useState } from "react";
-import {
-} from "react-icons/fc";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
@@ -45,6 +44,54 @@ interface DashboardMetric {
   description: string;
 }
 
+// Language content
+const translations = {
+  en: {
+    alertMessage: "System Administration Dashboard: Overview of all system metrics and user activity",
+    activeUsers: "Active Users",
+    departments: "Departments",
+    groups: "Groups",
+    inactiveUsers: "Inactive Users",
+    currentlyActive: "Currently active in system",
+    organizationalUnits: "Organizational units",
+    permissionGroups: "Permission groups",
+    requiringReview: "Requiring review",
+    addedByCategory: "Added By Category",
+    currentMonthBreakdown: "Current month breakdown",
+    monthlyDataTrend: "Monthly Data Trend",
+    lastMonths: "Last current months",
+    accountsOverview: "Accounts Overview",
+    active: "Active",
+    dashboardTitle: "System Administration Dashboard",
+    switchToFilipino: "Switch to Filipino",
+    switchToEnglish: "Switch to English",
+    users: "Users",
+    inactiveUsersLabel: "Inactive Users"
+  },
+  fil: {
+    alertMessage: "System Administration Dashboard: Pangkalahatang-ideya ng lahat ng system metrics at user activity",
+    activeUsers: "Mga Aktibong User",
+    departments: "Mga Departamento",
+    groups: "Mga Grupo",
+    inactiveUsers: "Mga Di-Aktibong User",
+    currentlyActive: "Kasalukuyang aktibo sa system",
+    organizationalUnits: "Mga yunit ng organisasyon",
+    permissionGroups: "Mga grupo ng pahintulot",
+    requiringReview: "Nangangailangan ng pagsusuri",
+    addedByCategory: "Idinagdag Ayon sa Kategorya",
+    currentMonthBreakdown: "Pagbabalangkas ng kasalukuyang buwan",
+    monthlyDataTrend: "Trend ng Buwanang Data",
+    lastMonths: "Nakaraang mga buwan",
+    accountsOverview: "Pangkalahatang-ideya ng mga Account",
+    active: "Aktibo",
+    dashboardTitle: "Dashboard ng System Administration",
+    switchToFilipino: "Palitan sa Filipino",
+    switchToEnglish: "Palitan sa Ingles",
+    users: "Mga User",
+    inactiveUsersLabel: "Mga Di-Aktibong User"
+  }
+};
+
 export default function BudgetRoutes() {
   const [dataUser, setDataUser] = useState<any>();
   const [dataUserTable, setDataUserTable] = useState<User[]>([]);
@@ -52,6 +99,8 @@ export default function BudgetRoutes() {
   const [dataGroup, setDataGroup] = useState<any>();
   const [dataInactiveUsers, setDataInactiveUsers] = useState<any>();
   const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState<'en' | 'fil'>('en');
+  const [t, setT] = useState(translations.en);
 
   const [metrics, setMetrics] = useState<any>({
     users: 0,
@@ -61,6 +110,13 @@ export default function BudgetRoutes() {
   });
   const [userData, setUserData] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Toggle language
+  const toggleLanguage = () => {
+    const newLanguage = language === 'en' ? 'fil' : 'en';
+    setLanguage(newLanguage);
+    setT(translations[newLanguage]);
+  };
 
   // Fetch all data in parallel
   const fetchDashboardData = async () => {
@@ -97,7 +153,7 @@ export default function BudgetRoutes() {
     try {
       setLoading(true);
       const dataFetch = await UserService.getActiveUsers();
-      setDataUserTable(dataFetch); // Works in React state
+      setDataUserTable(dataFetch);
     } catch (error) {
       message.error("error");
     } finally {
@@ -112,40 +168,40 @@ export default function BudgetRoutes() {
 
   const dashboardMetrics: DashboardMetric[] = [
     {
-      title: "Active Users",
+      title: t.activeUsers,
       value: metrics.users,
       icon: <UserOutlined />,
       color: "#52c41a",
       trend: 12,
       loading,
-      description: "Currently active in system"
+      description: t.currentlyActive
     },
     {
-      title: "Departments",
+      title: t.departments,
       value: metrics.departments,
       icon: <ApartmentOutlined />,
       color: "#1890ff",
       trend: 0,
       loading,
-      description: "Organizational units"
+      description: t.organizationalUnits
     },
     {
-      title: "Groups",
+      title: t.groups,
       value: metrics.groups,
       icon: <TeamOutlined />,
       color: "#722ed1",
       trend: 5,
       loading,
-      description: "Permission groups"
+      description: t.permissionGroups
     },
     {
-      title: "Inactive Users",
+      title: t.inactiveUsers,
       value: metrics.inactiveUsers,
       icon: <CloseCircleOutlined />,
       color: "#f5222d",
       trend: -8,
       loading,
-      description: "Requiring review"
+      description: t.requiringReview
     }
   ];
 
@@ -204,7 +260,7 @@ export default function BudgetRoutes() {
       render: () => (
         <>
           <Tag color="green">
-            <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+            <CheckCircleOutlined className="float-left mt-1 mr-1" /> {t.active}
           </Tag>
         </>
       )
@@ -228,11 +284,17 @@ export default function BudgetRoutes() {
 
   return (
     <div>
-      {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
-      {/* Dashboard Header */}
+      <div className="flex justify-between items-center mb-4">
+        <Title level={3}>{t.dashboardTitle}</Title>
+        <Button type="default" onClick={toggleLanguage}>
+          {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+        </Button>
+      </div>
+
+      {/* THIS IS THE FIRST ROW OF DASHBOARD */}
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Alert
-          message="System Administration Dashboard: Overview of all system metrics and user activity"
+          message={t.alertMessage}
           type="info"
           showIcon
           closable
@@ -277,41 +339,34 @@ export default function BudgetRoutes() {
           ))}
         </Row>
 
-
         {/* THIS IS THE SECOND ROW OF DASHBOARD */}
-
         <Row>
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-            <Card
-              className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            >
+            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Added By Category
+                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.addedByCategory}
                 </h2>
-                <p className="flex flex-wrap">Current month breakdown</p>
+                <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
                 {loading && <Spin></Spin>}
                 {!loading &&
                   <PieChart
                     data={[
-                      { type: "Users", value: dataUser },
-                      { type: "Departments", value: dataDepartment },
-                      { type: "Groups", value: dataGroup },
-                      { type: "Inactive Users", value: dataInactiveUsers },
+                      { type: t.users, value: dataUser },
+                      { type: t.departments, value: dataDepartment },
+                      { type: t.groups, value: dataGroup },
+                      { type: t.inactiveUsersLabel, value: dataInactiveUsers },
                     ]}
                     title=""
                   />}
-
               </div>
             </Card>
-            <Card
-              className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-            >
+            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Data Trend
+                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
                 </h2>
-                <p className="flex flex-wrap">Last current months</p>
+                <p className="flex flex-wrap">{t.lastMonths}</p>
                 <BarChart
                   data={salesData}
                   title=""
@@ -324,14 +379,13 @@ export default function BudgetRoutes() {
         </Row>
 
         {/* THIS IS THE THIRD ROW OF DASHBOARD */}
-
         <Row>
           <Col span={24}>
             <div className="shadow-lg">
               <Card title={
                 <div className="flex items-center">
-                  <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
-                  Accounts Overview
+                  <RiPieChart2Fill className="mr-2 text-green-500" />
+                  {t.accountsOverview}
                 </div>
               }>
                 {loading && <Spin></Spin>}

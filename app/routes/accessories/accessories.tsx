@@ -152,11 +152,11 @@ export default function AccesoriessRoute() {
         <Link to={`/inventory/accessories/checkedout/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
           <div className="flex items-center">
-            <Avatar
+            {/* <Avatar
               src={"/img/picture.png"}
               size="small"
               className="mr-2"
-            />
+            /> */}
             <a className="hover:underline">{data.name || 'N/A'}</a>
           </div>
         </Link>

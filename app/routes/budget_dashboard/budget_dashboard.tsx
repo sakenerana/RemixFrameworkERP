@@ -1,5 +1,6 @@
 import {
   Alert,
+  Button,
   Card,
   Col,
   Row,
@@ -36,10 +37,77 @@ interface DataTypeAssetCategories {
   address: string;
 }
 
+// Language content
+const translations = {
+  en: {
+    alertMessage: "You can see here all the status of overall budget status. Please check closely.",
+    netWorth: "Net Worth",
+    monthlyIncome: "Monthly Income",
+    monthlyExpenses: "Monthly Expenses",
+    savingsRate: "Savings Rate",
+    totalAssetsMinusLiabilities: "Your total assets minus liabilities",
+    totalIncomeThisMonth: "Total income this month",
+    totalExpensesThisMonth: "Total expenses this month",
+    percentageOfIncomeSaved: "Percentage of income saved",
+    spendingByCategory: "Spending By Category",
+    currentMonthBreakdown: "Current month breakdown",
+    monthlySpendingTrend: "Monthly Spending Trend",
+    lastMonths: "Last current months",
+    accountsOverview: "Accounts Overview",
+    recentTransactions: "Recent Transactions",
+    dashboardTitle: "Budget Dashboard",
+    switchToFilipino: "Switch to Filipino",
+    switchToEnglish: "Switch to English",
+    food: "Food",
+    transport: "Transport",
+    entertainment: "Entertainment",
+    accounts: "Accounts",
+    balance: "Balance",
+    categories: "Categories",
+    toBeDetermined: "TBD"
+  },
+  fil: {
+    alertMessage: "Maaari mong makita dito ang lahat ng status ng kabuuang budget. Mangyaring suriin nang mabuti.",
+    netWorth: "Netong Halaga",
+    monthlyIncome: "Buwanang Kita",
+    monthlyExpenses: "Buwanang Gastos",
+    savingsRate: "Rate ng Pag-iipon",
+    totalAssetsMinusLiabilities: "Ang iyong kabuuang assets minus liabilities",
+    totalIncomeThisMonth: "Kabuuang kita ngayong buwan",
+    totalExpensesThisMonth: "Kabuuang gastos ngayong buwan",
+    percentageOfIncomeSaved: "Porsyento ng kita na naiipon",
+    spendingByCategory: "Pagkakagastos ayon sa Kategorya",
+    currentMonthBreakdown: "Pagbabalangkas ng kasalukuyang buwan",
+    monthlySpendingTrend: "Trend ng Buwanang Paggastos",
+    lastMonths: "Nakaraang mga buwan",
+    accountsOverview: "Pangkalahatang-ideya ng mga Account",
+    recentTransactions: "Mga Kamakailang Transaksyon",
+    dashboardTitle: "Dashboard ng Budget",
+    switchToFilipino: "Palitan sa Filipino",
+    switchToEnglish: "Palitan sa Ingles",
+    food: "Pagkain",
+    transport: "Transportasyon",
+    entertainment: "Aliwan",
+    accounts: "Mga Account",
+    balance: "Balanse",
+    categories: "Mga Kategorya",
+    toBeDetermined: "TBD"
+  }
+};
+
 export default function BudgetRoutes() {
-  //   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [language, setLanguage] = useState<'en' | 'fil'>('en');
+  const [t, setT] = useState(translations.en);
+
+  // Toggle language
+  const toggleLanguage = () => {
+    const newLanguage = language === 'en' ? 'fil' : 'en';
+    setLanguage(newLanguage);
+    setT(translations[newLanguage]);
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -112,11 +180,11 @@ export default function BudgetRoutes() {
 
   const columnsLocation: TableColumnsType<DataTypeLocation> = [
     {
-      title: "Accounts",
+      title: t.accounts,
       dataIndex: "name",
     },
     {
-      title: "Balance",
+      title: t.balance,
       dataIndex: "age",
     },
   ];
@@ -144,11 +212,11 @@ export default function BudgetRoutes() {
 
   const columnsAssetCategories: TableColumnsType<DataTypeAssetCategories> = [
     {
-      title: "Categories",
+      title: t.categories,
       dataIndex: "name",
     },
     {
-      title: "Balance",
+      title: t.balance,
       dataIndex: "age",
     },
   ];
@@ -173,6 +241,7 @@ export default function BudgetRoutes() {
       address: "Sydney No. 1 Lake Park",
     },
   ];
+
   const salesData = [
     { category: "Jan", value: 120 },
     { category: "Feb", value: 200 },
@@ -183,113 +252,110 @@ export default function BudgetRoutes() {
 
   return (
     <div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">{t.dashboardTitle}</h1>
+        <Button type="default" onClick={toggleLanguage}>
+          {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+        </Button>
+      </div>
+
       <Alert
-        message="You can see here all the status of overall budget status. Please check closely."
+        message={t.alertMessage}
         type="info"
         showIcon
       />
 
-      {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
-
+      {/* First Row - Summary Cards */}
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-          >
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
             <div>
-              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Net Worth</h2>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.netWorth}
+              </h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
               </p>
-              <p>Your total assets minus liabilities</p>
+              <p>{t.totalAssetsMinusLiabilities}</p>
             </div>
-            <div
-              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
-              TBD
+            <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+              {t.toBeDetermined}
             </div>
           </Card>
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-          >
+
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
             <div>
-              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Income</h2>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyIncome}
+              </h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
               </p>
-              <p>Total income this month</p>
+              <p>{t.totalIncomeThisMonth}</p>
             </div>
-            <div
-              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
-              TBD
+            <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+              {t.toBeDetermined}
             </div>
           </Card>
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-          >
+
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
             <div>
-              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Expenses</h2>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyExpenses}
+              </h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
               </p>
-              <p>Total expenses this month</p>
+              <p>{t.totalExpensesThisMonth}</p>
             </div>
-            <div
-              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
-              TBD
+            <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+              {t.toBeDetermined}
             </div>
           </Card>
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-          >
+
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
             <div>
-              <h2 className="flex flex-wrap text-sm font-semibold mb-2"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Savings Rate</h2>
+              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.savingsRate}
+              </h2>
               <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                <AiOutlineStock className="mt-1 mr-2" />{" "}
-                {formatCurrency(123141)}
+                <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
               </p>
-              <p>Percentage of income saved</p>
+              <p>{t.percentageOfIncomeSaved}</p>
             </div>
-            <div
-              className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800`}>
-              TBD
+            <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+              {t.toBeDetermined}
             </div>
           </Card>
         </div>
       </Row>
 
-      {/* THIS IS THE SECOND ROW OF DASHBOARD */}
-
+      {/* Second Row - Charts */}
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-          >
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
             <div>
               <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.spendingByCategory}
               </h2>
-              <p className="flex flex-wrap">Current month breakdown</p>
+              <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
               <PieChart
                 data={[
-                  { type: "Food", value: 27 },
-                  { type: "Transport", value: 25 },
-                  { type: "Entertainment", value: 18 },
+                  { type: t.food, value: 27 },
+                  { type: t.transport, value: 25 },
+                  { type: t.entertainment, value: 18 },
                 ]}
                 title=""
               />
             </div>
           </Card>
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-          >
+
+          <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
             <div>
               <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Monthly Spending Trend
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlySpendingTrend}
               </h2>
-              <p className="flex flex-wrap">Last current months</p>
+              <p className="flex flex-wrap">{t.lastMonths}</p>
               <BarChart
                 data={salesData}
                 title=""
@@ -301,15 +367,14 @@ export default function BudgetRoutes() {
         </div>
       </Row>
 
-      {/* THIS IS THE THIRD ROW OF DASHBOARD */}
-
+      {/* Third Row - Tables */}
       <Row gutter={32} className="pt-7">
         <Col span={12}>
           <div className="shadow-lg m-[-5px]">
             <Card title={
               <div className="flex items-center">
-                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
-                Accounts Overview
+                <RiPieChart2Fill className="mr-2 text-green-500" />
+                {t.accountsOverview}
               </div>
             }>
               <Table<DataTypeLocation>
@@ -325,8 +390,8 @@ export default function BudgetRoutes() {
           <div className="shadow-lg m-[-5px]">
             <Card title={
               <div className="flex items-center">
-                <RiPieChart2Fill className="mr-2 text-green-500" /> {/* Your icon */}
-                Recent Transactions
+                <RiPieChart2Fill className="mr-2 text-green-500" />
+                {t.recentTransactions}
               </div>
             }>
               <Table<DataTypeAssetCategories>
