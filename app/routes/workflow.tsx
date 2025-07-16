@@ -13,16 +13,14 @@ import {
 import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown } from "antd";
 import { Link, Outlet } from "@remix-run/react";
 import {
-  FcConferenceCall,
-  FcDepartment,
   FcGlobe,
-  FcPortraitMode,
-  FcSalesPerformance,
+  FcTemplate,
+  FcTreeStructure,
   FcSettings,
 } from "react-icons/fc";
-import Setting from "~/routes/settings/settings";
-import MovingAttentionAlert from "./attention";
-import ScrollingAttentionBanner from "./scrolling_attention";
+import ScrollingAttentionBanner from "~/components/scrolling_attention";
+import MovingAttentionAlert from "~/components/attention";
+import Setting from "./settings";
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,7 +30,7 @@ interface MenuItem {
   label: React.ReactNode;
 }
 
-export default function AdminLayoutIndex() {
+export default function WorkflowLayoutIndex() {
   const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
@@ -40,7 +38,7 @@ export default function AdminLayoutIndex() {
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
-  // Fixed dark mode state initialization
+  // Dark mode state initialization with localStorage
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -50,12 +48,11 @@ export default function AdminLayoutIndex() {
     return false;
   });
 
+  // Responsive detection and automatic layout switching
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      // Automatically switch to horizontal layout on mobile
-      setIsHorizontal(mobile);
       // Auto-collapse sidebar on mobile
       if (mobile) {
         setCollapsed(true);
@@ -67,6 +64,7 @@ export default function AdminLayoutIndex() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Apply theme and user data
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -80,6 +78,7 @@ export default function AdminLayoutIndex() {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Toggle functions
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
@@ -94,50 +93,32 @@ export default function AdminLayoutIndex() {
     }
   };
 
-  // Fixed toggle functions
-  const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
-  };
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+  const toggleSidebar = () => setCollapsed(prev => !prev);
   const toggleLayout = () => {
     // Only allow layout toggle on desktop
     if (!isMobile) {
       setIsHorizontal(prev => !prev);
     }
   };
-
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
   const handleTrack = () => setIsModalOpen(true);
-  const handleOk = () => setIsModalOpen(false);
   const handleCancel = () => setIsModalOpen(false);
 
   const menuItems: MenuItem[] = [
     {
       key: "1",
       icon: <FcGlobe />,
-      label: <Link to="/admin">Dashboard</Link>,
+      label: <Link to="/workflow/dashboard">Dashboard</Link>,
+    },
+    {
+      key: "2",
+      icon: <FcTemplate />,
+      label: <Link to="/workflow/workflows">Workflow</Link>,
     },
     {
       key: "3",
-      icon: <FcPortraitMode />,
-      label: <Link to="/admin/users">Users</Link>,
-    },
-    {
-      key: "4",
-      icon: <FcDepartment />,
-      label: <Link to="/admin/departments">Departments</Link>,
-    },
-    {
-      key: "5",
-      icon: <FcConferenceCall />,
-      label: <Link to="/admin/groups">Groups</Link>,
+      icon: <FcTreeStructure />,
+      label: <Link to="/workflow/workflow-tracker">Tracker</Link>,
     },
   ];
 
@@ -149,19 +130,19 @@ export default function AdminLayoutIndex() {
       onClick: toggleDarkMode
     },
     {
-      key: '3',
+      key: '2',
       label: isFullscreen ? 'Exit Fullscreen' : 'Fullscreen',
       icon: isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
       onClick: toggleFullscreen
     },
     {
-      key: '4',
+      key: '3',
       label: 'Settings',
       icon: <FcSettings />,
       onClick: handleTrack
     },
     {
-      key: '5',
+      key: '4',
       label: 'Switch App',
       icon: <SwapOutlined />,
       onClick: () => window.location.href = '/landing-page'
@@ -176,28 +157,24 @@ export default function AdminLayoutIndex() {
           colorText: isDarkMode ? '#ffffff' : undefined,
           colorTextSecondary: isDarkMode ? '#e6e6e6' : undefined,
           colorTextTertiary: isDarkMode ? '#cccccc' : undefined,
-          colorTextQuaternary: isDarkMode ? '#b3b3b3' : undefined,
         },
         components: {
           Layout: {
-            headerBg: isDarkMode ? '#1f1f1f' : '#001529',
+            headerBg: isDarkMode ? '#1f1f1f' : '#ffffff',
             bodyBg: isDarkMode ? '#141414' : '#f5f5f5',
-            colorText: isDarkMode ? '#ffffff' : undefined,
           },
-          Typography: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Menu: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Button: { colorText: isDarkMode ? '#ffffff' : undefined },
+          Menu: {
+            colorItemBgSelected: isDarkMode ? '#1d1d1d' : '#f0f0f0',
+            colorItemBgHover: isDarkMode ? '#2a2a2a' : '#f5f5f5',
+          },
           Card: {
             colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
-            colorText: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
-            colorTextHeading: isDarkMode ? '#ffffff' : undefined,
-            colorTextDescription: isDarkMode ? 'rgba(255, 255, 255, 0.65)' : undefined,
-            colorBorderSecondary: isDarkMode ? '#424242' : '#f0f0f0',
           },
         },
       }}
     >
       <Layout className="min-h-screen">
+        {/* Mobile Header with Horizontal Menu */}
         {/* Mobile Header */}
         {isMobile && (
           <Header className="flex items-center justify-between p-0 px-4" style={{
@@ -228,7 +205,7 @@ export default function AdminLayoutIndex() {
         )}
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Only show vertical sidebar on desktop when not in horizontal mode */}
+          {/* Desktop Sidebar - Only shown when not mobile */}
           {!isMobile && !isHorizontal && (
             <Sider
               trigger={null}
@@ -236,10 +213,6 @@ export default function AdminLayoutIndex() {
               collapsed={collapsed}
               collapsedWidth={80}
               width={250}
-              breakpoint="lg"
-              onBreakpoint={(broken) => {
-                setCollapsed(broken);
-              }}
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
                 borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
@@ -369,10 +342,10 @@ export default function AdminLayoutIndex() {
               style={{
                 background: isDarkMode ? '#141414' : '#ffffff',
                 color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
-                marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
+                marginTop: isMobile ? 0 : 0
               }}
             >
-              {!isHorizontal && (
+              {!isMobile && (
                 <div className="mb-4">
                   <ScrollingAttentionBanner
                     text="ATTENTION: Other features is still under maintenance."

@@ -44,9 +44,9 @@ import {
   FcSalesPerformance,
   FcSettings,
 } from "react-icons/fc";
-import Setting from "~/routes/settings/settings";
-import MovingAttentionAlert from "./attention";
-import ScrollingAttentionBanner from "./scrolling_attention";
+import ScrollingAttentionBanner from "~/components/scrolling_attention";
+import MovingAttentionAlert from "~/components/attention";
+import Setting from "./settings";
 
 const { Header, Sider, Content } = Layout;
 
@@ -135,7 +135,7 @@ export default function InventoryLayoutIndex() {
     {
       key: "1",
       icon: <FcGlobe />,
-      label: <Link to="/inventory">Dashboard</Link>,
+      label: <Link to="/inventory/dashboard">Dashboard</Link>,
     },
     {
       key: "11",

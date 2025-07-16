@@ -9,9 +9,9 @@ import {
 } from "antd";
 import { useState } from "react";
 import supabase from "~/utils/supabase.client";
-import { useAuth } from "./AuthContext";
 import { useNavigate } from "@remix-run/react";
 import ClientOnly from "~/components/client-only";
+import { useAuth } from "~/auth/AuthContext";
 
 export const handle = { hydrate: false };
 export default function LoginIndex() {

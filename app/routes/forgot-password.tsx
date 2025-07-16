@@ -2,8 +2,8 @@ import { LoadingOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Alert, Image, Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import { useState } from "react";
-import { useAuth } from "./AuthContext";
 import ClientOnly from "~/components/client-only";
+import { useAuth } from "~/auth/AuthContext";
 
 export default function ForgotPasswordIndex() {
   const [loading, setLoading] = useState(false);
