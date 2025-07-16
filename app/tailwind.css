@@ -141,11 +141,4 @@ body {
   li {
     font-family: 'Montserrat', sans-serif !important;
   }
-
-  /* Ant Design specific overrides */
-  .ant-*,
-  [class^='ant-'],
-  [class*=' ant-'] {
-    font-family: 'Montserrat', sans-serif !important;
-  }
 }
