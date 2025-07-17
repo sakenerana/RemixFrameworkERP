@@ -1,4 +1,4 @@
-import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, GlobalOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Alert,
   Button,
@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { UserService } from "~/services/user.service";
@@ -283,124 +284,127 @@ export default function BudgetRoutes() {
   ];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <Title level={3}>{t.dashboardTitle}</Title>
-        <Button type="default" onClick={toggleLanguage}>
-          {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
-        </Button>
-      </div>
+    <ProtectedRoute>
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <Title level={3}>{t.dashboardTitle}</Title>
+          <Button type="default" onClick={toggleLanguage}>
+            <GlobalOutlined />
+            {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+          </Button>
+        </div>
 
-      {/* THIS IS THE FIRST ROW OF DASHBOARD */}
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <Alert
-          message={t.alertMessage}
-          type="info"
-          showIcon
-          closable
-        />
+        {/* THIS IS THE FIRST ROW OF DASHBOARD */}
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Alert
+            message={t.alertMessage}
+            type="info"
+            showIcon
+            closable
+          />
 
-        {/* Metrics Section */}
-        <Row gutter={[16, 16]}>
-          {dashboardMetrics.map((metric, index) => (
-            <Col key={index} xs={24} sm={12} md={12} lg={6}>
-              <Card
-                hoverable
-                loading={metric.loading}
-                bodyStyle={{ padding: '16px' }}
-                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-              >
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text strong style={{ color: metric.color }}>
-                      {metric.icon} {metric.title}
-                    </Text>
-                    {metric.trend !== undefined && (
-                      <Text type="secondary">
-                        {renderTrendIndicator(metric.trend)}
+          {/* Metrics Section */}
+          <Row gutter={[16, 16]}>
+            {dashboardMetrics.map((metric, index) => (
+              <Col key={index} xs={24} sm={12} md={12} lg={6}>
+                <Card
+                  hoverable
+                  loading={metric.loading}
+                  bodyStyle={{ padding: '16px' }}
+                  className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
+                >
+                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Text strong style={{ color: metric.color }}>
+                        {metric.icon} {metric.title}
                       </Text>
+                      {metric.trend !== undefined && (
+                        <Text type="secondary">
+                          {renderTrendIndicator(metric.trend)}
+                        </Text>
+                      )}
+                    </div>
+                    <Title level={3} style={{ margin: 0, color: metric.color }}>
+                      {metric.loading ? '--' : metric.value}
+                    </Title>
+                    <Text type="secondary">{metric.description}</Text>
+                    {metric.trend !== undefined && (
+                      <Progress
+                        percent={Math.abs(metric.trend)}
+                        showInfo={false}
+                        strokeColor={metric.trend > 0 ? '#52c41a' : '#f5222d'}
+                        size="small"
+                      />
                     )}
-                  </div>
-                  <Title level={3} style={{ margin: 0, color: metric.color }}>
-                    {metric.loading ? '--' : metric.value}
-                  </Title>
-                  <Text type="secondary">{metric.description}</Text>
-                  {metric.trend !== undefined && (
-                    <Progress
-                      percent={Math.abs(metric.trend)}
-                      showInfo={false}
-                      strokeColor={metric.trend > 0 ? '#52c41a' : '#f5222d'}
-                      size="small"
-                    />
-                  )}
-                </Space>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-        {/* THIS IS THE SECOND ROW OF DASHBOARD */}
-        <Row>
-          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.addedByCategory}
-                </h2>
-                <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
-                {loading && <Spin></Spin>}
-                {!loading &&
-                  <PieChart
-                    data={[
-                      { type: t.users, value: dataUser },
-                      { type: t.departments, value: dataDepartment },
-                      { type: t.groups, value: dataGroup },
-                      { type: t.inactiveUsersLabel, value: dataInactiveUsers },
-                    ]}
-                    title=""
-                  />}
-              </div>
-            </Card>
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
-                </h2>
-                <p className="flex flex-wrap">{t.lastMonths}</p>
-                <BarChart
-                  data={salesData}
-                  title=""
-                  color="#16a34a"
-                  height={350}
-                />
-              </div>
-            </Card>
-          </div>
-        </Row>
-
-        {/* THIS IS THE THIRD ROW OF DASHBOARD */}
-        <Row>
-          <Col span={24}>
-            <div className="shadow-lg">
-              <Card title={
-                <div className="flex items-center">
-                  <RiPieChart2Fill className="mr-2 text-green-500" />
-                  {t.accountsOverview}
+          {/* THIS IS THE SECOND ROW OF DASHBOARD */}
+          <Row>
+            <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
+              <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.addedByCategory}
+                  </h2>
+                  <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
+                  {loading && <Spin></Spin>}
+                  {!loading &&
+                    <PieChart
+                      data={[
+                        { type: t.users, value: dataUser },
+                        { type: t.departments, value: dataDepartment },
+                        { type: t.groups, value: dataGroup },
+                        { type: t.inactiveUsersLabel, value: dataInactiveUsers },
+                      ]}
+                      title=""
+                    />}
                 </div>
-              }>
-                {loading && <Spin></Spin>}
-                {!loading &&
-                  <Table<User>
-                    bordered
-                    size={"small"}
-                    columns={columnsUser}
-                    dataSource={dataUserTable}
-                  />}
+              </Card>
+              <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
+                  </h2>
+                  <p className="flex flex-wrap">{t.lastMonths}</p>
+                  <BarChart
+                    data={salesData}
+                    title=""
+                    color="#16a34a"
+                    height={350}
+                  />
+                </div>
               </Card>
             </div>
-          </Col>
-        </Row>
-      </Space>
-    </div>
+          </Row>
+
+          {/* THIS IS THE THIRD ROW OF DASHBOARD */}
+          <Row>
+            <Col span={24}>
+              <div className="shadow-lg">
+                <Card title={
+                  <div className="flex items-center">
+                    <RiPieChart2Fill className="mr-2 text-green-500" />
+                    {t.accountsOverview}
+                  </div>
+                }>
+                  {loading && <Spin></Spin>}
+                  {!loading &&
+                    <Table<User>
+                      bordered
+                      size={"small"}
+                      columns={columnsUser}
+                      dataSource={dataUserTable}
+                    />}
+                </Card>
+              </div>
+            </Col>
+          </Row>
+        </Space>
+      </div>
+    </ProtectedRoute>
   );
 }

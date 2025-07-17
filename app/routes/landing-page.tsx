@@ -16,6 +16,7 @@ import { Content } from "antd/es/layout/layout";
 import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
 import { User } from "~/types/user.type";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -103,116 +104,132 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat p-6">
-      <div className="max-w-7xl mx-auto">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Section with Gradient Overlay */}
+        <div className="relative bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-indigo-800/90"></div>
 
-        {/* Header Section */}
-        <header className="flex flex-col items-center pt-8 pb-12 bg-black/30 backdrop-blur-sm rounded-xl p-6 mb-10">
-          <img
-            className="h-20 mb-6 transition-transform duration-300 hover:scale-105"
-            src="./img/cficoop.png"
-            alt="CFI Cooperative Logo"
-          />
-          <h1 className="text-5xl font-bold mb-4 text-center text-white">
-            Enterprise Resource Planning
-          </h1>
-          <p className="text-xl text-white/90 mb-6 text-center max-w-3xl leading-relaxed">
-            Comprehensive tools to streamline inventory management, financial oversight,
-            operational workflows, and administrative controls.
-          </p>
-          <div className="h-1 w-24 bg-blue-400 rounded-full mt-2"></div>
-        </header>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-          {features.map((feature, index) => (
-            <Card
-              key={index}
-              className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${feature.access
-                  ? 'border-gray-200 hover:border-blue-300 hover:shadow-lg cursor-pointer bg-white'
-                  : 'border-gray-100 bg-gray-50 cursor-not-allowed'
-                }`}
-              hoverable={feature.access}
-            >
-              {/* Status Ribbon */}
-              <div
-                className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg ${feature.access ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}
-              >
-                {feature.access ? 'Available' : 'Restricted'}
+          <div className="relative max-w-7xl mx-auto px-6 py-24 sm:py-32 lg:px-8">
+            {/* Header Content */}
+            <div className="text-center backdrop-blur-sm bg-white/5 rounded-2xl p-8 border border-white/10 shadow-2xl">
+              <img
+                className="h-20 mx-auto mb-8 transition-transform duration-300 hover:scale-105"
+                src="./img/cficoop.png"
+                alt="CFI Cooperative Logo"
+              />
+              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+                Enterprise Resource Planning
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-white/90 max-w-3xl mx-auto">
+                Integrated solutions to optimize inventory management, financial operations,
+                workflow automation, and administrative governance.
+              </p>
+              <div className="mt-8 flex justify-center">
+                <div className="h-1 w-24 bg-gradient-to-r from-blue-400 to-cyan-300 rounded-full"></div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              {feature.access ? (
-                <Link to={feature.link} className="block h-full">
-                  <div className="p-6 flex flex-col h-full">
-                    {/* Icon */}
-                    <div className="flex justify-center text-4xl mb-4 text-blue-500">
-                      {feature.icon}
+        {/* Features Grid Section */}
+        <div className="max-w-7xl mx-auto px-6 py-16 sm:py-24 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <Card
+                key={index}
+                className={`relative overflow-hidden rounded-xl transition-all duration-300 ${feature.access
+                    ? 'bg-white border border-gray-200 hover:border-blue-300 hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-50 border border-gray-100 cursor-not-allowed'
+                  }`}
+                hoverable={feature.access}
+              >
+                {/* Status Badge */}
+                <div
+                  className={`absolute top-3 right-3 px-2.5 py-0.5 text-xs font-semibold rounded-full ${feature.access
+                      ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
+                      : 'bg-red-50 text-red-700 ring-1 ring-red-600/20'
+                    }`}
+                >
+                  {feature.access ? 'Available' : 'Restricted'}
+                </div>
+
+                {feature.access ? (
+                  <Link to={feature.link} className="block h-full">
+                    <div className="p-5 flex flex-col h-full">
+                      {/* Icon Container */}
+                      <div className="flex justify-center mb-4">
+                        <div className="p-3 bg-blue-50 rounded-lg text-blue-600 text-3xl">
+                          {feature.icon}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-grow">
+                        <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+                          {feature.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm text-center">
+                          {feature.description}
+                        </p>
+                      </div>
+
+                      {/* Access Indicator */}
+                      <div className="mt-6 flex justify-center">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${feature.access
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                            }`}
+                        >
+                          {feature.access ? (
+                            <>
+                              <AiFillCheckCircle className="mr-1.5" />
+                              Access Granted
+                            </>
+                          ) : (
+                            <>
+                              <AiFillCloseCircle className="mr-1.5" />
+                              No Access
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="p-5 flex flex-col h-full">
+                    {/* Icon Container */}
+                    <div className="flex justify-center mb-4">
+                      <div className="p-3 bg-gray-100 rounded-lg text-gray-400 text-3xl">
+                        {feature.icon}
+                      </div>
                     </div>
 
                     {/* Content */}
                     <div className="flex-grow">
-                      <h3 className="text-lg font-semibold text-gray-800 text-center mb-2">
+                      <h3 className="text-lg font-semibold text-gray-700 text-center mb-2">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-600 text-sm text-center">
+                      <p className="text-gray-500 text-sm text-center">
                         {feature.description}
                       </p>
                     </div>
 
                     {/* Access Indicator */}
-                    <div className="mt-4 flex justify-center">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${feature.access
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                          }`}
-                      >
-                        {feature.access ? (
-                          <>
-                            <AiFillCheckCircle className="mr-1.5" />
-                            Access Granted
-                          </>
-                        ) : (
-                          <>
-                            <AiFillCloseCircle className="mr-1.5" />
-                            No Access
-                          </>
-                        )}
+                    <div className="mt-6 flex justify-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        <AiFillCloseCircle className="mr-1.5" />
+                        No Access
                       </span>
                     </div>
                   </div>
-                </Link>
-              ) : (
-                <div className="p-6 flex flex-col h-full">
-                  {/* Icon */}
-                  <div className="flex justify-center text-4xl mb-4 text-gray-400">
-                    {feature.icon}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-grow">
-                    <h3 className="text-lg font-semibold text-gray-700 text-center mb-2">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-500 text-sm text-center">
-                      {feature.description}
-                    </p>
-                  </div>
-
-                  {/* Access Indicator */}
-                  <div className="mt-4 flex justify-center">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      <AiFillCloseCircle className="mr-1.5" />
-                      No Access
-                    </span>
-                  </div>
-                </div>
-              )}
-            </Card>
-          ))}
+                )}
+              </Card>
+            ))}
+          </div>
         </div>
-
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

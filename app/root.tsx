@@ -17,6 +17,7 @@ import '@fontsource/montserrat/400.css'; // Regular (Normal)
 import '@fontsource/montserrat/500.css'; // Medium
 import '@fontsource/montserrat/600.css'; // Semi-Bold
 import '@fontsource/montserrat/700.css'; // Bold
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -43,9 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <AuthProvider>
           <Provider store={store}>
-            {/* <ProtectedRoute> */}
             {children}
-            {/* </ProtectedRoute> */}
           </Provider>
           <ScrollRestoration />
           <Scripts />

@@ -598,6 +598,20 @@ export default function UsersRoutes() {
                                 />
                             </Form.Item>
                         </Col>
+
+                        <Col xs={24} sm={8}>
+                            <Form.Item
+                                label={<span className="font-medium">AB User ID <span className="text-red-500">*</span></span>}
+                                name="ab_user_id"
+                                rules={[{ required: true, message: "Required field" }]}
+                            >
+                                <Input
+                                    placeholder="123"
+                                    prefix={<AiOutlineUser className="text-gray-400" />}
+                                    className="h-10"
+                                />
+                            </Form.Item>
+                        </Col>
                     </Row>
 
                     {/* Security Section */}

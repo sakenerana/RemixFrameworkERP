@@ -10,8 +10,8 @@ import {
   SwapOutlined,
   VerticalAlignTopOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown } from "antd";
-import { Link, Outlet } from "@remix-run/react";
+import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar } from "antd";
+import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
   FcConferenceCall,
   FcDepartment,
@@ -23,6 +23,7 @@ import {
 import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
 import Setting from "./settings";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
 
 const { Header, Sider, Content } = Layout;
 
@@ -33,12 +34,23 @@ interface MenuItem {
 }
 
 export default function AdminLayoutIndex() {
+  const navigate = useNavigate();
+  const matches = useMatches();
   const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
   const [isFname, setIsFname] = useState('');
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+
+  // Get current path for menu selection
+  const currentPath = matches[matches.length - 1]?.pathname || '';
+  // Redirect to dashboard on initial load if at root admin path
+  useEffect(() => {
+    if (currentPath === '/admin') {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [currentPath, navigate]);
 
   // Fixed dark mode state initialization
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -169,262 +181,285 @@ export default function AdminLayoutIndex() {
   ];
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: {
-          colorText: isDarkMode ? '#ffffff' : undefined,
-          colorTextSecondary: isDarkMode ? '#e6e6e6' : undefined,
-          colorTextTertiary: isDarkMode ? '#cccccc' : undefined,
-          colorTextQuaternary: isDarkMode ? '#b3b3b3' : undefined,
-        },
-        components: {
-          Layout: {
-            headerBg: isDarkMode ? '#1f1f1f' : '#001529',
-            bodyBg: isDarkMode ? '#141414' : '#f5f5f5',
+    <ProtectedRoute>
+      <ConfigProvider
+        theme={{
+          algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+          token: {
             colorText: isDarkMode ? '#ffffff' : undefined,
+            colorTextSecondary: isDarkMode ? '#e6e6e6' : undefined,
+            colorTextTertiary: isDarkMode ? '#cccccc' : undefined,
+            colorTextQuaternary: isDarkMode ? '#b3b3b3' : undefined,
           },
-          Typography: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Menu: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Button: { colorText: isDarkMode ? '#ffffff' : undefined },
-          Card: {
-            colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
-            colorText: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
-            colorTextHeading: isDarkMode ? '#ffffff' : undefined,
-            colorTextDescription: isDarkMode ? 'rgba(255, 255, 255, 0.65)' : undefined,
-            colorBorderSecondary: isDarkMode ? '#424242' : '#f0f0f0',
+          components: {
+            Layout: {
+              headerBg: isDarkMode ? '#1f1f1f' : '#001529',
+              bodyBg: isDarkMode ? '#141414' : '#f5f5f5',
+              colorText: isDarkMode ? '#ffffff' : undefined,
+            },
+            Typography: { colorText: isDarkMode ? '#ffffff' : undefined },
+            Menu: { colorText: isDarkMode ? '#ffffff' : undefined },
+            Button: { colorText: isDarkMode ? '#ffffff' : undefined },
+            Card: {
+              colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff',
+              colorText: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
+              colorTextHeading: isDarkMode ? '#ffffff' : undefined,
+              colorTextDescription: isDarkMode ? 'rgba(255, 255, 255, 0.65)' : undefined,
+              colorBorderSecondary: isDarkMode ? '#424242' : '#f0f0f0',
+            },
           },
-        },
-      }}
-    >
-      <Layout className="min-h-screen">
-        {/* Mobile Header */}
-        {isMobile && (
-          <Header className="flex items-center justify-between p-0 px-4" style={{
-            background: isDarkMode ? '#1f1f1f' : '#ffffff',
-            borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
-          }}>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={toggleSidebar}
-              style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
-            />
-
-            <Image
-              width={120}
-              src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
-              preview={false}
-            />
-
-            <Dropdown menu={{ items: mobileMenuItems }} trigger={['click']}>
+        }}
+      >
+        <Layout className="min-h-screen">
+          {/* Mobile Header */}
+          {isMobile && (
+            <Header className="flex items-center justify-between p-0 px-4" style={{
+              background: isDarkMode ? '#1f1f1f' : '#ffffff',
+              borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
+            }}>
               <Button
                 type="text"
-                icon={<MenuOutlined />}
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={toggleSidebar}
                 style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
               />
-            </Dropdown>
-          </Header>
-        )}
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Only show vertical sidebar on desktop when not in horizontal mode */}
-          {!isMobile && !isHorizontal && (
-            <Sider
-              trigger={null}
-              collapsible
-              collapsed={collapsed}
-              collapsedWidth={80}
-              width={250}
-              breakpoint="lg"
-              onBreakpoint={(broken) => {
-                setCollapsed(broken);
-              }}
-              style={{
-                background: isDarkMode ? '#141414' : '#ffffff',
-                borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
-              }}
-            >
-              <div className="h-16 flex items-center justify-center" style={{
-                background: isDarkMode ? '#1f1f1f' : '#fafafa',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
-              }}>
-                {collapsed ? (
-                  <img src="/img/user.png" alt="User" width={40} className="rounded-full" />
-                ) : (
-                  <div className="flex items-center px-4 w-full">
-                    <img src="/img/user.png" alt="User" width={30} className="rounded-full" />
-                    <span className="ml-3 font-medium truncate">{isFname} {isLname}</span>
-                  </div>
-                )}
-              </div>
-              <Menu
-                theme={isDarkMode ? 'dark' : 'light'}
-                mode="inline"
-                defaultSelectedKeys={['1']}
-                items={menuItems}
-                style={{
-                  background: isDarkMode ? '#141414' : '#ffffff',
-                  height: 'calc(100vh - 64px)',
-                  overflowY: 'auto',
-                }}
+              <Image
+                width={120}
+                src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
+                preview={false}
               />
-            </Sider>
+
+              <Dropdown menu={{ items: mobileMenuItems }} trigger={['click']}>
+                <Button
+                  type="text"
+                  icon={<MenuOutlined />}
+                  style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030' }}
+                />
+              </Dropdown>
+            </Header>
           )}
 
-          <Layout className="flex-1 overflow-auto">
-            {/* Desktop Header */}
-            {!isMobile && (
-              <Header className="flex items-center" style={{
-                padding: 0,
-                background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
-              }}>
-                <Space style={{ marginLeft: 16 }}>
-                  {!isHorizontal && (
-                    <Button
-                      type="text"
-                      icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                      onClick={toggleSidebar}
-                      style={{
-                        fontSize: "16px",
-                        width: 64,
-                        height: 64,
-                        color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : '#303030'
-                      }}
-                    />
-                  )}
-                  <div className="ml-4">
-                    <Image
-                      className="mt-4"
-                      width={200}
-                      src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
-                      preview={false}
-                    />
-                  </div>
-                </Space>
-
-                <div className="flex-1">
-                  <div className="flex justify-end items-center h-full pr-4">
-                    <Space className="gap-2">
-                      <Switch
-                        checkedChildren={<MoonOutlined />}
-                        unCheckedChildren={<SunOutlined />}
-                        checked={isDarkMode}
-                        onChange={toggleDarkMode}
-                        className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Sidebar - Only show vertical sidebar on desktop when not in horizontal mode */}
+            {!isMobile && !isHorizontal && (
+              <Sider
+                trigger={null}
+                collapsible
+                collapsed={collapsed}
+                collapsedWidth={80}
+                width={250}
+                breakpoint="lg"
+                onBreakpoint={(broken) => {
+                  setCollapsed(broken);
+                }}
+                style={{
+                  background: isDarkMode ? '#141414' : '#ffffff',
+                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
+                }}
+              >
+                <div className="h-16 flex items-center justify-center" style={{
+                  background: isDarkMode ? '#1f1f1f' : '#fafafa',
+                  color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+                }}>
+                  {collapsed ? (
+                    <img src="/img/user.png" alt="User" width={40} className="rounded-full" />
+                  ) : (
+                    <div className="flex items-center w-full ml-4">
+                      <Avatar
+                        src="/img/user.png"
+                        size="default"
+                        className="cursor-pointer"
                       />
-                      {!isMobile && (
-                        <Button
-                          type="text"
-                          icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
-                          onClick={toggleLayout}
-                        >
-                          {isHorizontal ? 'Vertical' : 'Horizontal'}
-                        </Button>
-                      )}
-                      <Button
-                        icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-                        onClick={toggleFullscreen}
-                      >
-                        Screen
-                      </Button>
-                      <Link to="/landing-page">
-                        <Button icon={<SwapOutlined />}>Switch</Button>
-                      </Link>
-                      <Button
-                        onClick={handleTrack}
-                        icon={<FcSettings />}
-                      >
-                        Settings
-                      </Button>
-                    </Space>
-                  </div>
+                      <div className="ml-3 overflow-hidden">
+                        <div className="font-medium truncate">{isFname} {isLname}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          CFI - Administrator
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </Header>
-            )}
-
-            {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
-            {(isMobile || isHorizontal) && (
-              <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
-                  mode={isMobile ? 'horizontal' : 'horizontal'}
+                  mode="inline"
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
-                    flex: 1,
-                    minWidth: 0,
-                    background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                    lineHeight: '48px',
+                    background: isDarkMode ? '#141414' : '#ffffff',
+                    height: 'calc(100vh - 64px)',
+                    overflowY: 'auto',
                   }}
-                  className={isMobile ? 'overflow-x-auto' : ''}
                 />
-              </Header>
+              </Sider>
             )}
 
-            {/* Content Area */}
-            <Content
-              className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
-              style={{
-                background: isDarkMode ? '#141414' : '#ffffff',
-                color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
-                marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
-              }}
-            >
-              {!isHorizontal && (
-                <div className="mb-4">
-                  <ScrollingAttentionBanner
-                    text="ATTENTION: Other features is still under maintenance."
-                    speed={100}
-                    backgroundColor={isDarkMode ? 'bg-gray-800' : 'bg-yellow-50'}
-                    textColor={isDarkMode ? 'text-gray-300' : 'text-yellow-800'}
-                  />
-                </div>
-              )}
-              <MovingAttentionAlert />
-              <Outlet />
-            </Content>
+            <Layout className="flex-1 overflow-auto">
+              {/* Desktop Header */}
+              {!isMobile && (
+                <Header className="flex items-center h-16 p-0" style={{
+                  background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                  borderBottom: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 100,
+                }}>
+                  <Space className="h-full" style={{ marginLeft: 16 }}>
+                    {!isHorizontal && (
+                      <Button
+                        type="text"
+                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        onClick={toggleSidebar}
+                        className="flex items-center justify-center"
+                        style={{
+                          width: 48,
+                          height: 48,
+                          color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
+                        }}
+                      />
+                    )}
+                    <Image
+                      width={isHorizontal ? 160 : 200}
+                      src={isDarkMode ? '/img/cficoop-white.png' : '/img/cficoop.svg'}
+                      preview={false}
+                      className="transition-all duration-300 mt-5"
+                    />
+                  </Space>
 
-            {/* Footer */}
-            <footer className={`
+                  <div className="flex-1">
+                    <div className="flex justify-end items-center h-full pr-4">
+                      <Space size="middle">
+                        <Tooltip title={isDarkMode ? 'Light Mode' : 'Dark Mode'}>
+                          <Switch
+                            checkedChildren={<MoonOutlined />}
+                            unCheckedChildren={<SunOutlined />}
+                            checked={isDarkMode}
+                            onChange={toggleDarkMode}
+                            className={isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
+                          />
+                        </Tooltip>
+
+                        <Tooltip title={isHorizontal ? 'Switch to Vertical Menu' : 'Switch to Horizontal Menu'}>
+                          <Button
+                            type="text"
+                            icon={isHorizontal ? <VerticalAlignTopOutlined /> : <MenuOutlined />}
+                            onClick={toggleLayout}
+                            className="hidden md:inline-flex"
+                          />
+                        </Tooltip>
+
+                        <Tooltip title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}>
+                          <Button
+                            type="text"
+                            icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                            onClick={toggleFullscreen}
+                          />
+                        </Tooltip>
+
+                        <Tooltip title="Switch Portal">
+                          <Link to="/landing-page">
+                            <Button
+                              type="text"
+                              icon={<SwapOutlined />}
+                            />
+                          </Link>
+                        </Tooltip>
+
+                        <Tooltip title="Settings">
+                          <Button
+                            type="text"
+                            icon={<FcSettings />}
+                            onClick={handleTrack}
+                          />
+                        </Tooltip>
+                      </Space>
+                    </div>
+                  </div>
+                </Header>
+              )}
+
+              {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
+              {(isMobile || isHorizontal) && (
+                <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
+                  <Menu
+                    theme={isDarkMode ? 'dark' : 'light'}
+                    mode={isMobile ? 'horizontal' : 'horizontal'}
+                    defaultSelectedKeys={['1']}
+                    items={menuItems}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                      lineHeight: '48px',
+                    }}
+                    className={isMobile ? 'overflow-x-auto' : ''}
+                  />
+                </Header>
+              )}
+
+              {/* Content Area */}
+              <Content
+                className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
+                style={{
+                  background: isDarkMode ? '#141414' : '#ffffff',
+                  color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
+                  marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
+                }}
+              >
+                {!isHorizontal && (
+                  <div className="mb-4">
+                    <ScrollingAttentionBanner
+                      text="ATTENTION: Other features is still under maintenance."
+                      speed={100}
+                      backgroundColor={isDarkMode ? 'bg-gray-800' : 'bg-yellow-50'}
+                      textColor={isDarkMode ? 'text-gray-300' : 'text-yellow-800'}
+                    />
+                  </div>
+                )}
+                <MovingAttentionAlert />
+                <Outlet />
+              </Content>
+
+              {/* Footer */}
+              <footer className={`
               flex flex-col md:flex-row justify-between items-center p-4
               ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
               border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
             `}>
-              <div className="text-sm mb-2 md:mb-0">
-                Ant Design using Remix <b>©{new Date().getFullYear()}</b>
-              </div>
-              <div className="text-sm">
-                <b>Developed by:</b> CFI IT Department
-              </div>
-            </footer>
-          </Layout>
-        </div>
+                <div className="text-sm mb-2 md:mb-0">
+                  Ant Design using Remix <b>©{new Date().getFullYear()}</b>
+                </div>
+                <div className="text-sm">
+                  <b>Developed by:</b> CFI IT Department
+                </div>
+              </footer>
+            </Layout>
+          </div>
 
-        {/* Settings Modal */}
-        <Modal
-          open={isModalOpen}
-          onCancel={handleCancel}
-          footer={null}
-          width={isMobile ? '90%' : 600}
-          styles={{
-            body: { background: isDarkMode ? '#1f1f1f' : '#ffffff' },
-            header: {
-              background: isDarkMode ? '#1f1f1f' : '#ffffff',
-              borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
+          {/* Settings Modal */}
+          <Modal
+            open={isModalOpen}
+            onCancel={handleCancel}
+            footer={null}
+            width={isMobile ? '90%' : 600}
+            styles={{
+              body: { background: isDarkMode ? '#1f1f1f' : '#ffffff' },
+              header: {
+                background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
+              }
+            }}
+            title={
+              <div className="flex items-center gap-2">
+                <FcSettings />
+                <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Settings</span>
+              </div>
             }
-          }}
-          title={
-            <div className="flex items-center gap-2">
-              <FcSettings />
-              <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Settings</span>
-            </div>
-          }
-        >
-          <Setting onSendData={(data: boolean) => setIsModalOpen(data)} />
-        </Modal>
-      </Layout>
-    </ConfigProvider>
+          >
+            <Setting onSendData={(data: boolean) => setIsModalOpen(data)} />
+          </Modal>
+        </Layout>
+      </ConfigProvider>
+    </ProtectedRoute>
   );
 }

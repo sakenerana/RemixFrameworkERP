@@ -6,6 +6,7 @@ import {
   Image,
   Card,
   Alert,
+  Checkbox,
 } from "antd";
 import { useState } from "react";
 import supabase from "~/utils/supabase.client";
@@ -43,26 +44,32 @@ export default function LoginIndex() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-800/80"></div>
+
       <ClientOnly>
-        <Card className="w-full max-w-md shadow-xl rounded-lg overflow-hidden backdrop-blur-sm bg-white/90">
-          <div className="px-8 py-6">
+        <Card className="w-full max-w-md shadow-2xl rounded-xl overflow-hidden border-0 relative">
+          {/* Decorative accent */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+
+          <div className="px-10 py-8 bg-white">
             {/* Logo Section */}
             <div className="flex flex-col items-center mb-8">
               <Image
-                width={250}
+                width={180}
                 src="./img/cficoop.svg"
                 alt="CFI Cooperative Logo"
                 className="transition-all duration-300 hover:scale-105"
               />
+              <h2 className="mt-4 text-2xl font-semibold text-gray-800">Enterprise Portal</h2>
             </div>
 
             {/* Error Message */}
             {errorAlert && (
               <Alert
-                className="mb-6 rounded-lg"
-                message="Invalid credentials"
-                description="The email or password you entered is incorrect. Please try again."
+                className="mb-6 rounded-lg border-red-200 bg-red-50"
+                message="Authentication Failed"
+                description="The email or password you entered is incorrect. Please verify your credentials and try again."
                 type="error"
                 showIcon
                 closable
@@ -75,11 +82,12 @@ export default function LoginIndex() {
               initialValues={{ remember: true }}
               onFinish={onFinish}
               layout="vertical"
+              className="space-y-5"
             >
               {/* Email Field */}
               <Form.Item
                 name="email"
-                label="Email Address"
+                label={<span className="text-gray-700 font-medium">Email Address</span>}
                 rules={[
                   {
                     required: true,
@@ -90,36 +98,38 @@ export default function LoginIndex() {
                     message: 'Please enter a valid email address'
                   }
                 ]}
-                className="mb-4"
               >
                 <Input
                   prefix={<UserOutlined className="text-gray-400" />}
                   placeholder="your.email@example.com"
                   size="large"
-                  className="py-2"
+                  className="py-3 px-4 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 />
               </Form.Item>
 
               {/* Password Field */}
               <Form.Item
                 name="password"
-                label="Password"
+                label={<span className="text-gray-700 font-medium">Password</span>}
                 rules={[{ required: true, message: "Please enter your password" }]}
-                className="mb-1"
               >
                 <Input.Password
                   prefix={<LockOutlined className="text-gray-400" />}
                   placeholder="••••••••"
                   size="large"
-                  className="py-2"
+                  className="py-3 px-4 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                 />
               </Form.Item>
 
-              {/* Forgot Password Link */}
-              <div className="flex justify-end mb-6">
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between mb-2">
+                <Form.Item name="remember" valuePropName="checked" className="mb-0">
+                  <Checkbox className="text-gray-600">Remember me</Checkbox>
+                </Form.Item>
+
                 <a
                   href="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
                 >
                   Forgot password?
                 </a>
@@ -132,7 +142,7 @@ export default function LoginIndex() {
                   htmlType="submit"
                   block
                   size="large"
-                  className="h-12 font-medium text-base"
+                  className="h-12 font-medium text-base rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md"
                   disabled={loading}
                 >
                   {loading ? (
@@ -147,14 +157,25 @@ export default function LoginIndex() {
               </Form.Item>
             </Form>
 
-            {/* Optional: Registration Link */}
-            <div className="mt-6 text-center text-sm text-gray-600">
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Need help?</span>
+              </div>
+            </div>
+
+            {/* Contact Admin */}
+            <div className="text-center text-sm text-gray-600">
               Don't have an account?{' '}
-              <span
+              <a
+                href="mailto:admin@cfi.coop"
                 className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
               >
                 Contact Administrator
-              </span>
+              </a>
             </div>
           </div>
         </Card>

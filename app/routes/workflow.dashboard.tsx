@@ -24,6 +24,7 @@ import {
   FcPackage,
 } from "react-icons/fc";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
+import { useAuth } from "~/auth/AuthContext";
 
 interface DataType {
   id: number;
@@ -66,7 +67,7 @@ export default function WorkflowDashboard() {
   const [error, setError] = useState(null);
   const [language, setLanguage] = useState<'en' | 'fil'>('en');
   const [t, setT] = useState(translations.en);
-
+  const { user, token } = useAuth();
   // Toggle language
   const toggleLanguage = () => {
     const newLanguage = language === 'en' ? 'fil' : 'en';
@@ -77,7 +78,19 @@ export default function WorkflowDashboard() {
   const fetchData = async () => {
     try {
       const response = await axios
-        .get<DataType[]>("https://jsonplaceholder.typicode.com/posts")
+        .post<DataType[]>(
+          "https://iaccs-api-staging.cficoop.com/api/external/activitybuilder/active-activities",
+          {
+            userid: user?.id ?? 4, // Replace with actual user ID logic
+            username: user?.email ?? "raerana" // Replace with actual user email logic
+          },
+          {
+            headers: {
+              "x-external-platform": "erp",
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
         .then((response) => {
           setData(response.data);
           setLoading(false);
@@ -89,6 +102,21 @@ export default function WorkflowDashboard() {
     } catch (err) {
       console.error(err);
     }
+
+    // try {
+    //   const response = await axios
+    //     .get<DataType[]>("https://jsonplaceholder.typicode.com/posts")
+    //     .then((response) => {
+    //       setData(response.data);
+    //       setLoading(false);
+    //     })
+    //     .catch((error) => {
+    //       setError(error.message);
+    //       setLoading(false);
+    //     });
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   useEffect(() => {
