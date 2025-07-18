@@ -1,4 +1,4 @@
-import { AppstoreOutlined, CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, CheckCircleOutlined, FolderOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -108,7 +108,14 @@ export default function CategoriesRoutes() {
       title: "Name",
       dataIndex: "name",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => (
+        <div className="flex items-center">
+          <FolderOutlined className="mr-3 text-lg text-blue-500" />
+          <span className="font-medium">
+            {text || <span className="text-gray-400">Unnamed</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "Type",

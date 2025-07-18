@@ -23,6 +23,7 @@ import {
   Dropdown,
   Avatar,
   Tooltip,
+  Tag,
 } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
@@ -379,38 +380,61 @@ export default function InventoryLayoutIndex() {
                 collapsible
                 collapsed={collapsed}
                 collapsedWidth={80}
-                width={250}
+                width={280}
                 breakpoint="lg"
                 onBreakpoint={(broken) => {
                   setCollapsed(broken);
                 }}
                 style={{
                   background: isDarkMode ? '#141414' : '#ffffff',
-                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
+                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
+                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '2px 0 8px rgba(0, 0, 0, 0.05)',
+                  overflow: 'hidden',
                 }}
               >
+                {/* User Profile Section */}
                 <div className="h-16 flex items-center justify-center" style={{
                   background: isDarkMode ? '#1f1f1f' : '#fafafa',
                   color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
                 }}>
                   {collapsed ? (
-                    <img src="/img/user.png" alt="User" width={40} className="rounded-full" />
-                  ) : (
-                    <div className="flex items-center w-full ml-4">
+                    <div className="p-2">
                       <Avatar
                         src="/img/user.png"
-                        size="default"
-                        className="cursor-pointer"
+                        size={40}
+                        className="cursor-pointer transition-transform hover:scale-105"
+                        style={{ border: isDarkMode ? '2px solid #434343' : '2px solid #e8e8e8' }}
                       />
-                      <div className="ml-3 overflow-hidden">
-                        <div className="font-medium truncate">{isFname} {isLname}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          CFI - User
+                    </div>
+                  ) : (
+                    <div className="flex items-center w-full px-4">
+                      <Avatar
+                        src="/img/user.png"
+                        size={48}
+                        className="cursor-pointer transition-transform hover:scale-105"
+                        style={{ border: isDarkMode ? '2px solid #434343' : '2px solid #e8e8e8' }}
+                      />
+                      <div className="ml-4 overflow-hidden">
+                        <div className="font-medium text-base truncate">{isFname} {isLname}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">
+                          <Tag
+                            color={isDarkMode ? 'volcano' : 'blue'}
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              padding: '0 6px',
+                              lineHeight: '18px'
+                            }}
+                          >
+                            CFI - User
+                          </Tag>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
+
+                {/* Menu Section */}
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
                   mode="inline"
@@ -418,9 +442,11 @@ export default function InventoryLayoutIndex() {
                   items={menuItems}
                   style={{
                     background: isDarkMode ? '#141414' : '#ffffff',
-                    height: 'calc(100vh - 64px)',
+                    height: 'calc(100vh - 80px)',
                     overflowY: 'auto',
+                    padding: '8px 0',
                   }}
+                  className="custom-menu"
                 />
               </Sider>
             )}

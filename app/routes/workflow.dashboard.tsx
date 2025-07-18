@@ -1,4 +1,4 @@
-import { MenuUnfoldOutlined } from "@ant-design/icons";
+import { GlobalOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import {
   Alert,
   Button,
@@ -137,6 +137,7 @@ export default function WorkflowDashboard() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">{t.dashboardTitle}</h1>
         <Button type="default" onClick={toggleLanguage}>
+          <GlobalOutlined />
           {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
         </Button>
       </div>

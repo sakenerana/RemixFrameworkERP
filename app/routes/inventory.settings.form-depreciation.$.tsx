@@ -156,41 +156,43 @@ export default function CreateDepreciation() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Depreciation Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineCalculator className="text-blue-500" />
-                                Depreciation Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineCalculator className="text-blue-500" />
+                                    Depreciation Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Name <span className="text-red-500">*</span></span>}
+                                    name="name"
+                                    rules={[{
+                                        required: true,
+                                        message: "Depreciation name is required"
+                                    }]}
+                                >
+                                    <Input
+                                        placeholder="Enter depreciation method name"
+                                        prefix={<AiOutlineSolution className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Name <span className="text-red-500">*</span></span>}
-                                name="name"
-                                rules={[{
-                                    required: true,
-                                    message: "Depreciation name is required"
-                                }]}
-                            >
-                                <Input
-                                    placeholder="Enter depreciation method name"
-                                    prefix={<AiOutlineSolution className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Number of Months <span className="text-red-500">*</span></span>}
-                                name="months"
-                                rules={[{
-                                    required: true,
-                                    message: "Number of months is required"
-                                }]}
-                            >
-                                <Input
-                                    type="number"
-                                    placeholder="Enter number of months"
-                                    prefix={<AiOutlineCalendar className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Number of Months <span className="text-red-500">*</span></span>}
+                                    name="months"
+                                    rules={[{
+                                        required: true,
+                                        message: "Number of months is required"
+                                    }]}
+                                >
+                                    <Input
+                                        type="number"
+                                        placeholder="Enter number of months"
+                                        prefix={<AiOutlineCalendar className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Additional Information */}

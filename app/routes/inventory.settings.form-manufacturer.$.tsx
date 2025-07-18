@@ -156,74 +156,78 @@ export default function CreateManufacturer() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Manufacturer Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineBuild className="text-blue-500" />
-                                Manufacturer Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineBuild className="text-blue-500" />
+                                    Manufacturer Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Manufacturer Name <span className="text-red-500">*</span></span>}
+                                    name="name"
+                                    rules={[{
+                                        required: true,
+                                        message: "Manufacturer name is required"
+                                    }]}
+                                >
+                                    <Input
+                                        placeholder="Enter manufacturer name"
+                                        prefix={<AiOutlineSolution className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Manufacturer Name <span className="text-red-500">*</span></span>}
-                                name="name"
-                                rules={[{
-                                    required: true,
-                                    message: "Manufacturer name is required"
-                                }]}
-                            >
-                                <Input
-                                    placeholder="Enter manufacturer name"
-                                    prefix={<AiOutlineSolution className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Website URL</span>}
-                                name="url"
-                                rules={[{
-                                    type: 'url',
-                                    message: 'Please enter a valid URL (e.g. https://example.com)'
-                                }]}
-                            >
-                                <Input
-                                    placeholder="https://example.com"
-                                    prefix={<AiOutlineLink className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Website URL</span>}
+                                    name="url"
+                                    rules={[{
+                                        type: 'url',
+                                        message: 'Please enter a valid URL (e.g. https://example.com)'
+                                    }]}
+                                >
+                                    <Input
+                                        placeholder="https://example.com"
+                                        prefix={<AiOutlineLink className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Support Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineCustomerService className="text-blue-500" />
-                                Support Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineCustomerService className="text-blue-500" />
+                                    Support Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Support Phone</span>}
+                                    name="support_phone"
+                                >
+                                    <Input
+                                        placeholder="+1 (555) 123-4567"
+                                        prefix={<AiOutlinePhone className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Support Phone</span>}
-                                name="support_phone"
-                            >
-                                <Input
-                                    placeholder="+1 (555) 123-4567"
-                                    prefix={<AiOutlinePhone className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Support Email</span>}
-                                name="support_email"
-                                rules={[{
-                                    type: 'email',
-                                    message: 'Please enter a valid email address'
-                                }]}
-                            >
-                                <Input
-                                    placeholder="support@example.com"
-                                    prefix={<AiOutlineMail className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Support Email</span>}
+                                    name="support_email"
+                                    rules={[{
+                                        type: 'email',
+                                        message: 'Please enter a valid email address'
+                                    }]}
+                                >
+                                    <Input
+                                        placeholder="support@example.com"
+                                        prefix={<AiOutlineMail className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
                     </div>
 

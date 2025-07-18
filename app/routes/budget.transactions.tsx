@@ -1,4 +1,5 @@
 import {
+  CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   HomeOutlined,
@@ -116,13 +117,23 @@ export default function BudgetTransactions() {
       title: "Process ID",
       dataIndex: "process_id",
       width: 120,
-      render: () => <div>123</div>,
+      render: () => (
+        <div className="font-mono text-sm">
+          #PRC-12345
+        </div>
+      ),
+      fixed: 'left'
     },
     {
       title: "Date",
       dataIndex: "date",
       width: 120,
-      render: () => <div>test</div>,
+      render: () => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <span className="text-sm">Oct 15, 2023</span>
+        </div>
+      )
     },
     {
       title: "Transaction Type",
@@ -134,33 +145,45 @@ export default function BudgetTransactions() {
       title: "Status",
       dataIndex: "status",
       width: 120,
-      render: (_, value) => {
-        if (value.id === 1) {
-          return (
-            <Tag color="#389e0d">
-              <CheckCircleOutlined className="float-left mt-1 mr-1" /> End
-            </Tag>
-          );
-        } else if (value.id === 2) {
-          return (
-            <Tag color="#f75b00">
-              <ClockCircleOutlined className="float-left mt-1 mr-1" /> Pending
-            </Tag>
-          );
-        } else if (value.id === 3) {
-          return (
-            <Tag color="#1677ff">
-              <AiOutlineLike className="float-left mt-1 mr-1" /> Approved
-            </Tag>
-          );
-        }
-      },
+      render: (_, record) => {
+        const statusConfig = {
+          1: {
+            color: '#389e0d',
+            icon: <CheckCircleOutlined className="mr-1.5" />,
+            text: 'Completed',
+            className: 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+          },
+          2: {
+            color: '#f75b00',
+            icon: <ClockCircleOutlined className="mr-1.5" />,
+            text: 'Pending',
+            className: 'bg-orange-50 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200'
+          },
+          3: {
+            color: '#1677ff',
+            icon: <AiOutlineLike className="mr-1.5" />,
+            text: 'Approved',
+            className: 'bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+          }
+        }[record.id];
+
+        return (
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusConfig?.className || ''}`}>
+            {statusConfig?.icon}
+            {statusConfig?.text}
+          </div>
+        );
+      }
     },
     {
       title: "Amount",
       dataIndex: "amount",
       width: 120,
-      render: () => <div className="text-end">{formatCurrency(1241)}</div>,
+      render: () => (
+        <div className="text-right font-medium">
+          {formatCurrency(1241)}
+        </div>
+      ),
     },
   ];
 
@@ -220,7 +243,7 @@ export default function BudgetTransactions() {
             className="text-sm"
           />
         </div>
-        
+
       </div>
 
       {/* Toolbar Section */}

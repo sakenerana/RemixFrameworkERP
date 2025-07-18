@@ -2,6 +2,7 @@ import { CheckCircleOutlined, EnvironmentOutlined, HomeOutlined, LoadingOutlined
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -121,19 +122,45 @@ export default function LocationsRoutes() {
       title: "Location Name",
       dataIndex: "name",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => (
+        <div className="flex items-center">
+          <Avatar
+            src="/img/supplier-icon.png"
+            size="small"
+            className="mr-3 bg-blue-100 text-blue-600"
+            icon={<EnvironmentOutlined />}
+          />
+          <span className="font-medium">
+            {text || <span>N/A</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "Address",
       dataIndex: "address",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text, record) => (
+        <div className="flex items-start">
+          <EnvironmentOutlined className="mr-2 mt-1 text-gray-400" />
+          <div>
+            <div className="text-sm">{record.address || 'N/A'}</div>
+          </div>
+        </div>
+      )
     },
     {
       title: "Address 2",
       dataIndex: "address2",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text, record) => (
+        <div className="flex items-start">
+          <EnvironmentOutlined className="mr-2 mt-1 text-gray-400" />
+          <div>
+            <div className="text-sm">{record.address2 || 'N/A'}</div>
+          </div>
+        </div>
+      )
     },
     {
       title: "City",

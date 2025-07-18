@@ -254,191 +254,197 @@ export default function CreateComponents() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Component Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineTool className="text-blue-500" />
-                                Component Details
-                            </h3>
-
-                            <Form.Item
-                                label={<span className="font-medium">Component Name <span className="text-red-500">*</span></span>}
-                                name="name"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Input
-                                    placeholder="Enter component name"
-                                    prefix={<AiOutlineTags className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Category <span className="text-red-500">*</span></span>}
-                                name="category_id"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Select
-                                    placeholder="Select category"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10 w-full"
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineTool className="text-blue-500" />
+                                    Component Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Component Name <span className="text-red-500">*</span></span>}
+                                    name="name"
+                                    rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    {dataCategory.map((item: Category) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Input
+                                        placeholder="Enter component name"
+                                        prefix={<AiOutlineTags className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Model Number</span>}
-                                name="model_no"
-                            >
-                                <Input
-                                    placeholder="Enter model number"
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Category <span className="text-red-500">*</span></span>}
+                                    name="category_id"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <Select
+                                        placeholder="Select category"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    >
+                                        {dataCategory.map((item: Category) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Model Number</span>}
+                                    name="model_no"
+                                >
+                                    <Input
+                                        placeholder="Enter model number"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Vendor Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineShop className="text-blue-500" />
-                                Vendor Details
-                            </h3>
-
-                            <Form.Item
-                                label={<span className="font-medium">Company</span>}
-                                name="company_id"
-                            >
-                                <Select
-                                    placeholder="Select company"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10 w-full"
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineShop className="text-blue-500" />
+                                    Vendor Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Company</span>}
+                                    name="company_id"
                                 >
-                                    {dataCompany.map((item: Company) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Select
+                                        placeholder="Select company"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    >
+                                        {dataCompany.map((item: Company) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Supplier</span>}
-                                name="supplier_id"
-                            >
-                                <Select
-                                    placeholder="Select supplier"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10 w-full"
+                                <Form.Item
+                                    label={<span className="font-medium">Supplier</span>}
+                                    name="supplier_id"
                                 >
-                                    {dataSupplier.map((item: Supplier) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Select
+                                        placeholder="Select supplier"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    >
+                                        {dataSupplier.map((item: Supplier) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Manufacturer</span>}
-                                name="manufacturer_id"
-                            >
-                                <Select
-                                    placeholder="Select manufacturer"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10 w-full"
+                                <Form.Item
+                                    label={<span className="font-medium">Manufacturer</span>}
+                                    name="manufacturer_id"
                                 >
-                                    {dataManufacturer.map((item: Manufacturer) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Select
+                                        placeholder="Select manufacturer"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    >
+                                        {dataManufacturer.map((item: Manufacturer) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Location</span>}
-                                name="location_id"
-                            >
-                                <Select
-                                    placeholder="Select location"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10 w-full"
+                                <Form.Item
+                                    label={<span className="font-medium">Location</span>}
+                                    name="location_id"
                                 >
-                                    {dataLocation.map((item: Location) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Select
+                                        placeholder="Select location"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    >
+                                        {dataLocation.map((item: Location) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Purchase & Inventory */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineStock className="text-blue-500" />
-                                Inventory Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineStock className="text-blue-500" />
+                                    Inventory Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Order Number</span>}
+                                    name="order_no"
+                                >
+                                    <Input
+                                        placeholder="Enter order number"
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Order Number</span>}
-                                name="order_no"
-                            >
-                                <Input
-                                    placeholder="Enter order number"
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Purchase Date</span>}
+                                    name="purchase_date"
+                                >
+                                    <DatePicker
+                                        className="w-full h-10"
+                                        suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Purchase Date</span>}
-                                name="purchase_date"
-                            >
-                                <DatePicker
-                                    className="w-full h-10"
-                                    suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Purchase Cost</span>}
+                                    name="purchase_cost"
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={0}
+                                        step={0.01}
+                                        formatter={(value) => `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                        parser={(value: any) => value?.replace(/[^\d.]/g, '') || ''}
+                                        placeholder="0.00"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Purchase Cost</span>}
-                                name="purchase_cost"
-                            >
-                                <InputNumber
-                                    className="w-full h-10"
-                                    min={0}
-                                    step={0.01}
-                                    formatter={(value) => `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={(value: any) => value?.replace(/[^\d.]/g, '') || ''}
-                                    placeholder="0.00"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Quantity <span className="text-red-500">*</span></span>}
+                                    name="qty"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={1}
+                                        placeholder="1"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Quantity <span className="text-red-500">*</span></span>}
-                                name="qty"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <InputNumber
-                                    className="w-full h-10"
-                                    min={1}
-                                    placeholder="1"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Minimum Quantity</span>}
-                                name="min_qty"
-                            >
-                                <InputNumber
-                                    className="w-full h-10"
-                                    min={0}
-                                    placeholder="0"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Minimum Quantity</span>}
+                                    name="min_qty"
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={0}
+                                        placeholder="0"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
                     </div>
 

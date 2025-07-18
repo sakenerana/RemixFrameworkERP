@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
-import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
+import { Alert, Avatar, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlineLaptop, AiOutlinePlus } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetModelService } from "~/services/asset_model.service";
@@ -92,7 +92,19 @@ export default function AssetModelsRoutes() {
             title: "Name",
             dataIndex: "name",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (text) => (
+                <div className="flex items-center">
+                    <Avatar
+                        src="/img/supplier-icon.png"
+                        size="small"
+                        className="mr-3 bg-blue-100 text-blue-600"
+                        icon={<AiOutlineLaptop />}
+                    />
+                    <span className="font-medium">
+                        {text || <span>N/A</span>}
+                    </span>
+                </div>
+            )
         },
         {
             title: "Model No",

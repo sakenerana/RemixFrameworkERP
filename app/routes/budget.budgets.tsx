@@ -469,7 +469,7 @@ export default function Budgets() {
               <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                 <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
               </h2>
-              <p className="flex flex-wrap">Current month breakdown</p>
+              <p className="flex flex-wrap text-xs">Current month breakdown</p>
               <LineChart
                 data={trendData}
                 title="Monthly Performance"

@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Card,
@@ -32,12 +33,14 @@ import { useEffect, useState } from "react";
 import {
   AiOutlineApartment,
   AiOutlineBuild,
+  AiOutlineCheckCircle,
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlinePlus,
   AiOutlineSave,
   AiOutlineSend,
+  AiOutlineTeam,
   AiOutlineUndo,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
@@ -193,6 +196,19 @@ export default function DepartmentsRoutes() {
       title: "Department Name",
       dataIndex: "department",
       width: 120,
+      render: (text) => (
+        <div className="flex items-center">
+          <Avatar
+            src="/img/supplier-icon.png"
+            size="small"
+            className="mr-3 bg-blue-100 text-blue-600"
+            icon={<AiOutlineTeam />}
+          />
+          <span className="font-medium">
+            {text || <span>N/A</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "Status",
@@ -255,7 +271,7 @@ export default function DepartmentsRoutes() {
             {record.status_labels.name === 'Inactive' && (
               <Tag
                 className="cursor-pointer"
-                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
+                icon={<AiOutlineCheckCircle className="float-left mt-1 mr-1" />}
                 color="#1677ff"
               >
                 Activate

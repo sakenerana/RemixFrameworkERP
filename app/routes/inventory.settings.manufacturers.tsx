@@ -1,6 +1,7 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, ToolOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, ShopOutlined, ToolOutlined } from "@ant-design/icons";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -22,6 +23,8 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineFileExclamation,
+  AiOutlineMail,
+  AiOutlinePhone,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
@@ -109,25 +112,66 @@ export default function ManufacturersRoutes() {
       title: "Name",
       dataIndex: "name",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => (
+        <div className="flex items-center">
+          <Avatar
+            src="/img/supplier-icon.png"
+            size="small"
+            className="mr-3 bg-blue-100 text-blue-600"
+            icon={<ShopOutlined />}
+          />
+          <span className="font-medium">
+            {text || <span>N/A</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "URL",
       dataIndex: "url",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => text ? (
+        <a
+          href={text.startsWith('http') ? text : `https://${text}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline flex items-center truncate"
+        >
+          <LinkOutlined className="mr-2" />
+          {text.replace(/^https?:\/\//, '')}
+        </a>
+      ) : <span className="text-gray-400">N/A</span>
     },
     {
       title: "Support Phone",
       dataIndex: "support_phone",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (phone) => (
+        <div className="flex items-center">
+          <AiOutlinePhone className="text-gray-400 mr-2" />
+          <span>
+            {phone || <span>N/A</span>}
+          </span>
+        </div>
+      ),
     },
     {
       title: "Support Email",
       dataIndex: "support_email",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (email) => (
+        <div className="flex items-center">
+          <AiOutlineMail className="text-gray-400 mr-2" />
+          <a
+            href={`mailto:${email}?subject=Regarding Your Account`}
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200 truncate"
+            onClick={(e) => !email && e.preventDefault()}
+            title={email || 'No email provided'}
+          >
+            {email || <span className="text-gray-400">N/A</span>}
+          </a>
+        </div>
+      ),
     },
     {
       title: "Notes",

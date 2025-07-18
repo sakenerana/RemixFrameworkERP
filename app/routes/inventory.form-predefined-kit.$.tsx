@@ -164,53 +164,57 @@ export default function CreateManufacturer() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {/* Kit Information */}
                             <div className="space-y-4 md:col-span-2 lg:col-span-1">
-                                <h3 className="text-lg font-semibold flex items-center gap-2">
-                                    <AiOutlineDropbox className="text-blue-500" />
-                                    Kit Details
-                                </h3>
-
-                                <Form.Item
-                                    label={<span className="font-medium">Kit Name <span className="text-red-500">*</span></span>}
-                                    name="name"
-                                    rules={[{ required: true, message: "Required field" }]}
-                                >
-                                    <Input
-                                        placeholder="Enter kit name"
-                                        prefix={<AiOutlineTags className="text-gray-400" />}
-                                        className="h-10 w-full"
-                                    />
-                                </Form.Item>
+                                <Card type="inner" title={
+                                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                                        <AiOutlineDropbox className="text-blue-500" />
+                                        Kit Details
+                                    </h3>
+                                }>
+                                    <Form.Item
+                                        label={<span className="font-medium">Kit Name <span className="text-red-500">*</span></span>}
+                                        name="name"
+                                        rules={[{ required: true, message: "Required field" }]}
+                                    >
+                                        <Input
+                                            placeholder="Enter kit name"
+                                            prefix={<AiOutlineTags className="text-gray-400" />}
+                                            className="h-10 w-full"
+                                        />
+                                    </Form.Item>
+                                </Card>
                             </div>
 
                             {/* Quantity Information */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold flex items-center gap-2">
-                                    <AiOutlineStock className="text-blue-500" />
-                                    Quantity Details
-                                </h3>
+                                <Card type="inner" title={
+                                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                                        <AiOutlineStock className="text-blue-500" />
+                                        Quantity Details
+                                    </h3>
+                                }>
+                                    <Form.Item
+                                        label={<span className="font-medium">Quantity <span className="text-red-500">*</span></span>}
+                                        name="qty"
+                                        rules={[{ required: true, message: "Required field" }]}
+                                    >
+                                        <InputNumber
+                                            className="w-full h-10"
+                                            min={1}
+                                            placeholder="1"
+                                        />
+                                    </Form.Item>
 
-                                <Form.Item
-                                    label={<span className="font-medium">Quantity <span className="text-red-500">*</span></span>}
-                                    name="qty"
-                                    rules={[{ required: true, message: "Required field" }]}
-                                >
-                                    <InputNumber
-                                        className="w-full h-10"
-                                        min={1}
-                                        placeholder="1"
-                                    />
-                                </Form.Item>
-
-                                <Form.Item
-                                    label={<span className="font-medium">Minimum Quantity</span>}
-                                    name="min_qty"
-                                >
-                                    <InputNumber
-                                        className="w-full h-10"
-                                        min={0}
-                                        placeholder="0"
-                                    />
-                                </Form.Item>
+                                    <Form.Item
+                                        label={<span className="font-medium">Minimum Quantity</span>}
+                                        name="min_qty"
+                                    >
+                                        <InputNumber
+                                            className="w-full h-10"
+                                            min={0}
+                                            placeholder="0"
+                                        />
+                                    </Form.Item>
+                                </Card>
                             </div>
 
                             {/* <div className="space-y-4">

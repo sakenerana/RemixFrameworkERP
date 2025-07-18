@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -186,6 +187,19 @@ export default function GroupsRoutes() {
       title: "Group Name",
       dataIndex: "group",
       width: 120,
+      render: (text) => (
+        <div className="flex items-center">
+          <Avatar
+            src="/img/supplier-icon.png"
+            size="small"
+            className="mr-3 bg-blue-100 text-blue-600"
+            icon={<AiOutlineTeam />}
+          />
+          <span className="font-medium">
+            {text || <span>N/A</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "Status",

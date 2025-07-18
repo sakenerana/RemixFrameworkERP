@@ -44,7 +44,7 @@ const PieChart: React.FC<PieChartProps> = ({
   }, [data]);
 
   return (
-    <div className="pie-chart-container p-4 rounded-lg shadow">
+    <div className="pie-chart-container p-4">
       {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
       <div 
         ref={containerRef} 

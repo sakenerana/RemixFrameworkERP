@@ -1,6 +1,7 @@
 import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SearchOutlined, SettingOutlined } from "@ant-design/icons";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -22,6 +23,9 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineFileExclamation,
+  AiOutlineHome,
+  AiOutlineMail,
+  AiOutlinePhone,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
@@ -109,19 +113,50 @@ export default function CompaniesRoutes() {
       title: "Company Name",
       dataIndex: "name",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (text) => (
+        <div className="flex items-center">
+          <Avatar
+            src="/img/supplier-icon.png"
+            size="small"
+            className="mr-3 bg-blue-100 text-blue-600"
+            icon={<AiOutlineHome />}
+          />
+          <span className="font-medium">
+            {text || <span>N/A</span>}
+          </span>
+        </div>
+      )
     },
     {
       title: "Email",
       dataIndex: "email",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (email) => (
+        <div className="flex items-center">
+          <AiOutlineMail className="text-gray-400 mr-2" />
+          <a
+            href={`mailto:${email}?subject=Regarding Your Account`}
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200 truncate"
+            onClick={(e) => !email && e.preventDefault()}
+            title={email || 'No email provided'}
+          >
+            {email || <span className="text-gray-400">N/A</span>}
+          </a>
+        </div>
+      ),
     },
     {
       title: "Phone",
       dataIndex: "phone",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (phone) => (
+        <div className="flex items-center">
+          <AiOutlinePhone className="text-gray-400 mr-2" />
+          <span>
+            {phone || <span>N/A</span>}
+          </span>
+        </div>
+      ),
     },
     {
       title: "Fax",

@@ -157,48 +157,52 @@ export default function CreateCategories() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Category Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineAppstore className="text-blue-500" />
-                                Category Details
-                            </h3>
-
-                            <Form.Item
-                                label={<span className="font-medium">Category Name <span className="text-red-500">*</span></span>}
-                                name="name"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Input
-                                    placeholder="Enter category name"
-                                    prefix={<AiOutlineTag className="text-gray-400" />}
-                                    className="h-10 w-full"
-                                />
-                            </Form.Item>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineAppstore className="text-blue-500" />
+                                    Category Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Category Name <span className="text-red-500">*</span></span>}
+                                    name="name"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <Input
+                                        placeholder="Enter category name"
+                                        prefix={<AiOutlineTag className="text-gray-400" />}
+                                        className="h-10 w-full"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Type Selection */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineBars className="text-blue-500" />
-                                Category Type
-                            </h3>
-
-                            <Form.Item
-                                label={<span className="font-medium">Type <span className="text-red-500">*</span></span>}
-                                name="type"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Select
-                                    className="h-10 w-full"
-                                    showSearch
-                                    placeholder="Select category type"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    optionFilterProp="children"
-                                    filterOption={(input, option) =>
-                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    options={categoryType}
-                                />
-                            </Form.Item>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineBars className="text-blue-500" />
+                                    Category Type
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Type <span className="text-red-500">*</span></span>}
+                                    name="type"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <Select
+                                        className="h-10 w-full"
+                                        showSearch
+                                        placeholder="Select category type"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        optionFilterProp="children"
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
+                                        options={categoryType}
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
                     </div>
 

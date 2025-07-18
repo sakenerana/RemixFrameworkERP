@@ -50,7 +50,7 @@ const BarChart: React.FC<BarChartProps> = ({
   }, [data, color, xField, yField]);
 
   return (
-    <div className="bar-chart-container p-4 rounded-lg shadow">
+    <div className="bar-chart-container p-4">
       {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
       <div 
         ref={containerRef} 

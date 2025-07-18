@@ -272,7 +272,7 @@ export default function BudgetRoutes() {
         {/* First Row - Summary Cards */}
         <Row gutter={16} className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.netWorth}
@@ -280,14 +280,14 @@ export default function BudgetRoutes() {
                 <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                   <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
                 </p>
-                <p>{t.totalAssetsMinusLiabilities}</p>
+                <p className="text-xs mt-4">{t.totalAssetsMinusLiabilities}</p>
               </div>
               <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
                 {t.toBeDetermined}
               </div>
             </Card>
 
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyIncome}
@@ -295,14 +295,14 @@ export default function BudgetRoutes() {
                 <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                   <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
                 </p>
-                <p>{t.totalIncomeThisMonth}</p>
+                <p className="text-xs mt-4">{t.totalIncomeThisMonth}</p>
               </div>
               <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
                 {t.toBeDetermined}
               </div>
             </Card>
 
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyExpenses}
@@ -310,14 +310,14 @@ export default function BudgetRoutes() {
                 <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                   <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
                 </p>
-                <p>{t.totalExpensesThisMonth}</p>
+                <p className="text-xs mt-4">{t.totalExpensesThisMonth}</p>
               </div>
               <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
                 {t.toBeDetermined}
               </div>
             </Card>
 
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.savingsRate}
@@ -325,7 +325,7 @@ export default function BudgetRoutes() {
                 <p className="flex flex-wrap text-green-600 text-2xl font-bold">
                   <AiOutlineStock className="mt-1 mr-2" /> {formatCurrency(123141)}
                 </p>
-                <p>{t.percentageOfIncomeSaved}</p>
+                <p className="text-xs mt-4">{t.percentageOfIncomeSaved}</p>
               </div>
               <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
                 {t.toBeDetermined}
@@ -337,12 +337,12 @@ export default function BudgetRoutes() {
         {/* Second Row - Charts */}
         <Row gutter={16} className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.spendingByCategory}
                 </h2>
-                <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
+                <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
                 <PieChart
                   data={[
                     { type: t.food, value: 27 },
@@ -354,12 +354,12 @@ export default function BudgetRoutes() {
               </div>
             </Card>
 
-            <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlySpendingTrend}
                 </h2>
-                <p className="flex flex-wrap">{t.lastMonths}</p>
+                <p className="flex flex-wrap text-xs">{t.lastMonths}</p>
                 <BarChart
                   data={salesData}
                   title=""
@@ -374,7 +374,7 @@ export default function BudgetRoutes() {
         {/* Third Row - Tables */}
         <Row gutter={32} className="pt-7">
           <Col span={12}>
-            <div className="shadow-lg m-[-5px]">
+            <div className="shadow-sm m-[-5px]">
               <Card title={
                 <div className="flex items-center">
                   <RiPieChart2Fill className="mr-2 text-green-500" />
@@ -391,7 +391,7 @@ export default function BudgetRoutes() {
             </div>
           </Col>
           <Col span={12}>
-            <div className="shadow-lg m-[-5px]">
+            <div className="shadow-sm m-[-5px]">
               <Card title={
                 <div className="flex items-center">
                   <RiPieChart2Fill className="mr-2 text-green-500" />

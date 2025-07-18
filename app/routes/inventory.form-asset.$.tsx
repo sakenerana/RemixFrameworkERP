@@ -222,155 +222,163 @@ export default function CreateAssets() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Asset Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineInfoCircle className="text-blue-500" />
-                                Asset Details
-                            </h3>
-
-                            <Form.Item
-                                label={<span className="font-medium">Asset Name</span>}
-                                name="name"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Input
-                                    placeholder="Enter asset name"
-                                    prefix={<AiOutlineTags className="text-gray-400" />}
-                                    className="h-10"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Asset Model</span>}
-                                name="asset_model_id"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Select
-                                    placeholder="Select model"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10"
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineInfoCircle className="text-blue-500" />
+                                    Asset Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Asset Name</span>}
+                                    name="name"
+                                    rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    {dataAssetModel.map((item: AssetModel) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Input
+                                        placeholder="Enter asset name"
+                                        prefix={<AiOutlineTags className="text-gray-400" />}
+                                        className="h-10"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Location</span>}
-                                name="location_id"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <Select
-                                    placeholder="Select location"
-                                    suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    className="h-10"
+                                <Form.Item
+                                    label={<span className="font-medium">Asset Model</span>}
+                                    name="asset_model_id"
+                                    rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    {dataLocation.map((item: Location) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+                                    <Select
+                                        placeholder="Select model"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10"
+                                    >
+                                        {dataAssetModel.map((item: AssetModel) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    label={<span className="font-medium">Location</span>}
+                                    name="location_id"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <Select
+                                        placeholder="Select location"
+                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
+                                        className="h-10"
+                                    >
+                                        {dataLocation.map((item: Location) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Purchase Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineShoppingCart className="text-blue-500" />
-                                Purchase Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineShoppingCart className="text-blue-500" />
+                                    Purchase Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Order Number</span>}
+                                    name="order_no"
+                                >
+                                    <Input
+                                        placeholder="PO-12345"
+                                        prefix={<AiOutlineBarcode className="text-gray-400" />}
+                                        className="h-10"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Order Number</span>}
-                                name="order_no"
-                            >
-                                <Input
-                                    placeholder="PO-12345"
-                                    prefix={<AiOutlineBarcode className="text-gray-400" />}
-                                    className="h-10"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Purchase Date</span>}
+                                    name="purchase_date"
+                                >
+                                    <DatePicker
+                                        className="w-full h-10"
+                                        suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Purchase Date</span>}
-                                name="purchase_date"
-                            >
-                                <DatePicker
-                                    className="w-full h-10"
-                                    suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Purchase Cost</span>}
-                                name="purchase_cost"
-                            >
-                                <InputNumber
-                                    className="w-full h-10 rounded-lg"
-                                    min={0}
-                                    step={1000}
-                                    formatter={(value) => {
-                                        if (value === undefined || value === null) return '₱ 0';
-                                        // Format with commas and peso sign
-                                        return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                                    }}
-                                    parser={(value: any) => {
-                                        // Remove all non-numeric characters
-                                        return value ? value.replace(/[^\d]/g, '') : '';
-                                    }}
-                                    placeholder="Enter amount"
-                                />
-                            </Form.Item>
+                                <Form.Item
+                                    label={<span className="font-medium">Purchase Cost</span>}
+                                    name="purchase_cost"
+                                >
+                                    <InputNumber
+                                        className="w-full h-10 rounded-lg"
+                                        min={0}
+                                        step={1000}
+                                        formatter={(value) => {
+                                            if (value === undefined || value === null) return '₱ 0';
+                                            // Format with commas and peso sign
+                                            return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                        }}
+                                        parser={(value: any) => {
+                                            // Remove all non-numeric characters
+                                            return value ? value.replace(/[^\d]/g, '') : '';
+                                        }}
+                                        placeholder="Enter amount"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
 
                         {/* Quantity Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <AiOutlineStock className="text-blue-500" />
-                                Inventory Details
-                            </h3>
+                            <Card type="inner" title={
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <AiOutlineStock className="text-blue-500" />
+                                    Inventory Details
+                                </h3>
+                            }>
+                                <Form.Item
+                                    label={<span className="font-medium">Quantity</span>}
+                                    name="qty"
+                                    rules={[{ required: true, message: "Required field" }]}
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={1}
+                                        placeholder="1"
+                                    />
+                                </Form.Item>
 
-                            <Form.Item
-                                label={<span className="font-medium">Quantity</span>}
-                                name="qty"
-                                rules={[{ required: true, message: "Required field" }]}
-                            >
-                                <InputNumber
-                                    className="w-full h-10"
-                                    min={1}
-                                    placeholder="1"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="font-medium">Minimum Quantity</span>}
-                                name="min_qty"
-                            >
-                                <InputNumber
-                                    className="w-full h-10"
-                                    min={0}
-                                    placeholder="0"
-                                />
-                            </Form.Item>
-
-
+                                <Form.Item
+                                    label={<span className="font-medium">Minimum Quantity</span>}
+                                    name="min_qty"
+                                >
+                                    <InputNumber
+                                        className="w-full h-10"
+                                        min={0}
+                                        placeholder="0"
+                                    />
+                                </Form.Item>
+                            </Card>
                         </div>
                     </div>
 
                     {/* Asset Tags */}
                     <div className="mt-6">
-                        <Form.Item
-                            label={<span className="font-medium">Asset Tags</span>}
-                        >
-                            <AssetTag
-                                onDataChange={handleAssetTagChange}
-                                initialKeys={form.getFieldValue('asset_tag') || []}
-                                hasID={id}
-                            />
-                        </Form.Item>
+                        <Card type="inner" title={
+                            <div className="flex flex-wrap gap-2">
+                                <span>Asset Tags</span>
+                            </div>
+                        }>
+                            <Form.Item>
+                                <AssetTag
+                                    onDataChange={handleAssetTagChange}
+                                    initialKeys={form.getFieldValue('asset_tag') || []}
+                                    hasID={id}
+                                />
+                            </Form.Item>
+                        </Card>
                     </div>
 
                     {/* Notes Section */}

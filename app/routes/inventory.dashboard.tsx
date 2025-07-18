@@ -331,7 +331,7 @@ export default function DashboardRoutes() {
                                 hoverable
                                 loading={metric.loading}
                                 bodyStyle={{ padding: '16px' }}
-                                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
+                                className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105"
                             >
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -347,7 +347,7 @@ export default function DashboardRoutes() {
                                     <Title level={3} style={{ margin: 0, color: metric.color }}>
                                         {metric.loading ? '--' : metric.value}
                                     </Title>
-                                    <Text type="secondary">{metric.description}</Text>
+                                    <Text type="secondary" className="text-xs">{metric.description}</Text>
                                     {metric.trend !== undefined && (
                                         <Progress
                                             percent={Math.abs(metric.trend)}
@@ -365,12 +365,12 @@ export default function DashboardRoutes() {
                 {/* Charts Section */}
                 <Row className="pt-5">
                     <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-                        <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+                        <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
                             <div>
                                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                                     <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.inventoryByCategory}
                                 </h2>
-                                <p className="flex flex-wrap">{t.currentMonthBreakdown}</p>
+                                <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
                                 {loading && <Spin></Spin>}
                                 {!loading &&
                                     <PieChart
@@ -385,12 +385,12 @@ export default function DashboardRoutes() {
                                     />}
                             </div>
                         </Card>
-                        <Card className="rounded-md shadow-md overflow-hidden transition-transform duration-300">
+                        <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
                             <div>
                                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                                     <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
                                 </h2>
-                                <p className="flex flex-wrap">{t.lastMonths}</p>
+                                <p className="flex flex-wrap text-xs">{t.lastMonths}</p>
                                 <BarChart
                                     data={salesData}
                                     title=""
@@ -405,7 +405,7 @@ export default function DashboardRoutes() {
                 {/* Latest Assets Table */}
                 <Row gutter={16} className="pt-7">
                     <Col span={24}>
-                        <div className="shadow-lg">
+                        <div className="shadow-sm">
                             <Card title={
                                 <div className="flex items-center">
                                     <RiPieChart2Fill className="mr-2 text-green-500" />
