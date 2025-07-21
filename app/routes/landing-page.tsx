@@ -17,6 +17,7 @@ import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
 import { User } from "~/types/user.type";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
+import axios from "axios";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -33,6 +34,8 @@ export default function LandingPage() {
   const [dataWorkflow, setDataWorkflow] = useState(false);
   const [dataAdmin, setDataAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
+  const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
+  const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
 
   // Fetch data from Supabase
   const fetchDataByUUID = async () => {
@@ -50,6 +53,18 @@ export default function LandingPage() {
       localStorage.setItem('userAuthID', dataFetch.id);
       localStorage.setItem('fname', dataFetch.first_name);
       localStorage.setItem('lname', dataFetch.last_name);
+
+      axios.post(apiAuthExternal, {
+        external: "erp",
+        password: apiAuthExternalPassword
+      })
+        .then(response => {
+          console.log('Auth API successful:', response.data);
+        })
+        .catch(error => {
+          console.error('Error reading external api:', error);
+        });
+
       // Update all states at once
       setData(dataFetch);
       setDataIventory(arr.includes(1));
@@ -139,16 +154,16 @@ export default function LandingPage() {
               <Card
                 key={index}
                 className={`relative overflow-hidden rounded-xl transition-all duration-300 ${feature.access
-                    ? 'bg-white border border-gray-200 hover:border-blue-300 hover:shadow-xl cursor-pointer'
-                    : 'bg-gray-50 border border-gray-100 cursor-not-allowed'
+                  ? 'bg-white border border-gray-200 hover:border-blue-300 hover:shadow-xl cursor-pointer'
+                  : 'bg-gray-50 border border-gray-100 cursor-not-allowed'
                   }`}
                 hoverable={feature.access}
               >
                 {/* Status Badge */}
                 <div
                   className={`absolute top-3 right-3 px-2.5 py-0.5 text-xs font-semibold rounded-full ${feature.access
-                      ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
-                      : 'bg-red-50 text-red-700 ring-1 ring-red-600/20'
+                    ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
+                    : 'bg-red-50 text-red-700 ring-1 ring-red-600/20'
                     }`}
                 >
                   {feature.access ? 'Available' : 'Restricted'}
@@ -178,8 +193,8 @@ export default function LandingPage() {
                       <div className="mt-6 flex justify-center">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${feature.access
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                             }`}
                         >
                           {feature.access ? (

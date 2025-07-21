@@ -74,15 +74,16 @@ export default function WorkflowDashboard() {
     setLanguage(newLanguage);
     setT(translations[newLanguage]);
   };
+  const activeActivitiesAPI = import.meta.env.VITE_ACTIVE_ACTIVITIES_API;
 
   const fetchData = async () => {
     try {
       const response = await axios
         .post<DataType[]>(
-          "https://iaccs-api-staging.cficoop.com/api/external/activitybuilder/active-activities",
+          activeActivitiesAPI,
           {
-            userid: user?.id ?? 4, // Replace with actual user ID logic
-            username: user?.email ?? "raerana" // Replace with actual user email logic
+            userid: 4, // Replace with actual user ID logic
+            username: "raerana" // Replace with actual user email logic
           },
           {
             headers: {
