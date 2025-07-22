@@ -53,8 +53,10 @@ export default function LandingPage() {
       localStorage.setItem('userAuthID', dataFetch.id);
       localStorage.setItem('fname', dataFetch.first_name);
       localStorage.setItem('lname', dataFetch.last_name);
+      localStorage.setItem('ab_id', dataFetch.ab_user_id);
+      localStorage.setItem('username', dataFetch.username);
 
-      axios.post(apiAuthExternal, {
+      axios.post('/auth', {
         external: "erp",
         password: apiAuthExternalPassword
       })

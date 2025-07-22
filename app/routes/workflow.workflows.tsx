@@ -2,6 +2,7 @@ import { HomeOutlined, LoadingOutlined, SettingOutlined, UserOutlined } from "@a
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
+  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -20,11 +21,17 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiFillProfile, AiOutlinePlus } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { CrownFilled } from '@ant-design/icons';
 
 interface DataType {
   id: number;
-  title: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  activities_count: number;
+  workflows_breakdown: any[];
   body: string;
   userId?: number; // Optional property
 }
@@ -32,12 +39,14 @@ interface DataType {
 export default function Workflows() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const { user, token } = useAuth();
+  const [topThreeUserIds, setTopThreeUserIds] = useState<number[]>([]);
 
   const navigate = useNavigate();
 
@@ -48,21 +57,40 @@ export default function Workflows() {
   };
 
   const fetchData = async () => {
+    const getABID = localStorage.getItem('ab_id');
+    const getUsername = localStorage.getItem('username');
+
     try {
-      const response = await axios
-        .get<DataType[]>("https://jsonplaceholder.typicode.com/posts") // Specify response type
-        .then((response) => {
-          setData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.post<any>(
+        '/api/user-activities',
+        {
+          userid: getABID,
+          username: getUsername
+        },
+        {
+          headers: {
+            "x-external-platform": "erp",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          withCredentials: true
+        }
+      );
+
+      const sorted = [...response.data.data].sort((a, b) => b.activities_count - a.activities_count);
+      setTopThreeUserIds(sorted.slice(0, 3).map(user => user.id));
+      setData(sorted);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
@@ -74,7 +102,7 @@ export default function Workflows() {
       fetchData();
     } else {
       const filtered = data.filter(data =>
-        data.title?.toLowerCase().includes(searchText.toLowerCase())
+        data.username?.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -88,19 +116,48 @@ export default function Workflows() {
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
-    "Product Key": true,
+    "Activities Count": true,
     "Actions": true,
   });
 
   const columns: TableColumnsType<DataType> = [
     {
       title: "Name",
-      dataIndex: "name",
+      dataIndex: "username",
       width: 120,
+      render: (text, record) => {
+        const rank = topThreeUserIds.indexOf(record.id) + 1;
+        const crownColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
+
+        return (
+          <div className="flex items-center">
+            <Avatar
+              src="/img/supplier-icon.png"
+              size="small"
+              className="mr-2 bg-blue-100 text-blue-600"
+              icon={<UserOutlined />}
+            />
+            <span className="font-medium flex items-center">
+              {text}
+              {rank > 0 && rank <= 3 && (
+                <CrownFilled
+                  style={{
+                    color: crownColors[rank - 1],
+                    fontSize: '16px',
+                    marginLeft: '6px',
+                    filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.2))'
+                  }}
+                  title={`Top ${rank}`}
+                />
+              )}
+            </span>
+          </div>
+        );
+      }
     },
     {
-      title: "Product Key",
-      dataIndex: "product_key",
+      title: "Activities Count",
+      dataIndex: "activities_count",
       width: 120,
     },
     {
