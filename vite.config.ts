@@ -21,10 +21,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api/external/activitybuilder'), // Adjust path if needed
       },
-      '/auth': {  // All requests starting with `/api` will be proxied
+      '/api2': {  // All requests starting with `/api2` will be proxied
         target: 'http://192.168.31.3:82', // Your API server
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api/external/auth'), // Adjust path if needed
+        rewrite: (path) => path.replace(/^\/api2/, '/api/external/auth'), // Adjust path if needed
       },
     },
   },

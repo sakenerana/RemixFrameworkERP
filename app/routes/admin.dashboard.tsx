@@ -310,8 +310,8 @@ export default function BudgetRoutes() {
                 <Card
                   hoverable
                   loading={metric.loading}
-                  bodyStyle={{ padding: '16px' }}
-                  className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105"
+                  // styles.body={{ padding: '16px' }}
+                  className="p-[-16px] rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105"
                 >
                   <Space direction="vertical" size="small" style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -397,10 +397,16 @@ export default function BudgetRoutes() {
                   {loading && <Spin></Spin>}
                   {!loading &&
                     <Table<User>
+                      key={''}
                       bordered
                       size={"small"}
                       columns={columnsUser}
-                      dataSource={dataUserTable}
+                      dataSource={dataUserTable.map(item => ({
+                        ...item,
+                        key: item.id // Or any other unique identifier
+                      }))}
+                      // rowKey can also be used instead of modifying dataSource
+                      rowKey={(record) => record.id}
                     />}
                 </Card>
               </div>

@@ -1,4 +1,4 @@
-import { GlobalOutlined } from "@ant-design/icons";
+import { GlobalOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Col, Flex, Progress, Row, Spin, Tag } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -69,17 +69,17 @@ export default function WorkflowDashboard() {
       const response = await axios.post<ApiResponse>(
         '/api/active-activities',
         {
-          userid: getABID,
+          userid: Number(getABID),
           username: getUsername
         },
-        {
-          headers: {
-            "x-external-platform": "erp",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        }
+        // {
+        //   headers: {
+        //     "x-external-platform": "erp",
+        //     "Authorization": `Bearer ${token}`,
+        //     "Content-Type": "application/json"
+        //   },
+        //   withCredentials: true
+        // }
       );
 
       console.log("RESPONSE", response.data)
@@ -172,7 +172,7 @@ export default function WorkflowDashboard() {
                   </span>
 
                   {/* Workflow Name */}
-                  <h3 className="text-xl font-semibold text-gray-800 line-clamp-2">
+                  <h3 className="text-xl font-semibold line-clamp-2">
                     {workflow.name}
                   </h3>
 
@@ -197,13 +197,17 @@ export default function WorkflowDashboard() {
 
 
       {/* Activities Grid */}
-      <Row gutter={[16, 16]}>
-        {loading ? (
-          <Col span={24} className="text-center">
-            <Spin size="large" />
-          </Col>
-        ) : (
-          <>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spin
+            size="large"
+            tip="Loading user workflows..."
+            indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+          />
+        </div>
+      ) : (
+        <>
+          <Row gutter={[16, 16]}>
             {data.data.map((item) => {
               const rank = topActivities.indexOf(item.id) + 1;
               const crownColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
@@ -214,17 +218,19 @@ export default function WorkflowDashboard() {
                     className="h-full transition-transform hover:scale-105 hover:shadow-lg relative"
                     bodyStyle={{ padding: '12px' }}
                   >
+                    {/* Only show crown for top 3 rankings */}
                     {rank <= 3 && (
                       <div className="absolute -top-2 -right-2">
                         <CrownFilled
                           style={{
+                            display: rank === 0 ? 'none': '',
                             fontSize: '18px',
-                            color: crownColors[rank - 1],
+                            color: crownColors[rank - 1], // Applies gold/silver/bronze
                             filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.3))'
                           }}
                         />
                         <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-white">
-                          {rank}
+                          {rank === 0 ? '' : rank}
                         </span>
                       </div>
                     )}
@@ -251,9 +257,10 @@ export default function WorkflowDashboard() {
                 </Col>
               );
             })}
-          </>
-        )}
-      </Row>
+          </Row>
+        </>
+      )}
+
     </div>
   );
 }

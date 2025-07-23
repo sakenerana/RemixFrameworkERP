@@ -67,17 +67,9 @@ export default function Workflows() {
       const response = await axios.post<any>(
         '/api/user-activities',
         {
-          userid: getABID,
+          userid: Number(getABID),
           username: getUsername
         },
-        {
-          headers: {
-            "x-external-platform": "erp",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        }
       );
 
       const sorted = [...response.data.data].sort((a, b) => b.activities_count - a.activities_count);
@@ -110,7 +102,7 @@ export default function Workflows() {
 
   const handleShowWorkflows = (value: DataType) => {
     console.log("value", value)
-    navigate("/workflow/assigned/id?=" + value.id);
+    navigate("/workflow/assigned/id?id=" + value.id);
   };
 
   // State for column visibility

@@ -48,7 +48,7 @@ export default function LandingPage() {
       setLoading(true);
       const dataFetch = await UserService.getByUuid(user.id);
       const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-      console.log("User Data", dataFetch)
+      // console.log("User Data", dataFetch)
       localStorage.setItem('userDept', dataFetch.department_id);
       localStorage.setItem('userAuthID', dataFetch.id);
       localStorage.setItem('fname', dataFetch.first_name);
@@ -56,16 +56,16 @@ export default function LandingPage() {
       localStorage.setItem('ab_id', dataFetch.ab_user_id);
       localStorage.setItem('username', dataFetch.username);
 
-      axios.post('/auth', {
-        external: "erp",
-        password: apiAuthExternalPassword
-      })
-        .then(response => {
-          console.log('Auth API successful:', response.data);
-        })
-        .catch(error => {
-          console.error('Error reading external api:', error);
-        });
+      // axios.post('/api2', {
+      //   external: "erp",
+      //   password: apiAuthExternalPassword
+      // })
+      //   .then(response => {
+      //     console.log('Auth API successful:', response.data);
+      //   })
+      //   .catch(error => {
+      //     console.error('Error reading external api:', error);
+      //   });
 
       // Update all states at once
       setData(dataFetch);
