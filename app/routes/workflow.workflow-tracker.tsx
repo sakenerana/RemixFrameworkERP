@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, FileSearchOutlined, HistoryOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, SmileOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, FileSearchOutlined, HistoryOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, SmileOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -22,19 +22,31 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiFillProfile } from "react-icons/ai";
 import { FcRefresh, FcSearch } from "react-icons/fc";
+import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import dayjs from 'dayjs';
 
 interface DataType {
   id: number;
-  title: string;
-  body: string;
+  requested_by: string;
+  refno: string;
+  created_at: string;
+  due_date: string;
+  status: number;
+  workflow_id: number;
+  step_id: number;
+  workflow: {
+    id: number;
+    name: string;
+  }
   userId?: number; // Optional property
 }
 
 export default function WorkflowTracker() {
   const [data, setData] = useState<DataType[]>([]);
+  const [dataModal, setDataModal] = useState<any>({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -52,19 +64,28 @@ export default function WorkflowTracker() {
   };
 
   const fetchData = async () => {
+    const getABID = localStorage.getItem('ab_id');
+    const getUsername = localStorage.getItem('username');
+
     try {
-      const response = await axios
-        .get<DataType[]>("https://jsonplaceholder.typicode.com/posts") // Specify response type
-        .then((response) => {
-          setData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.post<any>(
+        '/api/user-active-activities',
+        {
+          userid: Number(getABID),
+          username: getUsername,
+          tracked_user_id: Number(getABID)
+        },
+      );
+
+      setData(response.data.data);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,13 +99,15 @@ export default function WorkflowTracker() {
       fetchData();
     } else {
       const filtered = data.filter(data =>
-        data.title?.toLowerCase().includes(searchText.toLowerCase())
+        data.requested_by?.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredData(filtered);
     }
   }, [searchText]); // Empty dependency array means this runs once on mount
 
-  const handleTrack = () => {
+  const handleTrack = (value: any) => {
+    console.log("VALUE", value)
+    setDataModal(value);
     setIsModalOpen(true);
   };
 
@@ -98,35 +121,90 @@ export default function WorkflowTracker() {
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
-    "Name": true,
-    "Product Key": true,
+    "Process Title": true,
+    "Reference No": true,
+    "Created At": true,
+    "Due Date": true,
+    "Workflow": true,
     "Actions": true,
   });
 
   const columns: TableColumnsType<DataType> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      width: 120,
+      title: "Process Title",
+      dataIndex: "requested_by",
+      key: "process_title",
+      width: 160,
+      ellipsis: true,
+      sorter: (a, b) => a.requested_by.localeCompare(b.requested_by),
     },
     {
-      title: "Product Key",
-      dataIndex: "product_key",
+      title: "Reference No",
+      dataIndex: "refno",
+      key: "refno",
+      width: 140,
+      render: (text) => <span className="text-monospace flex flex-wrap"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {text}</span>,
+    },
+    {
+      title: "Created At",
+      dataIndex: "created_at",
+      width: 160, // Increased width to accommodate time
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')} {/* Time */}
+            </span>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Due Date",
+      dataIndex: "due_date",
       width: 120,
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')} {/* Time */}
+            </span>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Workflow",
+      dataIndex: "workflow",
+      key: "workflow",
+      width: 150,
+      render: (workflow) => (
+        <Tag color="green">
+          {workflow.name}
+        </Tag>
+      )
     },
     {
       title: "Actions",
       dataIndex: "actions",
       width: 160,
       fixed: "right",
-      render: () => (
+      render: (_, value) => (
         <div className="flex">
           <Popconfirm
             title="Do you want to view?"
             description="Are you sure to view this workflows?"
             okText="Yes"
             cancelText="No"
-            onConfirm={() => handleTrack()}
+            onConfirm={() => handleTrack(value)}
           >
             <Tag
               className="cursor-pointer"
@@ -300,10 +378,43 @@ export default function WorkflowTracker() {
       <Modal
         width={680}
         title={
-          <div className="flex items-center gap-3">
-            <HistoryOutlined className="text-blue-500 text-xl" />
-            <span className="text-xl font-semibold">Workflow Timeline</span>
-          </div>
+          <>
+            <div className="space-y-2">
+              {/* Header Section */}
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {dataModal.requested_by}
+                  </h2>
+                  <span className="hidden sm:inline text-gray-400">—</span>
+                  <span className="text-sm font-medium text-gray-600">
+                    {dataModal.workflow?.name || 'No workflow'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Meta Info Section */}
+              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-700">Ref:</span>
+                  <span>{dataModal.refno}</span>
+                </div>
+                <span className="hidden sm:inline text-gray-400">•</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-700">Created:</span>
+                  <span>{dataModal.created_at}</span>
+                </div>
+                <span className="hidden sm:inline text-gray-400">•</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium text-gray-700">Status:</span>
+                  <span className="inline-flex items-center rounded-full bg-green-100 text-green-800 px-2 py-0.5 text-xs font-semibold">
+                    Active
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </>
         }
         open={isModalOpen}
         onCancel={handleCancel}

@@ -223,7 +223,7 @@ export default function WorkflowDashboard() {
                       <div className="absolute -top-2 -right-2">
                         <CrownFilled
                           style={{
-                            display: rank === 0 ? 'none': '',
+                            display: rank === 0 ? 'none' : '',
                             fontSize: '18px',
                             color: crownColors[rank - 1], // Applies gold/silver/bronze
                             filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.3))'
@@ -243,10 +243,12 @@ export default function WorkflowDashboard() {
                         <div className="text-right mt-2">
                           <Tag
                             color={
-                              rank === 1 ? 'gold' :
-                                rank === 2 ? 'default' :
-                                  rank === 3 ? 'orange' : 'green'
+                              item.activities_count === 0 ? 'red' :
+                                rank === 1 ? 'gold' :
+                                  rank === 2 ? 'default' :
+                                    rank === 3 ? 'orange' : 'green'
                             }
+                            className="text-lg"
                           >
                             {item.activities_count.toLocaleString()}
                           </Tag>
