@@ -40,7 +40,7 @@ export interface Component {
     location: string;
     total: number;
     order_no: string;
-    purchase_date: string;
+    purchase_date: any;
     purchase_cost: number;
     action?: string;
     notes?: string;

@@ -8,10 +8,16 @@ import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
 import { Location } from "~/types/location.type";
 const { TextArea } = Input;
-import moment from 'moment';
 import { LocationService } from "~/services/location.service";
 import { AssetModel } from "~/types/asset_model.tpye";
 import { AssetModelService } from "~/services/asset_model.service";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
+
+// Extend dayjs with plugins
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 export default function CreateAssets() {
     // const { id } = useParams();
@@ -67,20 +73,17 @@ export default function CreateAssets() {
         try {
             setLoading(true);
             const dataFetch = await AssetService.getPostById(Number(id));
-            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
 
-            // Convert date strings to moment objects
             const formattedData = {
                 ...dataFetch,
-                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
+                purchase_date: dataFetch.purchase_date
+                    ? dayjs(dataFetch.purchase_date, 'YYYY-MM-DD')
+                    : null,
             };
 
-            // Update all states at once
             form.setFieldsValue(formattedData);
-            //   setData(dataFetch);
         } catch (error) {
-            // console.error("Error fetching data:", error);
-            message.error("Error loading asset data");
+            message.error("Error loading accessory data");
         } finally {
             setLoading(false);
         }
@@ -134,12 +137,14 @@ export default function CreateAssets() {
     // Create or Update record
     const onFinish = async () => {
         try {
-
             const values = await form.validateFields();
 
-            // Include your extra field
-            const allValues = {
+            // Format the purchase_date before submission
+            const formattedValues = {
                 ...values,
+                purchase_date: values.purchase_date
+                    ? dayjs(values.purchase_date).format('YYYY-MM-DD')
+                    : null,
                 status_id: 1,
                 user_id: isUserID,
                 department_id: Number(isDepartmentID),
@@ -147,19 +152,11 @@ export default function CreateAssets() {
             };
 
             if (id) {
-                // Update existing record
-                const { error } = await AssetService.updatePost(Number(id), allValues);
-
-                if (error) throw message.error(error.message);
+                await AssetService.updatePost(Number(id), formattedValues);
                 message.success("Record updated successfully");
             } else {
-                // Create new record
                 setLoading(true);
-
-                const { error } = await AssetService.createPost(allValues);
-
-                if (error) throw message.error(error.message);
-
+                await AssetService.createPost(formattedValues);
                 message.success("Record created successfully");
             }
 
@@ -167,7 +164,8 @@ export default function CreateAssets() {
             form.resetFields();
             navigate("/inventory/assets");
         } catch (error) {
-            message.error("Error");
+            message.error("Error submitting form");
+            setLoading(false);
         }
     };
 
@@ -300,9 +298,12 @@ export default function CreateAssets() {
                                 <Form.Item
                                     label={<span className="font-medium">Purchase Date</span>}
                                     name="purchase_date"
+                                    getValueFromEvent={(date) => date} // Receives Day.js object directly
+                                    getValueProps={(value) => ({ value: value ? dayjs(value, 'YYYY-MM-DD') : null })}
                                 >
                                     <DatePicker
                                         className="w-full h-10"
+                                        format="YYYY-MM-DD"
                                         suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                                     />
                                 </Form.Item>

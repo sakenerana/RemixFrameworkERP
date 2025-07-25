@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -7,6 +7,7 @@ import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ConsumableService } from "~/services/consumable.service";
 import { Consumable } from "~/types/consumable.type";
+import dayjs from 'dayjs';
 
 export default function DeletedConsumables() {
     const [data, setData] = useState<Consumable[]>([]);
@@ -158,7 +159,16 @@ export default function DeletedConsumables() {
             title: "Purchase Date",
             dataIndex: "purchase_date",
             width: 120,
-            render: (text) => text || 'N/A'
+            render: (dateString) => (
+                <div className="flex items-center">
+                    <CalendarOutlined className="mr-2 text-gray-400" />
+                    <div className="flex flex-col">
+                        <span className="text-sm">
+                            {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+                        </span>
+                    </div>
+                </div>
+            )
         },
         {
             title: "Purchase Cost",

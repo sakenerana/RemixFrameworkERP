@@ -39,10 +39,10 @@ export interface License {
     seats: number;
     order_number: string;
     purchase_cost: number;
-    purchase_date: Date;
+    purchase_date: any;
     purchase_order_no: number;
     product_key: any;
-    expiration_date: Date;
+    expiration_date: any;
     termination_date: Date;
     license_email: string;
     license_name: string;

@@ -144,7 +144,7 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
   useEffect(() => {
     if (onDataChange) {
       onDataChange(dataSource);
-      console.log("testing 2", dataSource)
+      // console.log("testing 2", dataSource)
     }
   }, [dataSource, onDataChange]);
 

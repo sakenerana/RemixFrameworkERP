@@ -15,9 +15,15 @@ import { License } from "~/types/license.type";
 import { Manufacturer } from "~/types/manufacturer.type";
 import { Supplier } from "~/types/supplier.type";
 const { TextArea } = Input;
-import moment from 'moment';
 import { Company } from "~/types/company.type";
 import { CompanyService } from "~/services/company.service";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
+
+// Extend dayjs with plugins
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 export default function CreateLicense() {
     // const { id } = useParams();
@@ -115,23 +121,19 @@ export default function CreateLicense() {
         try {
             setLoading(true);
             const dataFetch = await LicenseService.getPostById(Number(id));
-            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
 
-            // Convert date strings to moment objects
             const formattedData = {
                 ...dataFetch,
-                purchase_date: dataFetch.purchase_date ? moment(dataFetch.purchase_date) : null,
-                expiration_date: dataFetch.expiration_date ? moment(dataFetch.expiration_date) : null,
-                termination_date: dataFetch.termination_date ? moment(dataFetch.termination_date) : null,
+                purchase_date: dataFetch.purchase_date
+                    ? dayjs(dataFetch.purchase_date, 'YYYY-MM-DD')
+                    : null,
+                expiration_date: dataFetch.expiration_date
+                    ? dayjs(dataFetch.expiration_date, 'YYYY-MM-DD')
+                    : null,
             };
 
-            // Update all states at once
             form.setFieldsValue(formattedData);
-            //   setData(dataFetch);
-
-            // console.log("dataFetch", dataFetch.product_key)
         } catch (error) {
-            // console.error("Error fetching data:", error);
             message.error("Error loading asset data");
         } finally {
             setLoading(false);
@@ -190,12 +192,17 @@ export default function CreateLicense() {
     // Create or Update record
     const onFinish = async () => {
         try {
-
             const values = await form.validateFields();
 
-            // Include your extra field
-            const allValues = {
+            // Format the purchase_date before submission
+            const formattedValues = {
                 ...values,
+                purchase_date: values.purchase_date
+                    ? dayjs(values.purchase_date).format('YYYY-MM-DD')
+                    : null,
+                expiration_date: values.expiration_date
+                    ? dayjs(values.expiration_date).format('YYYY-MM-DD')
+                    : null,
                 status_id: 1,
                 user_id: isUserID,
                 department_id: Number(isDepartmentID),
@@ -203,17 +210,11 @@ export default function CreateLicense() {
             };
 
             if (id) {
-                // Update existing record
-                const { error } = await LicenseService.updatePost(Number(id), allValues);
-
-                if (error) throw message.error(error.message);
+                await LicenseService.updatePost(Number(id), formattedValues);
                 message.success("Record updated successfully");
             } else {
-                // Create new record
                 setLoading(true);
-                const { error } = await LicenseService.createPost(allValues);
-
-                if (error) throw message.error('Error');
+                await LicenseService.createPost(formattedValues);
                 message.success("Record created successfully");
             }
 
@@ -221,7 +222,8 @@ export default function CreateLicense() {
             form.resetFields();
             navigate("/inventory/licenses");
         } catch (error) {
-            message.error("Error");
+            message.error("Error submitting form");
+            setLoading(false);
         }
     };
 
@@ -478,9 +480,12 @@ export default function CreateLicense() {
                                 <Form.Item
                                     label={<span className="font-medium">Purchase Date</span>}
                                     name="purchase_date"
+                                    getValueFromEvent={(date) => date} // Receives Day.js object directly
+                                    getValueProps={(value) => ({ value: value ? dayjs(value, 'YYYY-MM-DD') : null })}
                                 >
                                     <DatePicker
                                         className="w-full h-10"
+                                        format="YYYY-MM-DD"
                                         suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                                     />
                                 </Form.Item>
@@ -488,9 +493,12 @@ export default function CreateLicense() {
                                 <Form.Item
                                     label={<span className="font-medium">Expiration Date</span>}
                                     name="expiration_date"
+                                    getValueFromEvent={(date) => date} // Receives Day.js object directly
+                                    getValueProps={(value) => ({ value: value ? dayjs(value, 'YYYY-MM-DD') : null })}
                                 >
                                     <DatePicker
                                         className="w-full h-10"
+                                        format="YYYY-MM-DD"
                                         suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                                     />
                                 </Form.Item>

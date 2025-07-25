@@ -39,6 +39,7 @@ export interface Accessories {
   min_qty: number;
   total: string;
   checked_out: string;
+  purchase_date: any;
   purchase_cost: number;
   action?: string;
   notes?: string;

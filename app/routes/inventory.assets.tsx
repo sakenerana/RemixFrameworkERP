@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, DesktopOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, DesktopOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -32,6 +32,7 @@ import { TiWarning } from "react-icons/ti";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";
+import dayjs from 'dayjs';
 
 export default function AssetsRoute() {
   const [data, setData] = useState<Asset[]>([]);
@@ -172,7 +173,19 @@ export default function AssetsRoute() {
       title: "Purchase Date",
       dataIndex: "purchase_date",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')}
+            </span> */}
+          </div>
+        </div>
+      )
     },
     {
       title: "Min QTY",

@@ -40,7 +40,7 @@ export interface Consumable {
     remaining: string;
     location: string;
     order_no: string;
-    purchase_date: string;
+    purchase_date: any;
     purchase_cost: string;
     action?: string;
     notes?: string;

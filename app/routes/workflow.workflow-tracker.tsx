@@ -79,7 +79,7 @@ export default function WorkflowTracker() {
           tracked_user_id: Number(getABID)
         },
       );
-
+      console.log("RESPONSE DATA", response.data.data)
       setData(response.data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -188,7 +188,7 @@ export default function WorkflowTracker() {
       width: 150,
       render: (workflow) => (
         <Tag color="green">
-          {workflow.name}
+          {workflow}
         </Tag>
       )
     },
@@ -253,6 +253,48 @@ export default function WorkflowTracker() {
   ) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
+  const items = dataModal.sequences?.map((value: string, index: number) => {
+    const isDuplicate = dataModal.sequences?.indexOf(value) !== index;
+    const isStart = index === 0;
+    const isEnd = value === "End";
+    const isCurrent = value === dataModal.current_sequence;
+
+    return {
+      color: isEnd
+        ? "green"
+        : isCurrent
+          ? "purple"
+          : isDuplicate
+            ? "orange"
+            : "blue",
+      label: isEnd ? "END" : isStart ? "START" : `STEP ${index + 1}`,
+      children: (
+        <div
+          className={`p-3 rounded-lg border ${isCurrent
+              ? "bg-indigo-100 border-indigo-400"
+              : isEnd
+                ? "bg-green-50 border-green-200"
+                : isDuplicate
+                  ? "bg-yellow-50 border-yellow-200"
+                  : "bg-blue-50 border-blue-200"
+            }`}
+        >
+          <p
+            className={`font-medium ${isCurrent ? "text-indigo-800" : "text-gray-700"
+              }`}
+          >
+            {value}
+          </p>
+          {isCurrent && (
+            <p className="text-xs text-indigo-600 font-semibold mt-1">
+              ⏳ Current Step
+            </p>
+          )}
+        </div>
+      ),
+    };
+  });
 
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
@@ -388,7 +430,7 @@ export default function WorkflowTracker() {
                   </h2>
                   <span className="hidden sm:inline text-gray-400">—</span>
                   <span className="text-sm font-medium text-gray-600">
-                    {dataModal.workflow?.name || 'No workflow'}
+                    {dataModal.workflow || 'No workflow'}
                   </span>
                 </div>
               </div>
@@ -438,95 +480,7 @@ export default function WorkflowTracker() {
             <Spin size="large" />
           </div>
         ) : (
-          <Timeline
-            mode="right"
-            items={[
-              {
-                color: "green",
-                label: "2023-11-01 09:30",
-                children: (
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Workflow Initiated</p>
-                    <p className="text-sm text-gray-600">Request created by John Doe</p>
-                  </div>
-                ),
-              },
-              {
-                color: "green",
-                label: "2023-11-01 10:15",
-                children: (
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">First Approval</p>
-                    <p className="text-sm text-gray-600">Approved by Jane Smith</p>
-                  </div>
-                ),
-              },
-              {
-                color: "red",
-                label: "2023-11-02 14:20",
-                children: (
-                  <div className="bg-red-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Revision Requested</p>
-                    <p className="text-sm text-gray-600">Needs additional documentation</p>
-                    <p className="text-sm text-gray-600 mt-1">Assigned to: Technical Team</p>
-                  </div>
-                ),
-              },
-              {
-                label: "2023-11-03 11:45",
-                children: (
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Documentation Updated</p>
-                    <p className="text-sm text-gray-600">Submitted by Alex Johnson</p>
-                  </div>
-                ),
-              },
-              {
-                color: "gray",
-                label: "2023-11-04 16:30",
-                children: (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Pending Final Review</p>
-                    <p className="text-sm text-gray-600">Waiting for QA approval</p>
-                  </div>
-                ),
-              },
-              {
-                color: "#00CCFF",
-                dot: <CheckCircleOutlined className="text-blue-400" />,
-                label: "2023-11-05 10:00",
-                children: (
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Workflow Completed</p>
-                    <p className="text-sm text-gray-600">Closed by System</p>
-                  </div>
-                ),
-              },
-              {
-                color: "#00CCFF",
-                dot: <CheckCircleOutlined className="text-blue-400" />,
-                label: "2023-11-05 10:00",
-                children: (
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Workflow Completed</p>
-                    <p className="text-sm text-gray-600">Closed by System</p>
-                  </div>
-                ),
-              },
-              {
-                color: "#00CCFF",
-                dot: <CheckCircleOutlined className="text-blue-400" />,
-                label: "2023-11-05 10:00",
-                children: (
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="font-medium text-gray-700">Workflow Completed</p>
-                    <p className="text-sm text-gray-600">Closed by System</p>
-                  </div>
-                ),
-              },
-            ]}
-            className="workflow-timeline"
-          />
+          <Timeline mode="right" items={items} className="workflow-timeline" />
         )}
       </Modal>
     </div>

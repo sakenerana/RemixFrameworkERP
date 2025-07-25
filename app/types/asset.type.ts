@@ -40,7 +40,7 @@ export interface Asset {
     location: string;
     order_no: string;
     purchase_cost: number;
-    purchase_date: Date;
+    purchase_date: any;
     current_value: number;
     accounting_code: string;
     installed: string;

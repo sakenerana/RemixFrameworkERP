@@ -69,7 +69,7 @@ export default function DeletedLicense() {
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
         "Expiration Date": true,
-        "Termination Date": false,
+        // "Termination Date": false,
         "Licensed to Email": false,
         "Licensed to Name": true,
         "Manufacturer": true,
@@ -102,12 +102,12 @@ export default function DeletedLicense() {
             width: 120,
             render: (text) => text || 'N/A'
         },
-        {
-            title: "Termination Date",
-            dataIndex: "termination_date",
-            width: 120,
-            render: (text) => text || 'N/A'
-        },
+        // {
+        //     title: "Termination Date",
+        //     dataIndex: "termination_date",
+        //     width: 120,
+        //     render: (text) => text || 'N/A'
+        // },
         {
             title: "Licensed to Email",
             dataIndex: "license_email",

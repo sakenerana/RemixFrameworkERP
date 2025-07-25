@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, ExperimentOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, ExperimentOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -42,6 +42,7 @@ import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ConsumableService } from "~/services/consumable.service";
 import { Consumable } from "~/types/consumable.type";
+import dayjs from 'dayjs';
 
 export default function ConsumablesRoute() {
   const [data, setData] = useState<Consumable[]>([]);
@@ -233,7 +234,19 @@ export default function ConsumablesRoute() {
       title: "Purchase Date",
       dataIndex: "purchase_date",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')}
+            </span> */}
+          </div>
+        </div>
+      )
     },
     {
       title: "Purchase Cost",

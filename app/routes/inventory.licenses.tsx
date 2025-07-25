@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, HomeOutlined, LoadingOutlined, SafetyCertificateOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, LoadingOutlined, SafetyCertificateOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -35,6 +35,7 @@ import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
 import { License } from "~/types/license.type";
+import dayjs from 'dayjs';
 
 export default function LicensesRoute() {
   const [data, setData] = useState<License[]>([]);
@@ -112,7 +113,7 @@ export default function LicensesRoute() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
     "Expiration Date": true,
-    "Termination Date": false,
+    // "Termination Date": false,
     "Licensed to Email": false,
     "Licensed to Name": true,
     "Manufacturer": true,
@@ -148,20 +149,26 @@ export default function LicensesRoute() {
       title: "Expiration Date",
       dataIndex: "expiration_date",
       width: 120,
-      render: (text) => text ? new Date(text).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }) : 'N/A'
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')}
+            </span> */}
+          </div>
+        </div>
+      )
     },
-    {
-      title: "Termination Date",
-      dataIndex: "termination_date",
-      width: 120,
-      render: (text) => text || 'N/A'
-    },
+    // {
+    //   title: "Termination Date",
+    //   dataIndex: "termination_date",
+    //   width: 120,
+    //   render: (text) => text || 'N/A'
+    // },
     {
       title: "Licensed to Email",
       dataIndex: "license_email",
@@ -217,7 +224,19 @@ export default function LicensesRoute() {
       title: "Purchase Date",
       dataIndex: "purchase_date",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')}
+            </span> */}
+          </div>
+        </div>
+      )
     },
     {
       title: "Purchase Order Number",

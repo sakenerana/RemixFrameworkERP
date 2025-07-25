@@ -1,4 +1,4 @@
-import { ApiOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { ApiOutlined, CalendarOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -37,6 +37,7 @@ import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
+import dayjs from 'dayjs';
 
 export default function AccesoriessRoute() {
   const [data, setData] = useState<Accessories[]>([]);
@@ -228,7 +229,19 @@ export default function AccesoriessRoute() {
       title: "Purchase Date",
       dataIndex: "purchase_date",
       width: 120,
-      render: (text) => text || 'N/A'
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+              {dayjs(dateString).format('h:mm A')}
+            </span> */}
+          </div>
+        </div>
+      )
     },
     {
       title: "Purchase Cost",
