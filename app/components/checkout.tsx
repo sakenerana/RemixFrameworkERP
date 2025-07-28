@@ -1,7 +1,7 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineSend } from "react-icons/ai";
 import { AccessoryService } from "~/services/accessory.service";
 import { AssetService } from "~/services/asset.service";
 import { ComponentService } from "~/services/component.service";
@@ -9,6 +9,9 @@ import { ConsumableService } from "~/services/consumable.service";
 import { LicenseService } from "~/services/license.service";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 const { TextArea } = Input;
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
 
 interface CheckoutProps {
     stateData: any;
@@ -45,6 +48,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             if (stateData.categories && stateData.categories.type === "Component") {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -53,6 +59,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             } else if (stateData.categories && stateData.categories.type === "Consumable") {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -61,6 +70,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             } else if (stateData.categories && stateData.categories.type === "Accessory") {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -69,6 +81,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             } else if (stateData.categories && stateData.categories.type === "License") {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -78,6 +93,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             } else if (stateData.categories && stateData.categories.type === "Asset") {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -87,6 +105,9 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
             } else {
                 var allValues = {
                     ...values,
+                    checkout_date: values.checkout_date
+                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                        : null,
                     status_id: 1,
                     user_id: isUserID,
                     department_id: Number(isDepartmentID),
@@ -236,10 +257,13 @@ export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProp
                             label={<span className="font-medium">Checkout Date</span>}
                             name="checkout_date"
                             rules={[{ required: true, message: "Please select checkout date" }]}
+                            getValueFromEvent={(date) => date} // Receives Day.js object directly
+                            getValueProps={(value) => ({ value: value ? dayjs(value, 'YYYY-MM-DD') : null })}
                         >
                             <DatePicker
-                                className="w-full py-2"
-                                style={{ height: 40 }}
+                                className="w-full h-10"
+                                format="YYYY-MM-DD"
+                                suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                             />
                         </Form.Item>
 

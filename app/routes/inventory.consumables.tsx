@@ -363,7 +363,7 @@ export default function ConsumablesRoute() {
               <Tag
                 className={`cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
-                color={isDisabled ? "#d9d9d9" : "#3fd168"} // Gray when disabled, green when enabled
+                color={isDisabled ? "#f00404ff" : "#3fd168"} // Gray when disabled, green when enabled
               >
                 {isDisabled ? 'Completed' : 'Check-out'}
               </Tag>

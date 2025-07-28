@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   FullscreenExitOutlined,
   FullscreenOutlined,
@@ -9,6 +9,8 @@ import {
   SunOutlined,
   SwapOutlined,
   VerticalAlignTopOutlined,
+  MessageOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
@@ -22,6 +24,8 @@ import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
 import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
+import ManagerGroupChat from "~/components/chat";
+import { AiOutlineMinus } from "react-icons/ai";
 
 const { Header, Sider, Content } = Layout;
 
@@ -40,9 +44,13 @@ export default function WorkflowLayoutIndex() {
   const [isFname, setIsFname] = useState('');
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   // Get current path for menu selection
   const currentPath = matches[matches.length - 1]?.pathname || '';
+
   // Redirect to dashboard on initial load if at root admin path
   useEffect(() => {
     if (currentPath === '/workflow') {
@@ -50,7 +58,7 @@ export default function WorkflowLayoutIndex() {
     }
   }, [currentPath, navigate]);
 
-  // Dark mode state initialization with localStorage
+  // Fixed dark mode state initialization
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -60,12 +68,11 @@ export default function WorkflowLayoutIndex() {
     return false;
   });
 
-  // Responsive detection and automatic layout switching
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      // Auto-collapse sidebar on mobile
+      setIsHorizontal(mobile);
       if (mobile) {
         setCollapsed(true);
       }
@@ -76,7 +83,6 @@ export default function WorkflowLayoutIndex() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Apply theme and user data
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -90,7 +96,6 @@ export default function WorkflowLayoutIndex() {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Toggle functions
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
@@ -105,14 +110,33 @@ export default function WorkflowLayoutIndex() {
     }
   };
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
-  const toggleSidebar = () => setCollapsed(prev => !prev);
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
+  const toggleSidebar = () => {
+    setCollapsed(prev => !prev);
+  };
+
   const toggleLayout = () => {
-    // Only allow layout toggle on desktop
     if (!isMobile) {
       setIsHorizontal(prev => !prev);
     }
   };
+
+  const toggleChat = () => {
+    setChatVisible(prev => {
+      if (!prev) {
+        setIsChatMinimized(false);
+      }
+      return !prev;
+    });
+  };
+
+  const toggleChatMinimize = () => {
+    setIsChatMinimized(prev => !prev);
+  };
+
   const handleTrack = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
@@ -143,18 +167,24 @@ export default function WorkflowLayoutIndex() {
     },
     {
       key: '2',
+      label: chatVisible ? 'Hide Chat' : 'Manager Chat',
+      icon: <MessageOutlined />,
+      onClick: toggleChat
+    },
+    {
+      key: '3',
       label: isFullscreen ? 'Exit Fullscreen' : 'Fullscreen',
       icon: isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />,
       onClick: toggleFullscreen
     },
     {
-      key: '3',
+      key: '4',
       label: 'Settings',
       icon: <FcSettings />,
       onClick: handleTrack
     },
     {
-      key: '4',
+      key: '5',
       label: 'Switch App',
       icon: <SwapOutlined />,
       onClick: () => window.location.href = '/landing-page'
@@ -187,7 +217,6 @@ export default function WorkflowLayoutIndex() {
         }}
       >
         <Layout className="min-h-screen">
-          {/* Mobile Header with Horizontal Menu */}
           {/* Mobile Header */}
           {isMobile && (
             <Header className="flex items-center justify-between p-0 px-4" style={{
@@ -358,6 +387,14 @@ export default function WorkflowLayoutIndex() {
                           />
                         </Tooltip>
 
+                        <Tooltip title={chatVisible ? 'Hide Chat' : 'Show Chat'}>
+                          <Button
+                            type="text"
+                            icon={<MessageOutlined />}
+                            onClick={toggleChat}
+                          />
+                        </Tooltip>
+
                         <Tooltip title="Switch Portal">
                           <Link to="/landing-page">
                             <Button
@@ -424,10 +461,10 @@ export default function WorkflowLayoutIndex() {
 
               {/* Footer */}
               <footer className={`
-              flex flex-col md:flex-row justify-between items-center p-4
-              ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
-              border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
-            `}>
+                flex flex-col md:flex-row justify-between items-center p-4
+                ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}
+                border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
+              `}>
                 <div className="text-sm mb-2 md:mb-0">
                   Ant Design using Remix <b>©{new Date().getFullYear()}</b>
                 </div>
@@ -437,6 +474,88 @@ export default function WorkflowLayoutIndex() {
               </footer>
             </Layout>
           </div>
+
+          {/* Messenger-style Chat Popup */}
+          {chatVisible && (
+            <div
+              ref={chatRef}
+              className={`fixed bottom-0 right-4 z-50 transition-all duration-300 ease-in-out ${isChatMinimized ? 'w-64 h-12' : 'w-[26rem] h-[500px]'
+                }`}
+              style={{
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                border: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* Chat Header - Always visible */}
+              <div
+                className={`flex items-center justify-between p-3 cursor-pointer ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
+                onClick={toggleChatMinimize}
+                style={{
+                  transition: 'background-color 0.3s',
+                  flexShrink: 0 // Prevents header from shrinking
+                }}
+              >
+                <div className="flex items-center">
+                  <MessageOutlined className="text-white mr-2" />
+                  <span className="text-white font-medium">Managers Chat</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    type="text"
+                    icon={
+                      isChatMinimized ? (
+                        ''
+                      ) : (
+                        <AiOutlineMinus color="#ffffff" />
+                      )
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleChatMinimize();
+                    }}
+                  />
+                  <Button
+                    type="text"
+                    icon={<CloseOutlined className="text-white" />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleChat();
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Chat Content - Scrollable area */}
+              {!isChatMinimized && (
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <div>
+                    <ManagerGroupChat isDarkMode={isDarkMode} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Floating Chat Button (when chat is hidden) */}
+          {!chatVisible && (
+            <button
+              onClick={toggleChat}
+              className={`fixed bottom-6 right-6 z-40 flex items-center justify-center rounded-full p-4 shadow-lg transition-all hover:shadow-xl ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
+              style={{
+                width: '56px',
+                height: '56px',
+              }}
+            >
+              <MessageOutlined className="text-white text-xl" />
+            </button>
+          )}
 
           {/* Settings Modal */}
           <Modal
