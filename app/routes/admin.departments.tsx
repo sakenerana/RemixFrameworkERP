@@ -396,7 +396,7 @@ export default function DepartmentsRoutes() {
                 message: 'Department name is required',
               },
               {
-                min: 3,
+                min: 2,
                 message: 'Minimum 3 characters',
               },
               {

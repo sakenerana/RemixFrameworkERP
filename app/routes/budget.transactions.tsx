@@ -33,19 +33,13 @@ import {
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
-
-interface DataType {
-  id: number;
-  title: string;
-  body: string;
-  userId?: number; // Optional property
-  amount: number;
-}
+import dayjs from 'dayjs';
+import { RiCircleFill } from "react-icons/ri";
 
 export default function BudgetTransactions() {
-  const [data, setData] = useState<DataType[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
 
@@ -71,19 +65,39 @@ export default function BudgetTransactions() {
   };
 
   const fetchData = async () => {
+    const getABID = localStorage.getItem('ab_id');
+    const getUsername = localStorage.getItem('username');
+    const userDepartment = localStorage.getItem('dept'); // Assuming department is stored
+
     try {
-      const response = await axios
-        .get<DataType[]>("https://jsonplaceholder.typicode.com/posts") // Specify response type
-        .then((response) => {
-          setData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.post<any>(
+        '/api/completed-requisition-liquidation',
+        {
+          userid: Number(getABID),
+          username: getUsername,
+        },
+      );
+
+      // Filter data by department
+      const filteredByDepartment = response.data.data.filter(
+        (item: any) => item.department === userDepartment
+      );
+
+      // Sort by `startDate` (newest first)
+      const sorted = [...filteredByDepartment].sort((a, b) => {
+        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      });
+
+      setData(sorted);
+      // console.log("SORTED TRANSACTIONS BY DATE (NEWEST FIRST)", sorted);
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,7 +111,8 @@ export default function BudgetTransactions() {
       fetchData();
     } else {
       const filtered = data.filter(data =>
-        data.title?.toLowerCase().includes(searchText.toLowerCase())
+        data.referenceNo?.toLowerCase().includes(searchText.toLowerCase()) ||
+        data.processTitle?.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -105,83 +120,125 @@ export default function BudgetTransactions() {
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
-    "Process ID": true,
-    "Date": true,
-    "Transaction Type": true,
+    "Process Title": true,
+    "Reference No": true,
+    "Start Date": true,
+    "Due Date": true,
+    "Workflow Type": true,
+    "Type": true,
     "Status": true,
     "Amount": true,
   });
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<any> = [
     {
-      title: "Process ID",
-      dataIndex: "process_id",
+      title: "Process Title",
+      dataIndex: "processTitle",
       width: 120,
-      render: () => (
+      render: (_, value) => (
         <div className="font-mono text-sm">
-          #PRC-12345
+          {value.processTitle}
         </div>
       ),
       fixed: 'left'
     },
     {
-      title: "Date",
-      dataIndex: "date",
+      title: "Reference No",
+      dataIndex: "referenceNo",
       width: 120,
-      render: () => (
+      render: (_, value) => (
+        <div className="font-mono text-sm">
+          {value.referenceNo}
+        </div>
+      ),
+      fixed: 'left'
+    },
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      width: 120,
+      render: (dateString) => (
         <div className="flex items-center">
           <CalendarOutlined className="mr-2 text-gray-400" />
-          <span className="text-sm">Oct 15, 2023</span>
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+                    {dayjs(dateString).format('h:mm A')}
+                  </span> */}
+          </div>
         </div>
       )
     },
     {
-      title: "Transaction Type",
-      dataIndex: "transaction_type",
+      title: "Due Date",
+      dataIndex: "dueDate",
       width: 120,
-      render: () => <div>Liquidation</div>,
+      render: (dateString) => (
+        <div className="flex items-center">
+          <CalendarOutlined className="mr-2 text-gray-400" />
+          <div className="flex flex-col">
+            <span className="text-sm">
+              {dayjs(dateString).format('MMM DD YYYY')} {/* Date */}
+            </span>
+            {/* <span className="text-xs text-gray-500">
+                    {dayjs(dateString).format('h:mm A')}
+                  </span> */}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Workflow Type",
+      dataIndex: "workflowType",
+      width: 120,
+      render: (_, record) => {
+        return (
+          <>
+            {record.workflowType === 'Requisition' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-blue-500 mt-1 mr-2" /> {record.workflowType}</span>
+            )}
+            {record.workflowType === 'Liquidattion' && (
+              <span className="flex flex-wrap"><RiCircleFill className="text-blue-600 mt-1 mr-2" /> {record.workflowType}</span>
+            )}
+          </>
+        );
+      },
+      fixed: 'left'
+    },
+    {
+      title: "Type",
+      dataIndex: "requisitionType",
+      width: 120,
+      render: (_, value) => (
+        <Tag color="blue">
+          {value.requisitionType}
+        </Tag>
+      ),
+      fixed: 'left'
     },
     {
       title: "Status",
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        const statusConfig = {
-          1: {
-            color: '#389e0d',
-            icon: <CheckCircleOutlined className="mr-1.5" />,
-            text: 'Completed',
-            className: 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-          },
-          2: {
-            color: '#f75b00',
-            icon: <ClockCircleOutlined className="mr-1.5" />,
-            text: 'Pending',
-            className: 'bg-orange-50 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200'
-          },
-          3: {
-            color: '#1677ff',
-            icon: <AiOutlineLike className="mr-1.5" />,
-            text: 'Approved',
-            className: 'bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
-          }
-        }[record.id];
-
-        return (
-          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusConfig?.className || ''}`}>
-            {statusConfig?.icon}
-            {statusConfig?.text}
-          </div>
-        );
-      }
+        if (record.status === 5) {
+          return (
+            <Tag color="green">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Completed
+            </Tag>
+          );
+        }
+      },
     },
     {
       title: "Amount",
       dataIndex: "amount",
       width: 120,
-      render: () => (
+      render: (_, value) => (
         <div className="text-right font-medium">
-          {formatCurrency(1241)}
+          {formatCurrency(value.totalAmount)}
         </div>
       ),
     },
@@ -213,7 +270,7 @@ export default function BudgetTransactions() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<DataType>["onChange"] = (
+  const onChange: TableProps<any>["onChange"] = (
     pagination,
     filters,
     sorter,
@@ -309,7 +366,7 @@ export default function BudgetTransactions() {
           />
         </div>
       ) : (
-        <Table<DataType>
+        <Table<any>
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}

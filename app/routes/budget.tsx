@@ -483,7 +483,7 @@ export default function BudgetLayoutIndex() {
           {chatVisible && (
             <div
               ref={chatRef}
-              className={`fixed bottom-0 right-4 z-50 transition-all duration-300 ease-in-out ${isChatMinimized ? 'w-64 h-12' : 'w-80 h-[500px]'
+              className={`fixed bottom-0 right-4 z-50 transition-all duration-300 ease-in-out ${isChatMinimized ? 'w-64 h-12' : 'w-[26rem] h-[500px]'
                 }`}
               style={{
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -491,15 +491,18 @@ export default function BudgetLayoutIndex() {
                 overflow: 'hidden',
                 background: isDarkMode ? '#1f1f1f' : '#ffffff',
                 border: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
+                display: 'flex',
+                flexDirection: 'column'
               }}
             >
-              {/* Chat Header */}
+              {/* Chat Header - Always visible */}
               <div
                 className={`flex items-center justify-between p-3 cursor-pointer ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'
                   }`}
                 onClick={toggleChatMinimize}
                 style={{
                   transition: 'background-color 0.3s',
+                  flexShrink: 0 // Prevents header from shrinking
                 }}
               >
                 <div className="flex items-center">
@@ -532,10 +535,10 @@ export default function BudgetLayoutIndex() {
                 </div>
               </div>
 
-              {/* Chat Content */}
+              {/* Chat Content - Scrollable area */}
               {!isChatMinimized && (
-                <div className="h-full flex flex-col">
-                  <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <div>
                     <ManagerGroupChat isDarkMode={isDarkMode} />
                   </div>
                 </div>
