@@ -16,6 +16,7 @@ import {
   Progress,
   Row,
   Select,
+  Skeleton,
   Space,
   Spin,
   Tag,
@@ -23,7 +24,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlinePlusCircle, AiOutlineRise, AiOutlineSend, AiOutlineShareAlt } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import LineChart from "~/components/line_chart";
 import { BudgetService } from "~/services/budget.service";
@@ -38,7 +39,7 @@ interface DataType {
 }
 
 export default function Budgets() {
-  const [data, setData] = useState<Budget[]>([]);
+  const [data, setData] = useState<Budget>();
   const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
   const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
   const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
@@ -105,75 +106,108 @@ export default function Budgets() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const dataFetch = await BudgetService.getByData(isDepartmentID);
       setData(dataFetch); // Works in React state
-      console.log("BUDGET DATA", dataFetch)
+      console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   const fetchDataBudgetApproved = async () => {
-    const getABID = localStorage.getItem('ab_id');
-    const getUsername = localStorage.getItem('username');
-    const userDepartment = localStorage.getItem('dept');
+    const userId = Number(localStorage.getItem("ab_id"));
+    const username = localStorage.getItem("username") || "";
+    const userDepartment = localStorage.getItem("dept") || "";
+    const departmentId = isDepartmentID;
+
+    if (!userId || !username || !departmentId) {
+      console.warn("Missing required identifiers");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await axios.post<any>(
-        '/api/completed-requisition-liquidation',
+      // Fetch workflow data
+      const response = await axios.post<{ data: any[] }>(
+        "/api/completed-requisition-liquidation",
         {
-          userid: Number(getABID),
-          username: getUsername,
-        },
+          userid: userId,
+          username: username,
+        }
       );
 
-      // Filter data by department AND status === 5
-      const filteredByDepartmentAndStatus = response.data.data.filter(
-        (item: any) =>
-          item.department === userDepartment &&
-          item.status === 5 // Only include if status is 5
-      );
+      const items = response.data.data || [];
 
-      // Sort by `startDate` (newest first)
-      const sorted = [...filteredByDepartmentAndStatus].sort((a, b) => {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      // Fetch budget data to get date range
+      const budgetData = await BudgetService.getByData(departmentId);
+      const startDate = budgetData?.start_date;
+      const endDate = budgetData?.end_date;
+
+      // Filter and validate
+      const filtered = items.filter((item) => {
+        const matchesDepartment = item.department === userDepartment;
+        const matchesStatus = item.status === 5;
+
+        // Match by date range if provided
+        let matchesDateRange = true;
+        if (startDate && endDate && item.startDate) {
+          const itemDate = new Date(item.startDate).getTime();
+          const rangeStart = new Date(startDate).getTime();
+          const rangeEnd = new Date(endDate).getTime();
+          matchesDateRange = itemDate >= rangeStart && itemDate <= rangeEnd;
+        }
+
+        return matchesDepartment && matchesStatus && matchesDateRange;
       });
 
-      // Initialize totals
+      // Sort descending by date
+      const sorted = filtered.sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+
+      // Totals
       let requisitionTotal = 0;
       let liquidationTotal = 0;
-      let combinedTotal = 0; // New variable for combined sum
+      let combinedTotal = 0;
 
       sorted.forEach((item) => {
         const amount = Number(item.totalAmount) || 0;
         if (item.workflowType === "Requisition") {
           requisitionTotal += amount;
         } else if (item.workflowType === "Liquidation") {
-          liquidationTotal += amount;
+          liquidationTotal = amount;
         }
-        combinedTotal += amount; // Add to combined total
+        combinedTotal += amount;
       });
 
-      console.log("Requisition Total (Status=5):", requisitionTotal);
-      console.log("Liquidation Total (Status=5):", liquidationTotal);
-      console.log("Combined Total (Status=5):", combinedTotal); // Log combined total
+      console.log("Filtered Budget Data", {
+        requisitionTotal,
+        liquidationTotal,
+        combinedTotal,
+        range: startDate && endDate ? `${startDate} → ${endDate}` : "No range",
+        count: sorted.length,
+      });
 
+      // Set state
       setDataTotalRequisition(requisitionTotal);
       setDataTotalLiquidation(liquidationTotal);
-      setDataCombinedTotal(combinedTotal); // Store combined total in state
+      setDataCombinedTotal(combinedTotal);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      console.error('Failed to fetch data:', err);
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(message);
+      console.error("fetchDataBudgetApproved failed:", err);
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchData();
@@ -190,12 +224,12 @@ export default function Budgets() {
     {
       title: "Requisition",
       value: dataTotalRequisition,
-      totalBudget: data[0]?.budget
+      totalBudget: data?.budget
     },
     {
       title: "Liquidation",
       value: dataTotalLiquidation,
-      totalBudget: data[0]?.budget
+      totalBudget: data?.budget
     },
   ];
 
@@ -233,7 +267,7 @@ export default function Budgets() {
       const existingData = await BudgetService.getAllPosts(isDepartmentID, formattedDate);
 
       if (existingData && existingData.length > 0) {
-        throw new Error(`A budget record already exists for ${existingData[0].start_date} - ${existingData[0].end_date} in this department`);
+        throw new Error(`A budget record already exists for ${dayjs(existingData[0].start_date).format('MMM DD YYYY')} - ${dayjs(existingData[0].end_date).format('MMM DD YYYY')} in this department`);
       }
 
       // Prepare payload with formatted dates
@@ -425,48 +459,53 @@ export default function Budgets() {
       {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
 
       <Row gutter={16} className="pt-5">
-        {/* Summary Cards - Top Row */}
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
           {budget.map((data: any) => (
             <Card
               key={data.title}
-              loading={loading}
+              loading={false} // We handle loading state manually
               className="rounded-lg hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-2">
-                  <span className="flex flex-wrap text-sm font-medium"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {data.title}</span>
-                  {!loading && (
-                    <Tag color="green" className="flex gap-1 text-xs">
-                      <AiOutlineRise /> TBD
-                    </Tag>
-                  )}
+                  <span className="flex flex-wrap text-sm font-medium">
+                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
+                    {data.title}
+                  </span>
+                  <Tag color="green" className="flex gap-1 text-xs">
+                    <AiOutlineRise /> TBD
+                  </Tag>
                 </div>
                 <div className="mt-auto">
-                  {!loading && (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold">
-                        {formatCurrency(data.value || 0)}
-                      </span>
-                      <span className="text-sm">
-                        of {formatCurrency(data.totalBudget || 0)}
-                      </span>
-                    </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold">
+                      {loading ? (
+                        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+                      ) : (
+                        formatCurrency(data.value ?? 0)
+                      )}
+                    </span>
+                    <span className="text-sm">
+                      of ${formatCurrency(data.totalBudget ?? 0)}
+                    </span>
+                  </div>
+                  {loading ? (
+                    <Skeleton active paragraph={false} className="mt-3" />
+                  ) : (
+                    <Progress
+                      percent={Math.min(100, (data.value / data.totalBudget) * 100)}
+                      strokeColor={data.value > data.totalBudget ? "#f5222d" : "#52c41a"}
+                      showInfo={false}
+                      className="mt-3"
+                    />
                   )}
-                  <Progress
-                    percent={Math.min(100, (data.value / data.limit) * 100)}
-                    strokeColor={data.value > data.limit ? "#f5222d" : "#52c41a"}
-                    showInfo={false}
-                    className="mt-3"
-                  />
                 </div>
               </div>
             </Card>
           ))}
         </div>
-
-
       </Row>
+
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
           {/* Overall Budget Card */}
@@ -484,7 +523,7 @@ export default function Budgets() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Current Period:</span>
                   <Tag color="blue">
-                    {dayjs(data[0]?.start_date).format('MMM DD YYYY')} - {dayjs(data[0]?.end_date).format('MMM DD YYYY')}
+                    {dayjs(data?.start_date).format('MMM DD YYYY')} - {dayjs(data?.end_date).format('MMM DD YYYY')}
                   </Tag>
                 </div>
               </div>
@@ -494,7 +533,7 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Total Budget</div>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(data[0]?.budget || 0)}
+                    {formatCurrency(data?.budget || 0)}
                   </div>
                 </div>
 
@@ -508,7 +547,7 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Remaining</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(data[0]?.budget - dataCombinedTotal)}
+                    {formatCurrency(Number(data?.budget || 0) - dataCombinedTotal || 0)}
                   </div>
                 </div>
               </div>
@@ -533,7 +572,7 @@ export default function Budgets() {
       {/* THIS IS THE BUDGET DASHBOARD */}
 
       <Row gutter={16}>
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
           <Card
             className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
           >
@@ -542,14 +581,66 @@ export default function Budgets() {
                 <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
               </h2>
               <p className="flex flex-wrap text-xs">Current month breakdown</p>
-              <LineChart
-                data={trendData}
-                title="Monthly Performance"
-                color="#6a5acd"
-              />
+              {loading ? (
+                <Skeleton active paragraph={{ rows: 6 }} />
+              ) : (
+                <LineChart
+                  data={trendData}
+                  title="Monthly Performance"
+                  color="#6a5acd"
+                />
+              )}
             </div>
           </Card>
+        </div> */}
+        <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-start gap-4">
+            <AiOutlineInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-start">
+                <h3 className="text-lg font-semibold text-blue-900">
+                  Budgeting Tip of the Month
+                </h3>
+                <Tag color="blue" className="text-xs">NEW</Tag>
+              </div>
+              <p className="text-sm text-blue-800 leading-relaxed">
+                Track expenses weekly to avoid surprises.
+                <span className="font-medium text-blue-900"> Save 10% as emergency buffer.</span>
+              </p>
+              {/* <div className="mt-2 flex items-center gap-2">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<AiOutlinePlusCircle />}
+                  className="text-blue-600 text-xs"
+                >
+                  Create Reminder
+                </Button>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<AiOutlineShareAlt />}
+                  className="text-blue-600 text-xs"
+                >
+                  Share Tip
+                </Button>
+              </div> */}
+              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
+                <p className="text-xs text-blue-700 italic">
+                  “A budget is telling your money where to go instead of wondering where it went.”
+                  <span className="block font-medium text-blue-800 mt-1 not-italic">— IT Department</span>
+                </p>
+              </blockquote>
+              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
+                <p className="text-xs text-blue-700 italic">
+                  “Don’t save what is left after spending; spend what is left after saving.”
+                  <span className="block font-medium text-blue-800 mt-1 not-italic">— Finance Department</span>
+                </p>
+              </blockquote>
+            </div>
+          </div>
         </div>
+
       </Row>
     </div>
   );

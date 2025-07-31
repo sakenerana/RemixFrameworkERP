@@ -16,6 +16,7 @@ import {
   Dropdown,
   Input,
   MenuProps,
+  message,
   Space,
   Spin,
   Table,
@@ -35,9 +36,11 @@ import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs from 'dayjs';
 import { RiCircleFill } from "react-icons/ri";
+import { BudgetService } from "~/services/budget.service";
 
 export default function BudgetTransactions() {
   const [data, setData] = useState<any[]>([]);
+  const [dataBudget, setDataBudget] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUserID, setUserID] = useState<any>();
@@ -62,6 +65,19 @@ export default function BudgetTransactions() {
     setLoading(true);
     await fetchData();
     setLoading(false);
+  };
+
+  const fetchDataBudget = async () => {
+    try {
+      // setLoading(true);
+      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      setDataBudget(dataFetch); // Works in React state
+      console.log("BUDGET DATA", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      // setLoading(false);
+    }
   };
 
   const fetchData = async () => {
@@ -108,6 +124,7 @@ export default function BudgetTransactions() {
 
   useEffect(() => {
     if (searchText.trim() === '') {
+      fetchDataBudget();
       fetchData();
     } else {
       const filtered = data.filter(data =>

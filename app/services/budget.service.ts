@@ -27,16 +27,22 @@ export const BudgetService = {
     },
 
     async getByData(departmentID: number) {
+        const currentDate = new Date().toISOString();
+
         const { data, error } = await supabase
             .from('budget')
             .select('*, status_labels(*), departments(*)')
-            .eq('status_id', 1)
+            .eq('status_id', 1) // Only approved budgets
             .eq('department_id', departmentID)
             // Filter where current date is between start and end dates
-            .order('created_at', { ascending: false });
+            .lte('start_date', currentDate)
+            .gte('end_date', currentDate)
+            // Get the most recently created budget
+            .order('created_at', { ascending: false })
+            .limit(1); // Only get the single most recent budget
 
         if (error) throw error;
-        return data;
+        return data?.[0] || null; // Return single record or null
     },
 
     async getAllPosts(departmentID: number, currentDate: string) {
