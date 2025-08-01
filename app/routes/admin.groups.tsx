@@ -11,8 +11,6 @@ import {
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
   Form,
   Input,
@@ -20,12 +18,10 @@ import {
   message,
   Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -35,7 +31,6 @@ import {
   AiOutlineEdit,
   AiOutlinePlus,
   AiOutlineSave,
-  AiOutlineSend,
   AiOutlineTeam,
   AiOutlineUndo,
   AiOutlineUsergroupAdd,
@@ -89,9 +84,9 @@ export default function GroupsRoutes() {
     setIsTitle('Update Group')
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
+  // const handleOk = () => {
+  //   setIsModalOpen(false);
+  // };
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -300,15 +295,6 @@ export default function GroupsRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Groups>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -504,7 +490,6 @@ export default function GroupsRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

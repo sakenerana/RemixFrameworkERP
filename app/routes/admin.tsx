@@ -19,7 +19,6 @@ import {
   FcDepartment,
   FcGlobe,
   FcPortraitMode,
-  FcSalesPerformance,
   FcSettings,
 } from "react-icons/fc";
 import ScrollingAttentionBanner from "~/components/scrolling_attention";

@@ -2,7 +2,7 @@ import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, SettingOutlined } 
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ConsumableService } from "~/services/consumable.service";
@@ -41,7 +41,6 @@ export default function DeletedConsumables() {
             setLoading(true);
             const dataFetch = await ConsumableService.getAllPostsInactive(isDepartmentID);
             setData(dataFetch); // Works in React state
-            console.log("teast", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -313,15 +312,6 @@ export default function DeletedConsumables() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<Consumable>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <div className="flex pb-5 justify-between">
@@ -379,7 +369,6 @@ export default function DeletedConsumables() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

@@ -2,7 +2,6 @@ import { ApiOutlined, CalendarOutlined, CheckCircleOutlined, HomeOutlined, InfoC
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -28,7 +27,6 @@ import {
   AiOutlineExport,
   AiOutlineFileExclamation,
   AiOutlineForm,
-  AiOutlineImport,
   AiOutlinePlus,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
@@ -438,15 +436,6 @@ export default function AccesoriessRoute() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Accessories>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Checkout Modal */}
@@ -592,7 +581,6 @@ export default function AccesoriessRoute() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

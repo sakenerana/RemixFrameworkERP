@@ -8,17 +8,14 @@ import {
 import {
     Alert,
     Avatar,
-    Badge,
     Breadcrumb,
     Button,
     Card,
     Checkbox,
     CheckboxOptionType,
     Col,
-    Divider,
     Dropdown,
     Form,
-    GetProp,
     Input,
     MenuProps,
     message,
@@ -31,9 +28,7 @@ import {
     Spin,
     Table,
     TableColumnsType,
-    TableProps,
     Tag,
-    Tooltip,
 } from "antd";
 import { useEffect, useState } from "react";
 import {
@@ -50,22 +45,19 @@ import {
     AiOutlinePlus,
     AiOutlineSafetyCertificate,
     AiOutlineSave,
-    AiOutlineSend,
     AiOutlineTeam,
     AiOutlineUndo,
     AiOutlineUser,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { supabase } from "~/lib/supabase";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
 import { User } from "~/types/user.type";
-import { useDebounce } from 'use-debounce';
 
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
@@ -115,9 +107,9 @@ export default function UsersRoutes() {
         setIsTitle('Update User & Permissions')
     };
 
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
+    // const handleOk = () => {
+    //     setIsModalOpen(false);
+    // };
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -418,21 +410,6 @@ export default function UsersRoutes() {
     const filteredColumns = columns.filter(column =>
         column.title ? columnVisibility[column.title.toString()] : true
     );
-
-    const onChange: TableProps<User>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        // console.log("params", pagination, filters, sorter, extra);
-    };
-
-    const onChangeAccess: GetProp<typeof Checkbox.Group, "onChange"> = (
-        checkedValues
-    ) => {
-        // console.log("checked = ", checkedValues);
-    };
 
     const optionsOffice: CheckboxOptionType<any>[] = [
         { label: "Main Office", value: 1 },
@@ -742,7 +719,6 @@ export default function UsersRoutes() {
                                 >
                                     <Checkbox.Group
                                         options={options}
-                                        onChange={onChangeAccess}
                                         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
                                     />
                                 </Form.Item>
@@ -756,7 +732,6 @@ export default function UsersRoutes() {
                                 >
                                     <Checkbox.Group
                                         options={optionsPermission}
-                                        onChange={onChangeAccess}
                                         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                                     />
                                 </Form.Item>
@@ -863,7 +838,6 @@ export default function UsersRoutes() {
                     size="middle"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="shadow-sm rounded-lg overflow-hidden"
                     bordered
                     scroll={{ x: "max-content" }}

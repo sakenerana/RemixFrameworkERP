@@ -5,16 +5,12 @@ import {
   Breadcrumb,
   Button,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
-  Form,
   Input,
   MenuProps,
   message,
   Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
@@ -31,11 +27,9 @@ import {
   AiOutlineExport,
   AiOutlineFileExclamation,
   AiOutlineForm,
-  AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { TiWarning } from "react-icons/ti";
 import { Link } from "react-router-dom";
 import Checkout from "~/components/checkout";
@@ -443,15 +437,6 @@ export default function ConsumablesRoute() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Consumable>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Checkout Modal */}
@@ -597,7 +582,6 @@ export default function ConsumablesRoute() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

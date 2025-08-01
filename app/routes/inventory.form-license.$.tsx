@@ -1,8 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, DatePicker, Divider, Form, Input, InputNumber, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, message, Modal, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlineClear, AiOutlineCode, AiOutlineDown, AiOutlineFileText, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineShop, AiOutlineTags } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineClear, AiOutlineCode, AiOutlineDown, AiOutlineFileText, AiOutlineRollback, AiOutlineSave, AiOutlineShop, AiOutlineTags } from "react-icons/ai";
 import ProductKey from "~/components/product_key";
 import { CategoryService } from "~/services/category.service";
 import { DepreciationService } from "~/services/depreciation.service";
@@ -143,7 +143,7 @@ export default function CreateLicense() {
     const handleProductKeysChange = (newData: any[]) => {
         setProductKeys(newData);
         // You can also do other things with the data here
-        console.log("Updated product keys:", newData);
+        // console.log("Updated product keys:", newData);
     };
 
     useMemo(() => {

@@ -1,8 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, message, Modal, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineBarcode, AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineInfoCircle, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineShoppingCart, AiOutlineStock, AiOutlineTags } from "react-icons/ai";
+import { AiOutlineBarcode, AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineInfoCircle, AiOutlineRollback, AiOutlineSave, AiOutlineShoppingCart, AiOutlineStock, AiOutlineTags } from "react-icons/ai";
 import AssetTag from "~/components/asset_tag";
 import { AssetService } from "~/services/asset.service";
 import { Asset } from "~/types/asset.type";

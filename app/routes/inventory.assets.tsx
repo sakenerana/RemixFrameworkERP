@@ -2,7 +2,6 @@ import { CalendarOutlined, CheckCircleOutlined, DesktopOutlined, HomeOutlined, L
 import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
-  Avatar,
   Breadcrumb,
   Button,
   Checkbox,
@@ -368,15 +367,6 @@ export default function AssetsRoute() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Asset>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -492,7 +482,6 @@ export default function AssetsRoute() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

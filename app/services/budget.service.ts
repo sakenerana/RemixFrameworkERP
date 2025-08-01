@@ -27,7 +27,7 @@ export const BudgetService = {
     },
 
     async getByData(departmentID: number) {
-        const currentDate = new Date().toISOString();
+        // const currentDate = new Date().toISOString();
 
         const { data, error } = await supabase
             .from('budget')
@@ -35,8 +35,8 @@ export const BudgetService = {
             .eq('status_id', 1) // Only approved budgets
             .eq('department_id', departmentID)
             // Filter where current date is between start and end dates
-            .lte('start_date', currentDate)
-            .gte('end_date', currentDate)
+            // .lte('start_date', currentDate)
+            // .gte('end_date', currentDate)
             // Get the most recently created budget
             .order('created_at', { ascending: false })
             .limit(1); // Only get the single most recent budget

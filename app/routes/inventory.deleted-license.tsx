@@ -2,7 +2,7 @@ import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/
 import { Link } from "@remix-run/react";
 import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineRollback } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { TiWarning } from "react-icons/ti";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -334,15 +334,6 @@ export default function DeletedLicense() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<License>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <div className="flex pb-5 justify-between">
@@ -397,7 +388,6 @@ export default function DeletedLicense() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

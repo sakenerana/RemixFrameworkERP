@@ -29,7 +29,6 @@ import {
 } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
-  FcComboChart,
   FcDiploma1,
   FcGlobe,
   FcSalesPerformance,

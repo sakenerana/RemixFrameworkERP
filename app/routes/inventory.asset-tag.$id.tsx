@@ -243,15 +243,6 @@ export default function AssetTag() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<Asset>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <Modal
@@ -319,7 +310,6 @@ export default function AssetTag() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data[0]?.asset_tag}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

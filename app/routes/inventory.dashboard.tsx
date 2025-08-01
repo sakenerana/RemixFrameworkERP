@@ -1,4 +1,4 @@
-import { ApartmentOutlined, CheckCircleOutlined, CloseCircleOutlined, GlobalOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, GlobalOutlined } from "@ant-design/icons";
 import {
     Alert,
     Button,
@@ -16,7 +16,7 @@ import {
     Progress,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets, AiOutlineSolution, AiOutlineStock, AiOutlineUserAdd, AiOutlineUserDelete, AiOutlineUsergroupAdd } from "react-icons/ai";
+import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets } from "react-icons/ai";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
@@ -255,15 +255,6 @@ export default function DashboardRoutes() {
             dataIndex: "item",
         },
     ];
-
-    const onChange: TableProps<DataType>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
 
     const columnsAsset: TableColumnsType<Asset> = [
         {

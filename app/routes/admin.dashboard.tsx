@@ -6,7 +6,6 @@ import {
   Col,
   Row,
   TableColumnsType,
-  TableProps,
   Table,
   message,
   Tag,
@@ -213,41 +212,6 @@ export default function BudgetRoutes() {
       return <span style={{ color: '#f5222d' }}>↓ {Math.abs(trend)}%</span>;
     }
     return <span>→</span>;
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "PHP",
-    }).format(amount);
-  };
-
-  const columns: TableColumnsType<DataType> = [
-    {
-      title: "Date",
-      dataIndex: "date",
-    },
-    {
-      title: "Created By",
-      dataIndex: "created_by",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-    },
-    {
-      title: "Item",
-      dataIndex: "item",
-    },
-  ];
-
-  const onChange: TableProps<DataType>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
   };
 
   const columnsUser: TableColumnsType<User> = [

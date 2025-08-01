@@ -1,4 +1,4 @@
-import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
     Alert,
@@ -23,18 +23,12 @@ import {
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
-    AiOutlineCloseCircle,
-    AiOutlineDelete,
-    AiOutlineEdit,
     AiOutlineExport,
-    AiOutlineFileExclamation,
-    AiOutlinePlus,
     AiOutlineRollback,
     AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { Link, useParams } from "react-router-dom";
-import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ConsumableService } from "~/services/consumable.service";
 import { Consumable } from "~/types/consumable.type";
@@ -68,7 +62,6 @@ export default function Checkedout() {
             setLoading(true);
             const dataFetch = await ConsumableService.getAllChecked(isDepartmentID, Number(id));
             setData(dataFetch); // Works in React state
-            console.log("fuck", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -246,15 +239,6 @@ export default function Checkedout() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<Consumable>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <Modal
@@ -367,7 +351,6 @@ export default function Checkedout() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

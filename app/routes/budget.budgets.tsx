@@ -5,17 +5,13 @@ import {
   Breadcrumb,
   Button,
   Card,
-  Col,
   DatePicker,
-  Divider,
   Form,
-  Input,
   InputNumber,
   message,
   Modal,
   Progress,
   Row,
-  Select,
   Skeleton,
   Space,
   Spin,
@@ -26,17 +22,9 @@ import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlinePlusCircle, AiOutlineRise, AiOutlineSend, AiOutlineShareAlt } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
-import LineChart from "~/components/line_chart";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
-
-interface DataType {
-  id: number;
-  title: string;
-  body: string;
-  userId?: number; // Optional property
-}
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
@@ -50,8 +38,6 @@ export default function Budgets() {
 
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
-
-  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
@@ -71,9 +57,9 @@ export default function Budgets() {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
+  // const handleOk = () => {
+  //   setIsModalOpen(false);
+  // };
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -87,22 +73,22 @@ export default function Budgets() {
     }).format(amount);
   };
 
-  const getBudgetProgress = (spent: number, total: number) => {
-    return Math.min((spent / total) * 100, 100);
-  };
+  // const getBudgetProgress = (spent: number, total: number) => {
+  //   return Math.min((spent / total) * 100, 100);
+  // };
 
-  const getBudgetStatusColor = (spent: number, total: number) => {
-    const percentage = (spent / total) * 100;
-    if (percentage < 70) return "text-green-600";
-    if (percentage < 90) return "text-amber-600";
-    return "text-red-600";
-  };
+  // const getBudgetStatusColor = (spent: number, total: number) => {
+  //   const percentage = (spent / total) * 100;
+  //   if (percentage < 70) return "text-green-600";
+  //   if (percentage < 90) return "text-amber-600";
+  //   return "text-red-600";
+  // };
 
-  const handleRefetch = async () => {
-    setLoading(true);
-    await fetchData();
-    setLoading(false);
-  };
+  // const handleRefetch = async () => {
+  //   setLoading(true);
+  //   await fetchData();
+  //   setLoading(false);
+  // };
 
   const fetchData = async () => {
     try {
@@ -148,19 +134,28 @@ export default function Budgets() {
       const startDate = budgetData?.start_date;
       const endDate = budgetData?.end_date;
 
+      // If either startDate or endDate is missing, return no data
+      if (!startDate || !endDate) {
+        setDataTotalRequisition(0);
+        setDataTotalLiquidation(0);
+        setDataCombinedTotal(0);
+        return;
+      }
+
+      // Convert range dates to date-only strings (ignoring time)
+      const rangeStartStr = new Date(startDate).toISOString().split('T')[0];
+      const rangeEndStr = new Date(endDate).toISOString().split('T')[0];
+
       // Filter and validate
       const filtered = items.filter((item) => {
         const matchesDepartment = item.department === userDepartment;
         const matchesStatus = item.status === 5;
 
-        // Match by date range if provided
-        let matchesDateRange = true;
-        if (startDate && endDate && item.startDate) {
-          const itemDate = new Date(item.startDate).getTime();
-          const rangeStart = new Date(startDate).getTime();
-          const rangeEnd = new Date(endDate).getTime();
-          matchesDateRange = itemDate >= rangeStart && itemDate <= rangeEnd;
-        }
+        // Match by date range (date-only comparison)
+        if (!item.startDate) return false;
+
+        const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
+        const matchesDateRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
 
         return matchesDepartment && matchesStatus && matchesDateRange;
       });
@@ -171,7 +166,7 @@ export default function Budgets() {
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       );
 
-      // Totals
+      // Calculate totals
       let requisitionTotal = 0;
       let liquidationTotal = 0;
       let combinedTotal = 0;
@@ -186,14 +181,6 @@ export default function Budgets() {
         combinedTotal += amount;
       });
 
-      console.log("Filtered Budget Data", {
-        requisitionTotal,
-        liquidationTotal,
-        combinedTotal,
-        range: startDate && endDate ? `${startDate} → ${endDate}` : "No range",
-        count: sorted.length,
-      });
-
       // Set state
       setDataTotalRequisition(requisitionTotal);
       setDataTotalLiquidation(liquidationTotal);
@@ -203,16 +190,33 @@ export default function Budgets() {
         err instanceof Error ? err.message : "Unknown error occurred";
       setError(message);
       console.error("fetchDataBudgetApproved failed:", err);
+
+      // Reset totals on error
+      setDataTotalRequisition(0);
+      setDataTotalLiquidation(0);
+      setDataCombinedTotal(0);
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
-    fetchData();
-    fetchDataBudgetApproved();
-  }, []); // Empty dependency array means this runs once on mount+
+    const fetchAllData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          fetchData(),
+          fetchDataBudgetApproved()
+        ]);
+      } catch (error) {
+        setError("Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+  }, []);
 
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
@@ -261,7 +265,7 @@ export default function Budgets() {
       const currentDate = new Date(); // Get current date
       const formattedDate = currentDate.toISOString().split('T')[0];
 
-      console.log("currentDate", currentDate)
+      // console.log("currentDate", currentDate)
       // Check if data already exists for this department in current year
       setLoading(true);
       const existingData = await BudgetService.getAllPosts(isDepartmentID, formattedDate);
@@ -523,7 +527,7 @@ export default function Budgets() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Current Period:</span>
                   <Tag color="blue">
-                    {dayjs(data?.start_date).format('MMM DD YYYY')} - {dayjs(data?.end_date).format('MMM DD YYYY')}
+                    {dayjs(data?.start_date || '').format('MMM DD YYYY')} - {dayjs(data?.end_date || '').format('MMM DD YYYY')}
                   </Tag>
                 </div>
               </div>

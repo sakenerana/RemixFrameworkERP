@@ -1,7 +1,6 @@
 import {
   CalendarOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
   HomeOutlined,
   InboxOutlined,
   LoadingOutlined,
@@ -21,18 +20,11 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import {
-  AiOutlineCheckCircle,
-  AiOutlineLike,
-  AiOutlinePlus,
-} from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs from 'dayjs';
 import { RiCircleFill } from "react-icons/ri";
@@ -50,9 +42,6 @@ export default function BudgetTransactions() {
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<any[]>([]);
-
-  // DUMMY DATA
-  const value = 123412;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -72,7 +61,7 @@ export default function BudgetTransactions() {
       // setLoading(true);
       const dataFetch = await BudgetService.getByData(isDepartmentID);
       setDataBudget(dataFetch); // Works in React state
-      console.log("BUDGET DATA", dataFetch)
+      // console.log("BUDGET DATA", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -81,37 +70,73 @@ export default function BudgetTransactions() {
   };
 
   const fetchData = async () => {
-    const getABID = localStorage.getItem('ab_id');
-    const getUsername = localStorage.getItem('username');
-    const userDepartment = localStorage.getItem('dept'); // Assuming department is stored
+    const userId = Number(localStorage.getItem("ab_id"));
+    const username = localStorage.getItem("username") || "";
+    const userDepartment = localStorage.getItem("dept") || "";
+    const departmentId = isDepartmentID;
+
+    if (!userId || !username || !departmentId) {
+      console.warn("Missing required identifiers");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
+      setData([]); // Reset data at start
 
-      const response = await axios.post<any>(
-        '/api/completed-requisition-liquidation',
+      // Fetch workflow data
+      const response = await axios.post<{ data: any[] }>(
+        "/api/completed-requisition-liquidation",
         {
-          userid: Number(getABID),
-          username: getUsername,
-        },
+          userid: userId,
+          username: username,
+        }
       );
 
-      // Filter data by department
-      const filteredByDepartment = response.data.data.filter(
-        (item: any) => item.department === userDepartment
-      );
+      const items = response.data.data || [];
 
-      // Sort by `startDate` (newest first)
-      const sorted = [...filteredByDepartment].sort((a, b) => {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      // Fetch budget data to get date range
+      const budgetData = await BudgetService.getByData(departmentId);
+      const startDate = budgetData?.start_date;
+      const endDate = budgetData?.end_date;
+
+      // If either startDate or endDate is missing, return empty data
+      if (!startDate || !endDate) {
+        setData([]);
+        return;
+      }
+
+      // Convert range dates to date-only strings (ignoring time)
+      const rangeStartStr = new Date(startDate).toISOString().split('T')[0];
+      const rangeEndStr = new Date(endDate).toISOString().split('T')[0];
+
+      // Filter and validate
+      const filtered = items.filter((item) => {
+        const matchesDepartment = item.department === userDepartment;
+        const matchesStatus = item.status === 5;
+
+        // Strict date range matching - return false if no startDate
+        if (!item.startDate) return false;
+
+        const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
+        const matchesDateRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
+
+        return matchesDepartment && matchesStatus && matchesDateRange;
       });
 
+      // Sort descending by date
+      const sorted = filtered.sort(
+        (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+
+      // Set state
       setData(sorted);
-      // console.log("SORTED TRANSACTIONS BY DATE (NEWEST FIRST)", sorted);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      console.error('Failed to fetch data:', err);
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      setError(message);
+      setData([]); // Clear data on error
+      console.error("fetchData failed:", err);
     } finally {
       setLoading(false);
     }
@@ -287,15 +312,6 @@ export default function BudgetTransactions() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<any>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -387,7 +403,6 @@ export default function BudgetTransactions() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

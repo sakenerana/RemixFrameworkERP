@@ -235,15 +235,6 @@ export default function DeletedAssets() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<Asset>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <div className="flex pb-5 justify-between">
@@ -298,7 +289,6 @@ export default function DeletedAssets() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

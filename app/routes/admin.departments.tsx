@@ -10,10 +10,7 @@ import {
   Avatar,
   Breadcrumb,
   Button,
-  Card,
   Checkbox,
-  Col,
-  Divider,
   Dropdown,
   Form,
   Input,
@@ -21,12 +18,10 @@ import {
   message,
   Modal,
   Popconfirm,
-  Row,
   Space,
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -39,11 +34,10 @@ import {
   AiOutlineEdit,
   AiOutlinePlus,
   AiOutlineSave,
-  AiOutlineSend,
   AiOutlineTeam,
   AiOutlineUndo,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
@@ -309,15 +303,6 @@ export default function DepartmentsRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Department>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -513,7 +498,6 @@ export default function DepartmentsRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

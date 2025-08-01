@@ -14,7 +14,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -22,12 +21,9 @@ import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
   AiOutlineEdit,
-  AiOutlineExport,
   AiOutlineFileExclamation,
   AiOutlineForm,
-  AiOutlineImport,
   AiOutlinePlus,
-  AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { TiWarning } from "react-icons/ti";
@@ -39,7 +35,6 @@ import dayjs from 'dayjs';
 
 export default function LicensesRoute() {
   const [data, setData] = useState<License[]>([]);
-  const [dataRow, setDataRow] = useState<License>();
   const [loading, setLoading] = useState(false);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
@@ -425,15 +420,6 @@ export default function LicensesRoute() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<License>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -549,7 +535,6 @@ export default function LicensesRoute() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

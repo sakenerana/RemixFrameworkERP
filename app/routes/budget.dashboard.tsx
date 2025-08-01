@@ -1,31 +1,22 @@
-import { GlobalOutlined } from "@ant-design/icons";
+import { GlobalOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Button,
   Card,
-  Col,
   Row,
-  TableColumnsType,
-  TableProps,
-  Table,
   Tag,
-  Progress,
+  message,
+  Skeleton,
+  Spin,
 } from "antd";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDollar, AiOutlineFileText, AiOutlineInfoCircle, AiOutlineShoppingCart, AiOutlineStock, AiOutlineWallet } from "react-icons/ai";
-import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
-import BarChart from "~/components/bar_chart";
+import { RiCircleFill } from "react-icons/ri";
 import PieChart from "~/components/pie_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
-
-interface DataType {
-  key: React.Key;
-  date: string;
-  name: string;
-  created_by: string;
-  action: string;
-  item: string;
-}
+import { BudgetService } from "~/services/budget.service";
+import { Budget } from "~/types/budget.type";
 
 // Language content
 const translations = {
@@ -48,10 +39,19 @@ const translations = {
 };
 
 export default function BudgetRoutes() {
+  const [data, setData] = useState<Budget>();
+  const [dataMonthly, setMonthlyData] = useState<any>();
+  const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
+  const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
+  const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [language, setLanguage] = useState<'en' | 'fil'>('en');
   const [t, setT] = useState(translations.en);
+
+  const [isUserID, setUserID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<any>();
 
   // Toggle language
   const toggleLanguage = () => {
@@ -67,22 +67,148 @@ export default function BudgetRoutes() {
     }).format(amount);
   };
 
-  const onChange: TableProps<DataType>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
+  const fetchData = async () => {
+    try {
+      // setLoading(true);
+      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      setData(dataFetch); // Works in React state
+      // console.log("BUDGET DATAS", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      // setLoading(false);
+    }
   };
 
-  const salesData = [
-    { category: "Jan", value: 120, date: '2023-03-01' },
-    { category: "Feb", value: 200, date: '2023-03-01' },
-    { category: "Mar", value: 150, date: '2023-03-01' },
-    { category: "Apr", value: 80, date: '2023-03-01' },
-    { category: "May", value: 270, date: '2023-03-01' },
-  ];
+  const fetchDataBudgetApproved = async () => {
+    const userId = Number(localStorage.getItem("ab_id"));
+    const username = localStorage.getItem("username") || "";
+    const userDepartment = localStorage.getItem("dept") || "";
+    const departmentId = isDepartmentID;
+
+    if (!userId || !username || !departmentId) {
+      console.warn("Missing required identifiers");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch workflow data
+      const response = await axios.post<{ data: any[] }>(
+        "/api/completed-requisition-liquidation",
+        {
+          userid: userId,
+          username: username,
+        }
+      );
+
+      const items = response.data.data || [];
+      // const currentYear = 2024;
+      const currentYear = new Date().getFullYear();
+
+      // Filter and validate
+      const filtered = items.filter((item) => {
+        const matchesDepartment = item.department === userDepartment;
+        const matchesStatus = item.status === 5;
+
+        // Check if the item is from current year
+        let matchesCurrentYear = true;
+        if (item.startDate) {
+          const itemYear = new Date(item.startDate).getFullYear();
+          matchesCurrentYear = itemYear === currentYear;
+        }
+
+        return matchesDepartment && matchesStatus && matchesCurrentYear;
+      });
+
+      // Sort descending by date
+      const sorted = filtered.sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+
+      // Initialize totals
+      let requisitionTotal = 0;
+      let liquidationTotal = 0;
+      let combinedTotal = 0;
+
+      // Object to track monthly totals for current year
+      const monthlyTotals: Record<string, number> = {};
+
+      sorted.forEach((item) => {
+        const amount = Number(item.totalAmount) || 0;
+        const date = new Date(item.startDate);
+        const month = `${String(date.getMonth() + 1).padStart(2, '0')}`; // Just month (MM format)
+
+        // Update workflow type totals
+        if (item.workflowType === "Requisition") {
+          requisitionTotal += amount;
+        } else if (item.workflowType === "Liquidation") {
+          liquidationTotal = amount;
+        }
+        combinedTotal += amount;
+
+        // Update monthly totals
+        if (!monthlyTotals[month]) {
+          monthlyTotals[month] = 0;
+        }
+        monthlyTotals[month] += amount;
+      });
+
+      // Convert monthly totals to an array of objects
+      const monthlyData = Object.entries(monthlyTotals).map(([month, total]) => ({
+        month: `${currentYear}-${month}`, // Format as YYYY-MM
+        total
+      }));
+
+      // console.log(`Current Year (${currentYear}) Budget Data`, {
+      //   requisitionTotal,
+      //   liquidationTotal,
+      //   combinedTotal,
+      //   itemCount: sorted.length,
+      //   monthlyData
+      // });
+
+      // Set state
+      setDataTotalRequisition(requisitionTotal);
+      setDataTotalLiquidation(liquidationTotal);
+      setDataCombinedTotal(combinedTotal);
+      setMonthlyData(monthlyData);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(message);
+      console.error("fetchDataBudgetApproved failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          fetchData(),
+          fetchDataBudgetApproved()
+        ]);
+      } catch (error) {
+        setError("Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  useMemo(() => {
+    setUserID(localStorage.getItem('userAuthID'));
+    setDepartmentID(localStorage.getItem('userDept'));
+
+  }, []);
 
   return (
     <ProtectedRoute>
@@ -105,79 +231,105 @@ export default function BudgetRoutes() {
         <Row gutter={16} className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
             {/* 1. Total Budget for this year */}
-            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-blue-500 mt-2 mr-2" /> Total Budget
-                </h2>
-                <p className="flex flex-wrap text-blue-600 text-2xl font-bold">
-                  <AiOutlineDollar className="mt-1 mr-2" /> {formatCurrency(Number(12345) || 0)}
-                </p>
-                <p className="text-xs mt-4 text-gray-500">Annual allocation for {new Date().getFullYear()}</p>
-              </div>
-              <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-blue-100 text-blue-800">
-                Annual
-              </div>
-            </Card>
+            {loading ? (
+              <Card>
+                <Skeleton active paragraph={{ rows: 3 }} />
+              </Card>
+            ) : (
+              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-blue-500 mt-2 mr-2" /> Total Budget
+                  </h2>
+                  <p className="flex flex-wrap text-blue-600 text-2xl font-bold">
+                    <AiOutlineDollar className="mt-1 mr-2" /> {formatCurrency(data?.budget ?? 0)}
+                  </p>
+                  <p className="text-xs mt-4">Annual allocation for {new Date().getFullYear()}</p>
+                </div>
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-blue-100 text-blue-800">
+                  Annual
+                </div>
+              </Card>
+            )}
+
 
             {/* 2. Total Requisition for this year */}
-            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-amber-500 mt-2 mr-2" /> Total Requisition
-                </h2>
-                <p className="flex flex-wrap text-amber-600 text-2xl font-bold">
-                  <AiOutlineShoppingCart className="mt-1 mr-2" /> {formatCurrency(Number(12345) || 0)}
-                </p>
-                <p className="text-xs mt-4 text-gray-500">Approved requests this year</p>
-              </div>
-              <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-amber-100 text-amber-800">
-                YTD
-              </div>
-            </Card>
+            {loading ? (
+              <Card>
+                <Skeleton active paragraph={{ rows: 3 }} />
+              </Card>
+            ) : (
+              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-amber-500 mt-2 mr-2" /> Total Requisition
+                  </h2>
+                  <p className="flex flex-wrap text-amber-600 text-2xl font-bold">
+                    <AiOutlineShoppingCart className="mt-1 mr-2" /> {formatCurrency(Number(dataTotalRequisition) || 0)}
+                  </p>
+                  <p className="text-xs mt-4">Approved requests this year</p>
+                </div>
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-amber-100 text-amber-800">
+                  YTD
+                </div>
+              </Card>
+            )}
 
             {/* 3. Total Liquidation for this year */}
-            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-purple-500 mt-2 mr-2" /> Total Liquidation
-                </h2>
-                <p className="flex flex-wrap text-purple-600 text-2xl font-bold">
-                  <AiOutlineFileText className="mt-1 mr-2" /> {formatCurrency(Number(12345) || 0)}
-                </p>
-                <p className="text-xs mt-4 text-gray-500">Settled expenses this year</p>
-              </div>
-              <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-purple-100 text-purple-800">
-                YTD
-              </div>
-            </Card>
+            {loading ? (
+              <Card>
+                <Skeleton active paragraph={{ rows: 3 }} />
+              </Card>
+            ) : (
+              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-purple-500 mt-2 mr-2" /> Total Liquidation
+                  </h2>
+                  <p className="flex flex-wrap text-purple-600 text-2xl font-bold">
+                    <AiOutlineFileText className="mt-1 mr-2" /> {formatCurrency(Number(dataTotalLiquidation) || 0)}
+                  </p>
+                  <p className="text-xs mt-4">Settled expenses this year</p>
+                </div>
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-purple-100 text-purple-800">
+                  YTD
+                </div>
+              </Card>
+            )}
 
             {/* 4. Amount Spent */}
-            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Amount Spent
-                </h2>
-                <p className="flex flex-wrap text-green-600 text-2xl font-bold">
-                  <AiOutlineWallet className="mt-1 mr-2" /> {formatCurrency((Number(12345) || 0) - (Number(12345) || 0))}
-                </p>
-                <p className="text-xs mt-4 text-gray-500">Annual spent this year</p>
-                <div className="mt-2">
-                  {/* <Progress
+            {loading ? (
+              <Card>
+                <Skeleton active paragraph={{ rows: 3 }} />
+              </Card>
+            ) : (
+              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
+                <div>
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Amount Spent
+                  </h2>
+                  <p className="flex flex-wrap text-green-600 text-2xl font-bold">
+                    <AiOutlineWallet className="mt-1 mr-2" /> {formatCurrency(Number(dataCombinedTotal) || 0)}
+                  </p>
+                  <p className="text-xs mt-4">Annual spent this year</p>
+                  <div className="mt-2">
+                    {/* <Progress
                     percent={Math.min(100, ((Number(12345) || 0) / (Number(12345) || 1) * 100)}
                     strokeColor={(Number(12345) || 0) > (Number(12345) || 0) ? "#f5222d" : "#52c41a"}
                     showInfo={false}
                     size="small"
                   /> */}
-                  <p className="text-xs mt-1 text-gray-500">
-                    {/* {Math.round(((Number(12345) || 0) / (Number(12345) || 1) * 100)}% utilized */}
-                  </p>
+                    <p className="text-xs mt-1 text-gray-500">
+                      {/* {Math.round(((Number(12345) || 0) / (Number(12345) || 1) * 100)}% utilized */}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
-                Balance
-              </div>
-            </Card>
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+                  Balance
+                </div>
+              </Card>
+            )}
+
           </div>
         </Row>
 
@@ -187,79 +339,158 @@ export default function BudgetRoutes() {
             <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.spendingByCategory}
+                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
+                  {t.spendingByCategory}
                 </h2>
                 <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
-                <PieChart
-                  data={[
-                    { type: 'test1', value: 27 },
-                    { type: 'test2', value: 25 },
-                    { type: 'test3', value: 25 },
-                    { type: 'test4', value: 25 },
-                  ]}
-                  title=""
-                />
+
+                {loading ? (
+                  <div className="h-64 flex items-center justify-center">
+                    <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+                  </div>
+                ) : dataMonthly && dataMonthly.length > 0 ? (
+                  <PieChart
+                    data={dataMonthly.map((item: any) => ({
+                      type: item.month,
+                      value: item.total
+                    }))}
+                    title=""
+                  />
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
+                    No Data Available
+                  </div>
+                )}
+
+                {/* {dataMonthly && dataMonthly.length > 0 ? (
+                  <PieChart
+                    data={dataMonthly.map((item: any) => ({
+                      type: item.month,
+                      value: item.total
+                    }))}
+                    title=""
+                  // colors={['#0088FE', '#00C49F', '#FFBB28', '#FF8042']} // Custom colors
+                  />
+                ) : (
+                  <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
+                    No Data Available
+                  </div>
+                )} */}
               </div>
+
+              {/* Category Legend */}
+              {dataMonthly && dataMonthly.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                  {dataMonthly.map((item: any, index: number) => (
+                    <div key={index} className="flex items-center">
+                      <span
+                        className="w-2 h-2 rounded-full mr-2"
+                        style={{
+                          backgroundColor: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][index % 4]
+                        }}
+                      />
+                      <span className="truncate">{item.month}</span>
+                      <span className="ml-auto font-medium">
+                        {formatCurrency(item.total)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
 
-            <div className="rounded-lg p-4 border border-gray-200 shadow-sm">
+            <Card className="rounded-lg p-2 shadow-sm">
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
                 <RiCircleFill className="text-green-500 text-[5px] mt-0.5 flex-shrink-0" />
                 <div>
-                  <h3 className="text-sm font-semibold">Monthly Spending - 2023</h3>
+                  <h3 className="text-sm font-semibold">Monthly Spending - {new Date().getFullYear()}</h3>
                   <p className="text-xs">Full year overview</p>
                 </div>
               </div>
 
               {/* Monthly Data Grid */}
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                {Array.from({ length: 12 }).map((_, index) => {
-                  const monthName = new Date(2023, index).toLocaleString('default', { month: 'long' });
-                  const monthData = salesData.find(item => new Date(item.date).getMonth() === index);
-                  const amount = monthData?.value || 0;
-                  const isCurrentMonth = index === new Date().getMonth();
-
-                  return (
-                    <div
-                      key={index}
-                      className={`p-2 rounded-md border ${isCurrentMonth
-                        ? 'border-green-300 bg-green-50/50'
-                        : 'border-gray-100'
-                        }`}
-                    >
-                      <div className="text-xs font-medium">
-                        {monthName.slice(0, 3)}
-                      </div>
-                      <div className={`text-sm ${amount > 0 ? 'font-semibold text-gray-800' : 'text-gray-400'
-                        }`}>
-                        {amount > 0 ? `${formatCurrency(amount ?? 0)}` : '—'}
-                      </div>
+              {loading ? (
+                <div className="grid grid-cols-3 gap-3 mt-4">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={`month-skel-${i}`} className="p-2 rounded-md border border-gray-100">
+                      <Skeleton.Input active size="small" block className="mb-1" />
+                      <Skeleton.Input active size="small" block />
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                // Your existing monthly grid
+                <>
+                  <div className="grid grid-cols-3 gap-3 mt-4">
+                    {Array.from({ length: 12 }).map((_, index) => {
+                      const monthNumber = (index + 1).toString().padStart(2, '0');
+                      // const currentYear = 2024;
+                      const currentYear = new Date().getFullYear();
+                      const monthKey = `${currentYear}-${monthNumber}`;
+                      const monthData = dataMonthly?.find((item: any) => item.month === monthKey);
+                      const total = monthData?.total || 0;
+                      const monthName = new Date(currentYear, index).toLocaleString('default', { month: 'long' });
+                      const isCurrentMonth = index === new Date().getMonth();
 
-              {/* Yearly Summary */}
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <div className="flex justify-between text-sm">
-                  <span>Total annual spending:</span>
-                  <span className="font-semibold">
-                    ${salesData.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span>Highest month:</span>
-                  <span className="font-medium">
-                    {new Date(Math.max(...salesData.map(d => new Date(d.date).getTime())))
-                      .toLocaleString('default', { month: 'long' })}
-                    <span className="text-green-600 ml-1">
-                      (${Math.max(...salesData.map(d => d.value)).toLocaleString()})
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
+                      return (
+                        <div
+                          key={index}
+                          className={`p-2 rounded-md border ${isCurrentMonth
+                            ? 'border-green-300 bg-green-50/50'
+                            : 'border-gray-100'
+                            }`}
+                        >
+                          <div className="text-xs font-medium">
+                            {monthName.slice(0, 3)}
+                          </div>
+                          <div className={`text-sm ${total > 0
+                            ? 'font-semibold text-green-800'
+                            : 'text-green-400'
+                            }`}>
+                            {total > 0 ? `${formatCurrency(total)}` : '—'}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Yearly Summary */}
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex justify-between text-sm">
+                      <span>Total annual spending:</span>
+                      <span className="font-semibold">
+                        {formatCurrency(dataCombinedTotal ?? 0)}
+                      </span>
+                    </div>
+
+
+                    {dataMonthly && dataMonthly.length > 0 && (
+                      <div className="flex justify-between text-sm mt-1">
+                        <span>Highest month:</span>
+                        <span className="font-medium">
+                          {(() => {
+                            // Find the month with highest spending
+                            const highestMonth = dataMonthly.reduce((prev: any, current: any) =>
+                              (prev.total > current.total) ? prev : current
+                            );
+                            const monthName = new Date(highestMonth.month).toLocaleString('default', { month: 'long' });
+                            return (
+                              <>
+                                {monthName}
+                                <span className="text-green-600 ml-1">
+                                  ({formatCurrency(highestMonth.total)})
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </Card>
           </div>
         </Row>
 
