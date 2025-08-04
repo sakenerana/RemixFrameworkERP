@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import supabase from "~/utils/supabase.client";
 import { useNavigate } from "@remix-run/react";
-import ClientOnly from "~/components/client-only";
+// import ClientOnly from "~/components/client-only";
 // import { useAuth } from "~/auth/AuthContext";
 
 // Obfuscation functions (put these outside your component)
@@ -87,7 +87,7 @@ export default function LoginIndex() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-800/80"></div>
 
-      <ClientOnly>
+      {/* <ClientOnly> */}
         <Card className="w-full max-w-md shadow-2xl rounded-xl overflow-hidden border-0 relative">
           {/* Decorative accent */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
@@ -220,7 +220,7 @@ export default function LoginIndex() {
             </div>
           </div>
         </Card>
-      </ClientOnly>
+      {/* </ClientOnly> */}
     </div>
   );
 }
