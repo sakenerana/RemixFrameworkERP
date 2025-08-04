@@ -1,7 +1,7 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { HomeOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineClear, AiOutlineDown, AiOutlineEnvironment, AiOutlineFlag, AiOutlineGlobal, AiOutlineHome, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineClear, AiOutlineDown, AiOutlineEnvironment, AiOutlineFlag, AiOutlineGlobal, AiOutlineHome, AiOutlineRollback, AiOutlineSave } from "react-icons/ai";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LocationService } from "~/services/location.service";
 import { Location } from "~/types/location.type";

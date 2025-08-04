@@ -1,8 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Breadcrumb, Button, Card, Form, Input, message, Modal } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineBank, AiOutlineClear, AiOutlineContacts, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineSolution } from "react-icons/ai";
+import { AiOutlineBank, AiOutlineClear, AiOutlineContacts, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSolution } from "react-icons/ai";
 import { CompanyService } from "~/services/company.service";
 import { Company } from "~/types/company.type";
 const { TextArea } = Input;

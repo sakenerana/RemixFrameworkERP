@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@remix-run/react";
 import { Alert, Avatar, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlineLaptop, AiOutlinePlus } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetModelService } from "~/services/asset_model.service";
 import { AssetModel } from "~/types/asset_model.tpye";
@@ -46,7 +46,7 @@ export default function AssetModelsRoutes() {
         try {
             setLoading(true);
             const dataFetch = await AssetModelService.getAllPosts(isDepartmentID);
-            console.log("cats", dataFetch)
+            // console.log("cats", dataFetch)
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");
@@ -253,15 +253,6 @@ export default function AssetModelsRoutes() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<AssetModel>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div className="w-full px-4">
             {/* Header Section */}
@@ -367,7 +358,6 @@ export default function AssetModelsRoutes() {
                     size="middle"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data}
-                    onChange={onChange}
                     className="shadow-sm rounded-lg overflow-hidden"
                     bordered
                     scroll={{ x: "max-content" }}

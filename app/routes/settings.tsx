@@ -1,6 +1,5 @@
 import {
   CloseOutlined,
-  LoadingOutlined,
   LogoutOutlined,
   QuestionOutlined,
   SwapOutlined,
@@ -64,6 +63,26 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
 
   const handleSignout = async () => {
     setLoading(true);
+
+    // Clear all relevant localStorage data
+    localStorage.removeItem("ab_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("dept");
+    localStorage.removeItem("fname");
+    localStorage.removeItem("lname");
+    localStorage.removeItem("userAuthID");
+    localStorage.removeItem("userDept");
+
+    localStorage.removeItem("workflowDashboardData");
+    localStorage.removeItem("userActivitiesData");
+
+    // Clear any cached API data (remove all keys starting with your app's cache prefix)
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith("budgetApproved_") || key.startsWith("completedRequisition_") || key.startsWith("userActiveActivities_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
     await signOut();
     setLoading(false);
     navigate("/");
@@ -78,7 +97,6 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
   const onFinish = async (event: any) => {
     try {
       const values = await form.validateFields();
-      console.log(values)
 
       setLoading(true);
       const { error } = await supabase.auth.updateUser({

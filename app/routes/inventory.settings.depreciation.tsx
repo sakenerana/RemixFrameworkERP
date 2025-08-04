@@ -14,7 +14,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -25,7 +24,7 @@ import {
   AiOutlineFileExclamation,
   AiOutlinePlus,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { DepreciationService } from "~/services/depreciation.service";
@@ -228,15 +227,6 @@ export default function DepreciationRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Depreciation>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-4 py-6">
       {/* Header Section */}
@@ -342,7 +332,6 @@ export default function DepreciationRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

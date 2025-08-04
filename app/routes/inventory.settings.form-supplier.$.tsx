@@ -1,8 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineClear, AiOutlineContacts, AiOutlineEnvironment, AiOutlineHome, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineShop, AiOutlineSolution, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineClear, AiOutlineContacts, AiOutlineEnvironment, AiOutlineHome, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineShop, AiOutlineSolution, AiOutlineUser } from "react-icons/ai";
 import { SupplierService } from "~/services/supplier.service";
 import { Supplier } from "~/types/supplier.type";
 import countries from '~/data/country.json';

@@ -14,7 +14,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -27,7 +26,7 @@ import {
   AiOutlinePhone,
   AiOutlinePlus,
 } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ManufacturerService } from "~/services/manufacturer.service";
@@ -278,15 +277,6 @@ export default function ManufacturersRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Manufacturer>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -397,7 +387,6 @@ export default function ManufacturersRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

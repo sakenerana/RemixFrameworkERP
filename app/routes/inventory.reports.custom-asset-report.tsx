@@ -1,11 +1,10 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
   Button,
   Card,
   Checkbox,
-  CheckboxProps,
   Col,
   Divider,
   Form,
@@ -14,18 +13,15 @@ import {
   Select,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineDown, AiOutlineFileExcel, AiOutlineSave, AiOutlineSend } from "react-icons/ai";
+import { AiOutlineDown, AiOutlineFileExcel } from "react-icons/ai";
 import { AssetService } from "~/services/asset.service";
 import { AssetModelService } from "~/services/asset_model.service";
 import { CategoryService } from "~/services/category.service";
-import { CompanyService } from "~/services/company.service";
 import { LocationService } from "~/services/location.service";
 import { ManufacturerService } from "~/services/manufacturer.service";
 import { SupplierService } from "~/services/supplier.service";
 import { AssetModel } from "~/types/asset_model.tpye";
 import { Category } from "~/types/category.type";
-import { Company } from "~/types/company.type";
-import { CustomAsset } from "~/types/custom_asset.type";
 import { Location } from "~/types/location.type";
 import { Manufacturer } from "~/types/manufacturer.type";
 import { Supplier } from "~/types/supplier.type";

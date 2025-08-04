@@ -14,13 +14,12 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { AiFillProfile, AiOutlinePlus } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { AiFillProfile } from "react-icons/ai";
+import { FcRefresh } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CrownFilled } from '@ant-design/icons';
@@ -35,6 +34,9 @@ interface DataType {
   body: string;
   userId?: number; // Optional property
 }
+
+const CACHE_KEY = 'userActivitiesData';
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
 
 export default function Workflows() {
   const [data, setData] = useState<DataType[]>([]);
@@ -64,25 +66,59 @@ export default function Workflows() {
       setLoading(true);
       setError(null);
 
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const now = new Date().getTime();
+
+      if (cachedData) {
+        const { data, topThreeUserIds, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setData(data);
+          setTopThreeUserIds(topThreeUserIds);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If no cache or cache expired, make API request
       const response = await axios.post<any>(
         '/api/user-activities',
         {
           userid: Number(getABID),
           username: getUsername
-        },
+        }
       );
 
+      // Process data
       const sorted = [...response.data.data].sort((a, b) => b.activities_count - a.activities_count);
-      setTopThreeUserIds(sorted.slice(0, 3).map(user => user.id));
+      const newTopThreeUserIds = sorted.slice(0, 3).map(user => user.id);
+
+      // Update state
       setData(sorted);
+      setTopThreeUserIds(newTopThreeUserIds);
+
+      // Update cache
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: sorted,
+        topThreeUserIds: newTopThreeUserIds,
+        timestamp: now
+      }));
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      // Fallback to cached data if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, topThreeUserIds } = JSON.parse(cachedData);
+        setData(data);
+        setTopThreeUserIds(topThreeUserIds);
+      } else {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      }
       console.error('Failed to fetch data:', err);
     } finally {
       setLoading(false);
     }
   };
-
 
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
@@ -101,7 +137,7 @@ export default function Workflows() {
   }, [searchText]); // Empty dependency array means this runs once on mount
 
   const handleShowWorkflows = (value: DataType) => {
-    console.log("value", value)
+    // console.log("value", value)
     navigate("/workflow/assigned/id?id=" + value.id);
   };
 
@@ -205,15 +241,6 @@ export default function Workflows() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<DataType>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Header Section */}
@@ -301,7 +328,6 @@ export default function Workflows() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

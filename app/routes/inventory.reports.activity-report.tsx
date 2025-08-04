@@ -12,11 +12,10 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlinePlus, AiOutlineUserAdd } from "react-icons/ai";
+import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlineUserAdd } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { ActivityReportService } from "~/services/activity_report";
@@ -197,15 +196,6 @@ export default function ActivityReportRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<ActivityReport>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-4">
       {/* Header Section */}
@@ -282,7 +272,6 @@ export default function ActivityReportRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

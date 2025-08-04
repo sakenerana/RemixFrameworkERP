@@ -1,30 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  ApartmentOutlined,
-  AuditOutlined,
-  DropboxOutlined,
-} from "@ant-design/icons";
-import type { MenuProps, TabsProps } from "antd";
-import { Button, Card, Carousel, message, Space } from "antd";
-import { Link, useNavigate } from "@remix-run/react";
-import { supabase } from "~/lib/supabase";
-import { AiFillCheckCircle, AiFillCloseCircle, AiOutlineReconciliation } from "react-icons/ai";
+import React, { useMemo, useState } from "react";
+import type { MenuProps } from "antd";
+import { Card, message } from "antd";
+import { Link } from "@remix-run/react";
+import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { LuPackageSearch } from "react-icons/lu";
 import { FaClipboardList, FaDollarSign } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
-import { Content } from "antd/es/layout/layout";
 import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
-import { User } from "~/types/user.type";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
-import axios from "axios";
-
-type MenuItem = Required<MenuProps>["items"][number];
-
-const contentStyle: React.CSSProperties = {
-  textAlign: "center",
-  justifyContent: "center",
-};
 
 export default function LandingPage() {
   const { user } = useAuth();

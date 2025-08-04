@@ -1,11 +1,10 @@
 import { GlobalOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Alert, Button, Card, Col, Flex, Progress, Row, Spin, Tag } from "antd";
+import { Alert, Button, Card, Col, Row, Spin, Tag } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
+import { RiCircleFill } from "react-icons/ri";
 import { useAuth } from "~/auth/AuthContext";
 import { CrownFilled } from '@ant-design/icons';
-import LineChart from "~/components/line_chart";
 
 interface Activity {
   id: number;
@@ -45,6 +44,9 @@ const translations = {
   }
 };
 
+const CACHE_KEY = 'workflowDashboardData';
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+
 export default function WorkflowDashboard() {
   const [data, setData] = useState<ApiResponse>({ data: [] });
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,8 @@ export default function WorkflowDashboard() {
     setLanguage(prev => prev === 'en' ? 'fil' : 'en');
   };
 
+
+
   const fetchData = async () => {
     const getABID = localStorage.getItem('ab_id');
     const getUsername = localStorage.getItem('username');
@@ -66,29 +70,48 @@ export default function WorkflowDashboard() {
       setLoading(true);
       setError(null);
 
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const now = new Date().getTime();
+
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setData(data);
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await axios.post<ApiResponse>(
         '/api/active-activities',
         {
           userid: Number(getABID),
           username: getUsername
-        },
-        // {
-        //   headers: {
-        //     "x-external-platform": "erp",
-        //     "Authorization": `Bearer ${token}`,
-        //     "Content-Type": "application/json"
-        //   },
-        //   withCredentials: true
-        // }
+        }
       );
 
-      console.log("RESPONSE", response.data)
-      setData({
+      const processedData = {
         ...response.data,
         data: response.data.data.sort((a, b) => b.activities_count - a.activities_count)
-      });
+      };
+
+      setData(processedData);
+
+      // Update cache
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: processedData,
+        timestamp: now
+      }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      // Try to use cached data if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data } = JSON.parse(cachedData);
+        setData(data);
+      } else {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      }
       console.error('Failed to fetch data:', err);
     } finally {
       setLoading(false);

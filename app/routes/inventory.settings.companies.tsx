@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SearchOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Avatar,
@@ -14,7 +14,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -269,15 +268,6 @@ export default function CompaniesRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<Company>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4">
       {/* Header Section */}
@@ -388,7 +378,6 @@ export default function CompaniesRoutes() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

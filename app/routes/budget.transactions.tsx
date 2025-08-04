@@ -75,6 +75,11 @@ export default function BudgetTransactions() {
     const userDepartment = localStorage.getItem("dept") || "";
     const departmentId = isDepartmentID;
 
+    // Cache configuration
+    const CACHE_KEY = `completedRequisition_${userId}_${departmentId}`;
+    const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
+    const now = new Date().getTime();
+
     if (!userId || !username || !departmentId) {
       console.warn("Missing required identifiers");
       return;
@@ -85,57 +90,75 @@ export default function BudgetTransactions() {
       setError(null);
       setData([]); // Reset data at start
 
-      // Fetch workflow data
-      const response = await axios.post<{ data: any[] }>(
-        "/api/completed-requisition-liquidation",
-        {
-          userid: userId,
-          username: username,
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setData(data);
+          setLoading(false);
+          return;
         }
-      );
+      }
 
-      const items = response.data.data || [];
+      // Parallel API calls
+      const [requisitionResponse, budgetData] = await Promise.all([
+        axios.post<{ data: any[] }>(
+          "/api/completed-requisition-liquidation",
+          { userid: userId, username }
+        ),
+        BudgetService.getByData(departmentId)
+      ]);
 
-      // Fetch budget data to get date range
-      const budgetData = await BudgetService.getByData(departmentId);
+      const items = requisitionResponse.data.data || [];
       const startDate = budgetData?.start_date;
       const endDate = budgetData?.end_date;
 
-      // If either startDate or endDate is missing, return empty data
+      // Early return if missing dates
       if (!startDate || !endDate) {
         setData([]);
+        localStorage.removeItem(CACHE_KEY); // Clear stale cache
         return;
       }
 
-      // Convert range dates to date-only strings (ignoring time)
+      // Pre-compute date strings
       const rangeStartStr = new Date(startDate).toISOString().split('T')[0];
       const rangeEndStr = new Date(endDate).toISOString().split('T')[0];
 
-      // Filter and validate
-      const filtered = items.filter((item) => {
-        const matchesDepartment = item.department === userDepartment;
-        const matchesStatus = item.status === 5;
-
-        // Strict date range matching - return false if no startDate
+      // Optimized filtering
+      const filtered = items.filter(item => {
         if (!item.startDate) return false;
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
-        const matchesDateRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
-
-        return matchesDepartment && matchesStatus && matchesDateRange;
+        return item.department === userDepartment &&
+          item.status === 5 &&
+          itemDateStr >= rangeStartStr &&
+          itemDateStr <= rangeEndStr;
       });
 
-      // Sort descending by date
-      const sorted = filtered.sort(
-        (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      // Optimized sorting
+      const sorted = filtered.sort((a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       );
 
-      // Set state
+      // Update state and cache
       setData(sorted);
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: sorted,
+        timestamp: now
+      }));
+
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
-      setError(message);
-      setData([]); // Clear data on error
+      // Fallback to cache if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data } = JSON.parse(cachedData);
+        setData(data);
+      } else {
+        const message = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(message);
+        setData([]);
+      }
       console.error("fetchData failed:", err);
     } finally {
       setLoading(false);

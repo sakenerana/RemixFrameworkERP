@@ -1,4 +1,4 @@
-import { CalendarOutlined, CheckCircleOutlined, FileSearchOutlined, HistoryOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, SmileOutlined } from "@ant-design/icons";
+import { CalendarOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -14,14 +14,13 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
   Timeline,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiFillProfile } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
+import { FcRefresh } from "react-icons/fc";
 import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs from 'dayjs';
@@ -66,23 +65,55 @@ export default function WorkflowTracker() {
   const fetchData = async () => {
     const getABID = localStorage.getItem('ab_id');
     const getUsername = localStorage.getItem('username');
+    const CACHE_KEY = `userActiveActivities_${getABID}`; // Unique cache key per user
+    const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
 
     try {
       setLoading(true);
       setError(null);
 
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const now = new Date().getTime();
+
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setData(data);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If no cache or cache expired, make API request
       const response = await axios.post<any>(
         '/api/user-active-activities',
         {
           userid: Number(getABID),
           username: getUsername,
           tracked_user_id: Number(getABID)
-        },
+        }
       );
-      console.log("RESPONSE DATA", response.data.data)
-      setData(response.data.data);
+
+      // Update state with fresh data
+      const responseData = response.data.data;
+      setData(responseData);
+
+      // Update cache
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: responseData,
+        timestamp: now
+      }));
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      // Fallback to cached data if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data } = JSON.parse(cachedData);
+        setData(data);
+      } else {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      }
       console.error('Failed to fetch data:', err);
     } finally {
       setLoading(false);
@@ -106,7 +137,7 @@ export default function WorkflowTracker() {
   }, [searchText]); // Empty dependency array means this runs once on mount
 
   const handleTrack = (value: any) => {
-    console.log("VALUE", value)
+    // console.log("VALUE", value)
     setDataModal(value);
     setIsModalOpen(true);
   };
@@ -245,15 +276,6 @@ export default function WorkflowTracker() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<DataType>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   const items = dataModal.sequences?.map((value: string, index: number) => {
     const isDuplicate = dataModal.sequences?.indexOf(value) !== index;
     const isStart = index === 0;
@@ -272,12 +294,12 @@ export default function WorkflowTracker() {
       children: (
         <div
           className={`p-3 rounded-lg border ${isCurrent
-              ? "bg-indigo-100 border-indigo-400"
-              : isEnd
-                ? "bg-green-50 border-green-200"
-                : isDuplicate
-                  ? "bg-yellow-50 border-yellow-200"
-                  : "bg-blue-50 border-blue-200"
+            ? "bg-indigo-100 border-indigo-400"
+            : isEnd
+              ? "bg-green-50 border-green-200"
+              : isDuplicate
+                ? "bg-yellow-50 border-yellow-200"
+                : "bg-blue-50 border-blue-200"
             }`}
         >
           <p
@@ -383,7 +405,6 @@ export default function WorkflowTracker() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

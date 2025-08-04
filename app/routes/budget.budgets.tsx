@@ -1,5 +1,4 @@
 import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -109,6 +108,11 @@ export default function Budgets() {
     const userDepartment = localStorage.getItem("dept") || "";
     const departmentId = isDepartmentID;
 
+    // Cache configuration
+    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}`;
+    const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
+    const now = new Date().getTime();
+
     if (!userId || !username || !departmentId) {
       console.warn("Missing required identifiers");
       return;
@@ -118,86 +122,97 @@ export default function Budgets() {
       setLoading(true);
       setError(null);
 
-      // Fetch workflow data
-      const response = await axios.post<{ data: any[] }>(
-        "/api/completed-requisition-liquidation",
-        {
-          userid: userId,
-          username: username,
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { totals, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setDataTotalRequisition(totals.requisition);
+          setDataTotalLiquidation(totals.liquidation);
+          setDataCombinedTotal(totals.combined);
+          setLoading(false);
+          return;
         }
-      );
+      }
 
-      const items = response.data.data || [];
+      // Parallel API calls
+      const [requisitionResponse, budgetData] = await Promise.all([
+        axios.post<{ data: any[] }>(
+          "/api/completed-requisition-liquidation",
+          { userid: userId, username }
+        ),
+        BudgetService.getByData(departmentId)
+      ]);
 
-      // Fetch budget data to get date range
-      const budgetData = await BudgetService.getByData(departmentId);
+      const items = requisitionResponse.data.data || [];
       const startDate = budgetData?.start_date;
       const endDate = budgetData?.end_date;
 
-      // If either startDate or endDate is missing, return no data
+      // Early return if missing dates
       if (!startDate || !endDate) {
-        setDataTotalRequisition(0);
-        setDataTotalLiquidation(0);
-        setDataCombinedTotal(0);
+        resetTotals();
+        localStorage.removeItem(CACHE_KEY); // Clear stale cache
         return;
       }
 
-      // Convert range dates to date-only strings (ignoring time)
+      // Pre-compute date strings
       const rangeStartStr = new Date(startDate).toISOString().split('T')[0];
       const rangeEndStr = new Date(endDate).toISOString().split('T')[0];
 
-      // Filter and validate
-      const filtered = items.filter((item) => {
-        const matchesDepartment = item.department === userDepartment;
-        const matchesStatus = item.status === 5;
-
-        // Match by date range (date-only comparison)
-        if (!item.startDate) return false;
+      // Calculate totals in single pass
+      const totals = items.reduce((acc, item) => {
+        if (!item.startDate) return acc;
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
-        const matchesDateRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
+        const inRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
+        const matches = item.department === userDepartment && item.status === 5 && inRange;
 
-        return matchesDepartment && matchesStatus && matchesDateRange;
-      });
-
-      // Sort descending by date
-      const sorted = filtered.sort(
-        (a, b) =>
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-      );
-
-      // Calculate totals
-      let requisitionTotal = 0;
-      let liquidationTotal = 0;
-      let combinedTotal = 0;
-
-      sorted.forEach((item) => {
-        const amount = Number(item.totalAmount) || 0;
-        if (item.workflowType === "Requisition") {
-          requisitionTotal += amount;
-        } else if (item.workflowType === "Liquidation") {
-          liquidationTotal = amount;
+        if (matches) {
+          const amount = Number(item.totalAmount) || 0;
+          if (item.workflowType === "Requisition") {
+            acc.requisition += amount;
+          } else if (item.workflowType === "Liquidation") {
+            acc.liquidation += amount;
+          }
+          acc.combined += amount;
         }
-        combinedTotal += amount;
-      });
+        return acc;
+      }, { requisition: 0, liquidation: 0, combined: 0 });
 
-      // Set state
-      setDataTotalRequisition(requisitionTotal);
-      setDataTotalLiquidation(liquidationTotal);
-      setDataCombinedTotal(combinedTotal);
+      // Update state and cache
+      setDataTotalRequisition(totals.requisition);
+      setDataTotalLiquidation(totals.liquidation);
+      setDataCombinedTotal(totals.combined);
+
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        totals,
+        timestamp: now
+      }));
+
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-      setError(message);
+      // Fallback to cache if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { totals } = JSON.parse(cachedData);
+        setDataTotalRequisition(totals.requisition);
+        setDataTotalLiquidation(totals.liquidation);
+        setDataCombinedTotal(totals.combined);
+      } else {
+        const message = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(message);
+        resetTotals();
+      }
       console.error("fetchDataBudgetApproved failed:", err);
-
-      // Reset totals on error
-      setDataTotalRequisition(0);
-      setDataTotalLiquidation(0);
-      setDataCombinedTotal(0);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to reset all totals
+  const resetTotals = () => {
+    setDataTotalRequisition(0);
+    setDataTotalLiquidation(0);
+    setDataCombinedTotal(0);
   };
 
   useEffect(() => {

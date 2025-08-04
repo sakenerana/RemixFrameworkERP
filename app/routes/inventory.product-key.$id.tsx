@@ -1,11 +1,10 @@
-import { HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { HomeOutlined, InfoCircleOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
     Button,
     Checkbox,
-    Col,
     Dropdown,
     Form,
     Input,
@@ -13,12 +12,10 @@ import {
     message,
     Modal,
     Popconfirm,
-    Row,
     Space,
     Spin,
     Table,
     TableColumnsType,
-    TableProps,
     Tag,
     Tooltip,
     Typography,
@@ -27,7 +24,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
     AiOutlineExport,
     AiOutlineRollback,
-    AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { Link, useParams } from "react-router-dom";
@@ -218,15 +214,6 @@ export default function ProductKey() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<License>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
-
     return (
         <div>
             <Modal
@@ -294,7 +281,6 @@ export default function ProductKey() {
                     size="small"
                     columns={filteredColumns}
                     dataSource={searchText ? filteredData : data[0]?.product_key}
-                    onChange={onChange}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

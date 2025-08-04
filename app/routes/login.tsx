@@ -8,38 +8,78 @@ import {
   Alert,
   Checkbox,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "~/utils/supabase.client";
 import { useNavigate } from "@remix-run/react";
 import ClientOnly from "~/components/client-only";
-import { useAuth } from "~/auth/AuthContext";
+// import { useAuth } from "~/auth/AuthContext";
+
+// Obfuscation functions (put these outside your component)
+const obfuscate = (str: string): string => btoa(unescape(encodeURIComponent(str)));
+const deobfuscate = (str: string): string => decodeURIComponent(escape(atob(str)));
 
 export const handle = { hydrate: false };
 export default function LoginIndex() {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
-  const { getUser } = useAuth();
+  // const { getUser } = useAuth();
   const navigate = useNavigate();
 
-  const onFinish = async (values: any) => {
-    // let user = await supabase.auth.getUser();
+  // Load remembered credentials on component mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const obfuscatedPassword = localStorage.getItem("rememberedPassword");
+
+    if (rememberedEmail) {
+      form.setFieldsValue({
+        email: rememberedEmail,
+        remember: true
+      });
+
+      // Only deobfuscate password if it exists
+      if (obfuscatedPassword) {
+        try {
+          const rememberedPassword = deobfuscate(obfuscatedPassword);
+          form.setFieldsValue({
+            password: rememberedPassword
+          });
+        } catch (error) {
+          console.error("Failed to deobfuscate password:", error);
+          localStorage.removeItem("rememberedPassword");
+        }
+      }
+    }
+  }, [form]);
+
+  const onFinish = async (values: { email: string; password: string; remember: boolean }) => {
     try {
+      setLoading(true);
+
+      // Handle remember me functionality
+      if (values.remember) {
+        localStorage.setItem("rememberedEmail", values.email);
+        // Store obfuscated password
+        localStorage.setItem("rememberedPassword", obfuscate(values.password));
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
-        phone: "",
       });
+
       if (data) {
         navigate("/landing-page");
-        // console.log("fp", data.user?.id);
       }
       if (error) throw error;
-      setLoading(true);
     } catch (error) {
-      navigate("/");
-      setLoading(false);
       setErrorAlert(true);
-      return { error };
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,6 +118,7 @@ export default function LoginIndex() {
 
             {/* Login Form */}
             <Form
+              form={form}
               name="login"
               initialValues={{ remember: true }}
               onFinish={onFinish}

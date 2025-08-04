@@ -1,8 +1,8 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { Breadcrumb, Button, Card, Col, Divider, Form, Input, message, Modal, Row, Select } from "antd";
+import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
 import { useMemo, useState } from "react";
-import { AiOutlineAppstore, AiOutlineBars, AiOutlineClear, AiOutlineDown, AiOutlineEnvironment, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSend, AiOutlineTag } from "react-icons/ai";
+import { AiOutlineAppstore, AiOutlineBars, AiOutlineClear, AiOutlineDown, AiOutlineRollback, AiOutlineSave, AiOutlineTag } from "react-icons/ai";
 import { CategoryService } from "~/services/category.service";
 import { Category } from "~/types/category.type";
 import categoryType from "~/data/type.json"

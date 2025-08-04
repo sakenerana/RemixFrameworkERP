@@ -1,28 +1,14 @@
-import { FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
+import { FileSearchOutlined, HomeOutlined, LoadingOutlined, UserOutlined } from "@ant-design/icons";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
-    Button,
     Card,
-    Checkbox,
-    Dropdown,
-    Input,
-    MenuProps,
-    Popconfirm,
-    Space,
     Spin,
-    Table,
-    TableColumnsType,
-    TableProps,
-    Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { AiFillProfile } from "react-icons/ai";
-import { FcRefresh, FcSearch } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
-import PrintDropdownComponent from "~/components/print_dropdown";
 
 interface DataType {
     id: number;
@@ -65,7 +51,7 @@ export default function Assigned() {
 
             // Filter data to only include items with ID 188
             const filteredData = response.data.data.filter((item: any) => item.id === Number(id));
-            console.log("FILTERED ID2", id);
+            // console.log("FILTERED ID2", id);
             setData(filteredData); // Only stores data where ID = 188
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -82,7 +68,7 @@ export default function Assigned() {
 
     useEffect(() => {
         fetchData();
-        console.log("FILTERED ID", id);
+        // console.log("FILTERED ID", id);
     }, []); // Empty dependency array means this runs once on mount
 
     return (

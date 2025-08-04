@@ -226,7 +226,7 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
       ...item,
       ...row,
     });
-    console.log("testing 1", newData)
+    // console.log("testing 1", newData)
     setDataSource(newData);
   };
 

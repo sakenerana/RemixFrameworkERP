@@ -1,6 +1,5 @@
-import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalendar, AiOutlineSend } from "react-icons/ai";
 import { AccessoryService } from "~/services/accessory.service";
 import { AssetService } from "~/services/asset.service";
@@ -10,8 +9,6 @@ import { LicenseService } from "~/services/license.service";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 const { TextArea } = Input;
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import utc from 'dayjs/plugin/utc';
 
 interface CheckoutProps {
     stateData: any;

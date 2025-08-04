@@ -85,101 +85,123 @@ export default function BudgetRoutes() {
     const username = localStorage.getItem("username") || "";
     const userDepartment = localStorage.getItem("dept") || "";
     const departmentId = isDepartmentID;
+    const currentYear = new Date().getFullYear();
+    // const currentYear = 2024;
+
+    // Cache configuration
+    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}_${currentYear}`;
+    const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
+    const now = new Date().getTime();
 
     if (!userId || !username || !departmentId) {
       console.warn("Missing required identifiers");
       return;
     }
 
+    // Helper function to reset all data
+    const resetData = () => {
+      setDataTotalRequisition(0);
+      setDataTotalLiquidation(0);
+      setDataCombinedTotal(0);
+      setMonthlyData([]);
+    };
+
     try {
       setLoading(true);
       setError(null);
+      resetData(); // Reset data at start
 
-      // Fetch workflow data
+      // Check cache first
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { totals, monthlyData, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_EXPIRY) {
+          setDataTotalRequisition(totals.requisition);
+          setDataTotalLiquidation(totals.liquidation);
+          setDataCombinedTotal(totals.combined);
+          setMonthlyData(monthlyData);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fetch data
       const response = await axios.post<{ data: any[] }>(
         "/api/completed-requisition-liquidation",
-        {
-          userid: userId,
-          username: username,
-        }
+        { userid: userId, username }
       );
 
       const items = response.data.data || [];
-      // const currentYear = 2024;
-      const currentYear = new Date().getFullYear();
 
-      // Filter and validate
-      const filtered = items.filter((item) => {
-        const matchesDepartment = item.department === userDepartment;
-        const matchesStatus = item.status === 5;
+      // Process data in single pass
+      const result = items.reduce((acc, item) => {
+        if (!item.startDate) return acc;
 
-        // Check if the item is from current year
-        let matchesCurrentYear = true;
-        if (item.startDate) {
-          const itemYear = new Date(item.startDate).getFullYear();
-          matchesCurrentYear = itemYear === currentYear;
-        }
+        const itemYear = new Date(item.startDate).getFullYear();
+        if (itemYear !== currentYear) return acc;
 
-        return matchesDepartment && matchesStatus && matchesCurrentYear;
-      });
+        const matches = item.department === userDepartment && item.status === 5;
+        if (!matches) return acc;
 
-      // Sort descending by date
-      const sorted = filtered.sort(
-        (a, b) =>
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-      );
-
-      // Initialize totals
-      let requisitionTotal = 0;
-      let liquidationTotal = 0;
-      let combinedTotal = 0;
-
-      // Object to track monthly totals for current year
-      const monthlyTotals: Record<string, number> = {};
-
-      sorted.forEach((item) => {
         const amount = Number(item.totalAmount) || 0;
         const date = new Date(item.startDate);
-        const month = `${String(date.getMonth() + 1).padStart(2, '0')}`; // Just month (MM format)
+        const month = `${String(date.getMonth() + 1).padStart(2, '0')}`;
 
         // Update workflow type totals
         if (item.workflowType === "Requisition") {
-          requisitionTotal += amount;
+          acc.totals.requisition += amount;
         } else if (item.workflowType === "Liquidation") {
-          liquidationTotal = amount;
+          acc.totals.liquidation += amount;
         }
-        combinedTotal += amount;
+        acc.totals.combined += amount;
 
         // Update monthly totals
-        if (!monthlyTotals[month]) {
-          monthlyTotals[month] = 0;
+        if (!acc.monthlyTotals[month]) {
+          acc.monthlyTotals[month] = 0;
         }
-        monthlyTotals[month] += amount;
+        acc.monthlyTotals[month] += amount;
+
+        return acc;
+      }, {
+        totals: { requisition: 0, liquidation: 0, combined: 0 },
+        monthlyTotals: {} as Record<string, number>
       });
 
-      // Convert monthly totals to an array of objects
-      const monthlyData = Object.entries(monthlyTotals).map(([month, total]) => ({
-        month: `${currentYear}-${month}`, // Format as YYYY-MM
+      // Format monthly data
+      const monthlyData = Object.entries(result.monthlyTotals).map(([month, total]) => ({
+        month: `${currentYear}-${month}`,
         total
       }));
 
-      // console.log(`Current Year (${currentYear}) Budget Data`, {
-      //   requisitionTotal,
-      //   liquidationTotal,
-      //   combinedTotal,
-      //   itemCount: sorted.length,
-      //   monthlyData
-      // });
+      // Sort monthly data chronologically
+      monthlyData.sort((a, b) => a.month.localeCompare(b.month));
 
-      // Set state
-      setDataTotalRequisition(requisitionTotal);
-      setDataTotalLiquidation(liquidationTotal);
-      setDataCombinedTotal(combinedTotal);
+      // Update state
+      setDataTotalRequisition(result.totals.requisition);
+      setDataTotalLiquidation(result.totals.liquidation);
+      setDataCombinedTotal(result.totals.combined);
       setMonthlyData(monthlyData);
+
+      // Update cache
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        totals: result.totals,
+        monthlyData,
+        timestamp: now
+      }));
+
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-      setError(message);
+      // Fallback to cache if available
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { totals, monthlyData } = JSON.parse(cachedData);
+        setDataTotalRequisition(totals.requisition);
+        setDataTotalLiquidation(totals.liquidation);
+        setDataCombinedTotal(totals.combined);
+        setMonthlyData(monthlyData);
+      } else {
+        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        resetData();
+      }
       console.error("fetchDataBudgetApproved failed:", err);
     } finally {
       setLoading(false);

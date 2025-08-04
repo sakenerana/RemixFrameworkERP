@@ -15,7 +15,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
   Tooltip,
 } from "antd";
@@ -312,15 +311,6 @@ export default function PredefinedKitRoute() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  const onChange: TableProps<PredefinedKit>["onChange"] = (
-    pagination,
-    filters,
-    sorter,
-    extra
-  ) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
-
   return (
     <div className="w-full px-6 py-4 rounded-lg shadow-sm">
       {/* Checkout Modal */}
@@ -337,8 +327,8 @@ export default function PredefinedKitRoute() {
         footer={null}
         centered
         styles={{
-          header: {  },
-          body: {  }
+          header: {},
+          body: {}
         }}
       >
         <Checkout
@@ -456,7 +446,6 @@ export default function PredefinedKitRoute() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
-          onChange={onChange}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}

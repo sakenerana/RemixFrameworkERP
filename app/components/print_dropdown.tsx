@@ -1,5 +1,5 @@
 import { Button, Dropdown, MenuProps } from "antd";
-import { AiFillFilePdf, AiFillFileWord, AiOutlineFileExcel } from "react-icons/ai";
+import { AiOutlineFileExcel } from "react-icons/ai";
 import { FcExport } from "react-icons/fc";
 import { AlignmentType, BorderStyle, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import * as XLSX from 'xlsx';

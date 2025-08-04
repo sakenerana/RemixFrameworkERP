@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from '~/lib/supabase';
 import dayjs from 'dayjs';
 import { Avatar, Button, Spin } from 'antd';
-import { EllipsisOutlined, DownOutlined, LoadingOutlined } from '@ant-design/icons';
+import { DownOutlined, LoadingOutlined } from '@ant-design/icons';
 
 // Number of messages to load per page
 const MESSAGES_PER_PAGE = 300;
