@@ -32,7 +32,9 @@ export default function LandingPage() {
       setLoading(true);
       const dataFetch = await UserService.getByUuid(user.id);
       const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-      // console.log("User Data", dataFetch.departments.department)
+      // console.log("User Data", dataFetch.office.name)
+      localStorage.setItem('userOfficeID', dataFetch.office.id);
+      localStorage.setItem('userOffice', dataFetch.office.name);
       localStorage.setItem('userDept', dataFetch.department_id);
       localStorage.setItem('dept', dataFetch.departments.department);
       localStorage.setItem('userAuthID', dataFetch.id);

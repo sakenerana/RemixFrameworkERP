@@ -14,7 +14,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -81,6 +80,7 @@ export default function AssetsRoute() {
       setLoading(true);
       const dataFetch = await AssetService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
+      // console.log("DATA FETCH", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -465,7 +465,6 @@ export default function AssetsRoute() {
         <div className="flex justify-center items-center h-64">
           <Spin
             size="large"
-            tip="Loading asset data..."
             indicator={
               <LoadingOutlined
                 style={{

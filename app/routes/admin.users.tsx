@@ -21,7 +21,6 @@ import {
     message,
     Modal,
     Popconfirm,
-    Radio,
     Row,
     Select,
     Space,
@@ -54,15 +53,18 @@ import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
+import { OfficeService } from "~/services/office.service";
 import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
+import { Office } from "~/types/office.type";
 import { User } from "~/types/user.type";
 
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
     const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
     const [dataGroup, setDataGroup] = useState<Groups[]>([]);
+    const [dataOffice, setDataOffice] = useState<Office[]>([]);
     const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
@@ -170,6 +172,19 @@ export default function UsersRoutes() {
         }
     };
 
+    // Fetch data from Supabase
+    const fetchDataOffice = async () => {
+        try {
+            setLoading(true);
+            const dataFetchOffice = await OfficeService.getAllPosts();
+            setDataOffice(dataFetchOffice); // Works in React state
+        } catch (error) {
+            message.error("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (searchText.trim() === '') {
             fetchData();
@@ -186,6 +201,7 @@ export default function UsersRoutes() {
 
         fetchDataDepartment();
         fetchDataGroup();
+        fetchDataOffice();
     }, [searchText]); // Empty dependency array means this runs once on mount
 
     // Create or Update record
@@ -692,12 +708,19 @@ export default function UsersRoutes() {
                                     name="office_id"
                                     rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    <Radio.Group
-                                        options={optionsOffice}
-                                        optionType="button"
-                                        buttonStyle="solid"
-                                        className="flex flex-wrap gap-2"
-                                    />
+                                    <Select
+                                        placeholder="Select an office"
+                                        showSearch
+                                        optionFilterProp="label"
+                                        className="h-10"
+                                        style={{ width: '100%' }}
+                                    >
+                                        {dataOffice.map((item: Office) => (
+                                            <Option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </Option>
+                                        ))}
+                                    </Select>
                                 </Form.Item>
                             </Col>
                         </Row>

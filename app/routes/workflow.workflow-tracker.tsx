@@ -16,6 +16,7 @@ import {
   TableColumnsType,
   Tag,
   Timeline,
+  Tooltip,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
@@ -166,7 +167,22 @@ export default function WorkflowTracker() {
       dataIndex: "requested_by",
       key: "process_title",
       width: 160,
-      ellipsis: true,
+      render: (text) => (
+        <Tooltip title={text} placement="topLeft">
+          <div style={{
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+            lineHeight: '1.2',
+            maxHeight: '3.6em',
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical'
+          }}>
+            {text}
+          </div>
+        </Tooltip>
+      ),
       sorter: (a, b) => a.requested_by.localeCompare(b.requested_by),
     },
     {

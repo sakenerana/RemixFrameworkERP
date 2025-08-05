@@ -26,7 +26,7 @@ export const BudgetService = {
         return data
     },
 
-    async getByData(departmentID: number) {
+    async getByData(departmentID: number, officeID: number) {
         // const currentDate = new Date().toISOString();
 
         const { data, error } = await supabase
@@ -34,6 +34,7 @@ export const BudgetService = {
             .select('*, status_labels(*), departments(*)')
             .eq('status_id', 1) // Only approved budgets
             .eq('department_id', departmentID)
+            .eq('office_id', officeID)
             // Filter where current date is between start and end dates
             // .lte('start_date', currentDate)
             // .gte('end_date', currentDate)

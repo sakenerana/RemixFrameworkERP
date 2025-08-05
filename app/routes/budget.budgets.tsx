@@ -19,7 +19,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlinePlusCircle, AiOutlineRise, AiOutlineSend, AiOutlineShareAlt } from "react-icons/ai";
+import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
@@ -37,6 +37,7 @@ export default function Budgets() {
 
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [isOfficeID, setOfficeID] = useState<any>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
@@ -92,9 +93,9 @@ export default function Budgets() {
   const fetchData = async () => {
     try {
       // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
       setData(dataFetch); // Works in React state
-      console.log("BUDGET DATAS", dataFetch)
+      // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -106,14 +107,16 @@ export default function Budgets() {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
     const userDepartment = localStorage.getItem("dept") || "";
+    const userOffice = localStorage.getItem("userOffice") || "";
     const departmentId = isDepartmentID;
+    const officeId = isOfficeID;
 
     // Cache configuration
-    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}`;
+    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}_${officeId}`;
     const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
     const now = new Date().getTime();
 
-    if (!userId || !username || !departmentId) {
+    if (!userId || !username || !departmentId || !officeId) {
       console.warn("Missing required identifiers");
       return;
     }
@@ -141,7 +144,7 @@ export default function Budgets() {
           "/api/completed-requisition-liquidation",
           { userid: userId, username }
         ),
-        BudgetService.getByData(departmentId)
+        BudgetService.getByData(departmentId, officeId)
       ]);
 
       const items = requisitionResponse.data.data || [];
@@ -165,7 +168,7 @@ export default function Budgets() {
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
         const inRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
-        const matches = item.department === userDepartment && item.status === 5 && inRange;
+        const matches = item.department === userDepartment && item.branch === userOffice && item.status === 5 && inRange;
 
         if (matches) {
           const amount = Number(item.totalAmount) || 0;
@@ -236,7 +239,7 @@ export default function Budgets() {
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
     setDepartmentID(localStorage.getItem('userDept'));
-
+    setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
   const budget = [
@@ -296,6 +299,7 @@ export default function Budgets() {
         end_date: endDate.format("YYYY-MM-DD"),
         status_id: 1,
         department_id: isDepartmentID,
+        office_id: isOfficeID,
       };
 
       // Create new record

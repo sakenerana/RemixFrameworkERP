@@ -52,6 +52,7 @@ export default function BudgetRoutes() {
 
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [isOfficeID, setOfficeID] = useState<any>();
 
   // Toggle language
   const toggleLanguage = () => {
@@ -70,7 +71,7 @@ export default function BudgetRoutes() {
   const fetchData = async () => {
     try {
       // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
       setData(dataFetch); // Works in React state
       // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
@@ -84,6 +85,7 @@ export default function BudgetRoutes() {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
     const userDepartment = localStorage.getItem("dept") || "";
+    const userOffice = localStorage.getItem("userOffice") || "";
     const departmentId = isDepartmentID;
     const currentYear = new Date().getFullYear();
     // const currentYear = 2024;
@@ -132,7 +134,7 @@ export default function BudgetRoutes() {
       );
 
       const items = response.data.data || [];
-
+      // console.log("ITEMS", items)
       // Process data in single pass
       const result = items.reduce((acc, item) => {
         if (!item.startDate) return acc;
@@ -142,6 +144,9 @@ export default function BudgetRoutes() {
 
         const matches = item.department === userDepartment && item.status === 5;
         if (!matches) return acc;
+
+        const offices = item.branch === userOffice;
+        if (!offices) return acc;
 
         const amount = Number(item.totalAmount) || 0;
         const date = new Date(item.startDate);
@@ -229,7 +234,7 @@ export default function BudgetRoutes() {
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
     setDepartmentID(localStorage.getItem('userDept'));
-
+    setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
   return (

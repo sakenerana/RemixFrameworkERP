@@ -37,6 +37,7 @@ export default function BudgetTransactions() {
   const [error, setError] = useState<string | null>(null);
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [isOfficeID, setOfficeID] = useState<any>();
 
   const navigate = useNavigate();
 
@@ -59,7 +60,7 @@ export default function BudgetTransactions() {
   const fetchDataBudget = async () => {
     try {
       // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID);
+      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
       setDataBudget(dataFetch); // Works in React state
       // console.log("BUDGET DATA", dataFetch)
     } catch (error) {
@@ -73,14 +74,16 @@ export default function BudgetTransactions() {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
     const userDepartment = localStorage.getItem("dept") || "";
+    const userOffice = localStorage.getItem("userOffice") || "";
     const departmentId = isDepartmentID;
+    const officeId = isOfficeID;
 
     // Cache configuration
-    const CACHE_KEY = `completedRequisition_${userId}_${departmentId}`;
+    const CACHE_KEY = `completedRequisition_${userId}_${departmentId}_${officeId}`;
     const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
     const now = new Date().getTime();
 
-    if (!userId || !username || !departmentId) {
+    if (!userId || !username || !departmentId || !officeId) {
       console.warn("Missing required identifiers");
       return;
     }
@@ -107,7 +110,7 @@ export default function BudgetTransactions() {
           "/api/completed-requisition-liquidation",
           { userid: userId, username }
         ),
-        BudgetService.getByData(departmentId)
+        BudgetService.getByData(departmentId, officeId)
       ]);
 
       const items = requisitionResponse.data.data || [];
@@ -131,6 +134,7 @@ export default function BudgetTransactions() {
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
         return item.department === userDepartment &&
+          item.branch === userOffice &&
           item.status === 5 &&
           itemDateStr >= rangeStartStr &&
           itemDateStr <= rangeEndStr;
@@ -168,6 +172,7 @@ export default function BudgetTransactions() {
   useMemo(() => {
     setUserID(localStorage.getItem('userAuthID'));
     setDepartmentID(localStorage.getItem('userDept'));
+    setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
   useEffect(() => {
