@@ -59,6 +59,7 @@ import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
 import { Office } from "~/types/office.type";
 import { User } from "~/types/user.type";
+import supabase from "~/utils/supabase.client";
 
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
@@ -72,7 +73,7 @@ export default function UsersRoutes() {
     const [form] = Form.useForm<User>();
     const [editingId, setEditingId] = useState<number | null>(null);
     const { Option } = Select;
-    const { signUp } = useAuth();
+    const { adminSignUp } = useAuth();
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<User[]>([]);
 
@@ -139,6 +140,7 @@ export default function UsersRoutes() {
             setLoading(true);
             const dataFetch = await UserService.getAllPosts();
             setData(dataFetch); // Works in React state  
+            console.log("DATA FETCH", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -219,10 +221,11 @@ export default function UsersRoutes() {
                 // Create new record
                 setLoading(true);
 
-                const { data, error } = await signUp(values.email, values.password);
+                const { data, error } = await adminSignUp(values.email, values.password);
                 setLoading(false);
                 if (error) throw message.error(error.message);
-
+                // Immediately sign out the user
+                // await supabase.auth.signOut();
                 try {
                     setLoading(true);
                     // Include your extra field
@@ -255,7 +258,8 @@ export default function UsersRoutes() {
     const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
         "Name": true,
         "Email": true,
-        "Phone": true,
+        "Phone": false,
+        "Office": true,
         "Department": true,
         "Status": true,
         "Actions": true,
@@ -265,7 +269,7 @@ export default function UsersRoutes() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 120,
+            width: 180,
             render: (_, record) => (
                 <div className="flex items-center">
                     <Avatar
@@ -287,7 +291,7 @@ export default function UsersRoutes() {
         {
             title: "Email",
             dataIndex: "email",
-            width: 120,
+            width: 100,
             render: (email) => (
                 <div className="flex items-center">
                     <AiOutlineMail className="text-gray-400 mr-2" />
@@ -316,6 +320,21 @@ export default function UsersRoutes() {
             ),
         },
         {
+            title: "Office",
+            dataIndex: "office",
+            width: 120,
+            render: (_, record) => (
+                <div className="flex items-center group">
+                    <div className="p-1.5 mr-2 rounded-md bg-gray-100 group-hover:bg-blue-100 transition-colors">
+                        <AiOutlineTeam className="text-gray-500 group-hover:text-blue-600 transition-colors" />
+                    </div>
+                    <span className="font-medium text-gray-700 truncate">
+                        {record.office?.name || '—'}
+                    </span>
+                </div>
+            )
+        },
+        {
             title: "Department",
             dataIndex: "department",
             width: 120,
@@ -331,7 +350,7 @@ export default function UsersRoutes() {
         {
             title: "Status",
             dataIndex: "status",
-            width: 120,
+            width: 100,
             render: (_, record) => {
                 if (record.status_labels.name === 'Active') {
                     return (
@@ -351,7 +370,7 @@ export default function UsersRoutes() {
         {
             title: "Actions",
             dataIndex: "actions",
-            width: 120,
+            width: 190,
             fixed: "right",
             render: (_, record) => (
                 <div className="flex">

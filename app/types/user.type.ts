@@ -19,4 +19,8 @@ export interface User {
     count: any;
     auth_id: any;
     actions: string;
+    office: {
+        id: number;
+        name: string;
+    }
 }

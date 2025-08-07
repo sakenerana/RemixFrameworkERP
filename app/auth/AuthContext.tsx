@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User, AuthError } from "@supabase/supabase-js";
-import supabase from "~/utils/supabase.client";
 import { message } from "antd";
+import supabase from "~/utils/supabase.client";
+import { supabaseAdmin } from "~/utils/supabase.admin";
 
 type AuthContextType = {
   session: Session | null;
@@ -14,6 +15,10 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
   getUser: () => Promise<{ user: User | null; error: AuthError | null }>;
+  adminSignUp: (email: string, password: string) => Promise<{
+    data: { user: User | null } | null;
+    error: AuthError | null
+  }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,11 +56,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
       message.error((error as AuthError).message || "Sign up failed");
+      return { data: null, error: error as AuthError };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ADMIN-ONLY user creation (bypasses email confirmation)
+  const adminSignUp = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirms email
+        // user_metadata: { role: 'admin' } // Optional: add admin metadata
+      });
+
+      if (error) throw error;
+      return {
+        data: { user: data.user },
+        error: null
+      };
+    } catch (error) {
+      message.error("Admin creation failed");
       return { data: null, error: error as AuthError };
     } finally {
       setLoading(false);
@@ -152,6 +185,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut,
     resetPassword,
     getUser,
+    adminSignUp
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

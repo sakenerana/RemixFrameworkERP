@@ -52,7 +52,7 @@ export const UserService = {
   async getAllPosts() {
     const { data, error } = await supabase
       .from("users")
-      .select("*, departments(*), status_labels(*)")
+      .select("*, departments(*), office(*), status_labels(*)")
       .order("created_at", { ascending: false });
 
     if (error) throw error;

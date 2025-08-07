@@ -22,7 +22,7 @@
     "@remix-run/react": "^2.16.5",
     "@remix-run/serve": "^2.16.5",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.53.0",
     "antd": "^5.26.3",
     "axios": "^1.9.0",
     "docx": "^9.5.0",

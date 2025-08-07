@@ -9,8 +9,8 @@ import {
   Checkbox,
 } from "antd";
 import { useEffect, useState } from "react";
-import supabase from "~/utils/supabase.client";
 import { useNavigate } from "@remix-run/react";
+import supabase from "~/utils/supabase.client";
 // import ClientOnly from "~/components/client-only";
 // import { useAuth } from "~/auth/AuthContext";
 

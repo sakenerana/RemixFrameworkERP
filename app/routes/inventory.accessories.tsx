@@ -15,7 +15,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
   Tooltip,
 } from "antd";
