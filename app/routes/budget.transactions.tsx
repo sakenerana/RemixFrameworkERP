@@ -3,6 +3,7 @@ import {
   CheckCircleOutlined,
   HomeOutlined,
   InboxOutlined,
+  LinkOutlined,
   LoadingOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
@@ -80,7 +81,7 @@ export default function BudgetTransactions() {
 
     // Cache configuration
     const CACHE_KEY = `completedRequisition_${userId}_${departmentId}_${officeId}`;
-    const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
+    const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache
     const now = new Date().getTime();
 
     if (!userId || !username || !departmentId || !officeId) {
@@ -135,7 +136,7 @@ export default function BudgetTransactions() {
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
         return item.department === userDepartment &&
           item.branch === userOffice &&
-          item.status === 5 &&
+          // item.status === 5 &&
           itemDateStr >= rangeStartStr &&
           itemDateStr <= rangeEndStr;
       });
@@ -217,9 +218,14 @@ export default function BudgetTransactions() {
       dataIndex: "referenceNo",
       width: 120,
       render: (_, value) => (
-        <div className="font-mono text-sm">
+        <a
+          target="_blank"
+          href={`https://activitybuilder-staging.cficoop.com/activities/${value.referenceNo}`} // Adjust the URL as needed
+          className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
+        >
+          <LinkOutlined className="mr-1" />
           {value.referenceNo}
-        </div>
+        </a>
       ),
       fixed: 'left'
     },
@@ -269,7 +275,7 @@ export default function BudgetTransactions() {
             {record.workflowType === 'Requisition' && (
               <span className="flex flex-wrap"><RiCircleFill className="text-blue-500 mt-1 mr-2" /> {record.workflowType}</span>
             )}
-            {record.workflowType === 'Liquidattion' && (
+            {record.workflowType === 'Liquidation' && (
               <span className="flex flex-wrap"><RiCircleFill className="text-blue-600 mt-1 mr-2" /> {record.workflowType}</span>
             )}
           </>
@@ -282,7 +288,7 @@ export default function BudgetTransactions() {
       dataIndex: "requisitionType",
       width: 120,
       render: (_, value) => (
-        <Tag color="blue">
+        <Tag color="#3b82f6">
           {value.requisitionType}
         </Tag>
       ),
@@ -293,10 +299,28 @@ export default function BudgetTransactions() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record.status === 5) {
+        if (record.status === 'Completed') {
           return (
             <Tag color="green">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Completed
+            </Tag>
+          );
+        } else if (record.status === 'In Progress') {
+          return (
+            <Tag color="blue">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> In Progress
+            </Tag>
+          );
+        } else if (record.status === 'Overdue') {
+          return (
+            <Tag color="orange">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Overdue
+            </Tag>
+          );
+        } else if (record.status === 'Return') {
+          return (
+            <Tag color="red">
+              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Return
             </Tag>
           );
         }

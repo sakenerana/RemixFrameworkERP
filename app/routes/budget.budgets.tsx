@@ -113,7 +113,7 @@ export default function Budgets() {
 
     // Cache configuration
     const CACHE_KEY = `budgetApproved_${userId}_${departmentId}_${officeId}`;
-    const CACHE_EXPIRY = 5 * 60 * 1000; // 15 minutes cache
+    const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache
     const now = new Date().getTime();
 
     if (!userId || !username || !departmentId || !officeId) {
@@ -168,7 +168,7 @@ export default function Budgets() {
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
         const inRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
-        const matches = item.department === userDepartment && item.branch === userOffice && item.status === 5 && inRange;
+        const matches = item.department === userDepartment && item.branch === userOffice && item.status === 'Completed' && inRange;
 
         if (matches) {
           const amount = Number(item.totalAmount) || 0;

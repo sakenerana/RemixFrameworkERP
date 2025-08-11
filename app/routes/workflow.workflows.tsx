@@ -36,7 +36,7 @@ interface DataType {
 }
 
 const CACHE_KEY = 'userActivitiesData';
-const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
+const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes cache
 
 export default function Workflows() {
   const [data, setData] = useState<DataType[]>([]);

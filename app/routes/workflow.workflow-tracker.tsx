@@ -67,7 +67,7 @@ export default function WorkflowTracker() {
     const getABID = localStorage.getItem('ab_id');
     const getUsername = localStorage.getItem('username');
     const CACHE_KEY = `userActiveActivities_${getABID}`; // Unique cache key per user
-    const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
+    const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes cache
 
     try {
       setLoading(true);

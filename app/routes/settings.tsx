@@ -73,6 +73,7 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
     localStorage.removeItem("userAuthID");
     localStorage.removeItem("userDept");
     localStorage.removeItem("userOffice");
+    localStorage.removeItem("userOfficeID");
 
     localStorage.removeItem("workflowDashboardData");
     localStorage.removeItem("userActivitiesData");

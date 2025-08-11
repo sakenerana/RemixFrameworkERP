@@ -75,7 +75,7 @@ export default function BudgetRoutes() {
       setData(dataFetch); // Works in React state
       // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
-      message.error("error");
+      message.error("errorss");
     } finally {
       // setLoading(false);
     }
@@ -92,7 +92,7 @@ export default function BudgetRoutes() {
 
     // Cache configuration
     const CACHE_KEY = `budgetApproved_${userId}_${departmentId}_${currentYear}`;
-    const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes cache
+    const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache
     const now = new Date().getTime();
 
     if (!userId || !username || !departmentId) {
@@ -142,7 +142,7 @@ export default function BudgetRoutes() {
         const itemYear = new Date(item.startDate).getFullYear();
         if (itemYear !== currentYear) return acc;
 
-        const matches = item.department === userDepartment && item.status === 5;
+        const matches = item.department === userDepartment && item.status === 'Completed';
         if (!matches) return acc;
 
         const offices = item.branch === userOffice;

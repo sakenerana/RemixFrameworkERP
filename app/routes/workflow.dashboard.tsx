@@ -45,7 +45,7 @@ const translations = {
 };
 
 const CACHE_KEY = 'workflowDashboardData';
-const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 
 export default function WorkflowDashboard() {
   const [data, setData] = useState<ApiResponse>({ data: [] });
