@@ -129,7 +129,7 @@ export default function BudgetRoutes() {
 
       // Fetch data
       const response = await axios.post<{ data: any[] }>(
-        "/api/completed-requisition-liquidation",
+        `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
         { userid: userId, username }
       );
 

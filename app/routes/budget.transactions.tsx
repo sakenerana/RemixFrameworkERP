@@ -108,7 +108,7 @@ export default function BudgetTransactions() {
       // Parallel API calls
       const [requisitionResponse, budgetData] = await Promise.all([
         axios.post<{ data: any[] }>(
-          "/api/completed-requisition-liquidation",
+          `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
         BudgetService.getByData(departmentId, officeId)
@@ -220,7 +220,7 @@ export default function BudgetTransactions() {
       render: (_, value) => (
         <a
           target="_blank"
-          href={`https://activitybuilder-staging.cficoop.com/activities/${value.referenceNo}`} // Adjust the URL as needed
+          href={`${import.meta.env.VITE_AB_LINK}/activities/${value.referenceNo}`} // Adjust the URL as needed
           className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
         >
           <LinkOutlined className="mr-1" />

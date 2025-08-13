@@ -1,4 +1,4 @@
-import { CalendarOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -88,7 +88,7 @@ export default function WorkflowTracker() {
 
       // If no cache or cache expired, make API request
       const response = await axios.post<any>(
-        '/api/user-active-activities',
+        `${import.meta.env.VITE_API_BASE_URL}/user-active-activities`,
         {
           userid: Number(getABID),
           username: getUsername,
@@ -190,7 +190,17 @@ export default function WorkflowTracker() {
       dataIndex: "refno",
       key: "refno",
       width: 140,
-      render: (text) => <span className="text-monospace flex flex-wrap"><RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {text}</span>,
+      render: (_, value) => (
+        <a
+          target="_blank"
+          href={`${import.meta.env.VITE_AB_LINK}/activities/${value.refno}`} // Adjust the URL as needed
+          className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
+        >
+          <LinkOutlined className="mr-1" />
+          {value.refno}
+        </a>
+      ),
+      fixed: 'left'
     },
     {
       title: "Created At",

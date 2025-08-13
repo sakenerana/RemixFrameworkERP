@@ -84,7 +84,7 @@ export default function WorkflowDashboard() {
       }
 
       const response = await axios.post<ApiResponse>(
-        '/api/active-activities',
+        `${import.meta.env.VITE_API_BASE_URL}/active-activities`,
         {
           userid: Number(getABID),
           username: getUsername

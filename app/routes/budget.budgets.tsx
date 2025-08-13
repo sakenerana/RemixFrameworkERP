@@ -141,7 +141,7 @@ export default function Budgets() {
       // Parallel API calls
       const [requisitionResponse, budgetData] = await Promise.all([
         axios.post<{ data: any[] }>(
-          "/api/completed-requisition-liquidation",
+          `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
         BudgetService.getByData(departmentId, officeId)

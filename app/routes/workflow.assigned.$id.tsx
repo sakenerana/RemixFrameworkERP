@@ -42,7 +42,7 @@ export default function Assigned() {
             setError(null);
 
             const response = await axios.post<any>(
-                '/api/user-activities',
+                `${import.meta.env.VITE_API_BASE_URL}/user-activities`,
                 {
                     userid: Number(getABID),
                     username: getUsername
