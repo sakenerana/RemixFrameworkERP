@@ -37,11 +37,15 @@ export const UserService = {
   },
 
   //Read (single) For UUID
-  async getByUuid(uuid: any) { // Explicit string type for UUID
+  async getByUuid(uuid: string) {
     const { data, error } = await supabase
       .from('users')
-      .select('*, departments(*), office(*)')
-      .eq('auth_id', uuid) // Changed from 'id' to 'uuid'
+      .select(`
+      *,
+      departments(*),
+      office(*)
+    `)
+      .eq('auth_id', uuid)
       .single();
 
     if (error) throw error;
