@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
 
   // Environment variables setup
   const isProduction = mode === "production";
-  const apiBaseUrl = "https://iaccs-api-staging.cficoop.com";
+  const apiBaseUrl = "https://iaccs-api.cficoop.com";
 
   return {
     build: {
