@@ -4,7 +4,7 @@ import { Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { LuPackageSearch } from "react-icons/lu";
-import { FaClipboardList, FaDollarSign } from "react-icons/fa";
+import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaTicketAlt } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
 import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
@@ -16,6 +16,8 @@ export default function LandingPage() {
   const [dataInventory, setDataIventory] = useState(false);
   const [dataBudget, setDataBudget] = useState(false);
   const [dataWorkflow, setDataWorkflow] = useState(false);
+  const [dataBilling, setDataBilling] = useState(false);
+  const [dataTicketing, setDataTicketing] = useState(false);
   const [dataAdmin, setDataAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
@@ -60,6 +62,8 @@ export default function LandingPage() {
       setDataBudget(arr.includes(2));
       setDataWorkflow(arr.includes(3));
       setDataAdmin(arr.includes(4));
+      setDataBilling(arr.includes(5));
+      setDataTicketing(arr.includes(6));
 
       // Debug log - this will show the actual values
       // console.log('Access array:', arr);
@@ -74,13 +78,6 @@ export default function LandingPage() {
 
   const features = useMemo(() => [
     {
-      icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
-      title: "Inventory",
-      description: "Manage suppliers, inventory, and streamline warehouse operations.",
-      link: "/inventory",
-      access: dataInventory
-    },
-    {
       icon: <FaDollarSign className="h-8 w-8 text-green-500" />,
       title: "Budget Tracker",
       description: "Monitor expenses, set budget goals, and visualize financial performance.",
@@ -93,6 +90,27 @@ export default function LandingPage() {
       description: "Manage team workflows, assign tasks, and track progress in real-time.",
       link: "/workflow",
       access: dataWorkflow
+    },
+    {
+      icon: <FaFileInvoiceDollar className="h-8 w-8 text-red-500" />,
+      title: "Billing & Collections",
+      description: "Generate invoices, track payments, and manage accounts receivable efficiently.",
+      link: "/billing",
+      access: dataBilling
+    },
+    {
+      icon: <FaTicketAlt className="h-8 w-8 text-teal-500" />,
+      title: "Ticketing System",
+      description: "Create, track, and resolve support tickets and customer inquiries.",
+      link: "https://it-support.cficoop.com/en/",
+      access: dataTicketing
+    },
+    {
+      icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
+      title: "Inventory",
+      description: "Manage suppliers, inventory, and streamline warehouse operations.",
+      link: "https://asset-tracker.cficoop.com/",
+      access: dataInventory
     },
     {
       icon: <BsShieldCheck className="h-8 w-8 text-purple-500" />,

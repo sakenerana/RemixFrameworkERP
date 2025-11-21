@@ -19,6 +19,7 @@ import {
   FcTemplate,
   FcTreeStructure,
   FcSettings,
+  FcDocument,
 } from "react-icons/fc";
 import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
@@ -155,6 +156,11 @@ export default function WorkflowLayoutIndex() {
       key: "3",
       icon: <FcTreeStructure />,
       label: <Link to="/workflow/workflow-tracker">Tracker</Link>,
+    },
+    {
+      key: "4",
+      icon: <FcDocument />,
+      label: <Link to="/workflow/report">Report</Link>,
     },
   ];
 

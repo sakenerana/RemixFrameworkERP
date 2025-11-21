@@ -30,6 +30,7 @@ import {
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
   FcDiploma1,
+  FcDocument,
   FcGlobe,
   FcSalesPerformance,
   FcSettings,
@@ -158,6 +159,11 @@ export default function BudgetLayoutIndex() {
       key: "3",
       icon: <FcSalesPerformance />,
       label: <Link to="/budget/budgets">Budgets</Link>,
+    },
+    {
+      key: "4",
+      icon: <FcDocument />,
+      label: <Link to="/budget/report">Report</Link>,
     },
   ];
 

@@ -456,6 +456,8 @@ export default function UsersRoutes() {
         { label: "Budget Tracker", value: 2 },
         { label: "Workflow Tracker", value: 3 },
         { label: "Admin Panel", value: 4 },
+        { label: "Billing & Collections", value: 5 },
+        { label: "Ticketing System", value: 6 },
     ];
 
     const optionsPermission: CheckboxOptionType<any>[] = [
