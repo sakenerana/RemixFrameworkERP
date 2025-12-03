@@ -224,7 +224,7 @@ export default function BudgetRoutes() {
       dataIndex: "status",
       render: () => (
         <>
-          <Tag color="green">
+          <Tag color="green" variant="solid">
             <CheckCircleOutlined className="float-left mt-1 mr-1" /> {t.active}
           </Tag>
         </>
@@ -331,7 +331,7 @@ export default function BudgetRoutes() {
                     />}
                 </div>
               </Card>
-              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
+              <Card className="rounded-md border-gray-300 shadow-sm overflow-hidden transition-transform duration-300">
                 <div>
                   <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                     <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> {t.monthlyDataTrend}
@@ -352,7 +352,7 @@ export default function BudgetRoutes() {
           <Row>
             <Col span={24}>
               <div className="shadow-sm">
-                <Card title={
+                <Card className="border-gray-300" title={
                   <div className="flex items-center">
                     <RiPieChart2Fill className="mr-2 text-green-500" />
                     {t.accountsOverview}

@@ -12,7 +12,7 @@ import {
   MessageOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag } from "antd";
+import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag, MenuProps } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
   FcGlobe,
@@ -141,7 +141,7 @@ export default function WorkflowLayoutIndex() {
   const handleTrack = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuProps['items'] = [
     {
       key: "1",
       icon: <FcGlobe />,
@@ -321,7 +321,7 @@ export default function WorkflowLayoutIndex() {
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
-                    background: isDarkMode ? '#141414' : '#ffffff',
+                    backgroundColor: isDarkMode ? '#141414' : '#ffffff',
                     height: 'calc(100vh - 80px)',
                     overflowY: 'auto',
                     padding: '8px 0',

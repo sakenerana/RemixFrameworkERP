@@ -206,6 +206,7 @@ export default function Workflows() {
               className="cursor-pointer"
               icon={<AiFillProfile className="float-left mt-1 mr-1" />}
               color="#1677ff"
+              variant="solid"
             >
               Show Workflows
             </Tag>

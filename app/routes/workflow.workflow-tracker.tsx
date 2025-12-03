@@ -244,7 +244,7 @@ export default function WorkflowTracker() {
       key: "workflow",
       width: 150,
       render: (workflow) => (
-        <Tag color="green">
+        <Tag color="green" variant="solid">
           {workflow}
         </Tag>
       )
@@ -267,6 +267,7 @@ export default function WorkflowTracker() {
               className="cursor-pointer"
               icon={<AiFillProfile className="float-left mt-1 mr-1" />}
               color="#1677ff"
+              variant="solid"
             >
               Track Workflow
             </Tag>
@@ -472,11 +473,11 @@ export default function WorkflowTracker() {
               {/* Header Section */}
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold">
                     {dataModal.requested_by}
                   </h2>
-                  <span className="hidden sm:inline text-gray-400">—</span>
-                  <span className="text-sm font-medium text-gray-600">
+                  <span className="hidden sm:inline">—</span>
+                  <span className="text-sm font-medium">
                     {dataModal.workflow || 'No workflow'}
                   </span>
                 </div>

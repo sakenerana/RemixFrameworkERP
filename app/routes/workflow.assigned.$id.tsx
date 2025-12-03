@@ -74,9 +74,9 @@ export default function Assigned() {
                 },
             );
 
-            // Filter data to only include items with ID 188
+            // Filter data to only include items with ID ##
             const filteredData = response.data.data.filter((item: any) => item.id === Number(id));
-            setData(filteredData); // Only stores data where ID = 188
+            setData(filteredData); // Only stores data where ID = ##
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
             console.error('Failed to fetch data:', err);
@@ -269,10 +269,10 @@ export default function Assigned() {
                 />
             </div>
 
-            {/* Main Content with Sidebar */}
-            <Row gutter={[24, 24]}>
-                {/* Left Column - User Cards */}
-                <Col xs={24} lg={16}>
+            {/* Main Content - Full Width */}
+            <div className="space-y-8">
+                {/* User Cards Section */}
+                <div>
                     {loading ? (
                         <div className="flex justify-center items-center h-64">
                             <Spin
@@ -308,12 +308,11 @@ export default function Assigned() {
                             </Row>
 
                             {/* User Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {data.length > 0 ? (
                                     data.map((user) => (
                                         <Card
                                             key={user.id}
-                                            className="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                                            className="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border-0"
                                         >
                                             <div className="flex items-center mb-4">
                                                 <div className="bg-blue-100 p-3 rounded-full mr-4">
@@ -355,41 +354,85 @@ export default function Assigned() {
                                         </p>
                                     </div>
                                 )}
-                            </div>
+                            
                         </div>
                     )}
-                </Col>
+                </div>
 
-                {/* Right Column - History Logs */}
-                <Col xs={24} lg={8}>
-                    <Card
-                        title={
-                            <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-2">
-                                    <CalendarOutlined className="text-blue-500" />
-                                    Activity History
-                                </span>
-                                <Select
-                                    value={timeFilter}
-                                    onChange={setTimeFilter}
-                                    size="small"
-                                    className="w-28"
-                                >
-                                    <Option value="day">Today</Option>
-                                    <Option value="week">This Week</Option>
-                                    <Option value="month">This Month</Option>
-                                    <Option value="year">This Year</Option>
-                                </Select>
+                {/* History Logs Section - Now at the bottom */}
+                <Card
+                    title={
+                        <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-2 text-lg font-semibold">
+                                <CalendarOutlined className="text-blue-500" />
+                                Activity History
+                            </span>
+                            <Select
+                                value={timeFilter}
+                                onChange={setTimeFilter}
+                                size="middle"
+                                className="w-32"
+                            >
+                                <Option value="day">Today</Option>
+                                <Option value="week">This Week</Option>
+                                <Option value="month">This Month</Option>
+                                <Option value="year">This Year</Option>
+                            </Select>
+                        </div>
+                    }
+                    className="shadow-sm border-0"
+                    extra={
+                        <div className="flex items-center gap-4">
+                            <div className="text-sm text-gray-600">
+                                Showing {filteredHistory.length} activities
                             </div>
-                        }
-                        className="shadow-sm"
-                    >
-                        {historyLoading ? (
-                            <div className="flex justify-center items-center h-32">
-                                <Spin size="small" />
-                            </div>
-                        ) : (
-                            <div className="max-h-[600px] overflow-y-auto">
+                        </div>
+                    }
+                >
+                    {historyLoading ? (
+                        <div className="flex justify-center items-center h-32">
+                            <Spin size="large" tip="Loading activity history..." />
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {/* Quick Stats */}
+                            <Row gutter={16} className="mb-6">
+                                <Col span={6}>
+                                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                                        <div className="text-2xl font-bold text-green-600">
+                                            {filteredHistory.filter(log => log.status === 'completed').length}
+                                        </div>
+                                        <div className="text-sm text-green-700">Completed</div>
+                                    </div>
+                                </Col>
+                                <Col span={6}>
+                                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                        <div className="text-2xl font-bold text-blue-600">
+                                            {filteredHistory.filter(log => log.status === 'in_progress').length}
+                                        </div>
+                                        <div className="text-sm text-blue-700">In Progress</div>
+                                    </div>
+                                </Col>
+                                <Col span={6}>
+                                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                                        <div className="text-2xl font-bold text-orange-600">
+                                            {filteredHistory.filter(log => log.status === 'pending').length}
+                                        </div>
+                                        <div className="text-sm text-orange-700">Pending</div>
+                                    </div>
+                                </Col>
+                                <Col span={6}>
+                                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                                        <div className="text-2xl font-bold text-red-600">
+                                            {filteredHistory.filter(log => log.status === 'cancelled').length}
+                                        </div>
+                                        <div className="text-sm text-red-700">Cancelled</div>
+                                    </div>
+                                </Col>
+                            </Row>
+
+                            {/* Timeline */}
+                            <div className="max-h-[500px] overflow-y-auto pr-4">
                                 <Timeline>
                                     {filteredHistory.length > 0 ? (
                                         filteredHistory.map((log) => (
@@ -400,68 +443,52 @@ export default function Assigned() {
                                                     <div className="w-3 h-3 rounded-full bg-current" />
                                                 }
                                             >
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between items-start">
-                                                        <Tag color={getActionColor(log.action)} className="text-xs">
-                                                            {log.action}
-                                                        </Tag>
-                                                        <span className="text-xs text-gray-500">
-                                                            {dayjs(log.timestamp).format('MMM DD, HH:mm')}
+                                                <div className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <Tag color={getActionColor(log.action)} className="text-xs font-medium">
+                                                                {log.action}
+                                                            </Tag>
+                                                            <span className="text-sm font-semibold text-gray-900">
+                                                                {log.workflow}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                                                            {dayjs(log.timestamp).format('MMM DD, YYYY HH:mm')}
                                                         </span>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">
-                                                            {log.workflow}
-                                                        </p>
-                                                        <p className="text-xs text-gray-600">
-                                                            by {log.user}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            {log.details}
-                                                        </p>
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <p className="text-sm text-gray-600 mb-1">
+                                                                by <span className="font-medium">{log.user}</span>
+                                                            </p>
+                                                            <p className="text-sm text-gray-500">
+                                                                {log.details}
+                                                            </p>
+                                                        </div>
+                                                        <Tag
+                                                            color={getStatusColor(log.status)}
+                                                            className="text-xs capitalize font-medium"
+                                                        >
+                                                            {log.status.replace('_', ' ')}
+                                                        </Tag>
                                                     </div>
-                                                    <Tag
-                                                        color={getStatusColor(log.status)}
-                                                        className="text-xs capitalize"
-                                                    >
-                                                        {log.status.replace('_', ' ')}
-                                                    </Tag>
                                                 </div>
                                             </Timeline.Item>
                                         ))
                                     ) : (
-                                        <div className="text-center py-8 text-gray-500">
-                                            <FileSearchOutlined className="text-2xl mb-2" />
-                                            <p>No activity found for selected period</p>
+                                        <div className="text-center py-12 text-gray-500">
+                                            <FileSearchOutlined className="text-3xl mb-3" />
+                                            <p className="text-lg">No activity found for selected period</p>
+                                            <p className="text-sm mt-1">Try selecting a different time filter</p>
                                         </div>
                                     )}
                                 </Timeline>
                             </div>
-                        )}
-
-                        {/* Quick Stats */}
-                        <Divider className="my-4" />
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Total Activities:</span>
-                                <span className="font-medium">{filteredHistory.length}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Completed:</span>
-                                <Tag color="green" className="m-0">
-                                    {filteredHistory.filter(log => log.status === 'completed').length}
-                                </Tag>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">In Progress:</span>
-                                <Tag color="blue" className="m-0">
-                                    {filteredHistory.filter(log => log.status === 'in_progress').length}
-                                </Tag>
-                            </div>
                         </div>
-                    </Card>
-                </Col>
-            </Row>
+                    )}
+                </Card>
+            </div>
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { LuPackageSearch } from "react-icons/lu";
-import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaTicketAlt } from "react-icons/fa";
+import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaMoneyCheckAlt, FaTicketAlt } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
 import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
@@ -18,6 +18,7 @@ export default function LandingPage() {
   const [dataWorkflow, setDataWorkflow] = useState(false);
   const [dataBilling, setDataBilling] = useState(false);
   const [dataTicketing, setDataTicketing] = useState(false);
+  const [dataLoanTracker, setDataLoanTracker] = useState(false);
   const [dataAdmin, setDataAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
@@ -64,6 +65,7 @@ export default function LandingPage() {
       setDataAdmin(arr.includes(4));
       setDataBilling(arr.includes(5));
       setDataTicketing(arr.includes(6));
+      setDataLoanTracker(arr.includes(7));
 
       // Debug log - this will show the actual values
       // console.log('Access array:', arr);
@@ -104,6 +106,13 @@ export default function LandingPage() {
       description: "Create, track, and resolve support tickets and customer inquiries.",
       link: "https://it-support.cficoop.com/en/",
       access: dataTicketing
+    },
+    {
+      icon: <FaMoneyCheckAlt className="h-8 w-8 text-green-500" />,
+      title: "Loan Tracker",
+      description: "Monitor, manage, and track employees’ or members’ loan requests and statuses.",
+      link: "/loan",
+      access: dataLoanTracker
     },
     {
       icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
@@ -250,6 +259,14 @@ export default function LandingPage() {
               </Card>
             ))}
           </div>
+
+          {/* Footer Note */}
+          <div className="text-center mt-16">
+            <p className="text-gray-500 text-sm">
+              Need access to additional modules? Contact your system administrator.
+            </p>
+          </div>
+
         </div>
       </div>
     </ProtectedRoute>

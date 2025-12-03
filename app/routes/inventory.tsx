@@ -24,6 +24,7 @@ import {
   Avatar,
   Tooltip,
   Tag,
+  MenuProps,
 } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
@@ -145,7 +146,7 @@ export default function InventoryLayoutIndex() {
   const handleTrack = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuProps['items'] = [
     {
       key: "1",
       icon: <FcGlobe />,
@@ -441,7 +442,7 @@ export default function InventoryLayoutIndex() {
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
-                    background: isDarkMode ? '#141414' : '#ffffff',
+                    backgroundColor: isDarkMode ? '#141414' : '#ffffff',
                     height: 'calc(100vh - 80px)',
                     overflowY: 'auto',
                     padding: '8px 0',

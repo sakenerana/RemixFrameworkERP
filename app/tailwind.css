@@ -95,6 +95,14 @@ body {
   .ant-picker-cell-inner {
     color: green;
   }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  .ant-card {
+    border: 1px solid #d1d5db !important;
+  }
 }
 
 @keyframes infinite-scroll {

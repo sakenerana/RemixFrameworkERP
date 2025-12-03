@@ -203,13 +203,13 @@ export default function GroupsRoutes() {
       render: (_, record) => {
         if (record.status_labels.name === 'Active') {
           return (
-            <Tag color="green">
+            <Tag color="green" variant="solid">
               <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
             </Tag>
           );
         } else if (record.status_labels.name === 'Inactive') {
           return (
-            <Tag color="red">
+            <Tag color="red" variant="solid">
               <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
             </Tag>
           );
@@ -234,6 +234,7 @@ export default function GroupsRoutes() {
               className="cursor-pointer"
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
+              variant="solid"
             >
               Update
             </Tag>
@@ -247,18 +248,20 @@ export default function GroupsRoutes() {
           >
             {record.status_labels.name === 'Active' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#f50"
+                variant="solid"
               >
                 Deactivate
               </Tag>
             )}
             {record.status_labels.name === 'Inactive' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#1677ff"
+                variant="solid"
               >
                 Activate
               </Tag>

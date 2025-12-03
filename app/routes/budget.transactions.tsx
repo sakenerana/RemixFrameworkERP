@@ -63,7 +63,7 @@ export default function BudgetTransactions() {
       // setLoading(true);
       const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
       setDataBudget(dataFetch); // Works in React state
-      // console.log("BUDGET DATA", dataFetch)
+      console.log("BUDGET DATA", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {

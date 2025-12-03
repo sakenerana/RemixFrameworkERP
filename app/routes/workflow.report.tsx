@@ -467,7 +467,7 @@ export default function WorkflowHistoryReports() {
                         ]}
                         className="text-sm"
                     />
-                    <h1 className="text-2xl font-bold text-gray-900 mt-2">Workflow History Logs</h1>
+                    <h1 className="text-2xl font-bold mt-2">Workflow History Logs</h1>
                 </div>
             </div>
 

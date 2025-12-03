@@ -12,7 +12,7 @@ import {
   MessageOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag } from "antd";
+import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag, MenuProps } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
   FcConferenceCall,
@@ -146,7 +146,7 @@ export default function AdminLayoutIndex() {
   const handleOk = () => setIsModalOpen(false);
   const handleCancel = () => setIsModalOpen(false);
 
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuProps['items'] = [
     {
       key: "1",
       icon: <FcGlobe />,
@@ -331,7 +331,7 @@ export default function AdminLayoutIndex() {
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
-                    background: isDarkMode ? '#141414' : '#ffffff',
+                    backgroundColor: isDarkMode ? '#141414' : '#ffffff',
                     height: 'calc(100vh - 80px)',
                     overflowY: 'auto',
                     padding: '8px 0',
@@ -570,7 +570,7 @@ export default function AdminLayoutIndex() {
                 background: isDarkMode ? '#1f1f1f' : '#ffffff',
                 borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
               }
-            }}  
+            }}
             title={
               <div className="flex items-center gap-2">
                 <FcSettings />
