@@ -251,7 +251,7 @@ export default function BudgetRoutes() {
     <ProtectedRoute>
       <div>
         <div className="flex justify-between items-center mb-4">
-          <Title level={3}>{t.dashboardTitle}</Title>
+          <h1 className="font-bold">{t.dashboardTitle}</h1>
           <Button type="default" onClick={toggleLanguage}>
             <GlobalOutlined />
             {language === 'en' ? t.switchToFilipino : t.switchToEnglish}

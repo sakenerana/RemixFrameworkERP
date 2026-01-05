@@ -451,9 +451,9 @@ export default function WorkflowHistoryReports() {
     );
 
     return (
-        <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+        <Card className="w-full rounded-lg shadow-sm">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div>
                     <Breadcrumb
                         items={[
@@ -467,12 +467,12 @@ export default function WorkflowHistoryReports() {
                         ]}
                         className="text-sm"
                     />
-                    <h1 className="text-2xl font-bold mt-2">Workflow History Logs</h1>
+                    <h1 className="font-bold mt-2">Workflow History Logs</h1>
                 </div>
             </div>
 
             {/* Statistics Cards */}
-            <Row gutter={16} className="mb-6">
+            <Row gutter={16} className="mb-4">
                 <Col span={6}>
                     <Card>
                         <Statistic
@@ -796,6 +796,6 @@ export default function WorkflowHistoryReports() {
                     </div>
                 )}
             </Modal>
-        </div>
+        </Card>
     );
 }

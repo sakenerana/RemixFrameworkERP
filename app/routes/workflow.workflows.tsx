@@ -5,6 +5,7 @@ import {
   Avatar,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -243,9 +244,9 @@ export default function Workflows() {
   );
 
   return (
-    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+    <Card className="w-full rounded-lg shadow-sm">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div>
           <Breadcrumb
             items={[
@@ -263,7 +264,7 @@ export default function Workflows() {
       </div>
 
       {/* Toolbar Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
         <Alert
           message="This is the list of all users with existing workflows. Please review carefully."
           type="info"
@@ -359,6 +360,6 @@ export default function Workflows() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }

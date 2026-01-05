@@ -12,6 +12,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -365,7 +366,7 @@ export default function BudgetTransactions() {
   );
 
   return (
-    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+    <Card>
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -485,6 +486,6 @@ export default function BudgetTransactions() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }

@@ -42,6 +42,7 @@ import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import ManagerGroupChat from "~/components/chat";
 import { AiOutlineMinus } from "react-icons/ai";
+import { LuChartBarStacked, LuCreditCard, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
 
 const { Header, Sider, Content } = Layout;
 
@@ -148,22 +149,23 @@ export default function BudgetLayoutIndex() {
   const menuItems: MenuProps['items'] = [
     {
       key: "1",
-      icon: <FcGlobe />,
+      icon: <LuLayoutDashboard size={15} />,
       label: <Link to="/budget/dashboard">Dashboard</Link>,
     },
     {
       key: "2",
-      icon: <FcDiploma1 />,
+      icon: <LuCreditCard size={15} />,        // Perfect for transactions
       label: <Link to="/budget/transactions">Transactions</Link>,
     },
     {
       key: "3",
-      icon: <FcSalesPerformance />,
+      icon: <LuChartBarStacked size={15} />,          // Shows budget allocation
+      // Alternative: <Wallet /> or <DollarSign />
       label: <Link to="/budget/budgets">Budgets</Link>,
     },
     {
       key: "4",
-      icon: <FcDocument />,
+      icon: <LuTrendingUp size={15} />,        // Financial reporting/trends
       label: <Link to="/budget/report">Report</Link>,
     },
   ];
@@ -450,7 +452,7 @@ export default function BudgetLayoutIndex() {
               <Content
                 className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
                 style={{
-                  background: isDarkMode ? '#141414' : '#ffffff',
+                  background: isDarkMode ? '#141414' : '#FAFAFA',
                   color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
                   marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
                 }}

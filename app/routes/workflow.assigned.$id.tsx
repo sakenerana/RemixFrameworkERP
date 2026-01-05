@@ -237,9 +237,9 @@ export default function Assigned() {
     const totalWorkflows = data.reduce((sum, user) => sum + Object.keys(user.workflows_breakdown).length, 0);
 
     return (
-        <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+        <div className="w-full rounded-lg shadow-sm">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div>
                     <Breadcrumb
                         items={[
@@ -260,7 +260,7 @@ export default function Assigned() {
             </div>
 
             {/* Toolbar Section */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
                 <Alert
                     message="Review all users with assigned workflows. Monitor status and take action as needed."
                     type="info"

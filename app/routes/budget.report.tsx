@@ -386,7 +386,7 @@ export default function BudgetHistoryReports() {
     );
 
     return (
-        <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+        <Card className="w-full rounded-lg shadow-sm">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
@@ -402,12 +402,12 @@ export default function BudgetHistoryReports() {
                         ]}
                         className="text-sm"
                     />
-                    <h1 className="text-2xl font-bold mt-2">Budget Tracking History</h1>
+                    <h1 className="font-bold mt-2">Budget Tracking History</h1>
                 </div>
             </div>
 
             {/* Statistics Cards */}
-            <Row gutter={16} className="mb-6">
+            <Row gutter={16} className="mb-3">
                 <Col span={8}>
                     <Card>
                         <Statistic
@@ -684,6 +684,6 @@ export default function BudgetHistoryReports() {
                     </div>
                 )}
             </Modal>
-        </div>
+        </Card>
     );
 }

@@ -8,7 +8,7 @@ export default {
         'infinite-scroll': 'infinite-scroll 25s linear infinite',
       },
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'], // This will make Montserrat the default font
+        sans: ['Inter', 'sans-serif'], // This will make Montserrat the default font
       },
       backdropBlur: {
         xs: '2px',

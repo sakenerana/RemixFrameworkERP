@@ -27,6 +27,7 @@ import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import ManagerGroupChat from "~/components/chat";
 import { AiOutlineMinus } from "react-icons/ai";
+import { LuChartBarStacked, LuGitBranch, LuLayoutDashboard, LuWorkflow } from "react-icons/lu";
 
 const { Header, Sider, Content } = Layout;
 
@@ -144,22 +145,24 @@ export default function WorkflowLayoutIndex() {
   const menuItems: MenuProps['items'] = [
     {
       key: "1",
-      icon: <FcGlobe />,
+      icon: <LuLayoutDashboard size={15} />,
       label: <Link to="/workflow/dashboard">Dashboard</Link>,
     },
     {
       key: "2",
-      icon: <FcTemplate />,
+      icon: <LuWorkflow size={15} />, // Perfect for workflow
       label: <Link to="/workflow/workflows">Workflow</Link>,
     },
     {
       key: "3",
-      icon: <FcTreeStructure />,
+      icon: <LuGitBranch size={15} />, // Represents tracking/flow
+      // Alternative: <Search /> for tracker/search
       label: <Link to="/workflow/workflow-tracker">Tracker</Link>,
     },
     {
       key: "4",
-      icon: <FcDocument />,
+      icon: <LuChartBarStacked size={15} />, // Better for reports
+      // Alternative: <FileText /> for document reports
       label: <Link to="/workflow/report">Report</Link>,
     },
   ];
@@ -446,7 +449,7 @@ export default function WorkflowLayoutIndex() {
               <Content
                 className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
                 style={{
-                  background: isDarkMode ? '#141414' : '#ffffff',
+                  background: isDarkMode ? '#141414' : '#FAFAFA',
                   color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
                   marginTop: isMobile ? 0 : 0
                 }}

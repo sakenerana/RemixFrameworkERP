@@ -4,6 +4,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -346,9 +347,9 @@ export default function WorkflowTracker() {
   });
 
   return (
-    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+    <Card className="w-full rounded-lg shadow-sm">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div>
           <Breadcrumb
             items={[
@@ -366,7 +367,7 @@ export default function WorkflowTracker() {
       </div>
 
       {/* Toolbar Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
         <Alert
           message="Review all requested workflows. Monitor status and take action as needed."
           type="info"
@@ -473,7 +474,7 @@ export default function WorkflowTracker() {
               {/* Header Section */}
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-sm font-semibold">
                     {dataModal.requested_by}
                   </h2>
                   <span className="hidden sm:inline">—</span>
@@ -531,6 +532,6 @@ export default function WorkflowTracker() {
           <Timeline mode="right" items={items} className="workflow-timeline" />
         )}
       </Modal>
-    </div>
+    </Card>
   );
 }

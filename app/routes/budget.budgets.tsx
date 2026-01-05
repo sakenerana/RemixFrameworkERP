@@ -320,7 +320,7 @@ export default function Budgets() {
 
   return (
     <div>
-      <div className="flex pb-5 justify-between">
+      <div className="flex justify-between">
         <Breadcrumb
           items={[
             {
@@ -342,6 +342,7 @@ export default function Budgets() {
               icon={<AiOutlinePlus />}
               type="primary"
               disabled={isDisabled}
+              className="mb-2"
             >
               Create Budget
             </Button>

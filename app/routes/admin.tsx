@@ -27,6 +27,7 @@ import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import ManagerGroupChat from "~/components/chat";
 import { AiOutlineMinus } from "react-icons/ai";
+import { LuBuilding2, LuCircleUser, LuLayoutDashboard, LuUsers } from "react-icons/lu";
 
 const { Header, Sider, Content } = Layout;
 
@@ -149,22 +150,22 @@ export default function AdminLayoutIndex() {
   const menuItems: MenuProps['items'] = [
     {
       key: "1",
-      icon: <FcGlobe />,
+      icon: <LuLayoutDashboard size={15} />,
       label: <Link to="/admin/dashboard">Dashboard</Link>,
     },
     {
       key: "3",
-      icon: <FcPortraitMode />,
+      icon: <LuCircleUser size={15} />,
       label: <Link to="/admin/users">Users</Link>,
     },
     {
       key: "4",
-      icon: <FcDepartment />,
+      icon: <LuBuilding2 size={15} />,
       label: <Link to="/admin/departments">Departments</Link>,
     },
     {
       key: "5",
-      icon: <FcConferenceCall />,
+      icon: <LuUsers size={15} />,
       label: <Link to="/admin/groups">Groups</Link>,
     },
   ];

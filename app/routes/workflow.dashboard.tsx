@@ -25,7 +25,7 @@ const translations = {
     pending: "Pending",
     archived: "Archived",
     users: "Users",
-    dashboardTitle: "Workflow Dashboard",
+    dashboardTitle: "Workflows",
     switchToFilipino: "Switch to Filipino",
     switchToEnglish: "Switch to English",
     toBeDetermined: "TBD"
@@ -150,9 +150,9 @@ export default function WorkflowDashboard() {
 
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">{t.dashboardTitle}</h1>
+    <div>
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="font-bold">{t.dashboardTitle}</h1>
         <Button
           type="default"
           onClick={toggleLanguage}
@@ -170,12 +170,12 @@ export default function WorkflowDashboard() {
         message={t.alertMessage}
         type="info"
         showIcon
-        className="mb-6"
+        className="mb-3"
       />
 
       {/* Stats Card */}
       {/* Top 3 Workflows – New Design */}
-      <Row gutter={[16, 16]} className="mb-6">
+      <Row gutter={[16, 16]} className="mb-3">
         {top5Workflows.slice(0, 3).map((workflow, index) => {
           const rankColors = ['bg-yellow-400', 'bg-gray-400', 'bg-amber-600']; // Gold, Silver, Bronze
           const ranks = ['1st', '2nd', '3rd'];
