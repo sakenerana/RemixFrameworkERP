@@ -39,6 +39,7 @@ import {
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
 
@@ -129,6 +130,23 @@ export default function DepartmentsRoutes() {
     }
   };
 
+  // Fetch data from Supabase Budget Code particulars
+  const [particularOptions, setParticularOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const fetchBudgetParticular = async () => {
+    try {
+      setLoading(true);
+      const dataFetch = await BudgetCodeService.getAllParticulars();
+      setParticularOptions(dataFetch.map((item: any) => ({
+        label: item.particulars,
+        value: item.id.toString()
+      })));
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (searchText.trim() === '') {
       fetchData();
@@ -138,7 +156,7 @@ export default function DepartmentsRoutes() {
       );
       setFilteredData(filtered);
     }
-
+    fetchBudgetParticular();
   }, [searchText]); // Empty dependency array means this runs once on mount
 
   // Create or Update record
@@ -156,7 +174,6 @@ export default function DepartmentsRoutes() {
       if (editingId) {
         // Update existing record
         const { error } = await DepartmentService.updatePost(editingId, values);
-
         if (error) throw message.error(error.message);
         message.success("Record updated successfully");
       } else {
@@ -342,7 +359,7 @@ export default function DepartmentsRoutes() {
 
       {/* Department Creation/Edit Modal */}
       <Modal
-        width={500}
+        width={1000}
         title={
           <div className="flex items-center gap-2">
             <AiOutlineBuild className="text-blue-500 text-xl" />
@@ -400,6 +417,19 @@ export default function DepartmentsRoutes() {
               className="h-10"
               allowClear
             />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span className="font-medium">
+                Select Budget Particulars: <span className="text-red-500">*</span>
+              </span>
+            }
+            name="budget_code"
+            rules={[{ required: true, message: 'Please select at least one budget particular' }]}
+          >
+            <Checkbox.Group options={particularOptions}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" />
           </Form.Item>
 
           {/* Form Actions */}
