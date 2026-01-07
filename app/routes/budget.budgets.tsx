@@ -4,8 +4,11 @@ import {
   Breadcrumb,
   Button,
   Card,
+  Collapse,
+  CollapseProps,
   DatePicker,
   Form,
+  Input,
   InputNumber,
   message,
   Modal,
@@ -24,13 +27,14 @@ import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
+import { DepartmentService } from "~/services/department.service";
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
   const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
   const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
   const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
-
+  const [dataDepartment, setDataDepartment] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +44,7 @@ export default function Budgets() {
   const [isOfficeID, setOfficeID] = useState<any>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUnbudgetedRequisitionModalOpen, setIsUnbudgetedRequisitionModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
   const { RangePicker } = DatePicker;
 
@@ -53,17 +58,31 @@ export default function Budgets() {
     });
   };
 
+  const onResetUnbudgetedRequisition = () => {
+    Modal.confirm({
+      title: "Confirm Reset",
+      content: "Are you sure you want to reset all form fields?",
+      okText: "Reset",
+      cancelText: "Cancel",
+      onOk: () => form.resetFields(),
+    });
+  };
+
   const handleTrack = () => {
     setIsModalOpen(true);
   };
 
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-  // };
+  const handleUnbudgetedRequisition = () => {
+    setIsUnbudgetedRequisitionModalOpen(true);
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
     form.resetFields();
+  };
+
+  const handleCancelUnbudgetedRequisition = () => {
+    setIsUnbudgetedRequisitionModalOpen(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -72,23 +91,6 @@ export default function Budgets() {
       currency: "PHP",
     }).format(amount);
   };
-
-  // const getBudgetProgress = (spent: number, total: number) => {
-  //   return Math.min((spent / total) * 100, 100);
-  // };
-
-  // const getBudgetStatusColor = (spent: number, total: number) => {
-  //   const percentage = (spent / total) * 100;
-  //   if (percentage < 70) return "text-green-600";
-  //   if (percentage < 90) return "text-amber-600";
-  //   return "text-red-600";
-  // };
-
-  // const handleRefetch = async () => {
-  //   setLoading(true);
-  //   await fetchData();
-  //   setLoading(false);
-  // };
 
   const fetchData = async () => {
     try {
@@ -100,6 +102,20 @@ export default function Budgets() {
       message.error("error");
     } finally {
       // setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchDataDepartment = async () => {
+    try {
+      setLoading(true);
+      const dataFetch = await DepartmentService.getAllPosts();
+      setDataDepartment(dataFetch); // Works in React state
+      console.log("DATA DEPARTMENT", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -218,6 +234,15 @@ export default function Budgets() {
     setDataCombinedTotal(0);
   };
 
+  const disableCreateBudgetButton = async () => {
+    if(isDepartmentID == 2)
+    {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }
+
   useEffect(() => {
     const fetchAllData = async () => {
       try {
@@ -234,6 +259,8 @@ export default function Budgets() {
     };
 
     fetchAllData();
+    fetchDataDepartment();
+    disableCreateBudgetButton();
   }, []);
 
   useMemo(() => {
@@ -255,19 +282,12 @@ export default function Budgets() {
     },
   ];
 
-  const trendData = [
-    { date: "2023-01", value: 35 },
-    { date: "2023-02", value: 42 },
-    { date: "2023-03", value: 38 },
-    { date: "2023-04", value: 51 },
-    { date: "2023-05", value: 49 },
-    { date: "2023-06", value: 49 },
-    { date: "2023-07", value: 49 },
-    { date: "2023-08", value: 49 },
-    { date: "2023-09", value: 49 },
-    { date: "2023-10", value: 49 },
-    { date: "2023-11", value: 49 },
-  ];
+  const departments: CollapseProps['items'] = dataDepartment.map((item: any) => ({
+    key: item.id,
+    label: item.department,
+    children: <p>test</p>,
+    extra: "₱ 12341.00"
+  }));
 
   const onFinish = async () => {
     try {
@@ -318,6 +338,16 @@ export default function Budgets() {
     }
   };
 
+  const onFinishUnbudgetedRequisition = async () => {
+    try {
+      const values = await form.validateFields();
+      const { date, notes } = values;
+    } catch (error) {
+      console.error("Error:", error);
+      message.error(error instanceof Error ? error.message : "Failed to create record");
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between">
@@ -336,6 +366,17 @@ export default function Budgets() {
           ]}
         />
         <Space direction="horizontal">
+          <Space wrap>
+            <Button
+              onClick={() => handleUnbudgetedRequisition()}
+              icon={<AiOutlinePlus />}
+              type="default"
+              disabled={isDisabled}
+              className="mb-2"
+            >
+              Create Unbudgeted
+            </Button>
+          </Space>
           <Space wrap>
             <Button
               onClick={() => handleTrack()}
@@ -399,10 +440,6 @@ export default function Budgets() {
                 suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
                 format="MMM D, YYYY"
                 placeholder={['Start date', 'End date']}
-                disabledDate={(current) => {
-                  // Disable dates before today
-                  return current && current < moment().startOf('day');
-                }}
               />
             </Form.Item>
 
@@ -469,6 +506,140 @@ export default function Budgets() {
                 icon={!loading && <AiOutlineCheck />}
               >
                 {loading ? 'Creating...' : 'Create Budget'}
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+
+        {/* UNBUDGETED REQUISITION MODAL */}
+        <Modal
+          width={460}
+          title={
+            <div className="flex items-center gap-3">
+              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
+              <span className="text-xl font-semibold">Create Unbudgeted</span>
+            </div>
+          }
+          open={isUnbudgetedRequisitionModalOpen}
+          onCancel={handleCancelUnbudgetedRequisition}
+          footer={null}
+          centered
+          destroyOnClose
+          styles={{
+            header: { borderBottom: '1px solid #f0f0f0', padding: '20px 24px' },
+            body: { padding: '24px' }
+          }}
+          className="unbudgeted-requisition-modal"
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinishUnbudgetedRequisition}
+            className="unbudgeted-requisition-form"
+          >
+            {/* Date Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Date <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="date"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select date'
+                }
+              ]}
+              className="mb-6"
+            >
+              <DatePicker
+                className="w-full h-10 rounded-lg"
+                suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                format="MMM D, YYYY"
+                placeholder="Select date"
+              />
+            </Form.Item>
+
+            {/* Amount Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Amount <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="amount"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter amount'
+                },
+                {
+                  type: 'number',
+                  min: 0,
+                  message: 'Amount must be positive'
+                }
+              ]}
+              className="mb-2"
+            >
+              <InputNumber
+                className="w-full h-10 rounded-lg"
+                min={0}
+                step={1000}
+                formatter={(value) => {
+                  if (value === undefined || value === null) return '₱ 0';
+                  // Format with commas and peso sign
+                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }}
+                parser={(value: any) => {
+                  // Remove all non-numeric characters
+                  return value ? value.replace(/[^\d]/g, '') : '';
+                }}
+                placeholder="Enter amount"
+              />
+            </Form.Item>
+
+            {/* Notes Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Notes <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="notes"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter notes'
+                }
+              ]}
+              className="mb-2"
+            >
+              <Input.TextArea
+                className="w-full h-20 rounded-lg"
+                placeholder="Enter notes"
+              />
+            </Form.Item>
+            {/* Form Actions */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+              <Button
+                onClick={onResetUnbudgetedRequisition}
+                type="default"
+                size="large"
+                className="w-full sm:w-auto h-11"
+                icon={<AiOutlineClear className="text-gray-600" />}
+              >
+                Clear
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                loading={loading}
+                icon={!loading && <AiOutlineCheck />}
+              >
+                {loading ? 'Creating...' : 'Create Unbudgeted'}
               </Button>
             </div>
           </Form>
@@ -555,7 +726,7 @@ export default function Budgets() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <div className="text-sm">Total Budget</div>
+                  <div className="text-sm">Total Budgeted</div>
                   <div className="text-2xl font-bold">
                     {formatCurrency(data?.budget || 0)}
                   </div>
@@ -572,6 +743,22 @@ export default function Budgets() {
                   <div className="text-sm">Remaining</div>
                   <div className="text-2xl font-bold text-green-600">
                     {formatCurrency(Number(data?.budget || 0) - dataCombinedTotal || 0)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div className="space-y-2">
+                  <div className="text-sm">Total Unbudgeted</div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(data?.budget || 0)}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm">OVERALL BUDGET STATUS</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatCurrency(dataCombinedTotal)}
                   </div>
                 </div>
               </div>
@@ -593,30 +780,28 @@ export default function Budgets() {
         </div>
       </Row>
 
+      {/* LIST OF DEPARTMENT AND INFORMATION CARD */}
+      <Row gutter={16} className="">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
+          <Card
+            className="rounded-lg mb-6 shadow-sm"
+          >
+            <div className="flex flex-col">
+              <h2 className="flex flex-wrap text-md font-semibold">
+                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
+                ALL DEPARTMENTS ({dataDepartment.length})
+              </h2>
+              <div className="mt-2">
+                <Collapse items={departments} defaultActiveKey={['1']} />
+              </div>
+            </div>
+          </Card>
+        </div>
+      </Row>
+
       {/* THIS IS THE BUDGET DASHBOARD */}
 
       <Row gutter={16}>
-        {/* <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
-          <Card
-            className="rounded-md shadow-md overflow-hidden transition-transform duration-300"
-          >
-            <div>
-              <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Spending By Category
-              </h2>
-              <p className="flex flex-wrap text-xs">Current month breakdown</p>
-              {loading ? (
-                <Skeleton active paragraph={{ rows: 6 }} />
-              ) : (
-                <LineChart
-                  data={trendData}
-                  title="Monthly Performance"
-                  color="#6a5acd"
-                />
-              )}
-            </div>
-          </Card>
-        </div> */}
         <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-start gap-4">
             <AiOutlineInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
@@ -631,24 +816,6 @@ export default function Budgets() {
                 Track expenses weekly to avoid surprises.
                 <span className="font-medium text-blue-900"> Save 10% as emergency buffer.</span>
               </p>
-              {/* <div className="mt-2 flex items-center gap-2">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<AiOutlinePlusCircle />}
-                  className="text-blue-600 text-xs"
-                >
-                  Create Reminder
-                </Button>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<AiOutlineShareAlt />}
-                  className="text-blue-600 text-xs"
-                >
-                  Share Tip
-                </Button>
-              </div> */}
               <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
                 <p className="text-xs text-blue-700 italic">
                   “A budget is telling your money where to go instead of wondering where it went.”
