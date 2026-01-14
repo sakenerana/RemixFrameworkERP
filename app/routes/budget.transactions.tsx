@@ -59,18 +59,18 @@ export default function BudgetTransactions() {
     setLoading(false);
   };
 
-  const fetchDataBudget = async () => {
-    try {
-      // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
-      setDataBudget(dataFetch); // Works in React state
-      console.log("BUDGET DATA", dataFetch)
-    } catch (error) {
-      message.error("error");
-    } finally {
-      // setLoading(false);
-    }
-  };
+  // const fetchDataBudget = async () => {
+  //   try {
+  //     // setLoading(true);
+  //     const dataFetch = await BudgetService.getByData();
+  //     setDataBudget(dataFetch); // Works in React state
+  //     console.log("BUDGET DATA", dataFetch)
+  //   } catch (error) {
+  //     message.error("error");
+  //   } finally {
+  //     // setLoading(false);
+  //   }
+  // };
 
   const fetchData = async () => {
     const userId = Number(localStorage.getItem("ab_id"));
@@ -78,14 +78,13 @@ export default function BudgetTransactions() {
     const userDepartment = localStorage.getItem("dept") || "";
     const userOffice = localStorage.getItem("userOffice") || "";
     const departmentId = isDepartmentID;
-    const officeId = isOfficeID;
 
     // Cache configuration
-    const CACHE_KEY = `completedRequisition_${userId}_${departmentId}_${officeId}`;
+    const CACHE_KEY = `completedRequisition_${userId}_${departmentId}`;
     const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache
     const now = new Date().getTime();
 
-    if (!userId || !username || !departmentId || !officeId) {
+    if (!userId || !username || !departmentId) {
       console.warn("Missing required identifiers");
       return;
     }
@@ -112,12 +111,12 @@ export default function BudgetTransactions() {
           `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
-        BudgetService.getByData(departmentId, officeId)
+        BudgetService.getTransactionByDepartment(departmentId)
       ]);
 
       const items = requisitionResponse.data.data || [];
-      const startDate = budgetData?.start_date;
-      const endDate = budgetData?.end_date;
+      const startDate = budgetData?.start_date; // "2024-01-01";
+      const endDate = budgetData?.end_date; // "2024-12-31";
 
       // Early return if missing dates
       if (!startDate || !endDate) {
@@ -179,7 +178,7 @@ export default function BudgetTransactions() {
 
   useEffect(() => {
     if (searchText.trim() === '') {
-      fetchDataBudget();
+      // fetchDataBudget();
       fetchData();
     } else {
       const filtered = data.filter(data =>

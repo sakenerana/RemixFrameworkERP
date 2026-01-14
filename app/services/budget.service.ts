@@ -14,6 +14,17 @@ export const BudgetService = {
         return data[0]
     },
 
+    // Create Unbudgeted
+    async createUnbudgeted(postData: Budget) {
+        const { data, error } = await supabase
+            .from('unbudget')
+            .insert(postData)
+            .select()
+
+        if (error) throw error
+        return data[0]
+    },
+
     // Read (single)
     async getPostById(id: number) {
         const { data, error } = await supabase
@@ -26,25 +37,91 @@ export const BudgetService = {
         return data
     },
 
-    async getByData(departmentID: number, officeID: number) {
-        // const currentDate = new Date().toISOString();
+    async getByData() {
+        const currentYear = new Date().getFullYear();
 
         const { data, error } = await supabase
             .from('budget')
             .select('*, status_labels(*), departments(*)')
-            .eq('status_id', 1) // Only approved budgets
-            .eq('department_id', departmentID)
-            .eq('office_id', officeID)
-            // Filter where current date is between start and end dates
-            // .lte('start_date', currentDate)
-            // .gte('end_date', currentDate)
-            // Get the most recently created budget
+            .eq('status_id', 1)
+
+            // Filter where current date is within budget period
+            //.lte('start_date', currentYear) // start_date <= today
+            //.gte('end_date', currentYear)   // end_date >= today
+
+            // Alternative: Filter by year of start_date
+            .gte('end_date', `${currentYear}-01-01`)
+            .lte('start_date', `${currentYear}-12-31`)
+
             .order('created_at', { ascending: false })
-            .limit(1); // Only get the single most recent budget
 
         if (error) throw error;
-        return data?.[0] || null; // Return single record or null
+        return data || null;
     },
+
+    async getTransactionByDepartment(isDepartmentID: number) {
+        const currentYear = new Date().getFullYear();
+
+        const { data, error } = await supabase
+            .from('budget')
+            .select('*, status_labels(*), departments(*)')
+            .eq('status_id', 1)
+            .eq('department_id', isDepartmentID)
+            // Filter where current date is within budget period
+            //.lte('start_date', currentYear) // start_date <= today
+            //.gte('end_date', currentYear)   // end_date >= today
+
+            // Alternative: Filter by year of start_date
+            .gte('end_date', `${currentYear}-01-01`)
+            .lte('start_date', `${currentYear}-12-31`)
+
+            .order('created_at', { ascending: false })
+
+        if (error) throw error;
+        return data[0] || null;
+    },
+
+    async getAllUnbudgeted() {
+        const currentYear = new Date().getFullYear();
+
+        const { data, error } = await supabase
+            .from('unbudget')
+            .select('*, status_labels(*), departments(*)')
+            .eq('status_id', 1)
+
+            // Filter where current date is within budget period
+            //.lte('start_date', currentYear) // start_date <= today
+            //.gte('end_date', currentYear)   // end_date >= today
+
+            // Alternative: Filter by year of start_date
+            .gte('date', `${currentYear}-01-01`)
+            .lte('date', `${currentYear}-12-31`)
+
+            .order('created_at', { ascending: false })
+
+        if (error) throw error;
+        return data || null;
+    },
+
+    // async getByData() {
+    //     // const currentDate = new Date().toISOString();
+
+    //     const { data, error } = await supabase
+    //         .from('budget')
+    //         .select('*, status_labels(*), departments(*)')
+    //         .eq('status_id', 1) // Only approved budgets
+    //         //.eq('department_id', departmentID)
+    //         //.eq('office_id', officeID)
+    //         // Filter where current date is between start and end dates
+    //         // .lte('start_date', currentDate)
+    //         // .gte('end_date', currentDate)
+    //         // Get the most recently created budget
+    //         .order('created_at', { ascending: false })
+    //         .limit(1); // Only get the single most recent budget
+
+    //     if (error) throw error;
+    //     return data?.[0] || null; // Return single record or null
+    // },
 
     async getAllPosts(departmentID: number, currentDate: string) {
         const { data, error } = await supabase
@@ -55,6 +132,20 @@ export const BudgetService = {
             // Filter where current date is between start and end dates
             // .lte('start_date', currentDate)  // start_date <= currentDate
             .gte('end_date', currentDate)   // end_date >= currentDate
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
+
+    async getAllBudgetPosts() {
+        const { data, error } = await supabase
+            .from('budget')
+            .select('*, status_labels(*), departments(*)')
+            .eq('status_id', 1)
+            // Filter where current date is between start and end dates
+            // .lte('start_date', currentDate)  // start_date <= currentDate
+            // .gte('end_date', currentYear)   // end_date >= currentDate
             .order('created_at', { ascending: false });
 
         if (error) throw error;

@@ -34,6 +34,8 @@ export interface Budget {
     user_id: number;
     date?: [Moment, Moment];
     status_id: number;
+    department_id: number;
+    office_id: number;
 
     // Relationships
     status_labels: StatusLabel;

@@ -1,4 +1,4 @@
-import { HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { EditOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
   Alert,
   Breadcrumb,
@@ -14,10 +14,12 @@ import {
   Modal,
   Progress,
   Row,
+  Select,
   Skeleton,
   Space,
   Spin,
   Tag,
+  Tooltip,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -28,14 +30,20 @@ import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
 import { DepartmentService } from "~/services/department.service";
+import { Department } from "~/types/department.type";
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
+  const [dataUnbudget, setDataUnbudget] = useState<any>();
   const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
   const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
+  const [dataTotalBudgeted, setDataTotalBudgeted] = useState<any>(0);
+  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState<any>(0);
   const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
-  const [dataDepartment, setDataDepartment] = useState<any>([]);
+  const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
+  const [dataBudgetDepartment, setDataBudgetDepartment] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingBudget, setLoadingBudget] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +54,9 @@ export default function Budgets() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUnbudgetedRequisitionModalOpen, setIsUnbudgetedRequisitionModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
+  const [formUnbudgeted] = Form.useForm<any>();
   const { RangePicker } = DatePicker;
+  const { Option } = Select;
 
   const onReset = () => {
     Modal.confirm({
@@ -95,9 +105,26 @@ export default function Budgets() {
   const fetchData = async () => {
     try {
       // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
+      const dataFetch: any = await BudgetService.getByData();
       setData(dataFetch); // Works in React state
+      const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
+      setDataTotalBudgeted(totalBudget);
       // console.log("BUDGET DATAS", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const fetchUnbudgetData = async () => {
+    try {
+      // setLoading(true);
+      const dataFetch: any = await BudgetService.getAllUnbudgeted();
+      setDataUnbudget(dataFetch); // Works in React state
+      const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
+      setDataTotalUnBudgeted(totalUnBudget);
+      // console.log("UNBUDGET DATAS", totalUnBudget)
     } catch (error) {
       message.error("error");
     } finally {
@@ -111,7 +138,21 @@ export default function Budgets() {
       setLoading(true);
       const dataFetch = await DepartmentService.getAllPosts();
       setDataDepartment(dataFetch); // Works in React state
-      console.log("DATA DEPARTMENT", dataFetch)
+      // console.log("DATA DEPARTMENT", dataFetch)
+    } catch (error) {
+      message.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from Supabase
+  const fetchBudgetDepartment = async () => {
+    try {
+      setLoading(true);
+      const dataFetch = await BudgetService.getAllBudgetPosts();
+      setDataBudgetDepartment(dataFetch); // Works in React state
+      // console.log("DATA DEPARTMENT BUDGET", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -122,17 +163,14 @@ export default function Budgets() {
   const fetchDataBudgetApproved = async () => {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
-    const userDepartment = localStorage.getItem("dept") || "";
-    const userOffice = localStorage.getItem("userOffice") || "";
     const departmentId = isDepartmentID;
-    const officeId = isOfficeID;
 
     // Cache configuration
-    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}_${officeId}`;
+    const CACHE_KEY = `budgetApproved_${userId}_${departmentId}`;
     const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache
     const now = new Date().getTime();
 
-    if (!userId || !username || !departmentId || !officeId) {
+    if (!userId || !username) {
       console.warn("Missing required identifiers");
       return;
     }
@@ -153,20 +191,21 @@ export default function Budgets() {
           return;
         }
       }
-
+      setLoadingBudget(true)
       // Parallel API calls
       const [requisitionResponse, budgetData] = await Promise.all([
         axios.post<{ data: any[] }>(
           `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
-        BudgetService.getByData(departmentId, officeId)
+        BudgetService.getByData()
       ]);
 
       const items = requisitionResponse.data.data || [];
-      const startDate = budgetData?.start_date;
-      const endDate = budgetData?.end_date;
-
+      // const startDate = `2025-01-01`;
+      // const endDate = '2025-12-31';
+      const startDate = budgetData[0]?.start_date;
+      const endDate = budgetData[0]?.end_date;
       // Early return if missing dates
       if (!startDate || !endDate) {
         resetTotals();
@@ -180,11 +219,13 @@ export default function Budgets() {
 
       // Calculate totals in single pass
       const totals = items.reduce((acc, item) => {
+
         if (!item.startDate) return acc;
 
         const itemDateStr = new Date(item.startDate).toISOString().split('T')[0];
         const inRange = itemDateStr >= rangeStartStr && itemDateStr <= rangeEndStr;
-        const matches = item.department === userDepartment && item.branch === userOffice && item.status === 'Completed' && inRange;
+        const matches = item.status === 'Completed' && inRange;
+        //const matches = item.department === userDepartment && item.branch === userOffice && item.status === 'Completed' && inRange;
 
         if (matches) {
           const amount = Number(item.totalAmount) || 0;
@@ -202,6 +243,7 @@ export default function Budgets() {
       setDataTotalRequisition(totals.requisition);
       setDataTotalLiquidation(totals.liquidation);
       setDataCombinedTotal(totals.combined);
+      setLoadingBudget(false);
 
       localStorage.setItem(CACHE_KEY, JSON.stringify({
         totals,
@@ -235,8 +277,7 @@ export default function Budgets() {
   };
 
   const disableCreateBudgetButton = async () => {
-    if(isDepartmentID == 2)
-    {
+    if (isDepartmentID == 2) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -249,6 +290,7 @@ export default function Budgets() {
         setLoading(true);
         await Promise.all([
           fetchData(),
+          fetchUnbudgetData(),
           fetchDataBudgetApproved()
         ]);
       } catch (error) {
@@ -260,6 +302,7 @@ export default function Budgets() {
 
     fetchAllData();
     fetchDataDepartment();
+    fetchBudgetDepartment();
     disableCreateBudgetButton();
   }, []);
 
@@ -269,24 +312,51 @@ export default function Budgets() {
     setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
+  const currentYear = new Date().getFullYear();
   const budget = [
     {
-      title: "Requisition",
+      title: `Overall Requisition - ${currentYear}`,
       value: dataTotalRequisition,
-      totalBudget: data?.budget
+      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted
     },
     {
-      title: "Liquidation",
+      title: `Overall Liquidation - ${currentYear}`,
       value: dataTotalLiquidation,
-      totalBudget: data?.budget
+      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted
     },
   ];
 
-  const departments: CollapseProps['items'] = dataDepartment.map((item: any) => ({
+  const departments: CollapseProps['items'] = dataBudgetDepartment.map((item: any) => ({
     key: item.id,
-    label: item.department,
-    children: <p>test</p>,
-    extra: "₱ 12341.00"
+    label: item.departments.department,
+    children: <Particulars item={item} />,
+    extra: (
+      <div className="flex items-center gap-3">
+        {/* Budget Amount with subtle styling */}
+        <div className="text-xl font-bold text-blue-800 tracking-tight">
+          {new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(item.budget)}
+        </div>
+
+        {/* Edit Icon with button style */}
+        <Button
+          type="text"
+          size="small"
+          icon={<EditOutlined className="text-xs" />}
+          onClick={(e) => {
+            e.stopPropagation();
+            // handleEditBudget(item);
+          }}
+          className="flex items-center text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded"
+        >
+          Edit
+        </Button>
+      </div>
+    )
   }));
 
   const onFinish = async () => {
@@ -306,7 +376,7 @@ export default function Budgets() {
       // console.log("currentDate", currentDate)
       // Check if data already exists for this department in current year
       setLoading(true);
-      const existingData = await BudgetService.getAllPosts(isDepartmentID, formattedDate);
+      const existingData = await BudgetService.getAllPosts(values.department_id, formattedDate);
 
       if (existingData && existingData.length > 0) {
         throw new Error(`A budget record already exists for ${dayjs(existingData[0].start_date).format('MMM DD YYYY')} - ${dayjs(existingData[0].end_date).format('MMM DD YYYY')} in this department`);
@@ -318,7 +388,6 @@ export default function Budgets() {
         start_date: startDate.format("YYYY-MM-DD"),
         end_date: endDate.format("YYYY-MM-DD"),
         status_id: 1,
-        department_id: isDepartmentID,
         office_id: isOfficeID,
       };
 
@@ -340,8 +409,25 @@ export default function Budgets() {
 
   const onFinishUnbudgetedRequisition = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await formUnbudgeted.validateFields();
+      console.log("UNBUDGETED REQUISITION VALUES", values);
       const { date, notes } = values;
+
+      // Prepare payload with formatted dates
+      const allValues = {
+        ...values,
+        status_id: 1,
+        office_id: isOfficeID,
+      };
+
+      // Create new record
+      const { error } = await BudgetService.createUnbudgeted(allValues);
+      if (error) throw new Error(error.message);
+
+      message.success("Record created successfully for unbudgeted requisition");
+      setIsUnbudgetedRequisitionModalOpen(false);
+      formUnbudgeted.resetFields();
+      fetchUnbudgetData();
     } catch (error) {
       console.error("Error:", error);
       message.error(error instanceof Error ? error.message : "Failed to create record");
@@ -443,6 +529,31 @@ export default function Budgets() {
               />
             </Form.Item>
 
+            {/* SELECT DEPARTMENT */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Select Department <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="department_id"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select department'
+                }
+              ]}
+              className="mb-6"
+            >
+              <Select placeholder="Select a department" style={{ width: '100%' }}>
+                {dataDepartment.map((item: any) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.department}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
             {/* Initial Balance Field */}
             <Form.Item
               label={
@@ -532,7 +643,7 @@ export default function Budgets() {
           className="unbudgeted-requisition-modal"
         >
           <Form
-            form={form}
+            form={formUnbudgeted}
             layout="vertical"
             onFinish={onFinishUnbudgetedRequisition}
             className="unbudgeted-requisition-form"
@@ -559,6 +670,31 @@ export default function Budgets() {
                 format="MMM D, YYYY"
                 placeholder="Select date"
               />
+            </Form.Item>
+
+            {/* SELECT DEPARTMENT */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Select Department <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="department_id"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select department'
+                }
+              ]}
+              className="mb-6"
+            >
+              <Select placeholder="Select a department" style={{ width: '100%' }}>
+                {dataDepartment.map((item: any) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.department}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
 
             {/* Amount Field */}
@@ -674,14 +810,14 @@ export default function Budgets() {
                 <div className="mt-auto">
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold">
-                      {loading ? (
+                      {loadingBudget ? (
                         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                       ) : (
                         formatCurrency(data.value ?? 0)
                       )}
                     </span>
                     <span className="text-sm">
-                      of ${formatCurrency(data.totalBudget ?? 0)}
+                      of {formatCurrency(data.totalBudget ?? 0)}
                     </span>
                   </div>
                   {loading ? (
@@ -718,7 +854,8 @@ export default function Budgets() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Current Period:</span>
                   <Tag color="blue">
-                    {dayjs(data?.start_date || '').format('MMM DD YYYY')} - {dayjs(data?.end_date || '').format('MMM DD YYYY')}
+                    {`January 01 ${currentYear}`} to {`December 31 ${currentYear}`}
+                    {/* {dayjs(data?.start_date || '').format('MMM DD YYYY')} - {dayjs(data?.end_date || '').format('MMM DD YYYY')} */}
                   </Tag>
                 </div>
               </div>
@@ -728,13 +865,13 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Total Budgeted</div>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(data?.budget || 0)}
+                    {formatCurrency(dataTotalBudgeted || 0)}
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="text-sm">Amount Spent</div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-red-600">
                     {formatCurrency(dataCombinedTotal)}
                   </div>
                 </div>
@@ -742,7 +879,7 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Remaining</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(Number(data?.budget || 0) - dataCombinedTotal || 0)}
+                    {formatCurrency(Number(dataTotalBudgeted + dataTotalUnBudgeted || 0) - dataCombinedTotal || 0)}
                   </div>
                 </div>
               </div>
@@ -751,14 +888,14 @@ export default function Budgets() {
                 <div className="space-y-2">
                   <div className="text-sm">Total Unbudgeted</div>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(data?.budget || 0)}
+                    {formatCurrency(dataTotalUnBudgeted || 0)}
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="text-sm">OVERALL BUDGET STATUS</div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {formatCurrency(dataCombinedTotal)}
+                  <div className="text-2xl font-bold text-blue-800">
+                    {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
                   </div>
                 </div>
               </div>
@@ -792,7 +929,7 @@ export default function Budgets() {
                 ALL DEPARTMENTS ({dataDepartment.length})
               </h2>
               <div className="mt-2">
-                <Collapse items={departments} defaultActiveKey={['1']} />
+                <Collapse items={departments} />
               </div>
             </div>
           </Card>
@@ -833,6 +970,185 @@ export default function Budgets() {
         </div>
 
       </Row>
+    </div>
+  );
+}
+
+function Particulars({ item }: { item: any }) {
+  return (
+    <div className="space-y-6">
+      {/* Header with Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Total Budget Card */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="text-sm text-blue-600 font-medium">Total Budget</div>
+          <div className="text-2xl font-bold text-blue-800 mt-1">
+            {new Intl.NumberFormat('en-PH', {
+              style: 'currency',
+              currency: 'PHP',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(item.budget)}
+          </div>
+        </div>
+
+        {/* Total Spent Card */}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-sm text-red-600 font-medium">Total Spent</div>
+          <div className="text-2xl font-bold text-red-800 mt-1">
+            {new Intl.NumberFormat('en-PH', {
+              style: 'currency',
+              currency: 'PHP',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(item.totalSpent || 0)}
+          </div>
+        </div>
+
+        {/* Remaining Balance Card */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="text-sm text-green-600 font-medium">Remaining Balance</div>
+          <div className="text-2xl font-bold text-green-800 mt-1">
+            {new Intl.NumberFormat('en-PH', {
+              style: 'currency',
+              currency: 'PHP',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(item.budget - (item.totalSpent || 0))}
+          </div>
+          <div className="mt-2">
+            <div className="flex justify-between text-xs text-gray-600 mb-1">
+              <span>Utilization</span>
+              <span>{item.totalSpent ? Math.round((item.totalSpent / item.budget) * 100) : 0}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-green-500 h-2 rounded-full"
+                style={{
+                  width: `${item.totalSpent ? Math.min((item.totalSpent / item.budget) * 100, 100) : 0}%`
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Budget Particulars Table */}
+      <div>
+        <h4 className="text-lg font-semibold text-gray-800 mb-3">Budget Particulars</h4>
+        <div className="overflow-x-auto border border-gray-200 rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Particular</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocated Amount</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spent Amount</th>
+                <th className="px4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {item.particulars?.map((particular: any, index: number) => {
+                const spent = particular.spentAmount || 0;
+                const remaining = particular.allocatedAmount - spent;
+                const status = remaining <= 0 ? 'Exhausted' : remaining < particular.allocatedAmount * 0.2 ? 'Low' : 'Available';
+
+                return (
+                  <tr key={particular.id || index} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{particular.name}</div>
+                      <div className="text-xs text-gray-500">{particular.description || 'No description'}</div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-blue-700">
+                      {new Intl.NumberFormat('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(particular.allocatedAmount)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-red-700">
+                      {new Intl.NumberFormat('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(spent)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                      <span className={remaining > 0 ? 'text-green-700' : 'text-red-700'}>
+                        {new Intl.NumberFormat('en-PH', {
+                          style: 'currency',
+                          currency: 'PHP',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        }).format(remaining)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status === 'Available' ? 'bg-green-100 text-green-800' :
+                        status === 'Low' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                        {status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Monthly Breakdown Section */}
+      <div>
+        <h4 className="text-lg font-semibold text-gray-800 mb-3">Monthly Spending Trend</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {item.monthlySpending?.map((month: any, index: number) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-3">
+              <div className="text-xs font-medium text-gray-500">{month.month}</div>
+              <div className="text-sm font-semibold text-gray-800 mt-1">
+                {new Intl.NumberFormat('en-PH', {
+                  style: 'currency',
+                  currency: 'PHP',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(month.amount)}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                {month.percentage ? `${month.percentage}% of total` : ''}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes Section */}
+      {(item.notes || item.approvedBy) && (
+        <div className="border-t border-gray-200 pt-4">
+          <h4 className="text-sm font-semibold text-gray-800 mb-2">Additional Information</h4>
+          <div className="text-sm text-gray-600 space-y-2">
+            {item.notes && (
+              <div>
+                <span className="font-medium">Notes: </span>
+                {item.notes}
+              </div>
+            )}
+            {item.approvedBy && (
+              <div>
+                <span className="font-medium">Approved by: </span>
+                {item.approvedBy}
+              </div>
+            )}
+            {item.lastUpdated && (
+              <div className="text-xs text-gray-500">
+                Last updated: {new Date(item.lastUpdated).toLocaleDateString()}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
