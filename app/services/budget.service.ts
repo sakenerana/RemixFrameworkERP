@@ -139,6 +139,8 @@ export const BudgetService = {
     },
 
     async getAllBudgetPosts() {
+        const currentYear = new Date().getFullYear();
+        
         const { data, error } = await supabase
             .from('budget')
             .select('*, status_labels(*), departments(*)')
@@ -146,6 +148,8 @@ export const BudgetService = {
             // Filter where current date is between start and end dates
             // .lte('start_date', currentDate)  // start_date <= currentDate
             // .gte('end_date', currentYear)   // end_date >= currentDate
+            .gte('end_date', `${currentYear}-01-01`)
+            .lte('start_date', `${currentYear}-12-31`)
             .order('created_at', { ascending: false });
 
         if (error) throw error;

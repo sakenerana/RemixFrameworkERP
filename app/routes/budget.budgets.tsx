@@ -7,6 +7,7 @@ import {
   Collapse,
   CollapseProps,
   DatePicker,
+  Descriptions,
   Form,
   Input,
   InputNumber,
@@ -35,6 +36,7 @@ import { Department } from "~/types/department.type";
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
   const [dataUnbudget, setDataUnbudget] = useState<any>();
+  const [dataBudgetPerDepartment, setDataBudgetPerDepartment] = useState<any>();
   const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
   const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
   const [dataTotalBudgeted, setDataTotalBudgeted] = useState<any>(0);
@@ -52,8 +54,10 @@ export default function Budgets() {
   const [isOfficeID, setOfficeID] = useState<any>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenEditAllocateBudget, setIsModalOpenEditAllocateBudget] = useState(false);
   const [isUnbudgetedRequisitionModalOpen, setIsUnbudgetedRequisitionModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
+  const [formEditAllocateBudget] = Form.useForm<Budget>();
   const [formUnbudgeted] = Form.useForm<any>();
   const { RangePicker } = DatePicker;
   const { Option } = Select;
@@ -88,7 +92,9 @@ export default function Budgets() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setIsModalOpenEditAllocateBudget(false);
     form.resetFields();
+    formEditAllocateBudget.resetFields();
   };
 
   const handleCancelUnbudgetedRequisition = () => {
@@ -124,7 +130,7 @@ export default function Budgets() {
       setDataUnbudget(dataFetch); // Works in React state
       const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
       setDataTotalUnBudgeted(totalUnBudget);
-      // console.log("UNBUDGET DATAS", totalUnBudget)
+      console.log("UNBUDGET DATA", totalUnBudget)
     } catch (error) {
       message.error("error");
     } finally {
@@ -349,8 +355,12 @@ export default function Budgets() {
           icon={<EditOutlined className="text-xs" />}
           onClick={(e) => {
             e.stopPropagation();
-            // handleEditBudget(item);
+            setIsModalOpenEditAllocateBudget(true);
+            setDataBudgetPerDepartment(item);
+            console.log("COLLAPSE ITEM", item);
+            formEditAllocateBudget.setFieldsValue({ budget: item.budget });
           }}
+          disabled={isDisabled}
           className="flex items-center text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded"
         >
           Edit
@@ -428,6 +438,31 @@ export default function Budgets() {
       setIsUnbudgetedRequisitionModalOpen(false);
       formUnbudgeted.resetFields();
       fetchUnbudgetData();
+    } catch (error) {
+      console.error("Error:", error);
+      message.error(error instanceof Error ? error.message : "Failed to create record");
+    }
+  };
+
+  const onFinishEditAllocateBudget = async () => {
+    try {
+      const values = await formEditAllocateBudget.validateFields();
+      console.log("UNBUDGETED REQUISITION VALUES", values);
+
+      // Prepare payload with formatted dates
+      const allValues = {
+        ...values,
+        status_id: 1,
+      };
+
+      // Create new record
+      // const { error } = await BudgetService.createUnbudgeted(allValues);
+      // if (error) throw new Error(error.message);
+
+      message.success("Record updated successfully for budget adjustment.");
+      setIsModalOpenEditAllocateBudget(false);
+      formEditAllocateBudget.resetFields();
+      fetchData();
     } catch (error) {
       console.error("Error:", error);
       message.error(error instanceof Error ? error.message : "Failed to create record");
@@ -780,6 +815,112 @@ export default function Budgets() {
             </div>
           </Form>
         </Modal>
+
+        {/* EDIT ALLOCATED BUDGET PER DEPARTMENT */}
+        <Modal
+          width={460}
+          title={
+            <div className="flex items-center gap-3">
+              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
+              <span className="text-xl font-semibold">Update Budget</span>
+            </div>
+          }
+          open={isModalOpenEditAllocateBudget}
+          onCancel={handleCancel}
+          footer={null}
+          centered
+          destroyOnClose
+          styles={{
+            header: {
+              borderBottom: '1px solid #f0f0f0',
+              padding: '20px 24px'
+            },
+            body: {
+              padding: '24px'
+            }
+          }}
+          className="budget-modal"
+        >
+          <Form
+            form={formEditAllocateBudget}
+            layout="vertical"
+            onFinish={onFinishEditAllocateBudget}
+            className="budget-form"
+          >
+            <Descriptions className="mb-6" title="">
+              <Descriptions.Item label="Department" span={3}>{dataBudgetPerDepartment?.departments?.department}</Descriptions.Item>
+              <Descriptions.Item label="Start Date" span={3}>{dataBudgetPerDepartment?.start_date}</Descriptions.Item>
+              <Descriptions.Item label="End Date" span={3}>{dataBudgetPerDepartment?.end_date}</Descriptions.Item>
+            </Descriptions>
+
+            {/* Initial Balance Field */}
+            <Form.Item
+              label={
+                <span className="font-medium flex items-center">
+                  Initial Budget <span className="text-red-500 ml-1">*</span>
+                </span>
+              }
+              name="budget"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter initial amount'
+                },
+                {
+                  type: 'number',
+                  min: 0,
+                  message: 'Amount must be positive'
+                }
+              ]}
+              className="mb-2"
+            >
+              <InputNumber
+                className="w-full h-10 rounded-lg"
+                min={0}
+                step={1000}
+                formatter={(value) => {
+                  if (value === undefined || value === null) return '₱ 0';
+                  // Format with commas and peso sign
+                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }}
+                parser={(value: any) => {
+                  // Remove all non-numeric characters
+                  return value ? value.replace(/[^\d]/g, '') : '';
+                }}
+                placeholder="Enter amount"
+              />
+            </Form.Item>
+
+            <div className="text-sm mb-6">
+              <AiOutlineInfoCircle className="inline mr-2" />
+              Enter the starting balance for this budget period
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+              <Button
+                onClick={onReset}
+                type="default"
+                size="large"
+                className="w-full sm:w-auto h-11"
+                icon={<AiOutlineClear className="text-gray-600" />}
+              >
+                Clear
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                loading={loading}
+                icon={!loading && <AiOutlineCheck />}
+              >
+                {loading ? 'Creating...' : 'Update Budget'}
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+
       </div>
       <Alert
         message="You can see here all the status of overall budget status. Please check closely."
@@ -787,7 +928,7 @@ export default function Budgets() {
         showIcon
       />
 
-      {/* THIS IS THE FIRST ROWN OF DASHBOARD */}
+      {/* THIS IS THE FIRST ROW OF DASHBOARD */}
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">

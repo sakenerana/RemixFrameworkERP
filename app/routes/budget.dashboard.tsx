@@ -40,6 +40,9 @@ const translations = {
 
 export default function BudgetRoutes() {
   const [data, setData] = useState<Budget>();
+  const [dataUnbudget, setDataUnbudget] = useState<any>();
+  const [dataTotalBudgeted, setDataTotalBudgeted] = useState<any>(0);
+  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState<any>(0);
   const [dataMonthly, setMonthlyData] = useState<any>();
   const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
   const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
@@ -71,11 +74,28 @@ export default function BudgetRoutes() {
   const fetchData = async () => {
     try {
       // setLoading(true);
-      const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
+      const dataFetch: any = await BudgetService.getByData();
       setData(dataFetch); // Works in React state
+      const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
+      setDataTotalBudgeted(totalBudget);
       // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
-      message.error("errorss");
+      message.error("error");
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const fetchUnbudgetData = async () => {
+    try {
+      // setLoading(true);
+      const dataFetch: any = await BudgetService.getAllUnbudgeted();
+      setDataUnbudget(dataFetch); // Works in React state
+      const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
+      setDataTotalUnBudgeted(totalUnBudget);
+      // console.log("DATA FETCH", totalUnBudget)
+    } catch (error) {
+      message.error("error");
     } finally {
       // setLoading(false);
     }
@@ -142,11 +162,12 @@ export default function BudgetRoutes() {
         const itemYear = new Date(item.startDate).getFullYear();
         if (itemYear !== currentYear) return acc;
 
-        const matches = item.department === userDepartment && item.status === 'Completed';
+        // const matches = item.department === userDepartment && item.status === 'Completed';
+        const matches = item.status === 'Completed';
         if (!matches) return acc;
 
-        const offices = item.branch === userOffice;
-        if (!offices) return acc;
+        // const offices = item.branch === userOffice;
+        // if (!offices) return acc;
 
         const amount = Number(item.totalAmount) || 0;
         const date = new Date(item.startDate);
@@ -219,6 +240,7 @@ export default function BudgetRoutes() {
         setLoading(true);
         await Promise.all([
           fetchData(),
+          fetchUnbudgetData(),
           fetchDataBudgetApproved()
         ]);
       } catch (error) {
@@ -269,7 +291,7 @@ export default function BudgetRoutes() {
                     <RiCircleFill className="text-[5px] text-blue-500 mt-2 mr-2" /> Total Budget
                   </h2>
                   <p className="flex flex-wrap text-blue-600 text-2xl font-bold">
-                    <AiOutlineDollar className="mt-1 mr-2" /> {formatCurrency(data?.budget ?? 0)}
+                    <AiOutlineDollar className="mt-1 mr-2" /> {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
                   </p>
                   <p className="text-xs mt-4">Annual allocation for {new Date().getFullYear()}</p>
                 </div>
@@ -335,7 +357,7 @@ export default function BudgetRoutes() {
                   <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                     <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Amount Spent
                   </h2>
-                  <p className="flex flex-wrap text-green-600 text-2xl font-bold">
+                  <p className="flex flex-wrap text-red-600 text-2xl font-bold">
                     <AiOutlineWallet className="mt-1 mr-2" /> {formatCurrency(Number(dataCombinedTotal) || 0)}
                   </p>
                   <p className="text-xs mt-4">Annual spent this year</p>
