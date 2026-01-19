@@ -32,6 +32,7 @@ import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
+import Particulars from "~/components/particulars";
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
@@ -357,7 +358,7 @@ export default function Budgets() {
             e.stopPropagation();
             setIsModalOpenEditAllocateBudget(true);
             setDataBudgetPerDepartment(item);
-            console.log("COLLAPSE ITEM", item);
+            // console.log("COLLAPSE ITEM", item);
             formEditAllocateBudget.setFieldsValue({ budget: item.budget });
           }}
           disabled={isDisabled}
@@ -447,22 +448,23 @@ export default function Budgets() {
   const onFinishEditAllocateBudget = async () => {
     try {
       const values = await formEditAllocateBudget.validateFields();
-      console.log("UNBUDGETED REQUISITION VALUES", values);
+
 
       // Prepare payload with formatted dates
       const allValues = {
         ...values,
         status_id: 1,
       };
-
-      // Create new record
-      // const { error } = await BudgetService.createUnbudgeted(allValues);
-      // if (error) throw new Error(error.message);
+      // console.log("UNBUDGETED REQUISITION VALUES", allValues, dataBudgetPerDepartment.id);
+      // Update existing record
+      const { error } = await BudgetService.updatePost(dataBudgetPerDepartment.id, allValues);
+      if (error) throw new Error(error.message);
 
       message.success("Record updated successfully for budget adjustment.");
       setIsModalOpenEditAllocateBudget(false);
       formEditAllocateBudget.resetFields();
       fetchData();
+      fetchBudgetDepartment()
     } catch (error) {
       console.error("Error:", error);
       message.error(error instanceof Error ? error.message : "Failed to create record");
@@ -848,9 +850,29 @@ export default function Budgets() {
             className="budget-form"
           >
             <Descriptions className="mb-6" title="">
-              <Descriptions.Item label="Department" span={3}>{dataBudgetPerDepartment?.departments?.department}</Descriptions.Item>
-              <Descriptions.Item label="Start Date" span={3}>{dataBudgetPerDepartment?.start_date}</Descriptions.Item>
-              <Descriptions.Item label="End Date" span={3}>{dataBudgetPerDepartment?.end_date}</Descriptions.Item>
+              <Descriptions.Item label="Department" span={3}>
+                {dataBudgetPerDepartment?.departments?.department}
+              </Descriptions.Item>
+              <Descriptions.Item label="Start Date" span={3}>
+                {dataBudgetPerDepartment?.start_date ?
+                  new Date(dataBudgetPerDepartment.start_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  }) :
+                  'N/A'
+                }
+              </Descriptions.Item>
+              <Descriptions.Item label="End Date" span={3}>
+                {dataBudgetPerDepartment?.end_date ?
+                  new Date(dataBudgetPerDepartment.end_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  }) :
+                  'N/A'
+                }
+              </Descriptions.Item>
             </Descriptions>
 
             {/* Initial Balance Field */}
@@ -1111,185 +1133,6 @@ export default function Budgets() {
         </div>
 
       </Row>
-    </div>
-  );
-}
-
-function Particulars({ item }: { item: any }) {
-  return (
-    <div className="space-y-6">
-      {/* Header with Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Total Budget Card */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="text-sm text-blue-600 font-medium">Total Budget</div>
-          <div className="text-2xl font-bold text-blue-800 mt-1">
-            {new Intl.NumberFormat('en-PH', {
-              style: 'currency',
-              currency: 'PHP',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }).format(item.budget)}
-          </div>
-        </div>
-
-        {/* Total Spent Card */}
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-sm text-red-600 font-medium">Total Spent</div>
-          <div className="text-2xl font-bold text-red-800 mt-1">
-            {new Intl.NumberFormat('en-PH', {
-              style: 'currency',
-              currency: 'PHP',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }).format(item.totalSpent || 0)}
-          </div>
-        </div>
-
-        {/* Remaining Balance Card */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="text-sm text-green-600 font-medium">Remaining Balance</div>
-          <div className="text-2xl font-bold text-green-800 mt-1">
-            {new Intl.NumberFormat('en-PH', {
-              style: 'currency',
-              currency: 'PHP',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }).format(item.budget - (item.totalSpent || 0))}
-          </div>
-          <div className="mt-2">
-            <div className="flex justify-between text-xs text-gray-600 mb-1">
-              <span>Utilization</span>
-              <span>{item.totalSpent ? Math.round((item.totalSpent / item.budget) * 100) : 0}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-green-500 h-2 rounded-full"
-                style={{
-                  width: `${item.totalSpent ? Math.min((item.totalSpent / item.budget) * 100, 100) : 0}%`
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Budget Particulars Table */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">Budget Particulars</h4>
-        <div className="overflow-x-auto border border-gray-200 rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Particular</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allocated Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spent Amount</th>
-                <th className="px4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {item.particulars?.map((particular: any, index: number) => {
-                const spent = particular.spentAmount || 0;
-                const remaining = particular.allocatedAmount - spent;
-                const status = remaining <= 0 ? 'Exhausted' : remaining < particular.allocatedAmount * 0.2 ? 'Low' : 'Available';
-
-                return (
-                  <tr key={particular.id || index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{particular.name}</div>
-                      <div className="text-xs text-gray-500">{particular.description || 'No description'}</div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-blue-700">
-                      {new Intl.NumberFormat('en-PH', {
-                        style: 'currency',
-                        currency: 'PHP',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      }).format(particular.allocatedAmount)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-red-700">
-                      {new Intl.NumberFormat('en-PH', {
-                        style: 'currency',
-                        currency: 'PHP',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      }).format(spent)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                      <span className={remaining > 0 ? 'text-green-700' : 'text-red-700'}>
-                        {new Intl.NumberFormat('en-PH', {
-                          style: 'currency',
-                          currency: 'PHP',
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        }).format(remaining)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status === 'Available' ? 'bg-green-100 text-green-800' :
-                        status === 'Low' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                        {status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Monthly Breakdown Section */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">Monthly Spending Trend</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {item.monthlySpending?.map((month: any, index: number) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-3">
-              <div className="text-xs font-medium text-gray-500">{month.month}</div>
-              <div className="text-sm font-semibold text-gray-800 mt-1">
-                {new Intl.NumberFormat('en-PH', {
-                  style: 'currency',
-                  currency: 'PHP',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(month.amount)}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {month.percentage ? `${month.percentage}% of total` : ''}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Notes Section */}
-      {(item.notes || item.approvedBy) && (
-        <div className="border-t border-gray-200 pt-4">
-          <h4 className="text-sm font-semibold text-gray-800 mb-2">Additional Information</h4>
-          <div className="text-sm text-gray-600 space-y-2">
-            {item.notes && (
-              <div>
-                <span className="font-medium">Notes: </span>
-                {item.notes}
-              </div>
-            )}
-            {item.approvedBy && (
-              <div>
-                <span className="font-medium">Approved by: </span>
-                {item.approvedBy}
-              </div>
-            )}
-            {item.lastUpdated && (
-              <div className="text-xs text-gray-500">
-                Last updated: {new Date(item.lastUpdated).toLocaleDateString()}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

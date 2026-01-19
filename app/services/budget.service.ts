@@ -59,6 +59,17 @@ export const BudgetService = {
         return data || null;
     },
 
+    async getAllParticularsByDepartment(budgetCodeIDs: number[] | string[]) {
+        const { data, error } = await supabase
+            .from('budget_code')
+            .select('*')
+            .in('id', budgetCodeIDs)  // Use in() for multiple values
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || null;
+    },
+
     async getTransactionByDepartment(isDepartmentID: number) {
         const currentYear = new Date().getFullYear();
 
@@ -140,7 +151,7 @@ export const BudgetService = {
 
     async getAllBudgetPosts() {
         const currentYear = new Date().getFullYear();
-        
+
         const { data, error } = await supabase
             .from('budget')
             .select('*, status_labels(*), departments(*)')
