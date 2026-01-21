@@ -107,13 +107,13 @@ export default function LandingPage() {
       link: "https://it-support.cficoop.com/en/",
       access: dataTicketing
     },
-    {
-      icon: <FaMoneyCheckAlt className="h-8 w-8 text-green-500" />,
-      title: "Loan Tracker",
-      description: "Monitor, manage, and track employees’ or members’ loan requests and statuses.",
-      link: "/loan",
-      access: dataLoanTracker
-    },
+    // {
+    //   icon: <FaMoneyCheckAlt className="h-8 w-8 text-green-500" />,
+    //   title: "Loan Tracker",
+    //   description: "Monitor, manage, and track employees’ or members’ loan requests and statuses.",
+    //   link: "/loan",
+    //   access: dataLoanTracker
+    // },
     {
       icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
       title: "Inventory",

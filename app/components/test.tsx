@@ -55,7 +55,6 @@ export default function Particulars({ item }: { item: any }) {
                 );
 
                 setRequisitions(response.data.data || []);
-                console.log("Fetched requisitions:", response.data.data);
             } catch (err) {
                 console.error("Error fetching requisitions:", err);
             } finally {
@@ -197,55 +196,6 @@ export default function Particulars({ item }: { item: any }) {
         return total;
     }, [requisitions, item.departments.department]);
 
-    const liquidationCount = useMemo(() => {
-        if (!requisitions.length) return 0;
-
-        return requisitions.filter(item2 => {
-            let matchesDepartment = true;
-            let matchesWorkflowType = true;
-            let matchesStatus = true;
-            let matchesYear = true;
-
-            /* === DEPARTMENT MATCH (EXACT SAME LOGIC) === */
-            if (item.departments.department) {
-                if (
-                    item2.department === "N/A" ||
-                    item2.department === "n/a" ||
-                    item2.department === "NA" ||
-                    item2.department === null
-                ) {
-                    matchesDepartment =
-                        item2.branch === item.departments.department ||
-                        item2.branchName === item.departments.department ||
-                        item2.branchCode === item.departments.department ||
-                        item2.officeLocation === item.departments.department;
-                } else {
-                    matchesDepartment =
-                        item2.department === item.departments.department ||
-                        item2.departmentName === item.departments.department ||
-                        item2.deptCode === item.departments.department;
-                }
-            }
-
-            /* === WORKFLOW === */
-            matchesWorkflowType = item2.workflowType === "Liquidation";
-            matchesStatus = item2.status === "Completed";
-
-            /* === YEAR === */
-            if (item2.startDate) {
-                matchesYear = new Date(item2.startDate).getFullYear() === 2024;
-            }
-
-            return (
-                matchesDepartment &&
-                matchesWorkflowType &&
-                matchesStatus &&
-                matchesYear
-            );
-        }).length;
-    }, [requisitions, item.departments.department]);
-
-
 
     /* ===========================
        LOADING / ERROR
@@ -327,10 +277,10 @@ export default function Particulars({ item }: { item: any }) {
                                     <td className="px-4 py-3">
                                         <span
                                             className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${status === "Available"
-                                                ? "bg-green-100 text-green-800"
-                                                : status === "Low"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : "bg-red-100 text-red-800"
+                                                    ? "bg-green-100 text-green-800"
+                                                    : status === "Low"
+                                                        ? "bg-yellow-100 text-yellow-800"
+                                                        : "bg-red-100 text-red-800"
                                                 }`}
                                         >
                                             {status}
@@ -345,18 +295,17 @@ export default function Particulars({ item }: { item: any }) {
 
             {/* LIQUIDATION */}
             <div>
-                {/* <h4 className="text-lg font-semibold mb-3">Liquidation</h4> */}
+                <h4 className="text-lg font-semibold mb-3">Liquidation</h4>
                 <Liquidation
                     item={item}
                     liquidationTotal={
                         loadingAmountSpent
-                            ? 0
+                            ? null
                             : new Intl.NumberFormat("en-PH", {
                                 style: "currency",
                                 currency: "PHP"
                             }).format(liquidationTotal)
                     }
-                    liquidationCount={liquidationCount}
                 />
             </div>
         </div>

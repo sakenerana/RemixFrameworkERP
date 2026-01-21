@@ -117,6 +117,7 @@ body {
 
 /* In your main CSS file (e.g., index.css) */
 @layer base {
+
   /* Apply to ALL text elements */
   *:not(icon):not(svg):not(symbol):not(img):not([class*='icon']):not([class*='svg']) {
     font-family: 'Inter', sans-serif !important;

@@ -457,7 +457,7 @@ export default function AdminLayoutIndex() {
               <Content
                 className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
                 style={{
-                  background: isDarkMode ? '#141414' : '#ffffff',
+                  background: isDarkMode ? '#141414' : '#FAFAFA',
                   color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
                   marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
                 }}
