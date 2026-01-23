@@ -11,6 +11,7 @@ import {
   VerticalAlignTopOutlined,
   MessageOutlined,
   CloseOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag, MenuProps } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
@@ -28,6 +29,7 @@ import { ProtectedRoute } from "~/components/ProtectedRoute";
 import ManagerGroupChat from "~/components/chat";
 import { AiOutlineMinus } from "react-icons/ai";
 import { LuBuilding2, LuCircleUser, LuLayoutDashboard, LuUsers } from "react-icons/lu";
+import { useAuth } from "~/auth/AuthContext";
 
 const { Header, Sider, Content } = Layout;
 
@@ -49,6 +51,7 @@ export default function AdminLayoutIndex() {
   const [chatVisible, setChatVisible] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
+  const { signOut, getUser } = useAuth();
 
   // Get current path for menu selection
   const currentPath = matches[matches.length - 1]?.pathname || '';
@@ -139,6 +142,8 @@ export default function AdminLayoutIndex() {
     setIsChatMinimized(prev => !prev);
   };
 
+  const siderWidth = collapsed ? 80 : 280;
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -146,6 +151,33 @@ export default function AdminLayoutIndex() {
   const handleTrack = () => setIsModalOpen(true);
   const handleOk = () => setIsModalOpen(false);
   const handleCancel = () => setIsModalOpen(false);
+
+  const handleSignout = async () => {
+    // Clear all relevant localStorage data
+    localStorage.removeItem("ab_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("dept");
+    localStorage.removeItem("fname");
+    localStorage.removeItem("lname");
+    localStorage.removeItem("userAuthID");
+    localStorage.removeItem("userDept");
+    localStorage.removeItem("userOffice");
+    localStorage.removeItem("userOfficeID");
+
+    localStorage.removeItem("workflowDashboardData");
+    localStorage.removeItem("userActivitiesData");
+
+    // Clear any cached API data (remove all keys starting with your app's cache prefix)
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith("budgetApproved_") || key.startsWith("completedRequisition_") || key.startsWith("userActiveActivities_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    await signOut();
+    // setLoading(false);
+    navigate("/");
+  };
 
   const menuItems: MenuProps['items'] = [
     {
@@ -236,10 +268,18 @@ export default function AdminLayoutIndex() {
         <Layout className="min-h-screen">
           {/* Mobile Header */}
           {isMobile && (
-            <Header className="flex items-center justify-between p-0 px-4" style={{
-              background: isDarkMode ? '#1f1f1f' : '#ffffff',
-              borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0'
-            }}>
+            <Header
+              className="flex items-center justify-between p-0 px-4"
+              style={{
+                background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 300,
+              }}
+            >
               <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -277,6 +317,12 @@ export default function AdminLayoutIndex() {
                   setCollapsed(broken);
                 }}
                 style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  height: '100vh',
+                  zIndex: 200,
                   background: isDarkMode ? '#141414' : '#ffffff',
                   borderRight: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
                   boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '2px 0 8px rgba(0, 0, 0, 0.05)',
@@ -339,19 +385,60 @@ export default function AdminLayoutIndex() {
                   }}
                   className="custom-menu"
                 />
+
+                {/* Sidebar Footer / Sign Out */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    padding: collapsed ? "12px 8px" : "12px 16px",
+                    borderTop: isDarkMode ? "1px solid #303030" : "1px solid #e8e8e8",
+                    background: isDarkMode ? "#141414" : "#ffffff",
+                  }}
+                >
+                  <Button
+
+                    type="text"
+                    block
+                    icon={<LogoutOutlined />}
+                    onClick={handleSignout}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: collapsed ? "center" : "flex-start",
+                      color: isDarkMode ? "rgba(255,255,255,0.85)" : undefined,
+                    }}
+                  >
+                    {!collapsed && <span className="ml-2 font-medium">SIGN OUT</span>}
+                  </Button>
+                </div>
               </Sider>
             )}
 
-            <Layout className="flex-1 overflow-auto">
+            <Layout
+              className="flex-1 overflow-auto"
+              style={{
+                marginLeft: !isMobile && !isHorizontal ? siderWidth : 0,
+                transition: 'margin-left 0.3s ease',
+              }}
+            >
               {/* Desktop Header */}
               {!isMobile && (
-                <Header className="flex items-center h-16 p-0" style={{
-                  background: isDarkMode ? '#1f1f1f' : '#ffffff',
-                  borderBottom: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
-                  position: 'sticky',
-                  top: 0,
-                  zIndex: 100,
-                }}>
+                <Header
+                  className="flex items-center h-16 p-0"
+                  style={{
+                    background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                    borderBottom: `1px solid ${isDarkMode ? '#303030' : '#f0f0f0'}`,
+                    position: 'fixed',
+                    top: 0,
+                    left: !isMobile && !isHorizontal ? siderWidth : 0,
+                    right: 0,
+                    zIndex: 300,
+                    transition: 'left 0.3s ease',
+                  }}
+                >
                   <Space className="h-full" style={{ marginLeft: 16 }}>
                     {!isHorizontal && (
                       <Button
@@ -436,7 +523,19 @@ export default function AdminLayoutIndex() {
 
               {/* Horizontal Menu - Show on mobile or when horizontal mode is enabled */}
               {(isMobile || isHorizontal) && (
-                <Header className="p-0" style={{ height: 'auto', lineHeight: 'normal' }}>
+                <Header
+                  className="p-0"
+                  style={{
+                    height: 'auto',
+                    lineHeight: 'normal',
+                    position: 'fixed',
+                    top: 64,
+                    left: !isMobile && !isHorizontal ? siderWidth : 0,
+                    right: 0,
+                    zIndex: 250,
+                    background: isDarkMode ? '#1f1f1f' : '#ffffff',
+                  }}
+                >
                   <Menu
                     theme={isDarkMode ? 'dark' : 'light'}
                     mode={isMobile ? 'horizontal' : 'horizontal'}
@@ -457,9 +556,10 @@ export default function AdminLayoutIndex() {
               <Content
                 className={`p-4 ${isDarkMode ? 'dark-scrollbar' : 'light-scrollbar'}`}
                 style={{
+                  minHeight: '100vh',
+                  paddingTop: 64, // height of Header
                   background: isDarkMode ? '#141414' : '#FAFAFA',
                   color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
-                  marginTop: isMobile ? 0 : isHorizontal ? 0 : 0
                 }}
               >
                 {!isHorizontal && (

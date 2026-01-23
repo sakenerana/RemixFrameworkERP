@@ -202,9 +202,6 @@ export default function LandingPage() {
                       <h3 className="font-semibold text-gray-900 mb-2">
                         {feature.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                        {feature.description}
-                      </p>
 
                       <div className="mt-6 pt-5 border-t border-gray-100">
                         <div className={`
