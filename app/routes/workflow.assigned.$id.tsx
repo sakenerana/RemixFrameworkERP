@@ -236,6 +236,12 @@ export default function Assigned() {
     const totalActivities = data.reduce((sum, user) => sum + user.activities_count, 0);
     const totalWorkflows = data.reduce((sum, user) => sum + Object.keys(user.workflows_breakdown).length, 0);
 
+    // Gradient backgrounds for statistics cards
+    const statGradients = {
+        activities: 'linear-gradient(135deg, #4776E6 0%, #8E54E9 100%)', // Blue to purple
+        workflows: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'   // Teal to green
+    };
+
     return (
         <div className="w-full rounded-lg shadow-sm">
             {/* Header Section */}
@@ -283,78 +289,146 @@ export default function Assigned() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {/* Statistics Cards */}
+                            {/* Statistics Cards with Gradient Backgrounds */}
                             <Row gutter={16}>
                                 <Col span={12}>
-                                    <Card size="small">
+                                    <Card
+                                        size="small"
+                                        className="border-none"
+                                        bodyStyle={{
+                                            padding: '16px',
+                                            background: statGradients.activities,
+                                            borderRadius: '8px',
+                                            color: 'white'
+                                        }}
+                                    >
                                         <Statistic
-                                            title="Total Activities"
+                                            title={<span style={{ color: 'white' }}>Total Activities</span>}
                                             value={totalActivities}
-                                            valueStyle={{ color: '#3f51b5' }}
-                                            prefix={<FileSearchOutlined />}
+                                            valueStyle={{ color: 'white' }}
+                                            prefix={<FileSearchOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
+                                            suffix={
+                                                <div style={{
+                                                    fontSize: '12px',
+                                                    color: 'rgba(255, 255, 255, 0.8)',
+                                                    marginLeft: '4px'
+                                                }}>
+                                                    activities
+                                                </div>
+                                            }
                                         />
+                                        <div style={{
+                                            marginTop: '8px',
+                                            fontSize: '12px',
+                                            color: 'rgba(255, 255, 255, 0.8)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <div style={{
+                                                width: '8px',
+                                                height: '8px',
+                                                borderRadius: '50%',
+                                                background: 'rgba(255, 255, 255, 0.9)'
+                                            }} />
+                                            Active workflows count
+                                        </div>
                                     </Card>
                                 </Col>
                                 <Col span={12}>
-                                    <Card size="small">
+                                    <Card
+                                        size="small"
+                                        className="border-none"
+                                        bodyStyle={{
+                                            padding: '16px',
+                                            background: statGradients.workflows,
+                                            borderRadius: '8px',
+                                            color: 'white'
+                                        }}
+                                    >
                                         <Statistic
-                                            title="Total Workflows"
+                                            title={<span style={{ color: 'white' }}>Total Workflows</span>}
                                             value={totalWorkflows}
-                                            valueStyle={{ color: '#4caf50' }}
-                                            prefix={<BarChartOutlined />}
+                                            valueStyle={{ color: 'white' }}
+                                            prefix={<BarChartOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
+                                            suffix={
+                                                <div style={{
+                                                    fontSize: '12px',
+                                                    color: 'rgba(255, 255, 255, 0.8)',
+                                                    marginLeft: '4px'
+                                                }}>
+                                                    workflows
+                                                </div>
+                                            }
                                         />
+                                        <div style={{
+                                            marginTop: '8px',
+                                            fontSize: '12px',
+                                            color: 'rgba(255, 255, 255, 0.8)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <div style={{
+                                                width: '8px',
+                                                height: '8px',
+                                                borderRadius: '50%',
+                                                background: 'rgba(255, 255, 255, 0.9)'
+                                            }} />
+                                            Unique workflow types
+                                        </div>
                                     </Card>
                                 </Col>
                             </Row>
 
                             {/* User Cards */}
-                                {data.length > 0 ? (
-                                    data.map((user) => (
-                                        <Card
-                                            key={user.id}
-                                            className="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border-0"
-                                        >
-                                            <div className="flex items-center mb-4">
-                                                <div className="bg-blue-100 p-3 rounded-full mr-4">
-                                                    <UserOutlined className="text-blue-600 text-lg" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-900">{user.username}</h3>
-                                                    <p className="text-gray-500 text-sm">
-                                                        {user.firstname} {user.lastname}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400">
-                                                        {user.activities_count} activities
-                                                    </p>
-                                                </div>
+                            {data.length > 0 ? (
+                                data.map((user) => (
+                                    <Card
+                                        key={user.id}
+                                        className="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border-0"
+                                    >
+                                        <div className="flex items-center mb-4">
+                                            <div className="bg-blue-100 p-3 rounded-full mr-4">
+                                                <UserOutlined className="text-blue-600 text-lg" />
                                             </div>
-
-                                            <div className="space-y-3">
-                                                <h4 className="font-medium border-b pb-2 text-gray-700">
-                                                    Workflow Breakdown
-                                                </h4>
-
-                                                {Object.entries(user.workflows_breakdown).map(([workflow, count]) => (
-                                                    <div key={workflow} className="flex justify-between items-center">
-                                                        <span className="text-sm text-gray-600">{workflow}</span>
-                                                        <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">
-                                                            {count} tasks
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                            <div>
+                                                <h3 className="font-medium text-gray-900">{user.username}</h3>
+                                                <p className="text-gray-500 text-sm">
+                                                    {user.firstname} {user.lastname}
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    {user.activities_count} activities
+                                                </p>
                                             </div>
-                                        </Card>
-                                    ))
-                                ) : (
-                                    <div className="col-span-full py-12 flex flex-col items-center">
-                                        <FileSearchOutlined className="text-3xl mb-3 text-gray-400" />
-                                        <p className="text-gray-500 mb-2 text-base">No assigned workflows found</p>
-                                        <p className="text-gray-400 text-sm mb-4">
-                                            Create new assignments or check your filters
-                                        </p>
-                                    </div>
-                                )}
-                            
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <h4 className="font-medium border-b pb-2 text-gray-700">
+                                                Workflow Breakdown
+                                            </h4>
+
+                                            {Object.entries(user.workflows_breakdown).map(([workflow, count]) => (
+                                                <div key={workflow} className="flex justify-between items-center">
+                                                    <span className="text-sm text-gray-600">{workflow}</span>
+                                                    <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">
+                                                        {count} tasks
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Card>
+                                ))
+                            ) : (
+                                <div className="col-span-full py-12 flex flex-col items-center">
+                                    <FileSearchOutlined className="text-3xl mb-3 text-gray-400" />
+                                    <p className="text-gray-500 mb-2 text-base">No assigned workflows found</p>
+                                    <p className="text-gray-400 text-sm mb-4">
+                                        Create new assignments or check your filters
+                                    </p>
+                                </div>
+                            )}
+
                         </div>
                     )}
                 </div>

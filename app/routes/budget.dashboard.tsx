@@ -13,6 +13,7 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDollar, AiOutlineFileText, AiOutlineInfoCircle, AiOutlineShoppingCart, AiOutlineStock, AiOutlineWallet } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
+import AreaChart from "~/components/area_chart";
 import PieChart from "~/components/pie_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { BudgetService } from "~/services/budget.service";
@@ -38,6 +39,24 @@ const translations = {
   }
 };
 
+const dataAreaChart = [
+  { date: '2024-01-01', value: 3000, category: 'Product A' },
+  { date: '2024-01-02', value: 4000, category: 'Product A' },
+  { date: '2024-01-03', value: 3500, category: 'Product A' },
+  { date: '2024-01-04', value: 5000, category: 'Product A' },
+  { date: '2024-01-05', value: 4500, category: 'Product A' },
+  { date: '2024-01-01', value: 2000, category: 'Product B' },
+  { date: '2024-01-02', value: 3000, category: 'Product B' },
+  { date: '2024-01-03', value: 4500, category: 'Product B' },
+  { date: '2024-01-04', value: 3500, category: 'Product B' },
+  { date: '2024-01-05', value: 4000, category: 'Product B' },
+  { date: '2024-01-01', value: 1500, category: 'Product C' },
+  { date: '2024-01-02', value: 2500, category: 'Product C' },
+  { date: '2024-01-03', value: 3000, category: 'Product C' },
+  { date: '2024-01-04', value: 4000, category: 'Product C' },
+  { date: '2024-01-05', value: 3500, category: 'Product C' },
+];
+
 export default function BudgetRoutes() {
   const [data, setData] = useState<Budget>();
   const [dataUnbudget, setDataUnbudget] = useState<any>();
@@ -56,6 +75,31 @@ export default function BudgetRoutes() {
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
   const [isOfficeID, setOfficeID] = useState<any>();
+
+  // Gradient backgrounds for statistics cards
+  const statGradients = {
+    totalBudget: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',        // Purple gradient
+    totalRequisition: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',  // Green gradient
+    totalLiquidation: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)', // Orange gradient
+    amountSpent: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)'       // Red gradient
+  };
+
+  // Alternative gradient options:
+  // Option 2 (Corporate Blue theme):
+  // const statGradients = {
+  //   totalBudget: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+  //   totalRequisition: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
+  //   totalLiquidation: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)',
+  //   amountSpent: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)'
+  // };
+
+  // Option 3 (Elegant theme):
+  // const statGradients = {
+  //   totalBudget: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
+  //   totalRequisition: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+  //   totalLiquidation: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+  //   amountSpent: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)'
+  // };
 
   // Toggle language
   const toggleLanguage = () => {
@@ -285,22 +329,28 @@ export default function BudgetRoutes() {
                 <Skeleton active paragraph={{ rows: 3 }} />
               </Card>
             ) : (
-              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-                <div>
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                    <RiCircleFill className="text-[5px] text-blue-500 mt-2 mr-2" /> Total Budget
+              <Card
+                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
+                bodyStyle={{
+                  padding: '20px',
+                  background: statGradients.totalBudget,
+                  color: 'white'
+                }}
+              >
+                <div className="relative">
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
+                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Budget
                   </h2>
-                  <p className="flex flex-wrap text-blue-600 text-2xl font-bold">
-                    <AiOutlineDollar className="mt-1 mr-2" /> {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
+                  <p className="flex flex-wrap text-white text-2xl font-bold">
+                    <AiOutlineDollar className="mt-1 mr-2 text-white/90" /> {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
                   </p>
-                  <p className="text-xs mt-4">Annual allocation for {new Date().getFullYear()}</p>
+                  <p className="text-xs mt-4 text-white/80">Annual allocation for {new Date().getFullYear()}</p>
                 </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-blue-100 text-blue-800">
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
                   Annual
                 </div>
               </Card>
             )}
-
 
             {/* 2. Total Requisition for this year */}
             {loading ? (
@@ -308,17 +358,24 @@ export default function BudgetRoutes() {
                 <Skeleton active paragraph={{ rows: 3 }} />
               </Card>
             ) : (
-              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-                <div>
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                    <RiCircleFill className="text-[5px] text-amber-500 mt-2 mr-2" /> Total Requisition
+              <Card
+                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
+                bodyStyle={{
+                  padding: '20px',
+                  background: statGradients.totalRequisition,
+                  color: 'white'
+                }}
+              >
+                <div className="relative">
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
+                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Requisition
                   </h2>
-                  <p className="flex flex-wrap text-amber-600 text-2xl font-bold">
-                    <AiOutlineShoppingCart className="mt-1 mr-2" /> {formatCurrency(Number(dataTotalRequisition) || 0)}
+                  <p className="flex flex-wrap text-white text-2xl font-bold">
+                    <AiOutlineShoppingCart className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataTotalRequisition) || 0)}
                   </p>
-                  <p className="text-xs mt-4">Approved requests this year</p>
+                  <p className="text-xs mt-4 text-white/80">Approved requests this year</p>
                 </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-amber-100 text-amber-800">
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
                   YTD
                 </div>
               </Card>
@@ -330,17 +387,24 @@ export default function BudgetRoutes() {
                 <Skeleton active paragraph={{ rows: 3 }} />
               </Card>
             ) : (
-              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-                <div>
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                    <RiCircleFill className="text-[5px] text-purple-500 mt-2 mr-2" /> Total Liquidation
+              <Card
+                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
+                bodyStyle={{
+                  padding: '20px',
+                  background: statGradients.totalLiquidation,
+                  color: 'white'
+                }}
+              >
+                <div className="relative">
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
+                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Liquidation
                   </h2>
-                  <p className="flex flex-wrap text-purple-600 text-2xl font-bold">
-                    <AiOutlineFileText className="mt-1 mr-2" /> {formatCurrency(Number(dataTotalLiquidation) || 0)}
+                  <p className="flex flex-wrap text-white text-2xl font-bold">
+                    <AiOutlineFileText className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataTotalLiquidation) || 0)}
                   </p>
-                  <p className="text-xs mt-4">Settled expenses this year</p>
+                  <p className="text-xs mt-4 text-white/80">Settled expenses this year</p>
                 </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-purple-100 text-purple-800">
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
                   YTD
                 </div>
               </Card>
@@ -352,28 +416,43 @@ export default function BudgetRoutes() {
                 <Skeleton active paragraph={{ rows: 3 }} />
               </Card>
             ) : (
-              <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-                <div>
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Amount Spent
+              <Card
+                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
+                bodyStyle={{
+                  padding: '20px',
+                  background: statGradients.amountSpent,
+                  color: 'white'
+                }}
+              >
+                <div className="relative">
+                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
+                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Amount Spent
                   </h2>
-                  <p className="flex flex-wrap text-red-600 text-2xl font-bold">
-                    <AiOutlineWallet className="mt-1 mr-2" /> {formatCurrency(Number(dataCombinedTotal) || 0)}
+                  <p className="flex flex-wrap text-white text-2xl font-bold">
+                    <AiOutlineWallet className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataCombinedTotal) || 0)}
                   </p>
-                  <p className="text-xs mt-4">Annual spent this year</p>
-                  <div className="mt-2">
-                    {/* <Progress
-                    percent={Math.min(100, ((Number(12345) || 0) / (Number(12345) || 1) * 100)}
-                    strokeColor={(Number(12345) || 0) > (Number(12345) || 0) ? "#f5222d" : "#52c41a"}
-                    showInfo={false}
-                    size="small"
-                  /> */}
-                    <p className="text-xs mt-1 text-gray-500">
-                      {/* {Math.round(((Number(12345) || 0) / (Number(12345) || 1) * 100)}% utilized */}
+                  <p className="text-xs mt-4 text-white/80">Annual spent this year</p>
+                  {/* Budget utilization indicator */}
+                  {/* <div className="mt-2">
+                    <div className="flex items-center gap-2 mt-3">
+                      <div className="w-full bg-white/20 rounded-full h-2">
+                        <div
+                          className="bg-white/90 h-2 rounded-full"
+                          style={{
+                            width: `${Math.min(100, ((Number(dataCombinedTotal) || 0) / (dataTotalBudgeted + dataTotalUnBudgeted || 1) * 100))}%`
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-white">
+                        {Math.round(((Number(dataCombinedTotal) || 0) / (dataTotalBudgeted + dataTotalUnBudgeted || 1) * 100))}%
+                      </span>
+                    </div>
+                    <p className="text-xs mt-1 text-white/80">
+                      Budget utilization
                     </p>
-                  </div>
+                  </div> */}
                 </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-green-100 text-green-800">
+                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
                   Balance
                 </div>
               </Card>
@@ -386,6 +465,27 @@ export default function BudgetRoutes() {
         <Row gutter={16} className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
             <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
+              <div>
+                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
+                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Budget
+                </h2>
+                <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
+                {loading && <Spin></Spin>}
+                {!loading &&
+                  <AreaChart data={dataAreaChart} />
+                  // <PieChart
+                  //   data={[
+                  //     { type: t.users, value: dataUser },
+                  //     { type: t.departments, value: dataDepartment },
+                  //     { type: t.groups, value: dataGroup },
+                  //     { type: t.inactiveUsersLabel, value: dataInactiveUsers },
+                  //   ]}
+                  //   title=""
+                  // />}
+                }
+              </div>
+            </Card>
+            {/* <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
               <div>
                 <h2 className="flex flex-wrap text-sm font-semibold mb-2">
                   <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
@@ -411,23 +511,21 @@ export default function BudgetRoutes() {
                   </div>
                 )}
 
-                {/* {dataMonthly && dataMonthly.length > 0 ? (
+                {dataMonthly && dataMonthly.length > 0 ? (
                   <PieChart
                     data={dataMonthly.map((item: any) => ({
                       type: item.month,
                       value: item.total
                     }))}
                     title=""
-                  // colors={['#0088FE', '#00C49F', '#FFBB28', '#FF8042']} // Custom colors
                   />
                 ) : (
                   <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
                     No Data Available
                   </div>
-                )} */}
+                )}
               </div>
 
-              {/* Category Legend */}
               {dataMonthly && dataMonthly.length > 0 && (
                 <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                   {dataMonthly.map((item: any, index: number) => (
@@ -446,7 +544,7 @@ export default function BudgetRoutes() {
                   ))}
                 </div>
               )}
-            </Card>
+            </Card> */}
 
             <Card className="rounded-lg p-2 shadow-sm">
               {/* Header */}
@@ -577,13 +675,13 @@ export default function BudgetRoutes() {
               </div> */}
               <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
                 <p className="text-xs text-blue-700 italic">
-                  “A budget is telling your money where to go instead of wondering where it went.”
+                  "A budget is telling your money where to go instead of wondering where it went."
                   <span className="block font-medium text-blue-800 mt-1 not-italic">— IT Department</span>
                 </p>
               </blockquote>
               <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
                 <p className="text-xs text-blue-700 italic">
-                  “Don’t save what is left after spending; spend what is left after saving.”
+                  "Don't save what is left after spending; spend what is left after saving."
                   <span className="block font-medium text-blue-800 mt-1 not-italic">— Finance Department</span>
                 </p>
               </blockquote>

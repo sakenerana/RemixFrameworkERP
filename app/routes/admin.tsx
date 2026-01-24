@@ -328,43 +328,76 @@ export default function AdminLayoutIndex() {
                   boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '2px 0 8px rgba(0, 0, 0, 0.05)',
                   overflow: 'hidden',
                 }}
+                className="sidebar-gradient"
               >
-                {/* User Profile Section */}
-                <div className="h-16 flex items-center justify-center" style={{
-                  background: isDarkMode ? '#1f1f1f' : '#fafafa',
-                  color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)'
-                }}>
+                {/* User Profile Section - Enhanced */}
+                <div
+                  className="h-20 flex items-center justify-center relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  }}
+                >
+                  {/* Decorative accent */}
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-cyan-400" />
+
                   {collapsed ? (
-                    <div className="p-2">
-                      <Avatar
-                        src="/img/user.png"
-                        size={40}
-                        className="cursor-pointer transition-transform hover:scale-105"
-                        style={{ border: isDarkMode ? '2px solid #434343' : '2px solid #e8e8e8' }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center w-full px-4">
+                    <div className="p-3 relative group">
                       <Avatar
                         src="/img/user.png"
                         size={48}
-                        className="cursor-pointer transition-transform hover:scale-105"
-                        style={{ border: isDarkMode ? '2px solid #434343' : '2px solid #e8e8e8' }}
+                        className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                        style={{
+                          border: '3px solid rgba(255, 255, 255, 0.2)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                        }}
                       />
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center w-full px-5 py-4">
+                      <div className="relative group">
+                        <Avatar
+                          src="/img/user.png"
+                          size={56}
+                          className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                          style={{
+                            border: '3px solid rgba(255, 255, 255, 0.2)',
+                            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
+                          }}
+                        />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                        </div>
+                      </div>
                       <div className="ml-4 overflow-hidden">
-                        <div className="font-medium text-base truncate">{isFname} {isLname}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">
-                          <Tag
-                            color={isDarkMode ? 'volcano' : 'blue'}
-                            style={{
-                              fontSize: '10px',
-                              fontWeight: 600,
-                              padding: '0 6px',
-                              lineHeight: '18px'
-                            }}
-                          >
-                            CFI - Administrator
-                          </Tag>
+                        <div className="font-semibold text-lg text-white truncate">
+                          {isFname} {isLname}
+                        </div>
+                        <div className="flex items-center mt-2">
+                          <div className="flex-shrink-0">
+                            <Tag
+                              color="gold"
+                              style={{
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                padding: '2px 8px',
+                                lineHeight: '20px',
+                                background: 'linear-gradient(45deg, #ffd700, #ffed4e)',
+                                color: '#8b6500',
+                                border: 'none',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                              }}
+                            >
+                              <div className="flex items-center">
+                                <FcSettings className="mr-1" />
+                                ADMINISTRATOR
+                              </div>
+                            </Tag>
+                          </div>
+                        </div>
+                        <div className="text-xs text-blue-100/80 truncate mt-1">
+                          CFI Cooperative
                         </div>
                       </div>
                     </div>
@@ -378,41 +411,72 @@ export default function AdminLayoutIndex() {
                   defaultSelectedKeys={['1']}
                   items={menuItems}
                   style={{
-                    backgroundColor: isDarkMode ? '#141414' : '#ffffff',
+                    backgroundColor: isDarkMode ? '#141414' : 'transparent',
+                    color: isDarkMode ? '#141414' : '#f1f1f1',
                     height: 'calc(100vh - 80px)',
                     overflowY: 'auto',
                     padding: '8px 0',
                   }}
-                  className="custom-menu"
+                  className="custom-menu glass-effect"
                 />
 
                 {/* Sidebar Footer / Sign Out */}
+                {/* Enhanced Sign Out Section */}
                 <div
                   style={{
                     position: "absolute",
                     bottom: 0,
                     left: 0,
                     width: "100%",
-                    padding: collapsed ? "12px 8px" : "12px 16px",
-                    borderTop: isDarkMode ? "1px solid #303030" : "1px solid #e8e8e8",
-                    background: isDarkMode ? "#141414" : "#ffffff",
+                    padding: collapsed ? "16px 8px" : "20px 16px",
+                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    backdropFilter: "blur(10px)",
                   }}
                 >
-                  <Button
+                  {collapsed ? (
+                    <Tooltip title="Sign Out" placement="right">
+                      <Button
+                        type="text"
+                        icon={<LogoutOutlined className="text-white/80 hover:text-red-400" />}
+                        onClick={handleSignout}
+                        className="flex items-center justify-center w-full h-12 hover:bg-red-500/20 rounded-lg transition-all duration-300"
+                        style={{
+                          color: "rgba(255, 255, 255, 0.8)",
+                        }}
+                      />
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      color="danger" variant="solid"
+                      
+                      icon={<LogoutOutlined />}
+                      onClick={handleSignout}
+                      className="w-full h-12 border-red-500/30 hover:border-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group"
+                      
+                    >
+                      <span className="ml-2 font-semibold text-white/90 group-hover:text-red-300 transition-colors">
+                        SIGN OUT
+                      </span>
+                      <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
+                    </Button>
+                  )}
 
-                    type="text"
-                    block
-                    icon={<LogoutOutlined />}
-                    onClick={handleSignout}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: collapsed ? "center" : "flex-start",
-                      color: isDarkMode ? "rgba(255,255,255,0.85)" : undefined,
-                    }}
-                  >
-                    {!collapsed && <span className="ml-2 font-medium">SIGN OUT</span>}
-                  </Button>
+                  {/* Version Info (only visible when expanded) */}
+                  {!collapsed && (
+                    <div className="mt-4 text-center">
+                      <div className="text-xs text-white/50 font-medium tracking-wide">
+                        v0.0.1
+                      </div>
+                      <div className="text-[10px] text-white/30 mt-1">
+                        © {new Date().getFullYear()} CFI Admin
+                      </div>
+                    </div>
+                  )}
                 </div>
               </Sider>
             )}

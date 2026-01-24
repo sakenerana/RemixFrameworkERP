@@ -273,6 +273,31 @@ export default function WorkflowHistoryReports() {
         "Actions": true,
     });
 
+    // Gradient backgrounds for all statistics cards
+    const statGradients = {
+        totalWorkflows: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple gradient
+        completed: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',     // Green gradient
+        avgTime: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',      // Orange gradient
+        pending: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)'       // Red gradient
+    };
+
+    // Alternative gradient options:
+    // Option 2 (Ocean theme):
+    // const statGradients = {
+    //     totalWorkflows: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+    //     completed: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+    //     avgTime: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)',
+    //     pending: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)'
+    // };
+
+    // Option 3 (Soft pastel theme):
+    // const statGradients = {
+    //     totalWorkflows: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
+    //     completed: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
+    //     avgTime: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+    //     pending: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
+    // };
+
     const columns: TableColumnsType<HistoryDataType> = [
         {
             title: "Reference No",
@@ -471,45 +496,160 @@ export default function WorkflowHistoryReports() {
                 </div>
             </div>
 
-            {/* Statistics Cards */}
+            {/* Statistics Cards with Gradient Backgrounds */}
             <Row gutter={16} className="mb-4">
                 <Col span={6}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '20px',
+                            background: statGradients.totalWorkflows,
+                            borderRadius: '8px',
+                            color: 'white'
+                        }}
+                    >
                         <Statistic
-                            title="Total Workflows"
+                            title={<span style={{ color: 'white' }}>Total Workflows</span>}
                             value={stats.total_workflows}
-                            valueStyle={{ color: '#3f51b5' }}
-                            prefix={<FileSearchOutlined />}
+                            valueStyle={{ color: 'white', fontSize: '24px' }}
+                            prefix={<FileSearchOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
                         />
+                        <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.9)'
+                            }} />
+                            Total workflow instances
+                        </div>
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '20px',
+                            background: statGradients.completed,
+                            borderRadius: '8px',
+                            color: 'white'
+                        }}
+                    >
                         <Statistic
-                            title="Completed"
+                            title={<span style={{ color: 'white' }}>Completed</span>}
                             value={stats.completed_workflows}
-                            valueStyle={{ color: '#4caf50' }}
-                            suffix={`/ ${stats.total_workflows}`}
+                            valueStyle={{ color: 'white', fontSize: '24px' }}
+                            suffix={
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    marginLeft: '4px'
+                                }}>
+                                    / {stats.total_workflows}
+                                </div>
+                            }
                         />
+                        <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.9)'
+                            }} />
+                            {stats.total_workflows > 0 ?
+                                `${Math.round((stats.completed_workflows / stats.total_workflows) * 100)}% completion rate` :
+                                'No workflows'
+                            }
+                        </div>
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '20px',
+                            background: statGradients.avgTime,
+                            borderRadius: '8px',
+                            color: 'white'
+                        }}
+                    >
                         <Statistic
-                            title="Avg. Completion Time"
+                            title={<span style={{ color: 'white' }}>Avg. Completion Time</span>}
                             value={stats.average_completion_time}
-                            valueStyle={{ color: '#ff9800' }}
-                            suffix="days"
+                            valueStyle={{ color: 'white', fontSize: '24px' }}
+                            suffix={
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    marginLeft: '2px'
+                                }}>
+                                    days
+                                </div>
+                            }
                         />
+                        <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.9)'
+                            }} />
+                            Average processing duration
+                        </div>
                     </Card>
                 </Col>
                 <Col span={6}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '20px',
+                            background: statGradients.pending,
+                            borderRadius: '8px',
+                            color: 'white'
+                        }}
+                    >
                         <Statistic
-                            title="Pending"
+                            title={<span style={{ color: 'white' }}>Pending</span>}
                             value={stats.pending_workflows}
-                            valueStyle={{ color: '#f44336' }}
+                            valueStyle={{ color: 'white', fontSize: '24px' }}
                         />
+                        <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.9)'
+                            }} />
+                            Workflows in progress
+                        </div>
                     </Card>
                 </Col>
             </Row>

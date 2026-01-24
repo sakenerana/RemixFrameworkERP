@@ -62,6 +62,28 @@ export default function BudgetHistoryReports() {
     const [isDepartmentID, setDepartmentID] = useState<any>();
     const [isOfficeID, setOfficeID] = useState<any>();
 
+    // Gradient backgrounds for statistics cards
+    const statGradients = {
+        totalAllocated: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',        // Purple gradient
+        pendingApprovals: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',      // Orange gradient
+        approvedBudgets: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',      // Green gradient
+    };
+
+    // Alternative gradient options:
+    // Option 2 (Corporate theme):
+    // const statGradients = {
+    //     totalAllocated: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',      // Navy blue
+    //     pendingApprovals: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)',    // Red gradient
+    //     approvedBudgets: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',    // Teal green
+    // };
+
+    // Option 3 (Pastel theme):
+    // const statGradients = {
+    //     totalAllocated: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',      // Purple/blue
+    //     pendingApprovals: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',    // Pink/pastel
+    //     approvedBudgets: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',    // Soft blue/pink
+    // };
+
     const navigate = useNavigate();
 
     // const handleRefetch = async () => {
@@ -406,54 +428,135 @@ export default function BudgetHistoryReports() {
                 </div>
             </div>
 
-            {/* Statistics Cards */}
-            <Row gutter={16} className="mb-3">
+            {/* Statistics Cards with Gradient Backgrounds */}
+            <Row gutter={16} className="mb-6">
                 <Col span={8}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '24px',
+                            background: statGradients.totalAllocated,
+                            borderRadius: '8px',
+                            color: 'white',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
                         <Statistic
-                            title="Total Allocated"
+                            title={<span style={{ color: 'white' }}>Total Allocated</span>}
                             value={dataBudget?.budget}
-                            valueStyle={{ color: '#4caf50' }}
-                            prefix={<DollarOutlined />}
+                            valueStyle={{ color: 'white', fontSize: '24px' }}
+                            prefix={<DollarOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
                             formatter={value => formatCurrency(Number(value))}
                         />
+                        <div style={{
+                            marginTop: '12px',
+                            fontSize: '12px',
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <div style={{
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.9)'
+                            }} />
+                            Total budget allocation
+                        </div>
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '24px',
+                            background: statGradients.pendingApprovals,
+                            borderRadius: '8px',
+                            color: 'white',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
                         {loadingpendingApproved ? (
                             <div className="flex justify-center items-center h-16">
                                 <Spin
-                                    size="large"
-                                    tip="Loading budget history..."
-                                    indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+                                    indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white' }} spin />}
                                 />
                             </div>
                         ) : (
-                            <Statistic
-                                title="Pending Approvals"
-                                value={dataPendingApprovals}
-                                valueStyle={{ color: '#f44336' }}
-                            />
+                            <>
+                                <Statistic
+                                    title={<span style={{ color: 'white' }}>Pending Approvals</span>}
+                                    value={dataPendingApprovals}
+                                    valueStyle={{ color: 'white', fontSize: '24px' }}
+                                />
+                                <div style={{
+                                    marginTop: '12px',
+                                    fontSize: '12px',
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}>
+                                    <div style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: 'rgba(255, 255, 255, 0.9)'
+                                    }} />
+                                    Awaiting approval
+                                </div>
+                            </>
                         )}
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card>
+                    <Card
+                        className="border-none shadow-md"
+                        bodyStyle={{
+                            padding: '24px',
+                            background: statGradients.approvedBudgets,
+                            borderRadius: '8px',
+                            color: 'white',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
                         {loadingpendingApproved ? (
                             <div className="flex justify-center items-center h-16">
                                 <Spin
-                                    size="large"
-                                    tip="Loading budget history..."
-                                    indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+                                    indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white' }} spin />}
                                 />
                             </div>
                         ) : (
-                            <Statistic
-                                title="Approved Budgets"
-                                value={dataApprovedBudget}
-                                valueStyle={{ color: '#4caf50' }}
-                            />
+                            <>
+                                <Statistic
+                                    title={<span style={{ color: 'white' }}>Approved Budgets</span>}
+                                    value={dataApprovedBudget}
+                                    valueStyle={{ color: 'white', fontSize: '24px' }}
+                                />
+                                <div style={{
+                                    marginTop: '12px',
+                                    fontSize: '12px',
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}>
+                                    <div style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: 'rgba(255, 255, 255, 0.9)'
+                                    }} />
+                                    Approved requests
+                                </div>
+                            </>
                         )}
                     </Card>
                 </Col>

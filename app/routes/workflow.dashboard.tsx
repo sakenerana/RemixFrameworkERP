@@ -60,8 +60,6 @@ export default function WorkflowDashboard() {
     setLanguage(prev => prev === 'en' ? 'fil' : 'en');
   };
 
-
-
   const fetchData = async () => {
     const getABID = localStorage.getItem('ab_id');
     const getUsername = localStorage.getItem('username');
@@ -127,27 +125,22 @@ export default function WorkflowDashboard() {
     .slice(0, 3)
     .map(item => item.id);
 
-  const trendData = [
-    { date: "January", value: 35 },
-    { date: "February", value: 42 },
-    { date: "March", value: 38 },
-    { date: "April", value: 51 },
-    { date: "May", value: 49 },
-    { date: "June", value: 49 },
-    { date: "July", value: 49 },
-    { date: "August", value: 49 },
-    { date: "September", value: 49 },
-    { date: "October", value: 49 },
-    { date: "November", value: 49 },
-    { date: "December", value: 50 },
-  ];
-
   const top5Workflows = [...data.data]
     .sort((a, b) => b.activities_count - a.activities_count)
     .slice(0, 5);
 
-  const barColors = ['#FFD700', '#C0C0C0', '#CD7F32', '#82ca9d', '#8884d8']; // Gold, Silver, Bronze, etc.
+  // Gradient backgrounds for top 3 cards
+  const rankGradients = [
+    // Gold gradient for 1st place
+    'linear-gradient(135deg, #FFA500 0%, #FFD700 100%)',
+    // Silver gradient for 2nd place
+    'linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%)',
+    // Bronze gradient for 3rd place
+    'linear-gradient(135deg, #CD7F32 0%, #B56C2A 100%)'
+  ];
 
+  const rankTextColors = ['#FFFFFF', '#FFFFFF', '#FFFFFF']; // All white text
+  const rankBadgeColors = ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.2)'];
 
   return (
     <div>
@@ -173,51 +166,60 @@ export default function WorkflowDashboard() {
         className="mb-3"
       />
 
-      {/* Stats Card */}
-      {/* Top 3 Workflows – New Design */}
+      {/* Top 3 Workflows with Gradient Backgrounds */}
       <Row gutter={[16, 16]} className="mb-3">
         {top5Workflows.slice(0, 3).map((workflow, index) => {
-          const rankColors = ['bg-yellow-400', 'bg-gray-400', 'bg-amber-600']; // Gold, Silver, Bronze
           const ranks = ['1st', '2nd', '3rd'];
 
           return (
             <Col key={workflow.id} xs={24} sm={12} md={8}>
               <Card
-                className="h-full hover:shadow-lg transition-all duration-300"
-                bodyStyle={{ padding: '20px' }}
+                className="h-full hover:shadow-lg transition-all duration-300 border-none"
+                bodyStyle={{
+                  padding: '20px',
+                  background: rankGradients[index],
+                  color: rankTextColors[index],
+                  borderRadius: '8px'
+                }}
               >
                 <div className="flex flex-col items-start space-y-3">
-                  {/* Rank Badge */}
+                  {/* Rank Badge with semi-transparent background */}
                   <span
-                    className={`text-white text-xs font-semibold px-3 py-1 rounded-full ${rankColors[index]}`}
+                    className="text-white text-xs font-semibold px-3 py-1 rounded-full"
+                    style={{
+                      backgroundColor: rankBadgeColors[index],
+                      backdropFilter: 'blur(4px)'
+                    }}
                   >
                     {ranks[index]} Place
                   </span>
 
-                  {/* Workflow Name */}
-                  <h3 className="text-xl font-semibold line-clamp-2">
+                  {/* Workflow Name - White Text */}
+                  <h3 className="text-xl font-semibold line-clamp-2 text-white">
                     {workflow.name}
                   </h3>
 
-                  {/* Usage Tag */}
-                  <Tag
-                    color="blue"
+                  {/* Usage Tag with semi-transparent background */}
+                  <div
                     style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      backdropFilter: 'blur(4px)',
                       fontSize: '13px',
                       fontWeight: 600,
                       borderRadius: '4px',
-                      padding: '2px 10px',
+                      padding: '4px 12px',
+                      display: 'inline-block',
+                      color: 'white'
                     }}
                   >
                     {workflow.activities_count.toLocaleString()} Uses
-                  </Tag>
+                  </div>
                 </div>
               </Card>
             </Col>
           );
         })}
       </Row>
-
 
       {/* Activities Grid */}
       {loading ? (
@@ -248,7 +250,7 @@ export default function WorkflowDashboard() {
                           style={{
                             display: rank === 0 ? 'none' : '',
                             fontSize: '18px',
-                            color: crownColors[rank - 1], // Applies gold/silver/bronze
+                            color: crownColors[rank - 1],
                             filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.3))'
                           }}
                         />
@@ -285,7 +287,6 @@ export default function WorkflowDashboard() {
           </Row>
         </>
       )}
-
     </div>
   );
 }

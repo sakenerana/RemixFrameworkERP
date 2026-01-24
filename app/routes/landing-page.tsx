@@ -35,7 +35,6 @@ export default function LandingPage() {
       setLoading(true);
       const dataFetch = await UserService.getByUuid(user.id);
       const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-      // console.log("User Data", dataFetch.office.name)
       localStorage.setItem('userOfficeID', dataFetch.office.id);
       localStorage.setItem('userOffice', dataFetch.office.name);
       localStorage.setItem('userDept', dataFetch.department_id);
@@ -46,17 +45,6 @@ export default function LandingPage() {
       localStorage.setItem('ab_id', dataFetch.ab_user_id);
       localStorage.setItem('username', dataFetch.username);
 
-      // axios.post('/api2', {
-      //   external: "erp",
-      //   password: apiAuthExternalPassword
-      // })
-      //   .then(response => {
-      //     console.log('Auth API successful:', response.data);
-      //   })
-      //   .catch(error => {
-      //     console.error('Error reading external api:', error);
-      //   });
-
       // Update all states at once
       setData(dataFetch);
       setDataIventory(arr.includes(1));
@@ -66,69 +54,72 @@ export default function LandingPage() {
       setDataBilling(arr.includes(5));
       setDataTicketing(arr.includes(6));
       setDataLoanTracker(arr.includes(7));
-
-      // Debug log - this will show the actual values
-      // console.log('Access array:', arr);
-      // console.log('Inventory access:', arr.includes(1));
     } catch (error) {
-      // console.error("Error fetching data:", error);
       message.error("Error loading user data");
     } finally {
       setLoading(false);
     }
   };
 
-  const features = useMemo(() => [
+  // Regular features for all users
+  const regularFeatures = useMemo(() => [
     {
-      icon: <FaDollarSign className="h-8 w-8 text-green-500" />,
+      icon: <FaDollarSign className="h-10 w-10 text-white" />,
       title: "Budget Tracker",
-      description: "Monitor expenses, set budget goals, and visualize financial performance.",
       link: "/budget",
-      access: dataBudget
+      access: dataBudget,
+      bgColor: "bg-gradient-to-br from-green-500 to-emerald-600",
+      badgeColor: "bg-green-700/30 text-green-100",
+      iconBg: "bg-green-600/30"
     },
     {
-      icon: <FaClipboardList className="h-8 w-8 text-orange-500" />,
+      icon: <FaClipboardList className="h-10 w-10 text-white" />,
       title: "Workflow Tracker",
-      description: "Manage team workflows, assign tasks, and track progress in real-time.",
       link: "/workflow",
-      access: dataWorkflow
+      access: dataWorkflow,
+      bgColor: "bg-gradient-to-br from-orange-500 to-amber-600",
+      badgeColor: "bg-orange-700/30 text-orange-100",
+      iconBg: "bg-orange-600/30"
     },
     {
-      icon: <FaFileInvoiceDollar className="h-8 w-8 text-red-500" />,
+      icon: <FaFileInvoiceDollar className="h-10 w-10 text-white" />,
       title: "Billing & Collections",
-      description: "Generate invoices, track payments, and manage accounts receivable efficiently.",
       link: "/billing",
-      access: dataBilling
+      access: dataBilling,
+      bgColor: "bg-gradient-to-br from-red-500 to-rose-600",
+      badgeColor: "bg-red-700/30 text-red-100",
+      iconBg: "bg-red-600/30"
     },
     {
-      icon: <FaTicketAlt className="h-8 w-8 text-teal-500" />,
+      icon: <FaTicketAlt className="h-10 w-10 text-white" />,
       title: "Ticketing System",
-      description: "Create, track, and resolve support tickets and customer inquiries.",
       link: "https://it-support.cficoop.com/en/",
-      access: dataTicketing
+      access: dataTicketing,
+      bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600",
+      badgeColor: "bg-teal-700/30 text-teal-100",
+      iconBg: "bg-teal-600/30"
     },
-    // {
-    //   icon: <FaMoneyCheckAlt className="h-8 w-8 text-green-500" />,
-    //   title: "Loan Tracker",
-    //   description: "Monitor, manage, and track employees’ or members’ loan requests and statuses.",
-    //   link: "/loan",
-    //   access: dataLoanTracker
-    // },
     {
-      icon: <LuPackageSearch className="h-8 w-8 text-blue-500" />,
+      icon: <LuPackageSearch className="h-10 w-10 text-white" />,
       title: "Inventory",
-      description: "Manage suppliers, inventory, and streamline warehouse operations.",
       link: "https://asset-tracker.cficoop.com/",
-      access: dataInventory
+      access: dataInventory,
+      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
+      badgeColor: "bg-blue-700/30 text-blue-100",
+      iconBg: "bg-blue-600/30"
     },
-    {
-      icon: <BsShieldCheck className="h-8 w-8 text-purple-500" />,
-      title: "Admin Panel",
-      description: "Oversee user roles, permissions, and platform configurations.",
-      link: "/admin",
-      access: dataAdmin
-    },
-  ], [dataInventory, dataBudget, dataWorkflow, dataAdmin]);
+  ], [dataInventory, dataBudget, dataWorkflow, dataBilling, dataTicketing]);
+
+  // Admin feature - kept separate
+  const adminFeature = {
+    icon: <BsShieldCheck className="h-10 w-10 text-white" />,
+    title: "Administration",
+    link: "/admin",
+    access: dataAdmin,
+    bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
+    badgeColor: "bg-purple-700/30 text-purple-100",
+    iconBg: "bg-purple-600/30"
+  };
 
   useMemo(() => {
     fetchDataByUUID();
@@ -141,112 +132,89 @@ export default function LandingPage() {
         <div className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-800">
           <div className="absolute inset-0 bg-black/10" />
 
-          <div className="relative max-w-6xl mx-auto px-4 py-20 sm:py-28 lg:px-8">
+          <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 lg:px-8">
             <div className="text-center">
-              <div className="flex justify-center mb-8">
+              <div className="flex justify-center mb-6">
                 <div className="p-4 bg-white/10 backdrop-blur-sm rounded-xl">
                   <img
-                    className="h-16"
+                    className="h-14"
                     src="./img/cficoop.png"
                     alt="CFI Cooperative"
                   />
                 </div>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">
                 Enterprise Resource Planning
               </h1>
 
-              <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-                Streamlined solutions for inventory management, financial operations,
-                workflow automation, and administrative governance.
+              <p className="text-base text-white/80 max-w-2xl mx-auto">
+                Streamlined solutions for enterprise operations.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Modules Grid */}
-        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
+        {/* Regular User Modules Grid */}
+        <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 lg:px-8">
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-800 text-center mb-2">
+              Available Modules
+            </h2>
+            <p className="text-gray-600 text-sm text-center">
+              Select a module to manage your daily operations
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {regularFeatures.map((feature, index) => (
               <div
                 key={index}
                 className={`
-            relative rounded-lg border transition-all duration-200
-            ${feature.access
-                    ? 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
-                    : 'bg-gray-50/50 border-gray-100 cursor-default'
+                  relative rounded-lg border transition-all duration-200 overflow-hidden
+                  ${feature.access
+                    ? `${feature.bgColor} border-transparent hover:shadow-lg hover:scale-[1.03] cursor-pointer`
+                    : 'bg-gray-100 border-gray-200 cursor-default'
                   }
-          `}
+                `}
               >
                 {feature.access ? (
                   <Link to={feature.link} className="block h-full">
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-5">
-                        <div className={`p-3 rounded-lg ${feature.access ? 'bg-blue-50' : 'bg-gray-100'}`}>
-                          <div className={feature.access ? 'text-blue-600' : 'text-gray-400'}>
-                            {feature.icon}
-                          </div>
+                    <div className="p-4 h-full flex flex-col">
+                      <div className="flex flex-col items-center text-center">
+                        <div className={`p-4 rounded-full ${feature.iconBg} backdrop-blur-sm mb-3`}>
+                          {feature.icon}
                         </div>
-                        <span className={`
-                    text-xs font-medium px-2 py-1 rounded
-                    ${feature.access
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-gray-100 text-gray-500'
-                          }
-                  `}>
-                          {feature.access ? 'Available' : 'Restricted'}
-                        </span>
-                      </div>
 
-                      <h3 className="font-semibold text-gray-900 mb-2">
-                        {feature.title}
-                      </h3>
+                        <h3 className="font-bold text-white text-base mb-2">
+                          {feature.title}
+                        </h3>
 
-                      <div className="mt-6 pt-5 border-t border-gray-100">
-                        <div className={`
-                    inline-flex items-center text-sm font-medium
-                    ${feature.access ? 'text-blue-600' : 'text-gray-400'}
-                  `}>
-                          {feature.access ? (
-                            <>
-                              <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                              Access granted
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full mr-2" />
-                              Restricted access
-                            </>
-                          )}
+                        <div className="mt-2">
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${feature.badgeColor}`}>
+                            Available
+                          </span>
                         </div>
                       </div>
                     </div>
                   </Link>
                 ) : (
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-5">
-                      <div className="p-3 bg-gray-100 rounded-lg">
+                  <div className="p-4 h-full flex flex-col">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="p-4 bg-gray-200 rounded-full mb-3">
                         <div className="text-gray-400">
-                          {feature.icon}
+                          {React.cloneElement(feature.icon, { className: "h-10 w-10 text-gray-400" })}
                         </div>
                       </div>
-                      <span className="text-xs font-medium px-2 py-1 rounded bg-gray-100 text-gray-500">
-                        Restricted
-                      </span>
-                    </div>
 
-                    <h3 className="font-semibold text-gray-700 mb-2">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-                      {feature.description}
-                    </p>
+                      <h3 className="font-bold text-gray-600 text-base mb-2">
+                        {feature.title}
+                      </h3>
 
-                    <div className="mt-6 pt-5 border-t border-gray-100">
-                      <div className="inline-flex items-center text-sm font-medium text-gray-400">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full mr-2" />
-                        Restricted access
+                      <div className="mt-2">
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-600">
+                          Restricted
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -254,10 +222,57 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
 
-          {/* Admin Note */}
-          <div className="text-center mt-20 pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
+        {/* Admin Panel Section - Separate and Centered */}
+        {adminFeature.access && (
+          <div className="max-w-5xl mx-auto px-4 pb-12 lg:px-8">
+            <div className="border-t border-gray-200 pt-12 mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-xl font-bold text-gray-800 mb-2">
+                  Administrative Controls
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  System configuration and user management
+                </p>
+              </div>
+
+              <div className="flex justify-center">
+                <div className="w-full max-w-md">
+                  <div className={`
+                    relative rounded-xl border transition-all duration-200 overflow-hidden
+                    ${adminFeature.bgColor} border-transparent hover:shadow-lg hover:scale-[1.02] cursor-pointer
+                  `}>
+                    <Link to={adminFeature.link} className="block">
+                      <div className="p-6">
+                        <div className="flex flex-col items-center text-center">
+                          <div className={`p-5 rounded-full ${adminFeature.iconBg} backdrop-blur-sm mb-4`}>
+                            {adminFeature.icon}
+                          </div>
+
+                          <h3 className="font-bold text-white text-xl mb-3">
+                            {adminFeature.title}
+                          </h3>
+
+                          <div className="mt-2">
+                            <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${adminFeature.badgeColor}`}>
+                              Administrator Access Only
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Admin Note */}
+        <div className="max-w-5xl mx-auto px-4 pb-8 lg:px-8">
+          <div className="text-center pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
               For additional module access, contact system administration.
             </p>
           </div>

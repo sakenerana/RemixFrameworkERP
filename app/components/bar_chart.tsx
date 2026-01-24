@@ -1,64 +1,126 @@
+// bar_chart.tsx
 import React, { useEffect, useRef } from 'react';
 import { Bar } from '@antv/g2plot';
-import type { BarOptions } from '@antv/g2plot';
+
+export interface BarChartData {
+  category: string;
+  value: number;
+  color?: string; // Custom color for each bar
+}
 
 interface BarChartProps {
-  data: Array<{ category: string; value: number }>;
-  width?: number;
-  height?: number;
+  data: BarChartData[];
   title?: string;
-  color?: string;
   xField?: string;
   yField?: string;
+  colorField?: string; // NEW: Field name for colors
+  height?: number;
+  width?: number;
+  config?: Partial<any>;
 }
 
 const BarChart: React.FC<BarChartProps> = ({
   data,
-  width = '100%',
-  height = 400,
-  title = 'Bar Chart',
-  color = '#6395f9',
+  title = '',
   xField = 'category',
   yField = 'value',
+  colorField = 'color', // NEW prop
+  height = 350,
+  width = '100%',
+  config = {}
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<Bar | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current || data.length === 0) return;
+    if (!containerRef.current || !data || data.length === 0) return;
 
-    const config: BarOptions = {
-      data,
+    // Destroy previous chart instance
+    if (chartRef.current) {
+      chartRef.current.destroy();
+      chartRef.current = null;
+    }
+
+    // Prepare data with color as a regular field
+    const chartData = data.map((item, index) => ({
+      ...item,
+      // Ensure color exists, fallback to generated color
+      [colorField]: item.color || generateColor(index)
+    }));
+
+    const chartConfig: any = {
+      data: chartData,
       xField,
       yField,
-      seriesField: xField, // For color mapping
-      color,
-      legend: { position: 'top-left' },
-      interactions: [{ type: 'active-region' }],
-      barStyle: { radius: [4, 4, 0, 0] },
+      colorField, // Tell G2Plot to use this field for colors
+      color: colorField, // This is the key part - map colors from data field
+      xAxis: {
+        label: {
+          autoHide: true,
+          autoRotate: false,
+        },
+      },
+      yAxis: {
+        label: {
+          formatter: (v: string) => `${v}`.replace(/\d{1,3}(?=(\d{3})+$)/g, (s) => `${s},`),
+        },
+      },
+      meta: {
+        [yField]: {
+          alias: 'Value',
+        },
+        [xField]: {
+          alias: 'Category',
+        },
+      },
       label: {
         position: 'middle',
-        style: { fill: '#fff' },
+        style: {
+          fill: '#FFFFFF',
+          fontSize: 12,
+        },
+        formatter: (datum: any) => {
+          return datum.value.toLocaleString();
+        },
       },
+      tooltip: {
+        showMarkers: false,
+        formatter: (datum: any) => {
+          return { name: datum[xField], value: datum[yField].toLocaleString() };
+        },
+      },
+      ...config,
     };
 
-    const barPlot = new Bar(containerRef.current, config);
-    barPlot.render();
+    try {
+      chartRef.current = new Bar(containerRef.current, chartConfig);
+      chartRef.current.render();
+    } catch (error) {
+      console.error('Error creating chart:', error);
+    }
 
     return () => {
-      barPlot.destroy();
+      if (chartRef.current) {
+        try {
+          chartRef.current.destroy();
+          chartRef.current = null;
+        } catch (error) {
+          console.error('Error destroying chart:', error);
+        }
+      }
     };
-  }, [data, color, xField, yField]);
+  }, [data, xField, yField, colorField, config]);
 
-  return (
-    <div className="bar-chart-container p-4">
-      {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
-      <div 
-        ref={containerRef} 
-        style={{ width, height }}
-        className="w-full"
-      />
-    </div>
-  );
+  return <div ref={containerRef} style={{ width, height }} />;
+};
+
+// Helper function to generate colors if not provided
+const generateColor = (index: number): string => {
+  const colors = [
+    '#16a34a', '#3b82f6', '#8b5cf6', '#ef4444', '#f59e0b', '#ec4899',
+    '#06b6d4', '#84cc16', '#f97316', '#6366f1', '#d946ef', '#10b981'
+  ];
+  return colors[index % colors.length];
 };
 
 export default BarChart;

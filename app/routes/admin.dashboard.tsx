@@ -14,8 +14,9 @@ import {
   Progress,
   Typography,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
+import AreaChart from "~/components/area_chart";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
@@ -39,6 +40,8 @@ interface DashboardMetric {
   value: number | string;
   icon: React.ReactNode;
   color: string;
+  bgColor: string;
+  badgeColor: string;
   trend?: number;
   loading: boolean;
   description: string;
@@ -170,8 +173,10 @@ export default function BudgetRoutes() {
     {
       title: t.activeUsers,
       value: metrics.users,
-      icon: <UserOutlined />,
-      color: "#52c41a",
+      icon: <UserOutlined className="text-white" />,
+      color: "#ffffff",
+      bgColor: "bg-gradient-to-br from-green-500 to-emerald-600",
+      badgeColor: "bg-green-700/30 text-green-100",
       trend: 12,
       loading,
       description: t.currentlyActive
@@ -179,8 +184,10 @@ export default function BudgetRoutes() {
     {
       title: t.departments,
       value: metrics.departments,
-      icon: <ApartmentOutlined />,
-      color: "#1890ff",
+      icon: <ApartmentOutlined className="text-white" />,
+      color: "#ffffff",
+      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
+      badgeColor: "bg-blue-700/30 text-blue-100",
       trend: 0,
       loading,
       description: t.organizationalUnits
@@ -188,8 +195,10 @@ export default function BudgetRoutes() {
     {
       title: t.groups,
       value: metrics.groups,
-      icon: <TeamOutlined />,
-      color: "#722ed1",
+      icon: <TeamOutlined className="text-white" />,
+      color: "#ffffff",
+      bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
+      badgeColor: "bg-purple-700/30 text-purple-100",
       trend: 5,
       loading,
       description: t.permissionGroups
@@ -197,8 +206,10 @@ export default function BudgetRoutes() {
     {
       title: t.inactiveUsers,
       value: metrics.inactiveUsers,
-      icon: <CloseCircleOutlined />,
-      color: "#f5222d",
+      icon: <CloseCircleOutlined className="text-white" />,
+      color: "#ffffff",
+      bgColor: "bg-gradient-to-br from-red-500 to-rose-600",
+      badgeColor: "bg-red-700/30 text-red-100",
       trend: -8,
       loading,
       description: t.requiringReview
@@ -207,11 +218,11 @@ export default function BudgetRoutes() {
 
   const renderTrendIndicator = (trend: number) => {
     if (trend > 0) {
-      return <span style={{ color: '#52c41a' }}>↑ {trend}%</span>;
+      return <span className="text-white/90 font-medium">↑ {trend}%</span>;
     } else if (trend < 0) {
-      return <span style={{ color: '#f5222d' }}>↓ {Math.abs(trend)}%</span>;
+      return <span className="text-white/90 font-medium">↓ {Math.abs(trend)}%</span>;
     }
-    return <span>→</span>;
+    return <span className="text-white/90">→</span>;
   };
 
   const columnsUser: TableColumnsType<User> = [
@@ -233,18 +244,36 @@ export default function BudgetRoutes() {
   ];
 
   const salesData = [
-    { category: "Jan", value: dataUser },
-    { category: "Feb", value: 200 },
-    { category: "Mar", value: 150 },
-    { category: "Apr", value: 80 },
-    { category: "May", value: 270 },
-    { category: "Jun", value: 270 },
-    { category: "Jul", value: 270 },
-    { category: "Aug", value: 270 },
-    { category: "Sept", value: 270 },
-    { category: "Oct", value: 270 },
-    { category: "Nov", value: 270 },
-    { category: "Dec", value: 270 },
+    { category: "Jan", value: dataUser || 0, color: '#16a34a' }, // Green
+    { category: "Feb", value: dataDepartment || 0, color: '#3b82f6' }, // Blue
+    { category: "Mar", value: dataGroup || 0, color: '#8b5cf6' }, // Purple
+    { category: "Apr", value: dataInactiveUsers || 0, color: '#ef4444' }, // Red
+    { category: "May", value: 270, color: '#f59e0b' }, // Amber
+    { category: "Jun", value: 300, color: '#ec4899' }, // Pink
+    { category: "Jul", value: 200, color: '#06b6d4' }, // Cyan
+    { category: "Aug", value: 400, color: '#84cc16' }, // Lime
+    { category: "Sept", value: 350, color: '#f97316' }, // Orange
+    { category: "Oct", value: 280, color: '#6366f1' }, // Indigo
+    { category: "Nov", value: 320, color: '#d946ef' }, // Fuchsia
+    { category: "Dec", value: 380, color: '#10b981' }, // Emerald
+  ];
+
+  const data = [
+    { date: '2024-01-01', value: 3000, category: 'Product A' },
+    { date: '2024-01-02', value: 4000, category: 'Product A' },
+    { date: '2024-01-03', value: 3500, category: 'Product A' },
+    { date: '2024-01-04', value: 5000, category: 'Product A' },
+    { date: '2024-01-05', value: 4500, category: 'Product A' },
+    { date: '2024-01-01', value: 2000, category: 'Product B' },
+    { date: '2024-01-02', value: 3000, category: 'Product B' },
+    { date: '2024-01-03', value: 4500, category: 'Product B' },
+    { date: '2024-01-04', value: 3500, category: 'Product B' },
+    { date: '2024-01-05', value: 4000, category: 'Product B' },
+    { date: '2024-01-01', value: 1500, category: 'Product C' },
+    { date: '2024-01-02', value: 2500, category: 'Product C' },
+    { date: '2024-01-03', value: 3000, category: 'Product C' },
+    { date: '2024-01-04', value: 4000, category: 'Product C' },
+    { date: '2024-01-05', value: 3500, category: 'Product C' },
   ];
 
   return (
@@ -274,33 +303,48 @@ export default function BudgetRoutes() {
                 <Card
                   hoverable
                   loading={metric.loading}
-                  // styles.body={{ padding: '16px' }}
-                  className="p-[-16px] rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105"
+                  className={`
+                    rounded-lg shadow-sm overflow-hidden transition-all duration-300 
+                    hover:scale-105 hover:shadow-md border-0 p-0
+                    ${metric.bgColor}
+                  `}
+                  styles={{
+                    body: {
+                      padding: '20px',
+                      color: 'white'
+                    }
+                  }}
                 >
                   <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Text strong style={{ color: metric.color }}>
-                        {metric.icon} {metric.title}
-                      </Text>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
+                          {metric.icon}
+                        </div>
+                        <Text strong className="text-white text-base">
+                          {metric.title}
+                        </Text>
+                      </div>
                       {metric.trend !== undefined && (
                         <Tag
-                          color={metric.trend > 0 ? 'green' : 'red'}
-                          className="!m-0"
+                          className="!m-0 border-0 bg-white/20 text-white backdrop-blur-sm"
                         >
                           {renderTrendIndicator(metric.trend)}
                         </Tag>
                       )}
                     </div>
-                    <Title level={3} style={{ margin: 0, color: metric.color }}>
+                    <Title level={2} className="!m-0 !text-white">
                       {metric.loading ? '--' : metric.value}
                     </Title>
-                    <Text type="secondary" className="text-xs">{metric.description}</Text>
+                    <Text className="text-white/80 text-sm">{metric.description}</Text>
                     {metric.trend !== undefined && (
                       <Progress
                         percent={Math.abs(metric.trend)}
                         showInfo={false}
-                        strokeColor={metric.trend > 0 ? '#52c41a' : '#f5222d'}
+                        strokeColor="#ffffff"
+                        trailColor="rgba(255, 255, 255, 0.3)"
                         size="small"
+                        className="mt-2"
                       />
                     )}
                   </Space>
@@ -320,15 +364,17 @@ export default function BudgetRoutes() {
                   <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
                   {loading && <Spin></Spin>}
                   {!loading &&
-                    <PieChart
-                      data={[
-                        { type: t.users, value: dataUser },
-                        { type: t.departments, value: dataDepartment },
-                        { type: t.groups, value: dataGroup },
-                        { type: t.inactiveUsersLabel, value: dataInactiveUsers },
-                      ]}
-                      title=""
-                    />}
+                    <AreaChart data={data} />
+                    // <PieChart
+                    //   data={[
+                    //     { type: t.users, value: dataUser },
+                    //     { type: t.departments, value: dataDepartment },
+                    //     { type: t.groups, value: dataGroup },
+                    //     { type: t.inactiveUsersLabel, value: dataInactiveUsers },
+                    //   ]}
+                    //   title=""
+                    // />}
+                  }
                 </div>
               </Card>
               <Card className="rounded-md border-gray-300 shadow-sm overflow-hidden transition-transform duration-300">
@@ -340,7 +386,6 @@ export default function BudgetRoutes() {
                   <BarChart
                     data={salesData}
                     title=""
-                    color="#16a34a"
                     height={350}
                   />
                 </div>

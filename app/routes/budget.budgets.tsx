@@ -63,6 +63,25 @@ export default function Budgets() {
   const { RangePicker } = DatePicker;
   const { Option } = Select;
 
+  // Gradient backgrounds for statistics cards
+  const statGradients = {
+    overallRequisition: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple gradient
+    overallLiquidation: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)', // Green gradient
+  };
+
+  // Alternative gradient options:
+  // Option 2 (Blue/Teal theme):
+  // const statGradients = {
+  //   overallRequisition: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', // Navy blue
+  //   overallLiquidation: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', // Teal green
+  // };
+
+  // Option 3 (Warm theme):
+  // const statGradients = {
+  //   overallRequisition: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)', // Orange gradient
+  //   overallLiquidation: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)', // Purple/blue gradient
+  // };
+
   const onReset = () => {
     Modal.confirm({
       title: "Confirm Reset",
@@ -324,12 +343,14 @@ export default function Budgets() {
     {
       title: `Overall Requisition - ${currentYear}`,
       value: dataTotalRequisition,
-      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted
+      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted,
+      gradient: statGradients.overallRequisition
     },
     {
       title: `Overall Liquidation - ${currentYear}`,
       value: dataTotalLiquidation,
-      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted
+      totalBudget: dataTotalBudgeted + dataTotalUnBudgeted,
+      gradient: statGradients.overallLiquidation
     },
   ];
 
@@ -954,44 +975,70 @@ export default function Budgets() {
 
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          {budget.map((data: any) => (
+          {budget.map((data: any, index: number) => (
             <Card
               key={data.title}
-              loading={false} // We handle loading state manually
-              className="rounded-lg hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
+              loading={false}
+              className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
+              bodyStyle={{
+                padding: '24px',
+                background: data.gradient,
+                borderRadius: '8px',
+                color: 'white',
+                minHeight: '180px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
             >
               <div className="flex flex-col h-full">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="flex flex-wrap text-sm font-medium">
-                    <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
+                <div className="flex justify-between items-start mb-4">
+                  <span className="flex flex-wrap text-sm font-semibold text-white">
+                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" />
                     {data.title}
                   </span>
-                  <Tag color="green" className="flex gap-1 text-xs">
-                    <AiOutlineRise /> TBD
+                  <Tag
+                    color="gray"
+                    className="flex gap-1 text-xs bg-white/20 backdrop-blur-sm border-white/30 text-gray-800"
+                  >
+                    <AiOutlineRise className="text-gray-500" /> TBD
                   </Tag>
                 </div>
                 <div className="mt-auto">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">
+                    <span className="text-2xl font-bold text-white">
                       {loadingBudget ? (
                         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                       ) : (
                         formatCurrency(data.value ?? 0)
                       )}
                     </span>
-                    <span className="text-sm">
+                    <span className="text-sm text-white/80">
                       of {formatCurrency(data.totalBudget ?? 0)}
                     </span>
                   </div>
                   {loading ? (
-                    <Skeleton active paragraph={false} className="mt-3" />
+                    <Skeleton active paragraph={false} className="mt-3 bg-white/20" />
                   ) : (
-                    <Progress
-                      percent={Math.min(100, (data.value / data.totalBudget) * 100)}
-                      strokeColor={data.value > data.totalBudget ? "#f5222d" : "#52c41a"}
-                      showInfo={false}
-                      className="mt-3"
-                    />
+                    <div className="mt-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-full bg-white/20 rounded-full h-2">
+                          <div
+                            className="bg-white/90 h-2 rounded-full"
+                            style={{
+                              width: `${Math.min(100, (data.value / data.totalBudget) * 100)}%`
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium text-white min-w-[40px]">
+                          {Math.round(Math.min(100, (data.value / data.totalBudget) * 100))}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-white/80 mt-1">
+                        <span>0%</span>
+                        <span>Utilization</span>
+                        <span>100%</span>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1118,13 +1165,13 @@ export default function Budgets() {
               </p>
               <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
                 <p className="text-xs text-blue-700 italic">
-                  “A budget is telling your money where to go instead of wondering where it went.”
+                  "A budget is telling your money where to go instead of wondering where it went."
                   <span className="block font-medium text-blue-800 mt-1 not-italic">— IT Department</span>
                 </p>
               </blockquote>
               <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
                 <p className="text-xs text-blue-700 italic">
-                  “Don’t save what is left after spending; spend what is left after saving.”
+                  "Don't save what is left after spending; spend what is left after saving."
                   <span className="block font-medium text-blue-800 mt-1 not-italic">— Finance Department</span>
                 </p>
               </blockquote>
