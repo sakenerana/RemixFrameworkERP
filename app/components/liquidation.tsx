@@ -4,9 +4,11 @@ import { useEffect } from "react";
 export default function Liquidation({
   item,
   liquidationTotal,
+  requisitionTotal,
   liquidationCount,
 }: {
   item: any;
+  requisitionTotal?: any;
   liquidationTotal?: any;
   liquidationCount?: any;
 }) {
@@ -16,7 +18,7 @@ export default function Liquidation({
 
   // Calculate Remaining Balance
   const totalBudget = item?.budget || 0;
-  const totalSpent = item?.totalSpent || 0;
+  const totalSpent = Number(requisitionTotal) + Number(liquidationTotal) || 0;
   const remainingBalance = totalBudget - totalSpent;
 
   // Gradient backgrounds for statistics cards
@@ -57,6 +59,15 @@ export default function Liquidation({
 
           {/* Overall Total Liquidation + Inline Button */}
           <Col xs={24} sm={12}>
+          <Space size="middle" align="center">
+              <Statistic
+                title="Overall Total Requisition (Yearly)"
+                value={requisitionTotal}
+                precision={2}
+                valueStyle={{ color: "#1890ff", fontWeight: 600, fontSize: 24 }}
+                prefix=""
+              />
+            </Space>
             <Space size="middle" align="center">
               <Statistic
                 title="Overall Total Liquidation (Yearly)"

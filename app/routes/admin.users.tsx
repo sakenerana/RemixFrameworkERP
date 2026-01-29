@@ -455,13 +455,14 @@ export default function UsersRoutes() {
     ];
 
     const options: CheckboxOptionType<any>[] = [
-        { label: "Inventory Management", value: 1 },
-        { label: "Budget Tracker", value: 2 },
-        { label: "Workflow Tracker", value: 3 },
+        { label: "Inventory", value: 1 },
+        { label: "Budget Monitoring", value: 2 },
+        { label: "Workflow", value: 3 },
         { label: "Admin Panel", value: 4 },
-        { label: "Billing & Collections", value: 5 },
-        { label: "Ticketing System", value: 6 },
-        { label: "Loan Tracker", value: 7 },
+        { label: "BCD", value: 5 },
+        { label: "Ticketing", value: 6 },
+        { label: "Loan Release", value: 7 },
+        { label: "New Membership", value: 8 },
     ];
 
     const optionsPermission: CheckboxOptionType<any>[] = [

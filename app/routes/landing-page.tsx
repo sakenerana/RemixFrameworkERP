@@ -4,7 +4,7 @@ import { Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 import { LuPackageSearch } from "react-icons/lu";
-import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaMoneyCheckAlt, FaTicketAlt } from "react-icons/fa";
+import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaHandHoldingUsd, FaMoneyCheckAlt, FaTicketAlt, FaUserPlus } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
 import { useAuth } from "~/auth/AuthContext";
 import { UserService } from "~/services/user.service";
@@ -13,12 +13,13 @@ import { ProtectedRoute } from "~/components/ProtectedRoute";
 export default function LandingPage() {
   const { user } = useAuth();
   const [dataUser, setData] = useState<any>();
-  const [dataInventory, setDataIventory] = useState(false);
+  const [dataInventory, setDataInventory] = useState(false);
   const [dataBudget, setDataBudget] = useState(false);
+  const [dataNewMembership, setDataNewMembership] = useState(false);
+  const [dataLoanRelease, setDataLoanRelease] = useState(false);
   const [dataWorkflow, setDataWorkflow] = useState(false);
   const [dataBilling, setDataBilling] = useState(false);
   const [dataTicketing, setDataTicketing] = useState(false);
-  const [dataLoanTracker, setDataLoanTracker] = useState(false);
   const [dataAdmin, setDataAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
@@ -47,13 +48,14 @@ export default function LandingPage() {
 
       // Update all states at once
       setData(dataFetch);
-      setDataIventory(arr.includes(1));
+      setDataInventory(arr.includes(1));
       setDataBudget(arr.includes(2));
       setDataWorkflow(arr.includes(3));
       setDataAdmin(arr.includes(4));
       setDataBilling(arr.includes(5));
       setDataTicketing(arr.includes(6));
-      setDataLoanTracker(arr.includes(7));
+      setDataLoanRelease(arr.includes(7));
+      setDataNewMembership(arr.includes(8));
     } catch (error) {
       message.error("Error loading user data");
     } finally {
@@ -65,7 +67,7 @@ export default function LandingPage() {
   const regularFeatures = useMemo(() => [
     {
       icon: <FaDollarSign className="h-10 w-10 text-white" />,
-      title: "Budget Tracker",
+      title: "Budget Monitoring",
       link: "/budget",
       access: dataBudget,
       bgColor: "bg-gradient-to-br from-green-500 to-emerald-600",
@@ -73,8 +75,26 @@ export default function LandingPage() {
       iconBg: "bg-green-600/30"
     },
     {
+      icon: <FaUserPlus className="h-10 w-10 text-white" />,
+      title: "New Membership",
+      link: "/membership",
+      access: dataNewMembership, // You'll need to add this to your dependencies
+      bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
+      badgeColor: "bg-purple-700/30 text-purple-100",
+      iconBg: "bg-purple-600/30"
+    },
+    {
+      icon: <FaHandHoldingUsd className="h-10 w-10 text-white" />,
+      title: "Loan Release",
+      link: "/loan",
+      access: dataLoanRelease, // You'll need to add this to your dependencies
+      bgColor: "bg-gradient-to-br from-indigo-500 to-blue-600",
+      badgeColor: "bg-indigo-700/30 text-indigo-100",
+      iconBg: "bg-indigo-600/30"
+    },
+    {
       icon: <FaClipboardList className="h-10 w-10 text-white" />,
-      title: "Workflow Tracker",
+      title: "Workflow",
       link: "/workflow",
       access: dataWorkflow,
       bgColor: "bg-gradient-to-br from-orange-500 to-amber-600",
@@ -83,7 +103,7 @@ export default function LandingPage() {
     },
     {
       icon: <FaFileInvoiceDollar className="h-10 w-10 text-white" />,
-      title: "Billing & Collections",
+      title: "BCD",
       link: "/billing",
       access: dataBilling,
       bgColor: "bg-gradient-to-br from-red-500 to-rose-600",
@@ -92,7 +112,7 @@ export default function LandingPage() {
     },
     {
       icon: <FaTicketAlt className="h-10 w-10 text-white" />,
-      title: "Ticketing System",
+      title: "Ticketing",
       link: "https://it-support.cficoop.com/en/",
       access: dataTicketing,
       bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600",
@@ -102,13 +122,13 @@ export default function LandingPage() {
     {
       icon: <LuPackageSearch className="h-10 w-10 text-white" />,
       title: "Inventory",
-      link: "https://asset-tracker.cficoop.com/",
+      link: "/inventory",
       access: dataInventory,
       bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
       badgeColor: "bg-blue-700/30 text-blue-100",
       iconBg: "bg-blue-600/30"
     },
-  ], [dataInventory, dataBudget, dataWorkflow, dataBilling, dataTicketing]);
+  ], [dataInventory, dataNewMembership, dataLoanRelease, dataBudget, dataWorkflow, dataBilling, dataTicketing]); // Add new dependencies here
 
   // Admin feature - kept separate
   const adminFeature = {

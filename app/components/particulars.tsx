@@ -39,7 +39,7 @@ export default function Particulars({ item }: { item: any }) {
     }, [item]);
 
     /* ===========================
-       FETCH REQUISITIONS
+       FETCH REQUISITIONS AND LIQUIDATION
     ============================ */
     useEffect(() => {
         const fetchRequisitions = async () => {
@@ -55,7 +55,7 @@ export default function Particulars({ item }: { item: any }) {
                 );
 
                 setRequisitions(response.data.data || []);
-                console.log("Fetched requisitions:", response.data.data);
+                console.log("Fetched requisitions nad liquidation:", response.data.data);
             } catch (err) {
                 console.error("Error fetching requisitions:", err);
             } finally {
@@ -194,6 +194,71 @@ export default function Particulars({ item }: { item: any }) {
             })
             .reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
 
+        return total;
+    }, [requisitions, item.departments.department]);
+
+    const requisitionTotal = useMemo(() => {
+        if (!requisitions.length) return 0;
+        let total = 0;
+        particulars.forEach(particular => {
+            const key = `${particular.particulars}__${item.departments.department}`;
+
+            const filtered = requisitions.filter(item2 => {
+                let matchesParticular = true;
+                let matchesDepartment = true;
+                let matchesWorkflowType = true;
+                let matchesStatus = true;
+                let matchesYear = true;
+
+                /* === PARTICULAR MATCH (EXACT) === */
+                if (particular.particulars) {
+                    matchesParticular = item2.particular === particular.particulars;
+                }
+
+                /* === DEPARTMENT MATCH (EXACT) === */
+                if (item.departments.department) {
+                    if (
+                        item2.department === "N/A" ||
+                        item2.department === "n/a" ||
+                        item2.department === "NA"
+                    ) {
+                        matchesDepartment =
+                            item2.branch === item.departments.department ||
+                            item2.branchName === item.departments.department ||
+                            item2.branchCode === item.departments.department ||
+                            item2.officeLocation === item.departments.department;
+                    } else {
+                        matchesDepartment =
+                            item2.department === item.departments.department ||
+                            item2.departmentName === item.departments.department ||
+                            item2.deptCode === item.departments.department;
+                    }
+                }
+
+                /* === WORKFLOW === */
+                matchesWorkflowType = item2.workflowType === "Requisition";
+                matchesStatus = item2.status === "Completed";
+
+                /* === YEAR === */
+                if (item2.startDate) {
+                    matchesYear = new Date(item2.startDate).getFullYear() === 2024;
+                }
+
+                return (
+                    matchesParticular &&
+                    matchesDepartment &&
+                    matchesWorkflowType &&
+                    matchesStatus &&
+                    matchesYear
+                );
+            });
+
+            const totalForParticular = filtered.reduce(
+                (sum, r) => sum + Number(r.totalAmount || 0),
+                0
+            );
+            total += totalForParticular;
+        });
         return total;
     }, [requisitions, item.departments.department]);
 
@@ -348,13 +413,11 @@ export default function Particulars({ item }: { item: any }) {
                 {/* <h4 className="text-lg font-semibold mb-3">Liquidation</h4> */}
                 <Liquidation
                     item={item}
+                    requisitionTotal={
+                        requisitionTotal
+                    }
                     liquidationTotal={
-                        loadingAmountSpent
-                            ? 0
-                            : new Intl.NumberFormat("en-PH", {
-                                style: "currency",
-                                currency: "PHP"
-                            }).format(liquidationTotal)
+                        liquidationTotal
                     }
                     liquidationCount={liquidationCount}
                 />

@@ -25,7 +25,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise } from "react-icons/ai";
+import { AiOutlineBuild, AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineDown, AiOutlineEye, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSearch } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
@@ -178,7 +178,7 @@ export default function Budgets() {
       setLoading(true);
       const dataFetch = await BudgetService.getAllBudgetPosts();
       setDataBudgetDepartment(dataFetch); // Works in React state
-      // console.log("DATA DEPARTMENT BUDGET", dataFetch)
+      console.log("DATA DEPARTMENT BUDGET", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -356,39 +356,74 @@ export default function Budgets() {
 
   const departments: CollapseProps['items'] = dataBudgetDepartment.map((item: any) => ({
     key: item.id,
-    label: item.departments.department,
+    label: (
+      <div className="flex items-center justify-between w-full pr-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">
+              {item.departments?.department?.charAt(0) || 'D'}
+            </span>
+          </div>
+          <div>
+            <div className="font-semibold text-gray-800">{item.departments?.department || 'Unknown Department'}</div>
+            <div className="text-xs text-gray-500 flex items-center gap-2">
+              <span>Budget Period: {dayjs(item.start_date).format('MMM D')} - {dayjs(item.end_date).format('MMM D, YYYY')}</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <span>Status: <Tag color="green">Active</Tag></span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="text-right">
+            <div className="font-bold text-lg text-blue-800">
+              {new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+              }).format(item.budget)}
+            </div>
+            <div className="text-xs text-gray-500">Allocated Budget</div>
+          </div>
+          <div className="w-32">
+            <Progress
+              percent={Math.min(100, (dataCombinedTotal / item.budget) * 100)}
+              size="small"
+              strokeColor={
+                (dataCombinedTotal / item.budget) > 0.8 ? '#ef4444' :
+                  (dataCombinedTotal / item.budget) > 0.6 ? '#f59e0b' : '#10b981'
+              }
+            />
+          </div>
+        </div>
+      </div>
+    ),
     children: <Particulars item={item} />,
     extra: (
       <div className="flex items-center gap-3">
-        {/* Budget Amount with subtle styling */}
-        <div className="text-xl font-bold text-blue-800 tracking-tight">
-          {new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-          }).format(item.budget)}
-        </div>
-
-        {/* Edit Icon with button style */}
         <Button
           type="text"
           size="small"
-          icon={<EditOutlined className="text-xs" />}
+          icon={<EditOutlined className="text-sm" />}
           onClick={(e) => {
             e.stopPropagation();
             setIsModalOpenEditAllocateBudget(true);
             setDataBudgetPerDepartment(item);
-            // console.log("COLLAPSE ITEM", item);
             formEditAllocateBudget.setFieldsValue({ budget: item.budget });
           }}
           disabled={isDisabled}
-          className="flex items-center text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded"
+          className="flex items-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-all"
         >
-          Edit
+          Edit Budget
         </Button>
       </div>
-    )
+    ),
+    style: {
+      marginBottom: 8,
+      background: 'white',
+      borderRadius: 8,
+      border: '1px solid #e5e7eb',
+    }
   }));
 
   const onFinish = async () => {
@@ -1047,80 +1082,222 @@ export default function Budgets() {
         </div>
       </Row>
 
+      {/* 2nd Row of Budget Cards */}
       <Row gutter={16} className="pt-5">
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
-          {/* Overall Budget Card */}
+          {/* Overall Budget Card - Enhanced Design */}
           <Card
             loading={loading}
-            className="rounded-lg mb-6 shadow-sm"
+            className="rounded-xl shadow-lg border-0 overflow-hidden"
+            bodyStyle={{ padding: 0 }}
           >
-            <div className="flex flex-col">
-
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="flex flex-wrap text-lg font-semibold">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-3 mr-2" />
-                  Overall Budget Status
-                </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Current Period:</span>
-                  <Tag color="blue">
-                    {`January 01 ${currentYear}`} to {`December 31 ${currentYear}`}
-                    {/* {dayjs(data?.start_date || '').format('MMM DD YYYY')} - {dayjs(data?.end_date || '').format('MMM DD YYYY')} */}
+            <div className="relative">
+              {/* Header with gradient background */}
+              <div className=" px-6 pt-6 rounded-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <h2 className="text-xl font-bold">Overall Budget Status</h2>
+                    </div>
+                    <p className="text-gray-500 text-sm">Financial overview for current period</p>
+                  </div>
+                  <Tag className="bg-gray/20 border-gray/30 text-gray-500 text-sm px-3 py-1 rounded-full">
+                    {/* <AiOutlineCalendar /> */}
+                    {`Jan 01 ${currentYear}`} - {`Dec 31 ${currentYear}`}
                   </Tag>
                 </div>
               </div>
 
+              {/* Main Content */}
+              <div className="p-6">
+                {/* Key Metrics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <div className="text-sm">Total Budgeted</div>
-                  <div className="text-2xl font-bold">
-                    {formatCurrency(dataTotalBudgeted || 0)}
+                  {/* Total Budgeted */}
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-green-700 text-sm font-medium">Total Budgeted</div>
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                        <AiOutlineDollarCircle className="text-green-600 text-sm" />
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-green-800">
+                      {formatCurrency(dataTotalBudgeted || 0)}
+                    </div>
+                    <div className="text-xs text-green-600 mt-1">Allocated funds</div>
+                  </div>
+
+                  {/* Total Unbudgeted */}
+                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-amber-700 text-sm font-medium">Total Unbudgeted</div>
+                      <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center">
+                        <span className="text-amber-600 text-xs font-bold">U</span>
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-amber-800">
+                      {formatCurrency(dataTotalUnBudgeted || 0)}
+                    </div>
+                    <div className="text-xs text-amber-600 mt-1">Additional expenses</div>
+                  </div>
+
+                  {/* Overall Budget */}
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-blue-700 text-sm font-medium">Overall Budget</div>
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <AiOutlineInfoCircle className="text-blue-600 text-sm" />
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-800">
+                      {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
+                    </div>
+                    <div className="text-xs text-blue-600 mt-1">Overall allocation</div>
+                  </div>
+
+                  {/* Amount Spent */}
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-red-700 text-sm font-medium">Amount Spent</div>
+                      <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                        <AiOutlineRise className="text-red-600 text-sm" />
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-red-800">
+                      {formatCurrency(dataCombinedTotal || 0)}
+                    </div>
+                    <div className="text-xs text-red-600 mt-1">Utilized funds</div>
+                  </div>
+
+                  {/* Remaining Balance */}
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-emerald-700 text-sm font-medium">Remaining Balance</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <AiOutlineCheck className="text-emerald-600 text-sm" />
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-emerald-800">
+                      {formatCurrency((dataTotalBudgeted + dataTotalUnBudgeted || 0) - dataCombinedTotal || 0)}
+                    </div>
+                    <div className="text-xs text-emerald-600 mt-1">Available funds</div>
+                  </div>
+
+                </div>
+
+                {/* Progress Section */}
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-700">Budget Utilization</h3>
+                      <p className="text-sm text-gray-500">How much of your total budget has been used</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-700">
+                        {dataTotalBudgeted + dataTotalUnBudgeted > 0
+                          ? `${Math.round((dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)}%`
+                          : '0%'
+                        }
+                      </div>
+                      <div className="text-xs text-gray-500">Utilization Rate</div>
+                    </div>
+                  </div>
+
+                  {/* Custom Progress Bar */}
+                  <div className="relative pt-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                      <span>0%</span>
+                      <span className="font-medium">Budget Utilization</span>
+                      <span>100%</span>
+                    </div>
+
+                    <div className="h-4 bg-gray-200 rounded-full overflow-hidden relative">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${dataTotalBudgeted + dataTotalUnBudgeted > 0
+                            ? Math.min(100, (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)
+                            : 0}%`
+                        }}
+                      >
+                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-white border-2 border-blue-500 rounded-full shadow-sm"></div>
+                      </div>
+                    </div>
+
+                    {/* Milestone markers */}
+                    <div className="flex justify-between mt-1 relative">
+                      {[0, 25, 50, 75, 100].map((marker) => (
+                        <div key={marker} className="flex flex-col items-center">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                          <span className="text-xs text-gray-500 mt-1">{marker}%</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Budget breakdown indicators */}
+                    <div className="flex justify-between mt-6">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                        <span className="text-sm text-gray-600">Budget Used</span>
+                        <span className="text-sm font-semibold">{formatCurrency(dataCombinedTotal)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-gray-300 rounded"></div>
+                        <span className="text-sm text-gray-600">Budget Available</span>
+                        <span className="text-sm font-semibold">
+                          {formatCurrency((dataTotalBudgeted + dataTotalUnBudgeted) - dataCombinedTotal)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="text-sm">Amount Spent</div>
-                  <div className="text-2xl font-bold text-red-600">
-                    {formatCurrency(dataCombinedTotal)}
+                {/* Summary Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm text-gray-500 mb-1">Daily Average Spend</div>
+                    <div className="text-lg font-semibold text-gray-800">
+                      {formatCurrency(dataCombinedTotal / 365)}
+                    </div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm text-gray-500 mb-1">Monthly Average</div>
+                    <div className="text-lg font-semibold text-gray-800">
+                      {formatCurrency(dataCombinedTotal / 12)}
+                    </div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm text-gray-500 mb-1">Budget Health</div>
+                    <div className="flex items-center">
+                      <div className={`text-lg font-semibold mr-2 ${(dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
+                        ? 'text-green-600'
+                        : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
+                          ? 'text-amber-600'
+                          : 'text-red-600'
+                        }`}>
+                        {dataTotalBudgeted + dataTotalUnBudgeted > 0
+                          ? Math.round((dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)
+                          : 0
+                        }%
+                      </div>
+                      <Tag color={
+                        (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
+                          ? 'success'
+                          : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
+                            ? 'warning'
+                            : 'error'
+                      }>
+                        {(dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
+                          ? 'Healthy'
+                          : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
+                            ? 'Moderate'
+                            : 'Critical'
+                        }
+                      </Tag>
+                    </div>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm">Remaining</div>
-                  <div className="text-2xl font-bold text-green-600">
-                    {formatCurrency(Number(dataTotalBudgeted + dataTotalUnBudgeted || 0) - dataCombinedTotal || 0)}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <div className="space-y-2">
-                  <div className="text-sm">Total Unbudgeted</div>
-                  <div className="text-2xl font-bold">
-                    {formatCurrency(dataTotalUnBudgeted || 0)}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm">OVERALL BUDGET STATUS</div>
-                  <div className="text-2xl font-bold text-blue-800">
-                    {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
-                  </div>
-                </div>
-              </div>
-
-              <Progress
-                percent={50}
-                strokeColor="#1890ff"
-                status="active"
-                className="mt-6"
-              />
-
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
-                <span>0%</span>
-                <span>50%</span>
-                <span>100%</span>
               </div>
             </div>
           </Card>
@@ -1128,18 +1305,120 @@ export default function Budgets() {
       </Row>
 
       {/* LIST OF DEPARTMENT AND INFORMATION CARD */}
-      <Row gutter={16} className="">
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
+      <Row gutter={16} className="mt-6">
+        <div className="w-full">
           <Card
-            className="rounded-lg mb-6 shadow-sm"
+            className="rounded-xl shadow-md border-0 overflow-hidden"
+            bodyStyle={{ padding: 0 }}
           >
-            <div className="flex flex-col">
-              <h2 className="flex flex-wrap text-md font-semibold">
-                <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
-                ALL DEPARTMENTS ({dataDepartment.length})
-              </h2>
-              <div className="mt-2">
-                <Collapse items={departments} />
+            {/* Header with Stats */}
+            <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 p-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <h2 className="text-xl font-bold text-gray-800">Departments Overview</h2>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm text-gray-600">
+                        Total Departments: <span className="font-semibold">{dataDepartment.length}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-gray-600">
+                        Total Budget: <span className="font-semibold">{formatCurrency(dataTotalBudgeted || 0)}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<AiOutlineInfoCircle />}
+                    onClick={() => {/* Add department summary modal */ }}
+                    className="text-gray-500 hover:text-blue-600"
+                  >
+                    View Summary
+                  </Button>
+                  <Tag color="blue" className="px-3 py-1 rounded-full">
+                    <span className="flex items-center gap-1">
+                      <RiCircleFill className="text-[6px]" />
+                      Active
+                    </span>
+                  </Tag>
+                </div>
+              </div>
+            </div>
+
+            {/* Departments List - Enhanced Collapse */}
+            <div className="p-2">
+              <Collapse
+                items={departments}
+                expandIconPosition="end"
+                ghost
+                size="large"
+                className="department-collapse"
+                expandIcon={({ isActive }) => (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">
+                      {isActive ? 'Hide Details' : 'View Details'}
+                    </span>
+                    <div className={`transition-transform ${isActive ? 'rotate-180' : ''}`}>
+                      <AiOutlineDown className="text-gray-400" />
+                    </div>
+                  </div>
+                )}
+              />
+            </div>
+
+            {/* Empty State */}
+            {dataDepartment.length === 0 && (
+              <div className="py-16 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <AiOutlineBuild className="text-gray-400 text-2xl" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Departments Found</h3>
+                <p className="text-gray-500 mb-6">Add departments to start managing budgets</p>
+                <Button type="primary" icon={<AiOutlinePlus />}>
+                  Add First Department
+                </Button>
+              </div>
+            )}
+
+            {/* Footer with Summary */}
+            <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
+              <div className="flex flex-wrap justify-between items-center gap-4">
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-semibold">{dataDepartment.length}</span> departments
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-sm">
+                    <span className="text-gray-500">Total Allocated: </span>
+                    <span className="font-semibold text-green-600">
+                      {formatCurrency(dataTotalBudgeted || 0)}
+                    </span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="text-gray-500">Total Used: </span>
+                    <span className="font-semibold text-blue-600">
+                      {formatCurrency(dataCombinedTotal || 0)}
+                    </span>
+                  </div>
+                  <Tooltip title="Budget Utilization Rate">
+                    <div className="text-sm">
+                      <span className="text-gray-500">Utilization: </span>
+                      <span className={`font-semibold ${(dataCombinedTotal / dataTotalBudgeted) > 0.8 ? 'text-red-600' :
+                          (dataCombinedTotal / dataTotalBudgeted) > 0.6 ? 'text-amber-600' : 'text-green-600'
+                        }`}>
+                        {dataTotalBudgeted > 0 ? `${Math.round((dataCombinedTotal / dataTotalBudgeted) * 100)}%` : '0%'}
+                      </span>
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
             </div>
           </Card>
@@ -1149,7 +1428,7 @@ export default function Budgets() {
       {/* THIS IS THE BUDGET DASHBOARD */}
 
       <Row gutter={16}>
-        <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow mt-4">
           <div className="flex items-start gap-4">
             <AiOutlineInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
             <div className="flex flex-col gap-2">

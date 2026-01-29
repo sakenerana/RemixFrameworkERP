@@ -6,7 +6,6 @@ import {
     Col,
     Row,
     TableColumnsType,
-    TableProps,
     Table,
     message,
     Tag,
@@ -18,6 +17,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets } from "react-icons/ai";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
+import AreaChart from "~/components/area_chart";
 import BarChart from "~/components/bar_chart";
 import PieChart from "~/components/pie_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
@@ -46,6 +46,7 @@ interface DashboardMetric {
     trend?: number;
     loading: boolean;
     description: string;
+    gradient: string;
 }
 
 // Language content
@@ -87,6 +88,34 @@ const translations = {
         switchToEnglish: "Palitan sa Ingles"
     }
 };
+
+const dataAreaChart = [
+    { date: '2025-01-01', value: 3000, category: 'Assets' },
+    { date: '2025-01-02', value: 4000, category: 'Assets' },
+    { date: '2025-01-03', value: 3500, category: 'Assets' },
+    { date: '2025-01-04', value: 5000, category: 'Assets' },
+    { date: '2025-01-05', value: 4500, category: 'Assets' },
+    { date: '2025-01-01', value: 2000, category: 'Licenses' },
+    { date: '2025-01-02', value: 3000, category: 'Licenses' },
+    { date: '2025-01-03', value: 4500, category: 'Licenses' },
+    { date: '2025-01-04', value: 3500, category: 'Licenses' },
+    { date: '2025-01-05', value: 4000, category: 'Licenses' },
+    { date: '2025-01-01', value: 1500, category: 'Accessories' },
+    { date: '2025-01-02', value: 2500, category: 'Accessories' },
+    { date: '2025-01-03', value: 3000, category: 'Accessories' },
+    { date: '2025-01-04', value: 4000, category: 'Accessories' },
+    { date: '2025-01-05', value: 3500, category: 'Accessories' },
+    { date: '2025-01-01', value: 1500, category: 'Consumables' },
+    { date: '2025-01-02', value: 2500, category: 'Consumables' },
+    { date: '2025-01-03', value: 3000, category: 'Consumables' },
+    { date: '2025-01-04', value: 4000, category: 'Consumables' },
+    { date: '2025-01-05', value: 3500, category: 'Consumables' },
+    { date: '2025-01-01', value: 1500, category: 'Components' },
+    { date: '2025-01-02', value: 2500, category: 'Components' },
+    { date: '2025-01-03', value: 3000, category: 'Components' },
+    { date: '2025-01-04', value: 4000, category: 'Components' },
+    { date: '2025-01-05', value: 3500, category: 'Components' },
+];
 
 export default function DashboardRoutes() {
     const [dataAsset, setDataAsset] = useState<any>();
@@ -178,56 +207,61 @@ export default function DashboardRoutes() {
             title: t.assets,
             value: metrics.assets,
             icon: <AiOutlineSnippets />,
-            color: "#52c41a",
+            color: "#ffffff",
             trend: 12,
             loading,
-            description: `${t.totalDescription} ${t.assets.toLowerCase()}`
+            description: `${t.totalDescription} ${t.assets.toLowerCase()}`,
+            gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" // Purple gradient
         },
         {
             title: t.licenses,
             value: metrics.licenses,
             icon: <AiOutlineSchedule />,
-            color: "#1890ff",
+            color: "#ffffff",
             trend: 0,
             loading,
-            description: `${t.totalDescription} ${t.licenses.toLowerCase()}`
+            description: `${t.totalDescription} ${t.licenses.toLowerCase()}`,
+            gradient: "linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)" // Coral Pink
         },
         {
             title: t.accessories,
             value: metrics.accessory,
             icon: <AiOutlineMobile />,
-            color: "#722ed1",
+            color: "#ffffff",
             trend: 5,
             loading,
-            description: `${t.totalDescription} ${t.accessories.toLowerCase()}`
+            description: `${t.totalDescription} ${t.accessories.toLowerCase()}`,
+            gradient: "linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)" // Ocean Blue
         },
         {
             title: t.consumables,
             value: metrics.consumable,
             icon: <AiOutlineShopping />,
-            color: "#f5222d",
+            color: "#ffffff",
             trend: -8,
             loading,
-            description: `${t.totalDescription} ${t.consumables.toLowerCase()}`
+            description: `${t.totalDescription} ${t.consumables.toLowerCase()}`,
+            gradient: "linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)" // Forest Green
         },
         {
             title: t.components,
             value: metrics.component,
             icon: <AiOutlineDesktop />,
-            color: "#f4a540",
+            color: "#ffffff",
             trend: -8,
             loading,
-            description: `${t.totalDescription} ${t.components.toLowerCase()}`
+            description: `${t.totalDescription} ${t.components.toLowerCase()}`,
+            gradient: "linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)" // Sunset Orange
         }
     ];
 
     const renderTrendIndicator = (trend: number) => {
         if (trend > 0) {
-            return <span style={{ color: '#52c41a' }}>↑ {trend}%</span>;
+            return <span style={{ color: '#ffffff' }}>↑ {trend}%</span>;
         } else if (trend < 0) {
-            return <span style={{ color: '#f5222d' }}>↓ {Math.abs(trend)}%</span>;
+            return <span style={{ color: '#ffffff' }}>↓ {Math.abs(trend)}%</span>;
         }
-        return <span>→</span>;
+        return <span style={{ color: '#ffffff' }}>→</span>;
     };
 
     const formatCurrency = (amount: number) => {
@@ -236,25 +270,6 @@ export default function DashboardRoutes() {
             currency: "PHP",
         }).format(amount);
     };
-
-    const columns: TableColumnsType<DataType> = [
-        {
-            title: "Date",
-            dataIndex: "date",
-        },
-        {
-            title: "Created By",
-            dataIndex: "created_by",
-        },
-        {
-            title: "Action",
-            dataIndex: "action",
-        },
-        {
-            title: "Item",
-            dataIndex: "item",
-        },
-    ];
 
     const columnsAsset: TableColumnsType<Asset> = [
         {
@@ -293,7 +308,7 @@ export default function DashboardRoutes() {
         <ProtectedRoute>
             <div>
                 <div className="flex justify-between items-center mb-4">
-                    <Title level={3}>{t.dashboardTitle}</Title>
+                    <h1 className="font-bold">{t.dashboardTitle}</h1>
                     <Button type="default" onClick={toggleLanguage}>
                         <GlobalOutlined />
                         {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
@@ -321,29 +336,35 @@ export default function DashboardRoutes() {
                             <Card
                                 hoverable
                                 loading={metric.loading}
-                                bodyStyle={{ padding: '16px' }}
+                                bodyStyle={{
+                                    padding: '16px',
+                                    background: metric.gradient,
+                                    borderRadius: '8px',
+                                    color: '#ffffff'
+                                }}
                                 className="rounded-md shadow-sm overflow-hidden transition-transform duration-300 hover:scale-105"
                             >
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Text strong style={{ color: metric.color }}>
+                                        <Text strong style={{ color: metric.color, fontSize: '14px' }}>
                                             {metric.icon} {metric.title}
                                         </Text>
                                         {metric.trend !== undefined && (
-                                            <Text type="secondary">
+                                            <Text style={{ color: metric.color, fontSize: '12px' }}>
                                                 {renderTrendIndicator(metric.trend)}
                                             </Text>
                                         )}
                                     </div>
-                                    <Title level={3} style={{ margin: 0, color: metric.color }}>
+                                    <Title level={3} style={{ margin: 0, color: metric.color, fontSize: '28px' }}>
                                         {metric.loading ? '--' : metric.value}
                                     </Title>
-                                    <Text type="secondary" className="text-xs">{metric.description}</Text>
+                                    <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '12px' }}>{metric.description}</Text>
                                     {metric.trend !== undefined && (
                                         <Progress
                                             percent={Math.abs(metric.trend)}
                                             showInfo={false}
-                                            strokeColor={metric.trend > 0 ? '#52c41a' : '#f5222d'}
+                                            strokeColor="#ffffff"
+                                            trailColor="rgba(255, 255, 255, 0.3)"
                                             size="small"
                                         />
                                     )}
@@ -364,16 +385,18 @@ export default function DashboardRoutes() {
                                 <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
                                 {loading && <Spin></Spin>}
                                 {!loading &&
-                                    <PieChart
-                                        data={[
-                                            { type: t.assets, value: dataAsset },
-                                            { type: t.licenses, value: dataLicense },
-                                            { type: t.accessories, value: dataAccessory },
-                                            { type: t.consumables, value: dataConsumable },
-                                            { type: t.components, value: dataComponent },
-                                        ]}
-                                        title=""
-                                    />}
+                                    <AreaChart data={dataAreaChart} />
+                                    // <PieChart
+                                    //     data={[
+                                    //         { type: t.assets, value: dataAsset },
+                                    //         { type: t.licenses, value: dataLicense },
+                                    //         { type: t.accessories, value: dataAccessory },
+                                    //         { type: t.consumables, value: dataConsumable },
+                                    //         { type: t.components, value: dataComponent },
+                                    //     ]}
+                                    //     title=""
+                                    // />
+                                }
                             </div>
                         </Card>
                         <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
@@ -385,7 +408,7 @@ export default function DashboardRoutes() {
                                 <BarChart
                                     data={salesData}
                                     title=""
-                                    color="#16a34a"
+
                                     height={350}
                                 />
                             </div>

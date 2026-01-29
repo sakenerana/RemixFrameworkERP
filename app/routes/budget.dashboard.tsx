@@ -40,21 +40,21 @@ const translations = {
 };
 
 const dataAreaChart = [
-  { date: '2024-01-01', value: 3000, category: 'Product A' },
-  { date: '2024-01-02', value: 4000, category: 'Product A' },
-  { date: '2024-01-03', value: 3500, category: 'Product A' },
-  { date: '2024-01-04', value: 5000, category: 'Product A' },
-  { date: '2024-01-05', value: 4500, category: 'Product A' },
-  { date: '2024-01-01', value: 2000, category: 'Product B' },
-  { date: '2024-01-02', value: 3000, category: 'Product B' },
-  { date: '2024-01-03', value: 4500, category: 'Product B' },
-  { date: '2024-01-04', value: 3500, category: 'Product B' },
-  { date: '2024-01-05', value: 4000, category: 'Product B' },
-  { date: '2024-01-01', value: 1500, category: 'Product C' },
-  { date: '2024-01-02', value: 2500, category: 'Product C' },
-  { date: '2024-01-03', value: 3000, category: 'Product C' },
-  { date: '2024-01-04', value: 4000, category: 'Product C' },
-  { date: '2024-01-05', value: 3500, category: 'Product C' },
+  { date: '2025-01-01', value: 3000, category: 'Requisition' },
+  { date: '2025-01-02', value: 4000, category: 'Requisition' },
+  { date: '2025-01-03', value: 3500, category: 'Requisition' },
+  { date: '2025-01-04', value: 5000, category: 'Requisition' },
+  { date: '2025-01-05', value: 4500, category: 'Requisition' },
+  { date: '2025-01-01', value: 2000, category: 'Liquidation' },
+  { date: '2025-01-02', value: 3000, category: 'Liquidation' },
+  { date: '2025-01-03', value: 4500, category: 'Liquidation' },
+  { date: '2025-01-04', value: 3500, category: 'Liquidation' },
+  { date: '2025-01-05', value: 4000, category: 'Liquidation' },
+  { date: '2025-01-01', value: 1500, category: 'Amount Spent' },
+  { date: '2025-01-02', value: 2500, category: 'Amount Spent' },
+  { date: '2025-01-03', value: 3000, category: 'Amount Spent' },
+  { date: '2025-01-04', value: 4000, category: 'Amount Spent' },
+  { date: '2025-01-05', value: 3500, category: 'Amount Spent' },
 ];
 
 export default function BudgetRoutes() {
