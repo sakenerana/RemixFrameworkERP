@@ -9,6 +9,7 @@ export default function Particulars({ item }: { item: any }) {
     const [loadingAmountSpent, setLoadingAmountSpent] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [requisitions, setRequisitions] = useState<any[]>([]);
+    const currentYear = new Date().getFullYear();
 
     /* ===========================
        FETCH PARTICULARS
@@ -124,7 +125,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 /* === YEAR === */
                 if (item2.startDate) {
-                    matchesYear = new Date(item2.startDate).getFullYear() === 2024;
+                    matchesYear = new Date(item2.startDate).getFullYear() === currentYear;
                 }
 
                 return (
@@ -145,56 +146,59 @@ export default function Particulars({ item }: { item: any }) {
         return cache;
     }, [requisitions, particulars, item.departments.department]);
 
-    const liquidationTotal = useMemo(() => {
-        if (!requisitions.length) return 0;
+    const { liquidationData, liquidationTotal } = useMemo(() => {
+        if (!requisitions.length) return { liquidationData: [], liquidationTotal: 0 };
 
-        const total = requisitions
-            .filter(item2 => {
-                let matchesDepartment = true;
-                let matchesWorkflowType = true;
-                let matchesStatus = true;
-                let matchesYear = true;
+        const filteredData = requisitions.filter(item2 => {
+            let matchesDepartment = true;
+            let matchesWorkflowType = true;
+            let matchesStatus = true;
+            let matchesYear = true;
 
-                /* === DEPARTMENT MATCH (EXACT) === */
-                if (item.departments.department) {
-                    if (
-                        item2.department === "N/A" ||
-                        item2.department === "n/a" ||
-                        item2.department === "NA" ||
-                        item2.department === null
-                    ) {
-                        matchesDepartment =
-                            item2.branch === item.departments.department ||
-                            item2.branchName === item.departments.department ||
-                            item2.branchCode === item.departments.department ||
-                            item2.officeLocation === item.departments.department;
-                    } else {
-                        matchesDepartment =
-                            item2.department === item.departments.department ||
-                            item2.departmentName === item.departments.department ||
-                            item2.deptCode === item.departments.department;
-                    }
+            /* === DEPARTMENT MATCH (EXACT) === */
+            if (item.departments.department) {
+                if (
+                    item2.department === "N/A" ||
+                    item2.department === "n/a" ||
+                    item2.department === "NA" ||
+                    item2.department === null
+                ) {
+                    matchesDepartment =
+                        item2.branch === item.departments.department ||
+                        item2.branchName === item.departments.department ||
+                        item2.branchCode === item.departments.department ||
+                        item2.officeLocation === item.departments.department;
+                } else {
+                    matchesDepartment =
+                        item2.department === item.departments.department ||
+                        item2.departmentName === item.departments.department ||
+                        item2.deptCode === item.departments.department;
                 }
+            }
 
-                /* === WORKFLOW === */
-                matchesWorkflowType = item2.workflowType === "Liquidation";
-                matchesStatus = item2.status === "Completed";
+            /* === WORKFLOW === */
+            matchesWorkflowType = item2.workflowType === "Liquidation";
+            matchesStatus = item2.status === "Completed";
 
-                /* === YEAR === */
-                if (item2.startDate) {
-                    matchesYear = new Date(item2.startDate).getFullYear() === 2024;
-                }
+            /* === YEAR === */
+            if (item2.startDate) {
+                matchesYear = new Date(item2.startDate).getFullYear() === currentYear;
+            }
 
-                return (
-                    matchesDepartment &&
-                    matchesWorkflowType &&
-                    matchesStatus &&
-                    matchesYear
-                );
-            })
-            .reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
+            return (
+                matchesDepartment &&
+                matchesWorkflowType &&
+                matchesStatus &&
+                matchesYear
+            );
+        });
 
-        return total;
+        const total = filteredData.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
+
+        return {
+            liquidationData: filteredData,
+            liquidationTotal: total
+        };
     }, [requisitions, item.departments.department]);
 
     const requisitionTotal = useMemo(() => {
@@ -241,7 +245,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 /* === YEAR === */
                 if (item2.startDate) {
-                    matchesYear = new Date(item2.startDate).getFullYear() === 2024;
+                    matchesYear = new Date(item2.startDate).getFullYear() === currentYear;
                 }
 
                 return (
@@ -298,7 +302,7 @@ export default function Particulars({ item }: { item: any }) {
 
             /* === YEAR === */
             if (item2.startDate) {
-                matchesYear = new Date(item2.startDate).getFullYear() === 2024;
+                matchesYear = new Date(item2.startDate).getFullYear() === currentYear;
             }
 
             return (
@@ -420,6 +424,7 @@ export default function Particulars({ item }: { item: any }) {
                         liquidationTotal
                     }
                     liquidationCount={liquidationCount}
+                    liquidationData={liquidationData}
                 />
             </div>
         </div>
