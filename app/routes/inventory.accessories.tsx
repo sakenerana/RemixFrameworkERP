@@ -4,6 +4,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -436,7 +437,7 @@ export default function AccesoriessRoute() {
   );
 
   return (
-    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+    <Card className="w-full">
       {/* Checkout Modal */}
       <Modal
         width={480}
@@ -610,6 +611,6 @@ export default function AccesoriessRoute() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }

@@ -4,6 +4,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -228,7 +229,7 @@ export default function DepreciationRoutes() {
   );
 
   return (
-    <div className="w-full px-4 py-6">
+    <Card className="w-full">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -362,6 +363,6 @@ export default function DepreciationRoutes() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }

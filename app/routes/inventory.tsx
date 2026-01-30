@@ -224,11 +224,11 @@ export default function InventoryLayoutIndex() {
       icon: <FcMultipleSmartphones />,
       label: <Link to="/inventory/components">Tech Components</Link>,
     },
-    {
-      key: "6",
-      icon: <FcPaid />,
-      label: <Link to="/inventory/predefined-kit">Predefined Kits</Link>,
-    },
+    // {
+    //   key: "6",
+    //   icon: <FcPaid />,
+    //   label: <Link to="/inventory/predefined-kit">Predefined Kits</Link>,
+    // },
     {
       key: "2",
       icon: <FcAutomatic />,
@@ -533,7 +533,7 @@ export default function InventoryLayoutIndex() {
                   style={{
                     backgroundColor: isDarkMode ? '#141414' : 'transparent',
                     color: isDarkMode ? '#141414' : '#f1f1f1',
-                    height: 'calc(100vh - 80px)',
+                    height: 'calc(100vh - 200px)',
                     overflowY: 'auto',
                     padding: '8px 0',
                   }}

@@ -4,6 +4,7 @@ import {
   Alert,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -268,6 +269,7 @@ export default function AssetsRoute() {
               className="cursor-pointer"
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
+              variant="solid"
             >
               Update
             </Tag>
@@ -281,18 +283,20 @@ export default function AssetsRoute() {
           >
             {record.status_labels.name === 'Active' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#f50"
+                variant="solid"
               >
                 Deactivate
               </Tag>
             )}
             {record.status_labels.name === 'Inactive' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#1677ff"
+                variant="solid"
               >
                 Activate
               </Tag>
@@ -368,7 +372,7 @@ export default function AssetsRoute() {
   );
 
   return (
-    <div className="w-full px-6 rounded-lg shadow-sm">
+    <Card className="w-full">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -511,6 +515,6 @@ export default function AssetsRoute() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,6 +1,6 @@
 import { CheckCircleOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "@remix-run/react";
-import { Alert, Avatar, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
+import { Alert, Avatar, Breadcrumb, Button, Card, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineEdit, AiOutlineFileExclamation, AiOutlineLaptop, AiOutlinePlus } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
@@ -254,7 +254,7 @@ export default function AssetModelsRoutes() {
     );
 
     return (
-        <div className="w-full px-4">
+        <Card className="w-full">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
@@ -388,6 +388,6 @@ export default function AssetModelsRoutes() {
                     }}
                 />
             )}
-        </div>
+        </Card>
     );
 }

@@ -249,7 +249,7 @@ export default function CustomAssetReportRoutes() {
   };
 
   return (
-    <div className="w-full px-4">
+    <Card className="w-full">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
         <Breadcrumb
@@ -486,6 +486,6 @@ export default function CustomAssetReportRoutes() {
           </Card>
         </Col>
       </Row>
-    </div>
+    </Card>
   );
 }

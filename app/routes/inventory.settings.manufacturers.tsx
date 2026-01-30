@@ -4,6 +4,7 @@ import {
   Avatar,
   Breadcrumb,
   Button,
+  Card,
   Checkbox,
   Dropdown,
   Input,
@@ -278,7 +279,7 @@ export default function ManufacturersRoutes() {
   );
 
   return (
-    <div className="w-full px-6 py-4 rounded-lg shadow-sm">
+    <Card className="w-full">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -417,6 +418,6 @@ export default function ManufacturersRoutes() {
           }}
         />
       )}
-    </div>
+    </Card>
   );
 }
