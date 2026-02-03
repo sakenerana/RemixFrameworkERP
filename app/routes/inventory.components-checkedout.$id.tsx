@@ -197,6 +197,7 @@ export default function Checkedout() {
                             className="cursor-pointer"
                             icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
                             color="#1677ff"
+                            variant="solid"
                         >
                             Check-in
                         </Tag>

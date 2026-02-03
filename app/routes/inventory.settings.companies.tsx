@@ -208,6 +208,7 @@ export default function CompaniesRoutes() {
               className="cursor-pointer"
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
+              variant="solid"
             >
               Update
             </Tag>
@@ -221,18 +222,20 @@ export default function CompaniesRoutes() {
           >
             {record.status_labels.name === 'Active' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#f50"
+                variant="solid"
               >
                 Deactivate
               </Tag>
             )}
             {record.status_labels.name === 'Inactive' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#1677ff"
+                variant="solid"
               >
                 Activate
               </Tag>

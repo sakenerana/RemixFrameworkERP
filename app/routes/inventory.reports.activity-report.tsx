@@ -126,32 +126,32 @@ export default function ActivityReportRoutes() {
         return (
           <>
             {record.actions === 'Create' && (
-              <Tag color="blue">
+              <Tag color="blue" variant="solid">
                 <CheckCircleOutlined className="float-left mt-1 mr-1" /> Create
               </Tag>
             )}
             {record.actions === 'Update' && (
-              <Tag color="orange">
+              <Tag color="orange" variant="solid">
                 <AiOutlineEdit className="float-left mt-1 mr-1" /> Update / Deactivate
               </Tag>
             )}
             {record.actions === 'Delete' && (
-              <Tag color="red">
+              <Tag color="red" variant="solid">
                 <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Deactivate
               </Tag>
             )}
             {record.actions === 'Deactivate' && (
-              <Tag color="pink">
+              <Tag color="pink" variant="solid">
                 <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Deactivate
               </Tag>
             )}
             {record.actions === 'Checkout' && (
-              <Tag color="green">
+              <Tag color="green" variant="solid">
                 <CheckCircleOutlined className="float-left mt-1 mr-1" /> Checkout
               </Tag>
             )}
             {record.actions === 'Checkin' && (
-              <Tag color="yellow">
+              <Tag color="yellow" variant="solid">
                 <CheckCircleOutlined className="float-left mt-1 mr-1" /> Checkin
               </Tag>
             )}

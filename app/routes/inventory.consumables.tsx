@@ -302,6 +302,7 @@ export default function ConsumablesRoute() {
               className="cursor-pointer"
               icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
               color="#f7b63e"
+              variant="solid"
             >
               Update
             </Tag>
@@ -315,18 +316,20 @@ export default function ConsumablesRoute() {
           >
             {record.status_labels.name === 'Active' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#f50"
+                variant="solid"
               >
                 Deactivate
               </Tag>
             )}
             {record.status_labels.name === 'Inactive' && (
               <Tag
-                className="cursor-pointer"
+                className="cursor-pointer ml-2"
                 icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
                 color="#1677ff"
+                variant="solid"
               >
                 Activate
               </Tag>
@@ -338,7 +341,7 @@ export default function ConsumablesRoute() {
     {
       title: "Checkout",
       dataIndex: "checkout",
-      width: 120,
+      width: 150,
       fixed: "right",
       render: (_, data) => {
         const currentCount = data?.consumables_check?.[0]?.count || 0;
@@ -359,6 +362,7 @@ export default function ConsumablesRoute() {
                 className={`cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
                 color={isDisabled ? "#f00404ff" : "#3fd168"} // Gray when disabled, green when enabled
+                variant="solid"
               >
                 {isDisabled ? 'Completed' : 'Check-out'}
               </Tag>

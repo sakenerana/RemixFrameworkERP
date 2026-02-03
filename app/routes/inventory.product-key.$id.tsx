@@ -4,6 +4,7 @@ import {
     Alert,
     Breadcrumb,
     Button,
+    Card,
     Checkbox,
     Dropdown,
     Form,
@@ -173,6 +174,7 @@ export default function ProductKey() {
                                 className={`cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
                                 color={isDisabled ? "#f00404ff" : "#3fd168"} // Gray when disabled, green when enabled
+                                variant="solid"
                             >
                                 {isDisabled ? 'Completed' : 'Check-out'}
                             </Tag>
@@ -215,7 +217,7 @@ export default function ProductKey() {
     );
 
     return (
-        <div>
+        <Card className="w-full">
             <Modal
                 style={{ top: 20 }}
                 width={420}
@@ -248,7 +250,7 @@ export default function ProductKey() {
                 <Alert
                     message={
                         <span>
-                            Note: This is the list of all product key of <strong>{data[0]?.name || 'items'}</strong>. Please check closely.
+                            Note: <strong>{data[0]?.name || 'items'}</strong>. Please check closely.
                         </span>
                     }
                     type="info"
@@ -286,6 +288,6 @@ export default function ProductKey() {
                     scroll={{ x: "max-content" }}
                 />
             )}
-        </div>
+        </Card>
     );
 }

@@ -3,7 +3,7 @@ import type { MenuProps } from "antd";
 import { Card, message } from "antd";
 import { Link } from "@remix-run/react";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
-import { LuPackageSearch } from "react-icons/lu";
+import { LuChartNoAxesColumn, LuPackageSearch } from "react-icons/lu";
 import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaHandHoldingUsd, FaMoneyCheckAlt, FaTicketAlt, FaUserPlus } from "react-icons/fa";
 import { BsShieldCheck } from "react-icons/bs";
 import { useAuth } from "~/auth/AuthContext";
@@ -67,7 +67,7 @@ export default function LandingPage() {
   const regularFeatures = useMemo(() => [
     {
       icon: <FaDollarSign className="h-10 w-10 text-white" />,
-      title: "Budget Monitoring",
+      title: "Financial Monitoring",
       link: "/budget",
       access: dataBudget,
       bgColor: "bg-gradient-to-br from-green-500 to-emerald-600",
@@ -75,26 +75,17 @@ export default function LandingPage() {
       iconBg: "bg-green-600/30"
     },
     {
-      icon: <FaUserPlus className="h-10 w-10 text-white" />,
-      title: "New Membership",
-      link: "/membership",
+      icon: <LuChartNoAxesColumn className="h-10 w-10 text-white" />,
+      title: "Perofmance Report",
+      link: "/performancereport",
       access: dataNewMembership, // You'll need to add this to your dependencies
       bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
       badgeColor: "bg-purple-700/30 text-purple-100",
       iconBg: "bg-purple-600/30"
     },
     {
-      icon: <FaHandHoldingUsd className="h-10 w-10 text-white" />,
-      title: "Loan Release",
-      link: "/loan",
-      access: dataLoanRelease, // You'll need to add this to your dependencies
-      bgColor: "bg-gradient-to-br from-indigo-500 to-blue-600",
-      badgeColor: "bg-indigo-700/30 text-indigo-100",
-      iconBg: "bg-indigo-600/30"
-    },
-    {
       icon: <FaClipboardList className="h-10 w-10 text-white" />,
-      title: "Workflow",
+      title: "Operation Process",
       link: "/workflow",
       access: dataWorkflow,
       bgColor: "bg-gradient-to-br from-orange-500 to-amber-600",
@@ -102,32 +93,23 @@ export default function LandingPage() {
       iconBg: "bg-orange-600/30"
     },
     {
-      icon: <FaFileInvoiceDollar className="h-10 w-10 text-white" />,
-      title: "BCD",
-      link: "/billing",
-      access: dataBilling,
-      bgColor: "bg-gradient-to-br from-red-500 to-rose-600",
-      badgeColor: "bg-red-700/30 text-red-100",
-      iconBg: "bg-red-600/30"
-    },
-    {
-      icon: <FaTicketAlt className="h-10 w-10 text-white" />,
-      title: "Ticketing",
-      link: "https://it-support.cficoop.com/en/",
-      access: dataTicketing,
-      bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600",
-      badgeColor: "bg-teal-700/30 text-teal-100",
-      iconBg: "bg-teal-600/30"
-    },
-    {
       icon: <LuPackageSearch className="h-10 w-10 text-white" />,
-      title: "Inventory",
+      title: "CFI Asset Management",
       link: "/inventory",
       access: dataInventory,
       bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
       badgeColor: "bg-blue-700/30 text-blue-100",
       iconBg: "bg-blue-600/30"
     },
+    {
+      icon: <FaTicketAlt className="h-10 w-10 text-white" />,
+      title: "IT Support Ticket",
+      link: "https://it-support.cficoop.com/en/",
+      access: dataTicketing,
+      bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600",
+      badgeColor: "bg-teal-700/30 text-teal-100",
+      iconBg: "bg-teal-600/30"
+    }
   ], [dataInventory, dataNewMembership, dataLoanRelease, dataBudget, dataWorkflow, dataBilling, dataTicketing]); // Add new dependencies here
 
   // Admin feature - kept separate
@@ -165,7 +147,7 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                Enterprise Resource Planning
+                CFI Management System
               </h1>
 
               <p className="text-base text-white/80 max-w-2xl mx-auto">

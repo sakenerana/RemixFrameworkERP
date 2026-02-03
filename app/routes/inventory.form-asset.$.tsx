@@ -170,7 +170,7 @@ export default function CreateAssets() {
     };
 
     return (
-        <div className="w-full px-4">
+        <Card className="w-full px-4">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <Breadcrumb
@@ -204,10 +204,7 @@ export default function CreateAssets() {
             </div>
 
             {/* Form Card */}
-            <Card
-                className="shadow-sm border-0 rounded-lg"
-                bodyStyle={{ padding: '24px' }}
-            >
+            <div>
                 <Form
                     form={form}
                     layout="vertical"
@@ -421,7 +418,7 @@ export default function CreateAssets() {
                         </Button>
                     </div>
                 </Form>
-            </Card>
-        </div>
+            </div>
+        </Card>
     );
 }

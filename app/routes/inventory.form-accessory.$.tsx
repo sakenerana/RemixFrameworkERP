@@ -202,7 +202,7 @@ export default function CreateAccessory() {
     };
 
     return (
-        <div className="w-full px-4">
+        <Card className="w-full px-4">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 py-2">
                 <Breadcrumb
@@ -236,10 +236,7 @@ export default function CreateAccessory() {
             </div>
 
             {/* Form Card */}
-            <Card
-                className="w-full border-0 shadow-sm rounded-lg"
-                bodyStyle={{ padding: '24px' }}
-            >
+            <div>
                 <Form
                     form={form}
                     layout="vertical"
@@ -495,7 +492,7 @@ export default function CreateAccessory() {
                         </Button>
                     </div>
                 </Form>
-            </Card>
-        </div>
+            </div>
+        </Card>
     );
 }

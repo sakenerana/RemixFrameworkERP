@@ -4,6 +4,7 @@ import {
     Alert,
     Breadcrumb,
     Button,
+    Card,
     Checkbox,
     Col,
     Dropdown,
@@ -168,13 +169,11 @@ export default function Checkedout() {
         {
             title: "Model No.",
             dataIndex: "model_no",
-            width: 120,
             render: (text) => text || 'N/A'
         },
         {
             title: "Checked Out Date",
             dataIndex: "checkout_date",
-            width: 350,
             render: (dateString) => (
                 <div className="flex items-center">
                     <CalendarOutlined className="mr-2 text-gray-400" />
@@ -189,7 +188,6 @@ export default function Checkedout() {
         {
             title: "Notes",
             dataIndex: "notes",
-            width: 350,
             render: (text) => text || 'N/A'
         },
         {
@@ -210,6 +208,7 @@ export default function Checkedout() {
                             className="cursor-pointer"
                             icon={<AiOutlineExport className="float-left mt-1 mr-1" />}
                             color="#1677ff"
+                            variant="solid"
                         >
                             Check-in
                         </Tag>
@@ -255,7 +254,7 @@ export default function Checkedout() {
     };
 
     return (
-        <div>
+        <Card className="w-full">
             <Modal
                 style={{ top: 20 }}
                 width={420}
@@ -333,7 +332,7 @@ export default function Checkedout() {
                 <Alert
                     message={
                         <span>
-                            Note: This is the list of all <strong>{data[0]?.accessories?.name || 'items'}</strong> item user. Please check closely.
+                            Note: <strong>{data[0]?.accessories?.name || 'items'}</strong> item user. Please check closely.
                         </span>
                     }
                     type="info"
@@ -372,6 +371,6 @@ export default function Checkedout() {
                     scroll={{ x: "max-content" }}
                 />
             )}
-        </div>
+        </Card>
     );
 }
