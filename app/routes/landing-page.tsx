@@ -1,285 +1,305 @@
-import React, { useMemo, useState } from "react";
-import type { MenuProps } from "antd";
-import { Card, message } from "antd";
-import { Link } from "@remix-run/react";
-import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
-import { LuChartNoAxesColumn, LuPackageSearch } from "react-icons/lu";
-import { FaClipboardList, FaDollarSign, FaFileInvoiceDollar, FaHandHoldingUsd, FaMoneyCheckAlt, FaTicketAlt, FaUserPlus } from "react-icons/fa";
-import { BsShieldCheck } from "react-icons/bs";
-import { useAuth } from "~/auth/AuthContext";
-import { UserService } from "~/services/user.service";
-import { ProtectedRoute } from "~/components/ProtectedRoute";
+import React, { useMemo, useState } from 'react';
+import { ConfigProvider, Layout, Avatar, message } from 'antd';
+import {
+    Home,
+    FileText,
+    Building2,
+    User,
+    Mail,
+    ContactRound,
+    Warehouse,
+    LogOut,
+    BaggageClaim,
+} from 'lucide-react';
+import MetricCard from '~/components/MetricCard';
+import { useAuth } from '~/auth/AuthContext';
+import { UserService } from '~/services/user.service';
+import { FaDollarSign } from 'react-icons/fa';
+import { LuChartNoAxesColumn } from 'react-icons/lu';
 
-export default function LandingPage() {
-  const { user } = useAuth();
-  const [dataUser, setData] = useState<any>();
-  const [dataInventory, setDataInventory] = useState(false);
-  const [dataBudget, setDataBudget] = useState(false);
-  const [dataNewMembership, setDataNewMembership] = useState(false);
-  const [dataLoanRelease, setDataLoanRelease] = useState(false);
-  const [dataWorkflow, setDataWorkflow] = useState(false);
-  const [dataBilling, setDataBilling] = useState(false);
-  const [dataTicketing, setDataTicketing] = useState(false);
-  const [dataAdmin, setDataAdmin] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
-  const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
+export interface SidebarItemType {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    badge?: number;
+}
+const { Header, Content, Sider, Footer } = Layout;
 
-  // Fetch data from Supabase
-  const fetchDataByUUID = async () => {
-    if (!user?.id) {
-      console.error("User ID is not available");
-      return;
-    }
+const sidebarItems: SidebarItemType[] = [
+    { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" />, badge: 3 },
+    { id: 'mail', label: 'sakenerana@gmail.com', icon: <Mail className="w-4 h-4" />, badge: 3 },
+    { id: 'username', label: 'cdmerana', icon: <User className="w-4 h-4" />, badge: 5 },
+    { id: 'nickname', label: 'IT Staff - CD Erana', icon: <ContactRound className="w-4 h-4" /> },
+    { id: 'department', label: 'IT Department', icon: <Warehouse className="w-4 h-4" />, badge: 2 },
+];
 
-    try {
-      setLoading(true);
-      const dataFetch = await UserService.getByUuid(user.id);
-      const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-      localStorage.setItem('userOfficeID', dataFetch.office.id);
-      localStorage.setItem('userOffice', dataFetch.office.name);
-      localStorage.setItem('userDept', dataFetch.department_id);
-      localStorage.setItem('dept', dataFetch.departments.department);
-      localStorage.setItem('userAuthID', dataFetch.id);
-      localStorage.setItem('fname', dataFetch.first_name);
-      localStorage.setItem('lname', dataFetch.last_name);
-      localStorage.setItem('ab_id', dataFetch.ab_user_id);
-      localStorage.setItem('username', dataFetch.username);
+export default function LandingPage2() {
+    const [activeTab, setActiveTab] = useState('events');
+    const { user } = useAuth();
+    const [dataUser, setData] = useState<any>();
+    const [dataInventory, setDataInventory] = useState(false);
+    const [dataBudget, setDataBudget] = useState(false);
+    const [dataNewMembership, setDataNewMembership] = useState(false);
+    const [dataLoanRelease, setDataLoanRelease] = useState(false);
+    const [dataWorkflow, setDataWorkflow] = useState(false);
+    const [dataBilling, setDataBilling] = useState(false);
+    const [dataTicketing, setDataTicketing] = useState(false);
+    const [dataAdmin, setDataAdmin] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
+    const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
 
-      // Update all states at once
-      setData(dataFetch);
-      setDataInventory(arr.includes(1));
-      setDataBudget(arr.includes(2));
-      setDataWorkflow(arr.includes(3));
-      setDataAdmin(arr.includes(4));
-      setDataBilling(arr.includes(5));
-      setDataTicketing(arr.includes(6));
-      setDataLoanRelease(arr.includes(7));
-      setDataNewMembership(arr.includes(8));
-    } catch (error) {
-      message.error("Error loading user data");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Fetch data from Supabase
+    const fetchDataByUUID = async () => {
+        if (!user?.id) {
+            console.error("User ID is not available");
+            return;
+        }
 
-  // Regular features for all users
-  const regularFeatures = useMemo(() => [
-    {
-      icon: <FaDollarSign className="h-10 w-10 text-white" />,
-      title: "Financial Monitoring",
-      link: "/budget",
-      access: dataBudget,
-      bgColor: "bg-gradient-to-br from-green-500 to-emerald-600",
-      badgeColor: "bg-green-700/30 text-green-100",
-      iconBg: "bg-green-600/30"
-    },
-    {
-      icon: <LuChartNoAxesColumn className="h-10 w-10 text-white" />,
-      title: "Perofmance Report",
-      link: "/performancereport",
-      access: dataNewMembership, // You'll need to add this to your dependencies
-      bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
-      badgeColor: "bg-purple-700/30 text-purple-100",
-      iconBg: "bg-purple-600/30"
-    },
-    {
-      icon: <FaClipboardList className="h-10 w-10 text-white" />,
-      title: "Operation Process",
-      link: "/workflow",
-      access: dataWorkflow,
-      bgColor: "bg-gradient-to-br from-orange-500 to-amber-600",
-      badgeColor: "bg-orange-700/30 text-orange-100",
-      iconBg: "bg-orange-600/30"
-    },
-    {
-      icon: <LuPackageSearch className="h-10 w-10 text-white" />,
-      title: "CFI Asset Management",
-      link: "/inventory",
-      access: dataInventory,
-      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
-      badgeColor: "bg-blue-700/30 text-blue-100",
-      iconBg: "bg-blue-600/30"
-    },
-    {
-      icon: <FaTicketAlt className="h-10 w-10 text-white" />,
-      title: "IT Support Ticket",
-      link: "https://it-support.cficoop.com/en/",
-      access: dataTicketing,
-      bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600",
-      badgeColor: "bg-teal-700/30 text-teal-100",
-      iconBg: "bg-teal-600/30"
-    }
-  ], [dataInventory, dataNewMembership, dataLoanRelease, dataBudget, dataWorkflow, dataBilling, dataTicketing]); // Add new dependencies here
+        try {
+            setLoading(true);
+            const dataFetch = await UserService.getByUuid(user.id);
+            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
+            localStorage.setItem('userOfficeID', dataFetch.office.id);
+            localStorage.setItem('userOffice', dataFetch.office.name);
+            localStorage.setItem('userDept', dataFetch.department_id);
+            localStorage.setItem('dept', dataFetch.departments.department);
+            localStorage.setItem('userAuthID', dataFetch.id);
+            localStorage.setItem('fname', dataFetch.first_name);
+            localStorage.setItem('lname', dataFetch.last_name);
+            localStorage.setItem('ab_id', dataFetch.ab_user_id);
+            localStorage.setItem('username', dataFetch.username);
 
-  // Admin feature - kept separate
-  const adminFeature = {
-    icon: <BsShieldCheck className="h-10 w-10 text-white" />,
-    title: "Administration",
-    link: "/admin",
-    access: dataAdmin,
-    bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
-    badgeColor: "bg-purple-700/30 text-purple-100",
-    iconBg: "bg-purple-600/30"
-  };
+            // Update all states at once
+            setData(dataFetch);
+            setDataInventory(arr.includes(1));
+            setDataBudget(arr.includes(2));
+            setDataWorkflow(arr.includes(3));
+            setDataAdmin(arr.includes(4));
+            setDataBilling(arr.includes(5));
+            setDataTicketing(arr.includes(6));
+            setDataLoanRelease(arr.includes(7));
+            setDataNewMembership(arr.includes(8));
+        } catch (error) {
+            message.error("Error loading user data");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  useMemo(() => {
-    fetchDataByUUID();
-  }, []);
+    useMemo(() => {
+        fetchDataByUUID();
+    }, []);
 
-  return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
-        <div className="relative bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-800">
-          <div className="absolute inset-0 bg-black/10" />
-
-          <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 lg:px-8">
-            <div className="text-center">
-              <div className="flex justify-center mb-6">
-                <div className="p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <img
-                    className="h-14"
-                    src="./img/cficoop.png"
-                    alt="CFI Cooperative"
-                  />
-                </div>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                CFI Management System
-              </h1>
-
-              <p className="text-base text-white/80 max-w-2xl mx-auto">
-                Streamlined solutions for enterprise operations.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Regular User Modules Grid */}
-        <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 lg:px-8">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-800 text-center mb-2">
-              Available Modules
-            </h2>
-            <p className="text-gray-600 text-sm text-center">
-              Select a module to manage your daily operations
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {regularFeatures.map((feature, index) => (
-              <div
-                key={index}
-                className={`
-                  relative rounded-lg border transition-all duration-200 overflow-hidden
-                  ${feature.access
-                    ? `${feature.bgColor} border-transparent hover:shadow-lg hover:scale-[1.03] cursor-pointer`
-                    : 'bg-gray-100 border-gray-200 cursor-default'
-                  }
-                `}
-              >
-                {feature.access ? (
-                  <Link to={feature.link} className="block h-full">
-                    <div className="p-4 h-full flex flex-col">
-                      <div className="flex flex-col items-center text-center">
-                        <div className={`p-4 rounded-full ${feature.iconBg} backdrop-blur-sm mb-3`}>
-                          {feature.icon}
+    return (
+        <ConfigProvider
+            theme={{
+                token: {
+                    colorPrimary: '#1890ff',
+                    borderRadius: 4,
+                },
+            }}
+        >
+            <Layout className="min-h-screen">
+                {/* Top Header */}
+                <Header className="bg-[#1890ff] px-0 flex items-center justify-between h-14 sticky top-0 z-50 shadow-md">
+                    <div className="flex items-center">
+                        <div className="flex items-center h-14">
+                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400 bg-blue-700">
+                                <Home className="text-white w-5 h-5" />
+                            </button>
+                            {/* <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400">
+                                <MapIcon className="text-white w-5 h-5" />
+                            </button>
+                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400">
+                                <FileText className="text-white w-5 h-5" />
+                            </button>
+                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                <Plus className="text-white w-5 h-5" />
+                            </button> */}
                         </div>
-
-                        <h3 className="font-bold text-white text-base mb-2">
-                          {feature.title}
-                        </h3>
-
-                        <div className="mt-2">
-                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${feature.badgeColor}`}>
-                            Available
-                          </span>
-                        </div>
-                      </div>
                     </div>
-                  </Link>
-                ) : (
-                  <div className="p-4 h-full flex flex-col">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="p-4 bg-gray-200 rounded-full mb-3">
-                        <div className="text-gray-400">
-                          {React.cloneElement(feature.icon, { className: "h-10 w-10 text-gray-400" })}
+                    <div className="flex items-center px-6 gap-4">
+                        <div className="hidden md:flex flex-col items-end text-white leading-tight">
+                            <span className="text-xs font-bold">CFI Management System</span>
+                            <span className="text-[10px] opacity-80">Online</span>
                         </div>
-                      </div>
-
-                      <h3 className="font-bold text-gray-600 text-base mb-2">
-                        {feature.title}
-                      </h3>
-
-                      <div className="mt-2">
-                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-600">
-                          Restricted
-                        </span>
-                      </div>
+                        <Avatar src="./img/cfi-circle.png" />
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+                </Header>
 
-        {/* Admin Panel Section - Separate and Centered */}
-        {adminFeature.access && (
-          <div className="max-w-5xl mx-auto px-4 pb-12 lg:px-8">
-            <div className="border-t border-gray-200 pt-12 mb-8">
-              <div className="text-center mb-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">
-                  Administrative Controls
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  System configuration and user management
-                </p>
-              </div>
-
-              <div className="flex justify-center">
-                <div className="w-full max-w-md">
-                  <div className={`
-                    relative rounded-xl border transition-all duration-200 overflow-hidden
-                    ${adminFeature.bgColor} border-transparent hover:shadow-lg hover:scale-[1.02] cursor-pointer
-                  `}>
-                    <Link to={adminFeature.link} className="block">
-                      <div className="p-6">
-                        <div className="flex flex-col items-center text-center">
-                          <div className={`p-5 rounded-full ${adminFeature.iconBg} backdrop-blur-sm mb-4`}>
-                            {adminFeature.icon}
-                          </div>
-
-                          <h3 className="font-bold text-white text-xl mb-3">
-                            {adminFeature.title}
-                          </h3>
-
-                          <div className="mt-2">
-                            <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${adminFeature.badgeColor}`}>
-                              Administrator Access Only
-                            </span>
-                          </div>
+                <Layout>
+                    {/* Sidebar */}
+                    <Sider width={260} className="bg-white border-r border-gray-200 hidden lg:block overflow-auto">
+                        <div className="bg-[#34495e] text-white p-3 flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            <span className="font-semibold text-sm">PERSONAL DETAILS</span>
                         </div>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+                        <div className="py-2">
+                            {sidebarItems.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50  border-b border-gray-100 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3 text-gray-600 text-sm">
+                                        {item.icon}
+                                        <span>{item.label}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <div
+                                className="flex cursor-pointer px-4 py-3 hover:bg-gray-50  border-b border-gray-100 transition-colors"
+                            >
+                                <div className="flex items-center gap-3 text-gray-600 text-sm">
+                                    <LogOut className="text-red-900 w-4 h-4" />
+                                    <span className='text-red-900'>Sign Out</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-8 p-4">
+                            <a href="https://webportal.cficoop.com/" className="block" target='_blank'>
+                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
+                                    <img src="./img/cfi-bills-payment.jpg" alt="CFI Bills Payment" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
+                                        CFI Bills Payment Online
+                                    </div>
+                                </div>
+                            </a>
 
-        {/* Admin Note */}
-        <div className="max-w-5xl mx-auto px-4 pb-8 lg:px-8">
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500">
-              For additional module access, contact system administration.
-            </p>
-          </div>
-        </div>
-      </div>
-    </ProtectedRoute>
-  );
+                            <a href="https://webportal.cficoop.com/" className="block mt-2" target='_blank'>
+                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
+                                    <img src="./img/cfi-cpp.jpg" alt="CFI CPP" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
+                                        CFI CPP Online
+                                    </div>
+                                </div>
+                            </a>
+
+                            <a href="https://webportal.cficoop.com/" className="block mt-2" target='_blank'>
+                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
+                                    <img src="./img/cfionline.jpg" alt="CFI Online" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
+                                        CFI Online
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </Sider>
+
+                    {/* Main Dashboard Content */}
+                    <Content className="p-6 bg-[#ecf0f1]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <MetricCard
+                                title="Financial Monitoring"
+                                link="/budget"
+                                data={[
+                                    { name: 'Unbudgeted', value: 35, color: '#bdc3c7' },
+                                    { name: 'Budget', value: 65, color: '#9cc332' }
+                                ]}
+                                centerLabel="unbudget / budget"
+                                icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
+                                legend={[
+                                    { label: 'unbudget', value: 35, color: '#bdc3c7' },
+                                    { label: 'budget', value: 65, color: '#9cc332' }
+                                ]}
+                            />
+
+                            <MetricCard
+                                title="Performance Report"
+                                link="/performancereport"
+                                data={[
+                                    { name: 'Membership', value: 35, color: '#bdc3c7' },
+                                    { name: 'Loan Release', value: 65, color: '#9cc332' },
+                                    { name: 'Collections', value: 65, color: '#1890ff' }
+                                ]}
+                                centerLabel="membership / loan release / collections"
+                                icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
+                                legend={[
+                                    { label: 'membership', value: 35, color: '#bdc3c7' },
+                                    { label: 'loan release', value: 65, color: '#9cc332' },
+                                    { label: 'collections', value: 65, color: '#1890ff' }
+                                ]}
+                            />
+
+                            <MetricCard
+                                title="Operation Process"
+                                link="/workflow"
+                                data={[
+                                    { name: 'Requests', value: 65, color: '#9cc332' }
+                                ]}
+                                centerLabel="requests"
+                                icon={<FileText className="w-8 h-8 text-gray-400" />}
+                                legend={[
+                                    { label: 'requests', value: 65, color: '#9cc332' },
+                                ]}
+                            />
+
+                            <MetricCard
+                                title="CFI Asset Management"
+                                link="/inventory"
+                                data={[
+                                    { name: 'Licenses', value: 35, color: '#bdc3c7' },
+                                    { name: 'Assets', value: 65, color: '#9cc332' }
+                                ]}
+                                centerLabel="licenses / assets"
+                                icon={<BaggageClaim className="w-8 h-8 text-gray-400" />}
+                                legend={[
+                                    { label: 'licenses', value: 35, color: '#bdc3c7' },
+                                    { label: 'assets', value: 65, color: '#9cc332' }
+                                ]}
+                            />
+
+                            <MetricCard
+                                title="IT Support Ticket"
+                                link="https://it-support.cficoop.com/en/"
+                                data={[
+                                    { name: 'Offline', value: 50, color: '#bdc3c7' },
+                                    { name: 'Online', value: 50, color: '#9cc332' }
+                                ]}
+                                centerLabel="offline / online"
+                                icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
+                                legend={[
+                                    { label: 'offline', value: 50, color: '#bdc3c7' },
+                                    { label: 'online', value: 50, color: '#9cc332' }
+                                ]}
+                            />
+
+                        </div>
+                    </Content>
+                </Layout>
+
+                {/* Footer */}
+                {/* <Footer className="bg-[#34495e] text-white p-10">
+                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-10">
+                        <div>
+                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">Contacts</h3>
+                            <div className="text-xs text-gray-400 space-y-2">
+                                <p>Support Line: (032) 255-2525</p>
+                                <p>Email: it.department@cebucficoop.com</p>
+                                <p>© 2026 CFI. All rights reserved.</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">OPEN HOURS</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <ul className="text-xs text-gray-400 space-y-2">
+                                    <li className="hover:text-white cursor-pointer">• Monday to Saturday</li>
+                                    <li className="hover:text-white cursor-pointer">• 8:00AM-6:30PM</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">ADDRESS</h3>
+                            <div className="text-xs text-gray-400 space-y-2">
+                                <p>Address: Esperanza Fiel Garcia Bldg., Capitol Compound (Capitol Site),
+                                    N Escario St, Cebu City, 6000 Cebu</p>
+                            </div>
+                        </div>
+                    </div>
+                </Footer> */}
+            </Layout>
+        </ConfigProvider>
+    );
 }
