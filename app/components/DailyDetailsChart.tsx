@@ -14,8 +14,9 @@ import {
 
 export interface DailyData {
     date: string;
-    sales: number;
-    profit: number;
+    newmembership: number;
+    loanreleases: number;
+    collections: number;
 }
 
 export const COLORS = {
@@ -27,39 +28,48 @@ export const COLORS = {
 };
 
 export const DAILY_CHART_DATA: DailyData[] = Array.from({ length: 30 }, (_, i) => ({
-    date: `Oct ${i + 1}`,
-    sales: 3000 + Math.random() * 4000,
-    profit: 800 + Math.random() * 1200,
+    date: `Jan ${i + 1}`,
+    newmembership: 3000 + Math.random() * 4000,
+    loanreleases: 800 + Math.random() * 1200,
+    collections: 400 + Math.random() * 800,
 }));
 
 const DailyDetailsChart: React.FC = () => {
-    const avgSales = 4215;
+    const membershipTotalMonth = 4215;
     const avgProfit = 1195;
 
     return (
         <div className="bg-white p-6  shadow-sm border border-gray-300 flex flex-col h-full">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-4">Daily Details</h3>
+                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-4">Daily Details (Month)</h3>
                     <div className="flex gap-12">
                         <div>
-                            <p className="text-xl font-bold text-gray-800">$4,214.80</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Average Sales</p>
+                            <p className="text-xl font-bold text-gray-800">1234</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Memberships</p>
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-gray-800">$1,195.71</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Average Profit</p>
+                            <p className="text-xl font-bold text-gray-800">4567</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loan Releases</p>
+                        </div>
+                        <div>
+                            <p className="text-xl font-bold text-gray-800">789</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Collections</p>
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-4 text-[10px] font-bold tracking-widest uppercase text-gray-500">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                        <span>Sales</span>
+                        <span>New Memberships</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <span>Profit</span>
+                        <span>Loan Releases</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <span>Collections</span>
                     </div>
                 </div>
             </div>
@@ -83,16 +93,17 @@ const DailyDetailsChart: React.FC = () => {
                             axisLine={false}
                             tickLine={false}
                             tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 600 }}
-                            tickFormatter={(value) => `$${value}`}
+                            tickFormatter={(value) => `${value}`}
                         />
                         <Tooltip
                             cursor={{ fill: 'rgba(226, 232, 240, 0.4)' }}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                         />
-                        <ReferenceLine y={avgSales} stroke="#CBD5E1" strokeDasharray="3 3" label={{ position: 'top', value: `Avg. Sales: $${avgSales}`, fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} />
+                        <ReferenceLine y={membershipTotalMonth} stroke="#CBD5E1" strokeDasharray="3 3" label={{ position: 'top', value: `Membership: ${membershipTotalMonth}`, fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} />
 
-                        <Bar dataKey="sales" fill="#E2E8F0" radius={[4, 4, 0, 0]} barSize={24} />
-                        <Bar dataKey="profit" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={16} />
+                        <Bar dataKey="newmembership" fill="#E2E8F0" radius={[4, 4, 0, 0]} barSize={24} />
+                        <Bar dataKey="loanreleases" fill={COLORS.primary} radius={[4, 4, 0, 0]} barSize={16} />
+                        <Bar dataKey="collections" fill={COLORS.accent} radius={[4, 4, 0, 0]} barSize={16} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>

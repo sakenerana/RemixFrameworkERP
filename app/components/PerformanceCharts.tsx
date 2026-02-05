@@ -25,29 +25,29 @@ export const COLORS = {
 };
 
 export const CITIES_DATA: PerformanceData[] = [
-    { name: 'Ciudad de México', value: 37447 },
-    { name: 'Guadalajara', value: 32338 },
-    { name: 'Monterrey', value: 24793 },
-    { name: 'Puebla', value: 12554 },
-    { name: 'Hermosillo', value: 11953 },
-    { name: 'Guanajuato', value: 11572 },
+    { name: 'Main Office', value: 37447 },
+    { name: 'Danao Branch', value: 32338 },
+    { name: 'Lapu-Lapu Branch', value: 24793 },
+    { name: 'Bantayan Branch', value: 12554 },
+    { name: 'Makati Branch', value: 11953 },
+    { name: 'Tacloban Branch', value: 11572 },
 ];
 
 export const CATEGORIES_DATA: PerformanceData[] = [
-    { name: 'Toys', value: 48586 },
-    { name: 'Electronics', value: 28355 },
-    { name: 'Games', value: 22667 },
-    { name: 'Art & Crafts', value: 18832 },
-    { name: 'Sports & Outdoors', value: 12219 },
+    { name: 'Main Office', value: 48586 },
+    { name: 'Danao Branch', value: 28355 },
+    { name: 'Lapu-Lapu Branch', value: 22667 },
+    { name: 'Bantayan Branch', value: 18832 },
+    { name: 'Makati Branch', value: 12219 },
 ];
 
 const PerformanceCharts: React.FC = () => {
     return (
         <div className="space-y-6">
-            {/* Cities Performance */}
+            {/* Branch Performance */}
             <div className="bg-white p-6 shadow-sm border border-gray-300">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">Cities Performance</h3>
+                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">New Membership Performance</h3>
                     <div className="flex gap-2 text-gray-300">
                         <MousePointer2 size={16} />
                         <LayoutGrid size={16} />
@@ -70,7 +70,7 @@ const PerformanceCharts: React.FC = () => {
                                 tick={{ fontSize: 10, fill: '#64748B', fontWeight: 600 }}
                             />
                             <Tooltip cursor={{ fill: 'transparent' }} />
-                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16} label={{ position: 'right', fontSize: 10, fill: '#1E293B', fontWeight: 700, formatter: (val: any) => `$${val.toLocaleString()}` }}>
+                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16} label={{ position: 'right', fontSize: 10, fill: '#1E293B', fontWeight: 700, formatter: (val: any) => `${val.toLocaleString()}` }}>
                                 {CITIES_DATA.map((entry, index) => (
                                     <Cell key={index} fill={index < 3 ? COLORS.primary : '#E2E8F0'} />
                                 ))}
@@ -82,7 +82,17 @@ const PerformanceCharts: React.FC = () => {
 
             {/* Categories Performance */}
             <div className="bg-white p-6 shadow-sm border border-gray-300">
-                <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-6">Categories Performance</h3>
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">Collections Performance</h3>
+                    <div className="flex gap-2 text-gray-300">
+                        <MousePointer2 size={16} />
+                        <LayoutGrid size={16} />
+                        <BarChart2 size={16} className="text-gray-400" />
+                    </div>
+                </div>
+                <p className="text-[10px] text-gray-400 font-medium mb-4 italic flex items-center gap-1">
+                    <MousePointer2 size={10} /> Click on points|bars to filter dashboard
+                </p>
                 <div className="h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart layout="vertical" data={CATEGORIES_DATA} margin={{ left: 10, right: 40 }}>
@@ -96,7 +106,7 @@ const PerformanceCharts: React.FC = () => {
                                 tick={{ fontSize: 10, fill: '#64748B', fontWeight: 600 }}
                             />
                             <Tooltip cursor={{ fill: 'transparent' }} />
-                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16} label={{ position: 'right', fontSize: 10, fill: '#1E293B', fontWeight: 700, formatter: (val: any) => `$${val.toLocaleString()}` }}>
+                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16} label={{ position: 'right', fontSize: 10, fill: '#1E293B', fontWeight: 700, formatter: (val: any) => `${val.toLocaleString()}` }}>
                                 {CATEGORIES_DATA.map((entry, index) => (
                                     <Cell key={index} fill={index < 3 ? COLORS.primary : '#E2E8F0'} />
                                 ))}

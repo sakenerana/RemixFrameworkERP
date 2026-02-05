@@ -6,31 +6,31 @@ import {
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { ArrowLeftFromLine, Home, LogOut, User } from "lucide-react";
 import MetricCard2 from "~/components/MetricCard2";
-import StockPredictions from "~/components/StockPredictions";
+import BranchTopRightSider from "~/components/BranchTopRightSider";
 
 const { Header, Content } = Layout;
 
-export interface Product {
+export interface Staff {
     id: string;
     name: string;
-    views?: number;
+    tasks?: number;
     inventory?: number;
-    daysSupply: number;
+    taskCompleted: number;
     replenishmentDays: number;
     avgDailySales?: number;
     totalSales?: string;
     status: 'critical' | 'warning' | 'stable' | 'good';
 }
 
-export const VIEW_PRODUCTS: Product[] = [
-    { id: '1', name: 'Utility Pocket Coat', views: 9817, daysSupply: 14, replenishmentDays: 7, status: 'stable' },
-    { id: '2', name: 'Feather Trim Jacket', views: 9724, daysSupply: 6, replenishmentDays: 10, status: 'warning' },
-    { id: '3', name: 'Bomber Jacket', views: 9687, daysSupply: 13, replenishmentDays: 5, status: 'stable' },
-    { id: '4', name: 'Half-Zip Sweater', views: 8232, daysSupply: 21, replenishmentDays: 14, status: 'good' },
-    { id: '5', name: 'Felted Wool Jacket', views: 7575, daysSupply: 4, replenishmentDays: 12, status: 'critical' },
+export const VIEW_STAFFS: Staff[] = [
+    { id: '1', name: 'Charls Dave Erana', tasks: 9817, taskCompleted: 14, replenishmentDays: 7, status: 'stable' },
+    { id: '2', name: 'Richard Erana', tasks: 9724, taskCompleted: 6, replenishmentDays: 10, status: 'warning' },
+    { id: '3', name: 'Ron Richard Bascon', tasks: 9687, taskCompleted: 13, replenishmentDays: 5, status: 'stable' },
+    { id: '4', name: 'Ray Jhun Cagata', tasks: 8232, taskCompleted: 21, replenishmentDays: 14, status: 'good' },
+    { id: '5', name: 'Melvin Evangelista', tasks: 7575, taskCompleted: 4, replenishmentDays: 12, status: 'critical' },
 ];
 
-export default function PerformanceReportLayoutIndex() {
+export default function NewMembershipLayoutIndex() {
     return (
         <ProtectedRoute>
             <ConfigProvider
@@ -76,76 +76,76 @@ export default function PerformanceReportLayoutIndex() {
                                 <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">New Membership by Branches</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     <MetricCard2
-                                        title="Most Viewed Products"
+                                        title="Main Office"
                                         subtitle="test"
                                         value="480"
                                         percentage={24}
                                         percentageColor="bg-green-500"
-                                        subtitleValue="69.2 M"
-                                        topProductLabel="Most Viewed Product"
-                                        topProductName="Utility Pocket Coat"
-                                        products={VIEW_PRODUCTS}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Main Office"
+                                        staffs={VIEW_STAFFS}
+                                        type="tasks"
                                     />
                                     <MetricCard2
-                                        title="Least Viewed Products"
+                                        title="Danao Branch"
                                         subtitle="test"
                                         value="560"
                                         percentage={28}
                                         percentageColor="bg-orange-500"
-                                        subtitleValue="53.2 M"
-                                        topProductLabel="Least Viewed Product"
-                                        topProductName="Half-Zip Sweater"
-                                        products={[...VIEW_PRODUCTS].reverse()}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Danao Branch"
+                                        staffs={[...VIEW_STAFFS].reverse()}
+                                        type="tasks"
                                     />
                                     <MetricCard2
-                                        title="Products Not Viewed"
+                                        title="Lapu-Lapu Branch"
                                         subtitle="test"
                                         value="160"
                                         percentage={8}
                                         percentageColor="bg-red-500"
-                                        subtitleValue="48.5 M"
-                                        topProductLabel="Highest Inventory Product"
-                                        topProductName="Down Jacket"
-                                        products={VIEW_PRODUCTS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Lapu-Lapu Branch"
+                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
+                                        type="tasks"
                                     />
                                     <MetricCard2
-                                        title="Products Not Viewed"
+                                        title="Bantayan Branch"
                                         subtitle="test"
                                         value="160"
                                         percentage={8}
                                         percentageColor="bg-red-500"
-                                        subtitleValue="48.5 M"
-                                        topProductLabel="Highest Inventory Product"
-                                        topProductName="Down Jacket"
-                                        products={VIEW_PRODUCTS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Bantayan Branch"
+                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
+                                        type="tasks"
                                     />
                                     <MetricCard2
-                                        title="Products Not Viewed"
+                                        title="Makati Branch"
                                         subtitle="test"
                                         value="160"
                                         percentage={8}
                                         percentageColor="bg-red-500"
-                                        subtitleValue="48.5 M"
-                                        topProductLabel="Highest Inventory Product"
-                                        topProductName="Down Jacket"
-                                        products={VIEW_PRODUCTS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Makati Branch"
+                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
+                                        type="tasks"
                                     />
                                     <MetricCard2
-                                        title="Products Not Viewed"
+                                        title="Tacloban Branch"
                                         subtitle="test"
                                         value="160"
                                         percentage={8}
                                         percentageColor="bg-red-500"
-                                        subtitleValue="48.5 M"
-                                        topProductLabel="Highest Inventory Product"
-                                        topProductName="Down Jacket"
-                                        products={VIEW_PRODUCTS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="views"
+                                        subtitleValue="123"
+                                        topStaffLabel="Most Active Staff"
+                                        topStaffName="Tacloban Branch"
+                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
+                                        type="tasks"
                                     />
                                 </div>
                             </section>
@@ -154,7 +154,7 @@ export default function PerformanceReportLayoutIndex() {
                     </div>
 
                     {/* Right Sidebar */}
-                    <StockPredictions />
+                    <BranchTopRightSider />
                 </div>
             </ConfigProvider>
         </ProtectedRoute>

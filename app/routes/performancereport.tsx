@@ -67,9 +67,9 @@ export const KPI_DATA: KPIData[] = [
   {
     label: 'NEW MEMBERSHIPS',
     link: '/newmembership',
-    value: '$130,659',
+    value: '1234',
     trend: 16.58,
-    comparison: 'vs prev month $112,272',
+    comparison: 'per year - 2026',
     history: [
       { month: 'Jan', value: 40 }, { month: 'Feb', value: 70 }, { month: 'Mar', value: 50 },
       { month: 'Apr', value: 80 }, { month: 'May', value: 60 }, { month: 'Jun', value: 90 },
@@ -80,9 +80,9 @@ export const KPI_DATA: KPIData[] = [
   {
     label: 'LOAN RELEASES',
     link: '/loanrelease',
-    value: '$93,592',
+    value: '456',
     trend: 16.85,
-    comparison: 'vs prev month $80,098',
+    comparison: 'per year - 2026',
     history: [
       { month: 'Jan', value: 30 }, { month: 'Feb', value: 50 }, { month: 'Mar', value: 40 },
       { month: 'Apr', value: 60 }, { month: 'May', value: 45 }, { month: 'Jun', value: 70 },
@@ -93,9 +93,9 @@ export const KPI_DATA: KPIData[] = [
   {
     label: 'COLLECTIONS',
     link: '/collections',
-    value: '$37,067',
+    value: '7890',
     trend: 15.21,
-    comparison: 'vs prev month $32,174',
+    comparison: 'per year - 2026',
     history: [
       { month: 'Jan', value: 10 }, { month: 'Feb', value: 20 }, { month: 'Mar', value: 10 },
       { month: 'Apr', value: 20 }, { month: 'May', value: 15 }, { month: 'Jun', value: 20 },
@@ -106,9 +106,9 @@ export const KPI_DATA: KPIData[] = [
   {
     label: 'PERSONNEL TASK COMPLETION',
     link: '/personnel',
-    value: '28.37%',
+    value: '143',
     trend: -0.29,
-    comparison: 'vs prev month 28.66%',
+    comparison: 'per year - 2026',
     history: [
       { month: 'Jan', value: 28 }, { month: 'Feb', value: 29 }, { month: 'Mar', value: 27 },
       { month: 'Apr', value: 28 }, { month: 'May', value: 28 }, { month: 'Jun', value: 29 },
