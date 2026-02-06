@@ -12,10 +12,10 @@ export interface PredictionData {
 
 export const PREDICTIONS: PredictionData[] = [
   { name: 'Main Office', avgDailySales: 42, replenishmentDays: 30, daysOutOfStock: 25 },
-  { name: 'Danao Branch', avgDailySales: 35, replenishmentDays: 21, daysOutOfStock: 18 },
-  { name: 'Lapu-Lapu Branch', avgDailySales: 24, replenishmentDays: 19, daysOutOfStock: 15 },
-  { name: 'Bantayan Branch', avgDailySales: 19, replenishmentDays: 16, daysOutOfStock: 11 },
-  { name: 'Makati Branch', avgDailySales: 6, replenishmentDays: 11, daysOutOfStock: 9 },
+  { name: 'Batangas Branch', avgDailySales: 35, replenishmentDays: 21, daysOutOfStock: 18 },
+  { name: 'Catarman Branch', avgDailySales: 24, replenishmentDays: 19, daysOutOfStock: 15 },
+  { name: 'Davao Branch', avgDailySales: 19, replenishmentDays: 16, daysOutOfStock: 11 },
+  { name: 'Ormoc Branch', avgDailySales: 6, replenishmentDays: 11, daysOutOfStock: 9 },
 ];
 
 export const SCATTER_DATA = [

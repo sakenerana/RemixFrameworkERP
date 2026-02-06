@@ -30,6 +30,205 @@ export const VIEW_STAFFS: Staff[] = [
     { id: '5', name: 'Melvin Evangelista', tasks: 7575, taskCompleted: 4, replenishmentDays: 12, status: 'critical' },
 ];
 
+interface BranchData {
+    id: number;
+    title: string;
+    subtitle: string;
+    value: string;
+    percentage: number;
+    percentageColor: string;
+    subtitleValue: string;
+    topStaffLabel: string;
+    topStaffName: string;
+    staffs: Staff[];
+    type: 'tasks';
+}
+
+const BRANCHES_DATA: BranchData[] = [
+    {
+        id: 1,
+        title: "Main Office",
+        subtitle: "test",
+        value: "480",
+        percentage: 24,
+        percentageColor: "bg-green-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Main Office",
+        staffs: VIEW_STAFFS,
+        type: "tasks"
+    },
+    {
+        id: 2,
+        title: "Bacolod Branch",
+        subtitle: "test",
+        value: "560",
+        percentage: 28,
+        percentageColor: "bg-orange-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Bacolod Branch",
+        staffs: [...VIEW_STAFFS].reverse(),
+        type: "tasks"
+    },
+    {
+        id: 3,
+        title: "Batangas Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Batangas Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 4,
+        title: "Bohol Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Bohol Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 5,
+        title: "Cagayan Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Cagayan Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 6,
+        title: "Calbayog Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Calbayog Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 7,
+        title: "Catarman Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Catarman Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 8,
+        title: "Davao Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Davao Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 9,
+        title: "Dipolog Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Dipolog Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 10,
+        title: "Dumaguete Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Dumaguete Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 11,
+        title: "Iloilo Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Iloilo Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 12,
+        title: "Makati Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Makati Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 13,
+        title: "Ormoc Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Ormoc Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+    {
+        id: 14,
+        title: "Tacloban Branch",
+        subtitle: "test",
+        value: "160",
+        percentage: 8,
+        percentageColor: "bg-red-500",
+        subtitleValue: "123",
+        topStaffLabel: "Most Active Staff",
+        topStaffName: "Tacloban Branch",
+        staffs: VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const })),
+        type: "tasks"
+    },
+];
+
 export default function CollectionsLayoutIndex() {
     return (
         <ProtectedRoute>
@@ -73,83 +272,25 @@ export default function CollectionsLayoutIndex() {
                         <main className="p-6 space-y-8">
                             {/* Views Section */}
                             <section>
-                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Collections by Branches</h2>
+                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">New Membership by Branches</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <MetricCard2
-                                        title="Main Office"
-                                        subtitle="test"
-                                        value="480"
-                                        percentage={24}
-                                        percentageColor="bg-green-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Main Office"
-                                        staffs={VIEW_STAFFS}
-                                        type="tasks"
-                                    />
-                                    <MetricCard2
-                                        title="Danao Branch"
-                                        subtitle="test"
-                                        value="560"
-                                        percentage={28}
-                                        percentageColor="bg-orange-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Danao Branch"
-                                        staffs={[...VIEW_STAFFS].reverse()}
-                                        type="tasks"
-                                    />
-                                    <MetricCard2
-                                        title="Lapu-Lapu Branch"
-                                        subtitle="test"
-                                        value="160"
-                                        percentage={8}
-                                        percentageColor="bg-red-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Lapu-Lapu Branch"
-                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="tasks"
-                                    />
-                                    <MetricCard2
-                                        title="Bantayan Branch"
-                                        subtitle="test"
-                                        value="160"
-                                        percentage={8}
-                                        percentageColor="bg-red-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Bantayan Branch"
-                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="tasks"
-                                    />
-                                    <MetricCard2
-                                        title="Makati Branch"
-                                        subtitle="test"
-                                        value="160"
-                                        percentage={8}
-                                        percentageColor="bg-red-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Makati Branch"
-                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="tasks"
-                                    />
-                                    <MetricCard2
-                                        title="Tacloban Branch"
-                                        subtitle="test"
-                                        value="160"
-                                        percentage={8}
-                                        percentageColor="bg-red-500"
-                                        subtitleValue="123"
-                                        topStaffLabel="Most Active Staff"
-                                        topStaffName="Tacloban Branch"
-                                        staffs={VIEW_STAFFS.map(p => ({ ...p, status: 'critical' as const }))}
-                                        type="tasks"
-                                    />
+                                    {BRANCHES_DATA.map((branch) => (
+                                        <MetricCard2
+                                            key={branch.id}
+                                            title={branch.title}
+                                            subtitle={branch.subtitle}
+                                            value={branch.value}
+                                            percentage={branch.percentage}
+                                            percentageColor={branch.percentageColor}
+                                            subtitleValue={branch.subtitleValue}
+                                            topStaffLabel={branch.topStaffLabel}
+                                            topStaffName={branch.topStaffName}
+                                            staffs={branch.staffs}
+                                            type={branch.type}
+                                        />
+                                    ))}
                                 </div>
                             </section>
-
                         </main>
                     </div>
 
