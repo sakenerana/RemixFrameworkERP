@@ -41,7 +41,7 @@ export default function ForgotPasswordIndex() {
               alt="CFI Cooperative Logo"
               className="transition-all duration-300 hover:scale-105"
             />
-            <h2 className="mt-3 text-xl font-medium text-gray-600">Enterprise Portal</h2>
+            <h2 className="mt-3 text-xl font-medium text-gray-600">CFI Management System</h2>
           </div>
 
           {/* Title */}

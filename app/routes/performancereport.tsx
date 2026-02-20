@@ -65,7 +65,7 @@ export interface KPIData {
 
 export const KPI_DATA: KPIData[] = [
   {
-    label: 'NEW MEMBERSHIPS',
+    label: 'NEW MEMBERSHIP',
     link: '/newmembership',
     value: '1234',
     trend: 16.58,
@@ -78,7 +78,7 @@ export const KPI_DATA: KPIData[] = [
     ]
   },
   {
-    label: 'LOAN RELEASES',
+    label: 'LOAN RELEASE',
     link: '/loanrelease',
     value: '456',
     trend: 16.85,
@@ -91,7 +91,7 @@ export const KPI_DATA: KPIData[] = [
     ]
   },
   {
-    label: 'COLLECTIONS',
+    label: 'COLLECTION',
     link: '/collections',
     value: '7890',
     trend: 15.21,

@@ -81,7 +81,18 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         {centerLabel && (
           <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-2 flex gap-2">
             {centerLabel.split(' / ').map((l, i) => (
-              <span key={i} className={i === 1 ? 'text-[#9cc332]' : ''}>{l}</span>
+              <span
+                key={i}
+                className={
+                  i === 1
+                    ? 'text-[#9cc332]'
+                    : i === 2
+                      ? 'text-[#1890ff]'
+                      : ''
+                }
+              >
+                {l}
+              </span>
             ))}
           </div>
         )}

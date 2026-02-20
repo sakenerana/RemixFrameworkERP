@@ -76,7 +76,7 @@ export default function LandingPage() {
     },
     {
       icon: <LuChartNoAxesColumn className="h-10 w-10 text-white" />,
-      title: "Perofmance Report",
+      title: "Performance Report",
       link: "/performancereport",
       access: dataNewMembership, // You'll need to add this to your dependencies
       bgColor: "bg-gradient-to-br from-purple-500 to-violet-600",
@@ -85,7 +85,7 @@ export default function LandingPage() {
     },
     {
       icon: <FaClipboardList className="h-10 w-10 text-white" />,
-      title: "Operation Process",
+      title: "Performance Metric Report",
       link: "/workflow",
       access: dataWorkflow,
       bgColor: "bg-gradient-to-br from-orange-500 to-amber-600",

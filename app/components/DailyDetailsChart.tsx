@@ -46,30 +46,30 @@ const DailyDetailsChart: React.FC = () => {
                     <div className="flex gap-12">
                         <div>
                             <p className="text-xl font-bold text-gray-800">1234</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Memberships</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Membership</p>
                         </div>
                         <div>
                             <p className="text-xl font-bold text-gray-800">4567</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loan Releases</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loan Release</p>
                         </div>
                         <div>
                             <p className="text-xl font-bold text-gray-800">789</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Collections</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Collection</p>
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-4 text-[10px] font-bold tracking-widest uppercase text-gray-500">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                        <span>New Memberships</span>
+                        <span>New Membership</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <span>Loan Releases</span>
+                        <span>Loan Release</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <span>Collections</span>
+                        <span>Collection</span>
                     </div>
                 </div>
             </div>

@@ -675,13 +675,13 @@ export default function InventoryLayoutIndex() {
                           />
                         </Tooltip>
 
-                        <Tooltip title={chatVisible ? 'Hide Chat' : 'Show Chat'}>
+                        {/* <Tooltip title={chatVisible ? 'Hide Chat' : 'Show Chat'}>
                           <Button
                             type="text"
                             icon={<MessageOutlined />}
                             onClick={toggleChat}
                           />
-                        </Tooltip>
+                        </Tooltip> */}
 
                         <Tooltip title="Switch Portal">
                           <Link to="/landing-page">
@@ -776,8 +776,7 @@ export default function InventoryLayoutIndex() {
             </Layout>
           </div>
 
-          {/* Messenger-style Chat Popup */}
-          {chatVisible && (
+          {/* {chatVisible && (
             <div
               ref={chatRef}
               className={`fixed bottom-0 right-4 z-50 transition-all duration-300 ease-in-out ${isChatMinimized ? 'w-64 h-12' : 'w-[26rem] h-[500px]'
@@ -792,7 +791,6 @@ export default function InventoryLayoutIndex() {
                 flexDirection: 'column'
               }}
             >
-              {/* Chat Header - Always visible */}
               <div
                 className={`flex items-center justify-between p-3 cursor-pointer ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'
                   }`}
@@ -832,7 +830,6 @@ export default function InventoryLayoutIndex() {
                 </div>
               </div>
 
-              {/* Chat Content - Scrollable area */}
               {!isChatMinimized && (
                 <div className="flex-1 overflow-hidden flex flex-col">
                   <div>
@@ -843,7 +840,6 @@ export default function InventoryLayoutIndex() {
             </div>
           )}
 
-          {/* Floating Chat Button (when chat is hidden) */}
           {!chatVisible && (
             <button
               onClick={toggleChat}
@@ -856,7 +852,7 @@ export default function InventoryLayoutIndex() {
             >
               <MessageOutlined className="text-white text-xl" />
             </button>
-          )}
+          )} */}
 
           {/* Settings Modal */}
           <Modal

@@ -83,7 +83,7 @@ const PerformanceCharts: React.FC = () => {
             {/* Categories Performance */}
             <div className="bg-white p-6 shadow-sm border border-gray-300">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">Collections Performance</h3>
+                    <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">Collection Performance</h3>
                     <div className="flex gap-2 text-gray-300">
                         <MousePointer2 size={16} />
                         <LayoutGrid size={16} />

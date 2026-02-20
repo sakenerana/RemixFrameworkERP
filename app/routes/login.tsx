@@ -101,7 +101,7 @@ export default function LoginIndex() {
                 alt="CFI Cooperative Logo"
                 className="transition-all duration-300 hover:scale-105"
               />
-              <h2 className="mt-4 text-2xl font-semibold text-gray-800">Enterprise Portal</h2>
+              <h2 className="mt-4 text-2xl font-semibold text-gray-700">CFI Management System</h2>
             </div>
 
             {/* Error Message */}

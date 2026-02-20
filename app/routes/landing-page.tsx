@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ConfigProvider, Layout, Avatar, message } from 'antd';
+import { ConfigProvider, Layout, Avatar, message, Button } from 'antd';
 import {
     Home,
     FileText,
@@ -16,6 +16,7 @@ import { useAuth } from '~/auth/AuthContext';
 import { UserService } from '~/services/user.service';
 import { FaDollarSign } from 'react-icons/fa';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
+import { useNavigate } from 'react-router-dom';
 
 export interface SidebarItemType {
     id: string;
@@ -24,14 +25,6 @@ export interface SidebarItemType {
     badge?: number;
 }
 const { Header, Content, Sider, Footer } = Layout;
-
-const sidebarItems: SidebarItemType[] = [
-    { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" />, badge: 3 },
-    { id: 'mail', label: 'sakenerana@gmail.com', icon: <Mail className="w-4 h-4" />, badge: 3 },
-    { id: 'username', label: 'cdmerana', icon: <User className="w-4 h-4" />, badge: 5 },
-    { id: 'nickname', label: 'IT Staff - CD Erana', icon: <ContactRound className="w-4 h-4" /> },
-    { id: 'department', label: 'IT Department', icon: <Warehouse className="w-4 h-4" />, badge: 2 },
-];
 
 export default function LandingPage2() {
     const [activeTab, setActiveTab] = useState('events');
@@ -48,6 +41,35 @@ export default function LandingPage2() {
     const [loading, setLoading] = useState(false);
     const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
     const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
+    const { signOut, getUser } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSignout = async () => {
+        // Clear all relevant localStorage data
+        localStorage.removeItem("ab_id");
+        localStorage.removeItem("username");
+        localStorage.removeItem("dept");
+        localStorage.removeItem("fname");
+        localStorage.removeItem("lname");
+        localStorage.removeItem("userAuthID");
+        localStorage.removeItem("userDept");
+        localStorage.removeItem("userOffice");
+        localStorage.removeItem("userOfficeID");
+
+        localStorage.removeItem("workflowDashboardData");
+        localStorage.removeItem("userActivitiesData");
+
+        // Clear any cached API data (remove all keys starting with your app's cache prefix)
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith("budgetApproved_") || key.startsWith("completedRequisition_") || key.startsWith("userActiveActivities_")) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        await signOut();
+        // setLoading(false);
+        navigate("/");
+    };
 
     // Fetch data from Supabase
     const fetchDataByUUID = async () => {
@@ -80,6 +102,7 @@ export default function LandingPage2() {
             setDataTicketing(arr.includes(6));
             setDataLoanRelease(arr.includes(7));
             setDataNewMembership(arr.includes(8));
+            // console.log("User data loaded successfully", dataFetch);
         } catch (error) {
             message.error("Error loading user data");
         } finally {
@@ -90,6 +113,14 @@ export default function LandingPage2() {
     useMemo(() => {
         fetchDataByUUID();
     }, []);
+
+    const sidebarItems: SidebarItemType[] = [
+        { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" />, badge: 3 },
+        { id: 'mail', label: dataUser?.email || 'N/A', icon: <Mail className="w-4 h-4" />, badge: 3 },
+        { id: 'username', label: dataUser?.username || 'Unknown Username', icon: <User className="w-4 h-4" />, badge: 5 },
+        { id: 'nickname', label: `${dataUser?.first_name || 'First'} ${dataUser?.last_name || 'Last'}`, icon: <ContactRound className="w-4 h-4" /> },
+        { id: 'department', label: `${dataUser?.departments?.department || 'Unknown Department'} Staff`, icon: <Warehouse className="w-4 h-4" />, badge: 2 },
+    ];
 
     return (
         <ConfigProvider
@@ -152,10 +183,14 @@ export default function LandingPage2() {
                             <div
                                 className="flex cursor-pointer px-4 py-3 hover:bg-gray-50  border-b border-gray-100 transition-colors"
                             >
-                                <div className="flex items-center gap-3 text-gray-600 text-sm">
+                                <Button
+                                    type="default"
+                                    className="flex items-center gap-3 text-sm cursor-pointer w-full text-left"
+                                    onClick={handleSignout}
+                                >
                                     <LogOut className="text-red-900 w-4 h-4" />
-                                    <span className='text-red-900'>Sign Out</span>
-                                </div>
+                                    <span className="text-red-900">SIGN OUT</span>
+                                </Button>
                             </div>
                         </div>
                         <div className="mt-8 p-4">
@@ -192,7 +227,7 @@ export default function LandingPage2() {
                     <Content className="p-6 bg-[#ecf0f1]">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <MetricCard
-                                title="Financial Monitoring"
+                                title="Budget Monitoring"
                                 link="/budget"
                                 data={[
                                     { name: 'Unbudgeted', value: 35, color: '#bdc3c7' },
@@ -212,19 +247,19 @@ export default function LandingPage2() {
                                 data={[
                                     { name: 'Membership', value: 35, color: '#bdc3c7' },
                                     { name: 'Loan Release', value: 65, color: '#9cc332' },
-                                    { name: 'Collections', value: 65, color: '#1890ff' }
+                                    { name: 'Collection', value: 65, color: '#1890ff' }
                                 ]}
-                                centerLabel="membership / loan release / collections"
+                                centerLabel="membership / loan release / collection"
                                 icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
                                 legend={[
                                     { label: 'membership', value: 35, color: '#bdc3c7' },
                                     { label: 'loan release', value: 65, color: '#9cc332' },
-                                    { label: 'collections', value: 65, color: '#1890ff' }
+                                    { label: 'collection', value: 65, color: '#1890ff' }
                                 ]}
                             />
 
                             <MetricCard
-                                title="Operation Process"
+                                title="Performance Metric Report"
                                 link="/workflow"
                                 data={[
                                     { name: 'Requests', value: 65, color: '#9cc332' }

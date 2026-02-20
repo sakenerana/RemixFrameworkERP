@@ -255,7 +255,11 @@ export default function Workflows() {
                 title: <HomeOutlined className="text-gray-400" />,
               },
               {
-                title: <span className="text-blue-600 font-medium">Workflow</span>,
+                title: (
+                  <span className="text-blue-600 font-medium">
+                    Workflow Management
+                  </span>
+                ),
               },
             ]}
             className="text-sm"
@@ -266,7 +270,7 @@ export default function Workflows() {
       {/* Toolbar Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
         <Alert
-          message="This is the list of all users with existing workflows. Please review carefully."
+          message="Below is a list of all users with assigned workflows. Please review the information carefully."
           type="info"
           showIcon
           className="w-full lg:w-auto"
@@ -276,7 +280,7 @@ export default function Workflows() {
           <Input.Search
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search users..."
+            placeholder="Search by user name or details"
             className="w-full sm:w-64"
             size="middle"
           />
@@ -287,22 +291,22 @@ export default function Workflows() {
               icon={<FcRefresh className="text-blue-500" />}
               className="flex items-center gap-2 hover:border-blue-500"
             >
-              Refresh
+              Refresh Data
             </Button>
 
             <Dropdown
               menu={{
                 items: columnMenuItems,
-                className: "shadow-lg rounded-md min-w-[200px]"
+                className: "shadow-lg rounded-md min-w-[200px]",
               }}
               placement="bottomRight"
-              trigger={['click']}
+              trigger={["click"]}
             >
               <Button
                 icon={<SettingOutlined />}
                 className="flex items-center gap-2 hover:border-blue-500"
               >
-                Columns
+                Manage Columns
               </Button>
             </Dropdown>
 
@@ -321,7 +325,7 @@ export default function Workflows() {
         <div className="flex justify-center items-center h-64">
           <Spin
             size="large"
-            tip="Loading user workflows..."
+            tip="Loading workflow data..."
             indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
           />
         </div>
@@ -337,29 +341,24 @@ export default function Workflows() {
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
+            pageSizeOptions: ["10", "20", "50", "100"],
             defaultPageSize: 20,
             className: "px-4 py-2",
-            showTotal: (total) => `Total ${total} users`,
+            showTotal: (total) => `Showing ${total} users`,
           }}
           locale={{
             emptyText: (
               <div className="py-8 flex flex-col items-center">
                 <UserOutlined className="text-3xl text-gray-400 mb-2" />
-                <p className="text-gray-500 mb-4">No workflow users found</p>
-                {/* <Button
-                  type="primary"
-                  className="mt-2"
-                  onClick={() => navigate('/workflow/create')}
-                  icon={<AiOutlinePlus />}
-                >
-                  Add New User
-                </Button> */}
+                <p className="text-gray-500 mb-4">
+                  No users with workflows were found
+                </p>
               </div>
-            )
+            ),
           }}
         />
       )}
     </Card>
   );
+
 }
