@@ -32,10 +32,8 @@ export default function LandingPage2() {
     const [dataUser, setData] = useState<any>();
     const [dataInventory, setDataInventory] = useState(false);
     const [dataBudget, setDataBudget] = useState(false);
-    const [dataNewMembership, setDataNewMembership] = useState(false);
-    const [dataLoanRelease, setDataLoanRelease] = useState(false);
+    const [dataPerformanceReport, setDataPerformanceReport] = useState(false);
     const [dataWorkflow, setDataWorkflow] = useState(false);
-    const [dataBilling, setDataBilling] = useState(false);
     const [dataTicketing, setDataTicketing] = useState(false);
     const [dataAdmin, setDataAdmin] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -98,10 +96,8 @@ export default function LandingPage2() {
             setDataBudget(arr.includes(2));
             setDataWorkflow(arr.includes(3));
             setDataAdmin(arr.includes(4));
-            setDataBilling(arr.includes(5));
-            setDataTicketing(arr.includes(6));
-            setDataLoanRelease(arr.includes(7));
-            setDataNewMembership(arr.includes(8));
+            setDataTicketing(arr.includes(5));
+            setDataPerformanceReport(arr.includes(6));
             // console.log("User data loaded successfully", dataFetch);
         } catch (error) {
             message.error("Error loading user data");
@@ -226,80 +222,91 @@ export default function LandingPage2() {
                     {/* Main Dashboard Content */}
                     <Content className="p-6 bg-[#ecf0f1]">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <MetricCard
-                                title="Budget Monitoring"
-                                link="/budget"
-                                data={[
-                                    { name: 'Unbudgeted', value: 35, color: '#bdc3c7' },
-                                    { name: 'Budget', value: 65, color: '#9cc332' }
-                                ]}
-                                centerLabel="unbudget / budget"
-                                icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
-                                legend={[
-                                    { label: 'unbudget', value: 35, color: '#bdc3c7' },
-                                    { label: 'budget', value: 65, color: '#9cc332' }
-                                ]}
-                            />
 
-                            <MetricCard
-                                title="Performance Report"
-                                link="/performancereport"
-                                data={[
-                                    { name: 'Membership', value: 35, color: '#bdc3c7' },
-                                    { name: 'Loan Release', value: 65, color: '#9cc332' },
-                                    { name: 'Collection', value: 65, color: '#1890ff' }
-                                ]}
-                                centerLabel="membership / loan release / collection"
-                                icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
-                                legend={[
-                                    { label: 'membership', value: 35, color: '#bdc3c7' },
-                                    { label: 'loan release', value: 65, color: '#9cc332' },
-                                    { label: 'collection', value: 65, color: '#1890ff' }
-                                ]}
-                            />
+                            {dataBudget && (
+                                <MetricCard
+                                    title="Budget Monitoring"
+                                    link="/budget"
+                                    data={[
+                                        { name: 'Unbudgeted', value: 35, color: '#bdc3c7' },
+                                        { name: 'Budget', value: 65, color: '#9cc332' }
+                                    ]}
+                                    centerLabel="unbudget / budget"
+                                    icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'unbudget', value: 35, color: '#bdc3c7' },
+                                        { label: 'budget', value: 65, color: '#9cc332' }
+                                    ]}
+                                />
+                            )}
 
-                            <MetricCard
-                                title="Performance Metric Report"
-                                link="/workflow"
-                                data={[
-                                    { name: 'Requests', value: 65, color: '#9cc332' }
-                                ]}
-                                centerLabel="requests"
-                                icon={<FileText className="w-8 h-8 text-gray-400" />}
-                                legend={[
-                                    { label: 'requests', value: 65, color: '#9cc332' },
-                                ]}
-                            />
+                            {dataPerformanceReport && (
+                                <MetricCard
+                                    title="Performance Report"
+                                    link="/performancereport"
+                                    data={[
+                                        { name: 'Membership', value: 35, color: '#bdc3c7' },
+                                        { name: 'Loan Release', value: 65, color: '#9cc332' },
+                                        { name: 'Collection', value: 65, color: '#1890ff' }
+                                    ]}
+                                    centerLabel="membership / loan release / collection"
+                                    icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'membership', value: 35, color: '#bdc3c7' },
+                                        { label: 'loan release', value: 65, color: '#9cc332' },
+                                        { label: 'collection', value: 65, color: '#1890ff' }
+                                    ]}
+                                />
+                            )}
 
-                            <MetricCard
-                                title="CFI Asset Management"
-                                link="/inventory"
-                                data={[
-                                    { name: 'Licenses', value: 35, color: '#bdc3c7' },
-                                    { name: 'Assets', value: 65, color: '#9cc332' }
-                                ]}
-                                centerLabel="licenses / assets"
-                                icon={<BaggageClaim className="w-8 h-8 text-gray-400" />}
-                                legend={[
-                                    { label: 'licenses', value: 35, color: '#bdc3c7' },
-                                    { label: 'assets', value: 65, color: '#9cc332' }
-                                ]}
-                            />
+                            {dataWorkflow && (
+                                <MetricCard
+                                    title="Performance Metric Report"
+                                    link="/workflow"
+                                    data={[
+                                        { name: 'Requests', value: 65, color: '#9cc332' }
+                                    ]}
+                                    centerLabel="requests"
+                                    icon={<FileText className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'requests', value: 65, color: '#9cc332' },
+                                    ]}
+                                />
+                            )}
 
-                            <MetricCard
-                                title="IT Support Ticket"
-                                link="https://it-support.cficoop.com/en/"
-                                data={[
-                                    { name: 'Offline', value: 50, color: '#bdc3c7' },
-                                    { name: 'Online', value: 50, color: '#9cc332' }
-                                ]}
-                                centerLabel="offline / online"
-                                icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
-                                legend={[
-                                    { label: 'offline', value: 50, color: '#bdc3c7' },
-                                    { label: 'online', value: 50, color: '#9cc332' }
-                                ]}
-                            />
+                            {dataInventory && (
+                                <MetricCard
+                                    title="CFI Asset Management"
+                                    link="/inventory"
+                                    data={[
+                                        { name: 'Licenses', value: 35, color: '#bdc3c7' },
+                                        { name: 'Assets', value: 65, color: '#9cc332' }
+                                    ]}
+                                    centerLabel="licenses / assets"
+                                    icon={<BaggageClaim className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'licenses', value: 35, color: '#bdc3c7' },
+                                        { label: 'assets', value: 65, color: '#9cc332' }
+                                    ]}
+                                />
+                            )}
+
+                            {dataTicketing && (
+                                <MetricCard
+                                    title="IT Support Ticket"
+                                    link="https://it-support.cficoop.com/en/"
+                                    data={[
+                                        { name: 'Offline', value: 50, color: '#bdc3c7' },
+                                        { name: 'Online', value: 50, color: '#9cc332' }
+                                    ]}
+                                    centerLabel="offline / online"
+                                    icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'offline', value: 50, color: '#bdc3c7' },
+                                        { label: 'online', value: 50, color: '#9cc332' }
+                                    ]}
+                                />
+                            )}
 
                         </div>
                     </Content>
