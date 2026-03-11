@@ -1,12 +1,12 @@
 import { LoadingOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 import {
-  Button,
-  Form,
-  Input,
-  Image,
-  Card,
   Alert,
+  Button,
+  Card,
   Checkbox,
+  Form,
+  Image,
+  Input,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@remix-run/react";
@@ -14,11 +14,11 @@ import supabase from "~/utils/supabase.client";
 // import ClientOnly from "~/components/client-only";
 // import { useAuth } from "~/auth/AuthContext";
 
-// Obfuscation functions (put these outside your component)
 const obfuscate = (str: string): string => btoa(unescape(encodeURIComponent(str)));
 const deobfuscate = (str: string): string => decodeURIComponent(escape(atob(str)));
 
 export const handle = { hydrate: false };
+
 export default function LoginIndex() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,6 @@ export default function LoginIndex() {
   // const { getUser } = useAuth();
   const navigate = useNavigate();
 
-  // Load remembered credentials on component mount
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     const obfuscatedPassword = localStorage.getItem("rememberedPassword");
@@ -34,15 +33,14 @@ export default function LoginIndex() {
     if (rememberedEmail) {
       form.setFieldsValue({
         email: rememberedEmail,
-        remember: true
+        remember: true,
       });
 
-      // Only deobfuscate password if it exists
       if (obfuscatedPassword) {
         try {
           const rememberedPassword = deobfuscate(obfuscatedPassword);
           form.setFieldsValue({
-            password: rememberedPassword
+            password: rememberedPassword,
           });
         } catch (error) {
           console.error("Failed to deobfuscate password:", error);
@@ -52,14 +50,17 @@ export default function LoginIndex() {
     }
   }, [form]);
 
-  const onFinish = async (values: { email: string; password: string; remember: boolean }) => {
+  const onFinish = async (values: {
+    email: string;
+    password: string;
+    remember: boolean;
+  }) => {
     try {
       setLoading(true);
+      setErrorAlert(false);
 
-      // Handle remember me functionality
       if (values.remember) {
         localStorage.setItem("rememberedEmail", values.email);
-        // Store obfuscated password
         localStorage.setItem("rememberedPassword", obfuscate(values.password));
       } else {
         localStorage.removeItem("rememberedEmail");
@@ -71,10 +72,10 @@ export default function LoginIndex() {
         password: values.password,
       });
 
+      if (error) throw error;
       if (data) {
         navigate("/landing-page");
       }
-      if (error) throw error;
     } catch (error) {
       setErrorAlert(true);
       console.error("Login error:", error);
@@ -84,142 +85,177 @@ export default function LoginIndex() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-800/80"></div>
+    <div className="relative min-h-screen overflow-hidden bg-[url(/img/cfi-bills-payment.jpg)] bg-cover bg-center bg-no-repeat bg-fixed">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.28),_transparent_36%),linear-gradient(115deg,rgba(8,15,36,0.92),rgba(18,45,88,0.82),rgba(8,15,36,0.88))]" />
+      <div className="absolute inset-0 bg-black/20" />
 
       {/* <ClientOnly> */}
-        <Card className="w-full max-w-md shadow-2xl rounded-xl overflow-hidden border-0 relative">
-          {/* Decorative accent */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-[1.1fr_480px] lg:items-center">
+          <section className="hidden text-white lg:block">
+            <div className="max-w-xl">
+              <p className="mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-blue-100 backdrop-blur-sm">
+                Secure Internal Access
+              </p>
+              <h1 className="max-w-lg text-5xl font-semibold leading-tight text-white">
+                Manage cooperative operations from one reliable workspace.
+              </h1>
+              <p className="mt-6 max-w-lg text-base leading-7 text-blue-100/90">
+                Access member services, billing, inventory, and workflow tools through a single
+                protected portal designed for day-to-day operations.
+              </p>
 
-          <div className="px-10 py-8 bg-white">
-            {/* Logo Section */}
-            <div className="flex flex-col items-center mb-8">
-              <Image
-                width={180}
-                src="./img/cficoop.svg"
-                alt="CFI Cooperative Logo"
-                className="transition-all duration-300 hover:scale-105"
-              />
-              <h2 className="mt-4 text-2xl font-semibold text-gray-700">CFI Management System</h2>
+              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4">
+                {[
+                  { value: "24/7", label: "System availability" },
+                  { value: "Centralized", label: "Operational control" },
+                  { value: "Protected", label: "User authentication" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-sm border border-white/15 bg-white/10 p-5 backdrop-blur-sm"
+                  >
+                    <p className="text-2xl font-semibold text-white">{item.value}</p>
+                    <p className="mt-2 text-sm leading-6 text-blue-100/85">{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+          </section>
 
-            {/* Error Message */}
-            {errorAlert && (
-              <Alert
-                className="mb-6 rounded-lg border-red-200 bg-red-50"
-                message="Authentication Failed"
-                description="The email or password you entered is incorrect. Please verify your credentials and try again."
-                type="error"
-                showIcon
-                closable
-              />
-            )}
+          <Card className="overflow-hidden rounded-sm border border-white/20 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl">
 
-            {/* Login Form */}
-            <Form
-              form={form}
-              name="login"
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              layout="vertical"
-              className="space-y-5"
-            >
-              {/* Email Field */}
-              <Form.Item
-                name="email"
-                label={<span className="text-gray-700 font-medium">Email Address</span>}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter your email address"
-                  },
-                  {
-                    type: 'email',
-                    message: 'Please enter a valid email address'
-                  }
-                ]}
-              >
-                <Input
-                  prefix={<UserOutlined className="text-gray-400" />}
-                  placeholder="your.email@example.com"
-                  size="large"
-                  className="py-3 px-4 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+            <div className="px-6 py-7 sm:px-10 sm:py-9">
+              <div className="mb-8 flex flex-col items-center text-center">
+                {/* <div className="rounded-sm border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
+                  <Image
+                    width={170}
+                    preview={false}
+                    src="./img/cficoop.svg"
+                    alt="CFI Cooperative Logo"
+                  />
+                </div> */}
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
+                  CFI Management System
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+                  Welcome back
+                </h2>
+                <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+                  Sign in to continue to your dashboard and manage daily operations securely.
+                </p>
+              </div>
+
+              {errorAlert && (
+                <Alert
+                  className="mb-6 rounded-sm border-red-200 bg-red-50"
+                  message="Authentication failed"
+                  description="The email or password you entered is incorrect. Verify your credentials and try again."
+                  type="error"
+                  showIcon
+                  closable
                 />
-              </Form.Item>
+              )}
 
-              {/* Password Field */}
-              <Form.Item
-                name="password"
-                label={<span className="text-gray-700 font-medium">Password</span>}
-                rules={[{ required: true, message: "Please enter your password" }]}
+              <Form
+                form={form}
+                name="login"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                layout="vertical"
+                className="space-y-5"
               >
-                <Input.Password
-                  prefix={<LockOutlined className="text-gray-400" />}
-                  placeholder="••••••••"
-                  size="large"
-                  className="py-3 px-4 rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
-                />
-              </Form.Item>
-
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between mb-2">
-                <Form.Item name="remember" valuePropName="checked" className="mb-0">
-                  <Checkbox className="text-gray-600">Remember me</Checkbox>
+                <Form.Item
+                  name="email"
+                  label={<span className="text-sm font-semibold text-slate-700">Email address</span>}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your email address",
+                    },
+                    {
+                      type: "email",
+                      message: "Please enter a valid email address",
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={<UserOutlined className="text-slate-400" />}
+                    placeholder="your.email@example.com"
+                    size="large"
+                    className="h-12 rounded-xl border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                  />
                 </Form.Item>
 
-                <a
-                  href="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                <Form.Item
+                  name="password"
+                  label={<span className="text-sm font-semibold text-slate-700">Password</span>}
+                  rules={[{ required: true, message: "Please enter your password" }]}
                 >
-                  Forgot password?
+                  <Input.Password
+                    prefix={<LockOutlined className="text-slate-400" />}
+                    placeholder="Enter your password"
+                    size="large"
+                    className="h-12 rounded-xl border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                  />
+                </Form.Item>
+
+                <div className="flex flex-col gap-3 pb-1 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                  <Form.Item name="remember" valuePropName="checked" className="mb-0">
+                    <Checkbox className="text-sm text-slate-600">Remember me</Checkbox>
+                  </Form.Item>
+
+                  <a
+                    href="/forgot-password"
+                    className="text-sm font-semibold text-blue-700 transition-colors hover:text-blue-900"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+
+                <Form.Item className="mb-0 pt-2">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    size="large"
+                    className="h-12 rounded-xl border-0 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 text-base font-semibold shadow-lg shadow-blue-900/20 transition-all hover:brightness-105"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <LoadingOutlined className="mr-2 animate-spin" />
+                        Signing in...
+                      </span>
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+                </Form.Item>
+              </Form>
+
+              <div className="relative my-7">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-3 text-slate-400">Support</span>
+                </div>
+              </div>
+
+              <div className="rounded-sm border border-slate-200 bg-slate-50 px-5 py-4 text-center text-sm text-slate-600">
+                Don&apos;t have an account?{" "}
+                <a
+                  href="mailto:admin@cfi.coop"
+                  className="font-semibold text-blue-700 transition-colors hover:text-blue-900"
+                >
+                  Contact Administrator
                 </a>
               </div>
-
-              {/* Submit Button */}
-              <Form.Item className="mb-0">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  block
-                  size="large"
-                  className="h-12 font-medium text-base rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <LoadingOutlined className="animate-spin mr-2" />
-                      Signing in...
-                    </span>
-                  ) : (
-                    "Sign In"
-                  )}
-                </Button>
-              </Form.Item>
-            </Form>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Need help?</span>
-              </div>
             </div>
-
-            {/* Contact Admin */}
-            <div className="text-center text-sm text-gray-600">
-              Don't have an account?{' '}
-              <a
-                href="mailto:admin@cfi.coop"
-                className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                Contact Administrator
-              </a>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
+      </div>
       {/* </ClientOnly> */}
     </div>
   );
