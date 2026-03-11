@@ -68,14 +68,14 @@ export default function ForgotPasswordIndex() {
 
             <div className="px-6 py-7 sm:px-10 sm:py-9">
               <div className="mb-8 flex flex-col items-center text-center">
-                <div className="rounded-sm border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
+                {/* <div className="rounded-sm border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
                   <Image
                     width={170}
                     preview={false}
                     src="./img/cficoop.svg"
                     alt="CFI Cooperative Logo"
                   />
-                </div>
+                </div> */}
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
                   CFI Management System
                 </p>
