@@ -14,7 +14,7 @@ import {
 import MetricCard from '~/components/MetricCard';
 import { useAuth } from '~/auth/AuthContext';
 import { UserService } from '~/services/user.service';
-import { FaDollarSign } from 'react-icons/fa';
+import { FaDollarSign, FaRegUser } from 'react-icons/fa';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,6 +35,7 @@ export default function LandingPage2() {
     const [dataPerformanceReport, setDataPerformanceReport] = useState(false);
     const [dataWorkflow, setDataWorkflow] = useState(false);
     const [dataTicketing, setDataTicketing] = useState(false);
+    const [dataHR, setDataHR] = useState(false);
     const [dataAdmin, setDataAdmin] = useState(false);
     const [loading, setLoading] = useState(false);
     const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
@@ -98,6 +99,7 @@ export default function LandingPage2() {
             setDataAdmin(arr.includes(4));
             setDataTicketing(arr.includes(5));
             setDataPerformanceReport(arr.includes(6));
+            setDataHR(arr.includes(7));
             // console.log("User data loaded successfully", dataFetch);
         } catch (error) {
             message.error("Error loading user data");
@@ -304,6 +306,23 @@ export default function LandingPage2() {
                                     legend={[
                                         { label: 'offline', value: 50, color: '#bdc3c7' },
                                         { label: 'online', value: 50, color: '#9cc332' }
+                                    ]}
+                                />
+                            )}
+
+                            {dataHR && (
+                                <MetricCard
+                                    title="Human Resource Management"
+                                    link="/hr"
+                                    data={[
+                                        { name: 'Male', value: 50, color: '#bdc3c7' },
+                                        { name: 'Female', value: 50, color: '#9cc332' }
+                                    ]}
+                                    centerLabel="male / female"
+                                    icon={<FaRegUser className="w-8 h-8 text-gray-400" />}
+                                    legend={[
+                                        { label: 'male', value: 50, color: '#bdc3c7' },
+                                        { label: 'female', value: 50, color: '#9cc332' }
                                     ]}
                                 />
                             )}

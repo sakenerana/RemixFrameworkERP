@@ -164,12 +164,12 @@ body {
 }
 
 /* Custom menu item styling */
-.custom-menu .ant-menu-item {
+/* .custom-menu .ant-menu-item {
   margin: 4px 8px !important;
   border-radius: 8px !important;
   height: 48px !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
+} */
 
 .custom-menu .ant-menu-item:hover {
   background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.1) 100%) !important;
@@ -218,4 +218,22 @@ body {
 
 .animate-pulse-ring {
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* HR KPI CARD */
+.hr-kpi-card {
+  border-radius: 14px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  animation: kpiFade 420ms ease forwards;
+  opacity: 0;
+}
+
+.hr-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+@keyframes kpiFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }

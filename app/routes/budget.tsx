@@ -36,6 +36,8 @@ import {
   FcGlobe,
   FcSalesPerformance,
   FcSettings,
+  FcTemplate,
+  FcTreeStructure,
 } from "react-icons/fc";
 import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
@@ -181,23 +183,23 @@ export default function BudgetLayoutIndex() {
   const menuItems: MenuProps['items'] = [
     {
       key: "1",
-      icon: <LuLayoutDashboard size={15} />,
+      icon: <FcGlobe size={15} />,
       label: <Link to="/budget/dashboard">Dashboard</Link>,
     },
     {
       key: "2",
-      icon: <LuCreditCard size={15} />,        // Perfect for transactions
+      icon: <FcTemplate size={15} />,        // Perfect for transactions
       label: <Link to="/budget/transactions">Transactions</Link>,
     },
     {
       key: "3",
-      icon: <LuChartBarStacked size={15} />,          // Shows budget allocation
+      icon: <FcTreeStructure size={15} />,          // Shows budget allocation
       // Alternative: <Wallet /> or <DollarSign />
       label: <Link to="/budget/budgets">Budgets</Link>,
     },
     {
       key: "4",
-      icon: <LuTrendingUp size={15} />,        // Financial reporting/trends
+      icon: <FcDocument size={15} />,        // Financial reporting/trends
       label: <Link to="/budget/report">Report</Link>,
     },
   ];
@@ -351,47 +353,51 @@ export default function BudgetLayoutIndex() {
                     </div>
                   ) : (
                     <div className="flex items-center w-full px-5 py-4">
-                      <div className="relative group">
+                      <div className="relative">
                         <Avatar
                           src="/img/user.png"
-                          size={56}
-                          className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                          size={52}
+                          className="cursor-pointer transition-opacity duration-200 hover:opacity-90"
                           style={{
-                            border: '3px solid rgba(255, 255, 255, 0.2)',
-                            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
+                            border: "1px solid rgba(255, 255, 255, 0.18)",
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.18)",
                           }}
                         />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                        </div>
+                        {/* Online status (no pulse, more subtle) */}
+                        <span
+                          className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full"
+                          style={{
+                            background: "#22c55e",
+                            border: "2px solid rgba(15, 23, 42, 1)", // blends nicely in dark sidebar
+                          }}
+                        />
                       </div>
-                      <div className="ml-4 overflow-hidden">
-                        <div className="font-semibold text-lg text-white truncate">
-                          {isFname} {isLname}
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <div className="flex-shrink-0">
-                            <Tag
-                              color="gold"
-                              style={{
-                                fontSize: '10px',
-                                fontWeight: 700,
-                                padding: '2px 8px',
-                                lineHeight: '20px',
-                                background: 'linear-gradient(45deg, #ffd700, #ffed4e)',
-                                color: '#8b6500',
-                                border: 'none',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                              }}
-                            >
-                              <div className="flex items-center">
-                                <FcSettings className="mr-1" />
-                                ADMINISTRATOR
-                              </div>
-                            </Tag>
+
+                      <div className="ml-4 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="font-semibold text-[15px] leading-5 text-white truncate">
+                            {isFname} {isLname}
                           </div>
+
+                          {/* Role badge: clean, modern, non-flashy */}
+                          <Tag
+                            style={{
+                              marginInlineEnd: 0,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              padding: "0 8px",
+                              lineHeight: "20px",
+                              borderRadius: 999,
+                              border: "1px solid rgba(59, 130, 246, 0.35)",
+                              background: "rgba(59, 130, 246, 0.12)",
+                              color: "rgba(255, 255, 255, 0.85)",
+                            }}
+                          >
+                            ADMIN
+                          </Tag>
                         </div>
-                        <div className="text-xs text-blue-100/80 truncate mt-1">
+
+                        <div className="text-xs text-white/60 truncate mt-1">
                           CFI Cooperative
                         </div>
                       </div>
@@ -425,8 +431,7 @@ export default function BudgetLayoutIndex() {
                     width: "100%",
                     padding: collapsed ? "16px 8px" : "20px 16px",
                     borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-                    backdropFilter: "blur(10px)",
+                    backgroundColor: isDarkMode ? '#141414' : '#2e3c9c',
                   }}
                 >
                   {collapsed ? (
@@ -447,10 +452,10 @@ export default function BudgetLayoutIndex() {
 
                       icon={<LogoutOutlined />}
                       onClick={handleSignout}
-                      className="w-full h-12 border-red-500/30 hover:border-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group"
+                      className="w-full h-10 rounded-md border-red-500/30 hover:border-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group"
 
                     >
-                      <span className="ml-2 font-semibold text-white/90 group-hover:text-red-300 transition-colors">
+                      <span className="ml-2 font-semibold text-white/90 group-hover: transition-colors">
                         SIGN OUT
                       </span>
                       <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">

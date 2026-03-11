@@ -461,6 +461,7 @@ export default function UsersRoutes() {
         { label: "Admin Panel", value: 4 },
         { label: "Ticketing", value: 5 },
         { label: "Performance Report", value: 6 },
+        { label: "Human Resource Management", value: 7 },
     ];
 
     const optionsPermission: CheckboxOptionType<any>[] = [
