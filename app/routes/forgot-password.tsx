@@ -121,10 +121,10 @@ export default function ForgotPasswordIndex() {
                   <span className="font-semibold text-slate-800">Security note:</span> Accounts
                   without verified email addresses will not receive reset links. Contact{" "}
                   <a
-                    href="mailto:support@cfi.coop"
+                    href="mailto:it.department@cebucficoop.com"
                     className="font-semibold text-blue-700 transition-colors hover:text-blue-900"
                   >
-                    support@cfi.coop
+                    it.department@cebucficoop.com
                   </a>{" "}
                   for assistance.
                 </div>
@@ -162,7 +162,7 @@ export default function ForgotPasswordIndex() {
                   <Button
                     block
                     size="large"
-                    className="h-12 rounded-sm border-slate-200 font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-900"
+                    className="h-12 mt-4 rounded-sm border-slate-200 font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-900"
                   >
                     <ArrowLeftOutlined className="mr-2" />
                     Return to Login

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { TrendingUp, TrendingDown, Users, HandCoins, FileUser, ContactRound } from 'lucide-react';
 
 export interface KPIData {
@@ -75,13 +75,29 @@ interface Props {
     index: number;
 }
 
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value?: number; payload?: { month?: string } }> }) => {
+    if (!active || !payload?.length) {
+        return null;
+    }
+
+    return (
+        <div className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] shadow-sm">
+            <p className="font-semibold text-slate-700">{payload[0].payload?.month}</p>
+            <p className="text-slate-500">{payload[0].value ?? 0}</p>
+        </div>
+    );
+};
+
 const KPICard: React.FC<Props> = ({ data, index }) => {
     const isPositive = data.trend >= 0;
 
     const getIcon = () => {
         switch (data.label) {
+            case 'NEW MEMBERSHIP':
             case 'NEW MEMBERSHIPS': return <Users size={20} className="text-gray-300" />;
+            case 'LOAN RELEASE':
             case 'LOAN RELEASES': return <FileUser size={20} className="text-gray-300" />;
+            case 'COLLECTION':
             case 'COLLECTIONS': return <HandCoins size={20} className="text-gray-300" />;
             case 'PERSONNEL TASK COMPLETION': return <ContactRound size={20} className="text-gray-300" />;
             default: return null;
@@ -108,6 +124,10 @@ const KPICard: React.FC<Props> = ({ data, index }) => {
             <div className="h-16 w-full mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.history}>
+                        <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{ fill: 'rgba(148, 163, 184, 0.12)' }}
+                        />
                         <Bar dataKey="value" radius={[2, 2, 0, 0]}>
                             {data.history.map((entry, i) => (
                                 <Cell

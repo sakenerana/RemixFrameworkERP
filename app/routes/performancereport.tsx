@@ -1,58 +1,17 @@
-import { useEffect, useState, useRef } from "react";
-import {
-  FullscreenExitOutlined,
-  FullscreenOutlined,
-  MenuFoldOutlined,
-  MenuOutlined,
-  MenuUnfoldOutlined,
-  MoonOutlined,
-  SunOutlined,
-  SwapOutlined,
-  VerticalAlignTopOutlined,
-  MessageOutlined,
-  CloseOutlined,
-  LogoutOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Layout,
-  Menu,
-  Space,
-  theme,
-  Image,
-  Modal,
-  ConfigProvider,
-  Switch,
-  Dropdown,
-  Tooltip,
-  Avatar,
-  Tag,
-  MenuProps,
-} from "antd";
-import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
-import {
-  FcSettings,
-} from "react-icons/fc";
-import ScrollingAttentionBanner from "~/components/scrolling_attention";
-import MovingAttentionAlert from "~/components/attention";
-import Setting from "./settings";
-import { ProtectedRoute } from "~/components/ProtectedRoute";
-import ManagerGroupChat from "~/components/chat";
-import { AiOutlineMinus } from "react-icons/ai";
-import { LuChartBarStacked, LuCreditCard, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
-import { useAuth } from "~/auth/AuthContext";
-import { ArrowLeftFromLine, FileText, Home, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Avatar, Button, ConfigProvider, DatePicker, Layout, Typography } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import { Link } from "@remix-run/react";
+import { ArrowLeftFromLine, Home, RotateCcw } from "lucide-react";
+
 import KPICard from "~/components/KPICard";
 import DailyDetailsChart from "~/components/DailyDetailsChart";
 import PerformanceCharts from "~/components/PerformanceCharts";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
+import axios from "axios";
 
-const { Header, Sider, Content } = Layout;
-
-interface MenuItem {
-  key: string;
-  icon: React.ReactNode;
-  label: React.ReactNode;
-}
+const { Header, Content } = Layout;
+const { Title, Text } = Typography;
 
 export interface KPIData {
   label: string;
@@ -63,111 +22,217 @@ export interface KPIData {
   history: { month: string; value: number }[];
 }
 
-export const KPI_DATA: KPIData[] = [
+interface NewMembershipApiResponse {
+  error: boolean;
+  message: string;
+  workflow_name: string;
+  year: number;
+  total_count: number;
+  monthly_counts: Record<string, number>;
+}
+
+interface KpiDefinition {
+  label: string;
+  link: string;
+  endpoint: string;
+}
+
+const KPI_DEFINITIONS: KpiDefinition[] = [
   {
-    label: 'NEW MEMBERSHIP',
-    link: '/newmembership',
-    value: '1234',
-    trend: 16.58,
-    comparison: 'per year - 2026',
-    history: [
-      { month: 'Jan', value: 40 }, { month: 'Feb', value: 70 }, { month: 'Mar', value: 50 },
-      { month: 'Apr', value: 80 }, { month: 'May', value: 60 }, { month: 'Jun', value: 90 },
-      { month: 'Jul', value: 75 }, { month: 'Aug', value: 85 }, { month: 'Sep', value: 100 },
-      { month: 'Oct', value: 95 }, { month: 'Nov', value: 110 }, { month: 'Dec', value: 120 }
-    ]
+    label: "NEW MEMBERSHIP",
+    link: "/newmembership",
+    endpoint: "newmembers/count",
   },
   {
-    label: 'LOAN RELEASE',
-    link: '/loanrelease',
-    value: '456',
-    trend: 16.85,
-    comparison: 'per year - 2026',
-    history: [
-      { month: 'Jan', value: 30 }, { month: 'Feb', value: 50 }, { month: 'Mar', value: 40 },
-      { month: 'Apr', value: 60 }, { month: 'May', value: 45 }, { month: 'Jun', value: 70 },
-      { month: 'Jul', value: 55 }, { month: 'Aug', value: 65 }, { month: 'Sep', value: 80 },
-      { month: 'Oct', value: 75 }, { month: 'Nov', value: 85 }, { month: 'Dec', value: 90 }
-    ]
+    label: "LOAN RELEASE",
+    link: "/loanrelease",
+    endpoint: "loanprocessingv2/count",
   },
   {
-    label: 'COLLECTION',
-    link: '/collections',
-    value: '7890',
-    trend: 15.21,
-    comparison: 'per year - 2026',
-    history: [
-      { month: 'Jan', value: 10 }, { month: 'Feb', value: 20 }, { month: 'Mar', value: 10 },
-      { month: 'Apr', value: 20 }, { month: 'May', value: 15 }, { month: 'Jun', value: 20 },
-      { month: 'Jul', value: 20 }, { month: 'Aug', value: 20 }, { month: 'Sep', value: 20 },
-      { month: 'Oct', value: 20 }, { month: 'Nov', value: 25 }, { month: 'Dec', value: 30 }
-    ]
+    label: "COLLECTION",
+    link: "/collections",
+    endpoint: "collections/count",
   },
   {
-    label: 'PERSONNEL TASK COMPLETION',
-    link: '/personnel',
-    value: '143',
-    trend: -0.29,
-    comparison: 'per year - 2026',
-    history: [
-      { month: 'Jan', value: 28 }, { month: 'Feb', value: 29 }, { month: 'Mar', value: 27 },
-      { month: 'Apr', value: 28 }, { month: 'May', value: 28 }, { month: 'Jun', value: 29 },
-      { month: 'Jul', value: 28 }, { month: 'Aug', value: 28 }, { month: 'Sep', value: 28 },
-      { month: 'Oct', value: 28 }, { month: 'Nov', value: 28 }, { month: 'Dec', value: 28 }
-    ]
-  }
+    label: "PERSONNEL TASK COMPLETION",
+    link: "/personnel",
+    endpoint: "personnel/count",
+  },
 ];
 
 export default function PerformanceReportLayoutIndex() {
-  const navigate = useNavigate();
-  const matches = useMatches();
-  const [collapsed, setCollapsed] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHorizontal, setIsHorizontal] = useState(false);
-  const [isFname, setIsFname] = useState('');
-  const [isLname, setIsLname] = useState('');
-  const [isMobile, setIsMobile] = useState(false);
-  const [chatVisible, setChatVisible] = useState(false);
-  const [isChatMinimized, setIsChatMinimized] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
-  const { signOut, getUser } = useAuth();
+  const currentYear = dayjs().year();
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [kpiApiData, setKpiApiData] = useState<
+    Record<
+      string,
+      {
+        totalCount: number;
+        monthlyCounts: Record<string, number>;
+      } | null
+    >
+  >({});
+  const [isKpiLoading, setIsKpiLoading] = useState(false);
 
-  // Get current path for menu selection
-  const currentPath = matches[matches.length - 1]?.pathname || '';
+  const selectedYearValue = useMemo(() => dayjs().year(selectedYear), [selectedYear]);
+  const kpiData = useMemo(
+    () => {
+      const monthOrder = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const monthLabelMap: Record<string, string> = {
+        January: "Jan",
+        February: "Feb",
+        March: "Mar",
+        April: "Apr",
+        May: "May",
+        June: "Jun",
+        July: "Jul",
+        August: "Aug",
+        September: "Sep",
+        October: "Oct",
+        November: "Nov",
+        December: "Dec",
+      };
 
-  // Redirect to dashboard on initial load if at root admin path
+      return KPI_DEFINITIONS.map((kpi) => {
+        const apiData = kpiApiData[kpi.label];
+
+        return {
+          label: kpi.label,
+          link: kpi.link,
+          value: isKpiLoading
+            ? "..."
+            : (apiData?.totalCount ?? 0).toLocaleString(),
+          trend: 0,
+          history: monthOrder.map((month) => ({
+            month: monthLabelMap[month],
+            value: apiData?.monthlyCounts[month] ?? 0,
+          })),
+          comparison: `per year - ${selectedYear}`,
+        };
+      });
+    },
+    [isKpiLoading, kpiApiData, selectedYear]
+  );
+
   useEffect(() => {
-    if (currentPath === '/performancereport') {
-      navigate('/performancereport', { replace: true });
-    }
-  }, [currentPath, navigate]);
+    let ignore = false;
+    const controller = new AbortController();
+
+    const fetchKpiCounts = async () => {
+      setIsKpiLoading(true);
+      const userId = Number(localStorage.getItem("ab_id"));
+      const username = localStorage.getItem("username") || "";
+
+      try {
+        const responses = await Promise.allSettled(
+          KPI_DEFINITIONS.map(async (kpi) => {
+            const response = await axios.get<NewMembershipApiResponse>(
+              `${import.meta.env.VITE_API_BASE_URL}/${kpi.endpoint}/${selectedYear}`,
+              {
+                params: { userid: userId, username },
+                signal: controller.signal,
+              }
+            );
+
+            return {
+              label: kpi.label,
+              payload: response.data,
+            };
+          })
+        );
+
+        if (!ignore) {
+          const nextData = KPI_DEFINITIONS.reduce<
+            Record<string, { totalCount: number; monthlyCounts: Record<string, number> } | null>
+          >((acc, kpi, index) => {
+            const result = responses[index];
+
+            if (result.status === "fulfilled") {
+              acc[kpi.label] = {
+                totalCount: Number(result.value.payload?.total_count ?? 0),
+                monthlyCounts: result.value.payload?.monthly_counts ?? {},
+              };
+              return acc;
+            }
+
+            acc[kpi.label] = null;
+            return acc;
+          }, {});
+
+          setKpiApiData(nextData);
+        }
+      } catch {
+        if (!ignore) {
+          setKpiApiData(
+            KPI_DEFINITIONS.reduce<Record<string, null>>((acc, kpi) => {
+              acc[kpi.label] = null;
+              return acc;
+            }, {})
+          );
+        }
+      } finally {
+        if (!ignore) {
+          setIsKpiLoading(false);
+        }
+      }
+    };
+
+    fetchKpiCounts();
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [selectedYear]);
+
+  const handleYearChange = (date: Dayjs | null) => {
+    if (!date) return;
+    setSelectedYear(date.year());
+  };
+
+  const resetYear = () => {
+    setSelectedYear(currentYear);
+  };
 
   return (
     <ProtectedRoute>
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#1890ff',
-            borderRadius: 4,
+            colorPrimary: "#1677ff",
+            borderRadius: 8,
           },
         }}
       >
-        <Layout className="min-h-screen">
+        <Layout className="min-h-screen bg-slate-50">
           <Header className="bg-[#1890ff] px-0 flex items-center justify-between h-14 sticky top-0 z-50 shadow-md">
             <div className="flex items-center">
               <div className="flex items-center h-14">
-                <a href="/landing-page" className="h-full">
+                <Link to="/landing-page" className="h-full">
                   <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400 bg-blue-700">
                     <Home className="text-white w-5 h-5" />
                   </button>
-                </a>
-                <a href="/landing-page" className="h-full">
+                </Link>
+                <Link to="/landing-page" className="h-full">
                   <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400">
                     <ArrowLeftFromLine className="text-white w-5 h-5" />
                   </button>
-                </a>
+                </Link>
               </div>
             </div>
+
             <div className="flex items-center px-6 gap-4">
               <div className="hidden md:flex flex-col items-end text-white leading-tight">
                 <span className="text-xs font-bold">CFI Management System</span>
@@ -177,33 +242,48 @@ export default function PerformanceReportLayoutIndex() {
             </div>
           </Header>
 
-          <Content className="bg-gray-100 p-4">
-
-            {/* KPI Cards Grid */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {KPI_DATA.map((kpi, idx) => (
-                <div className="cursor-pointer hover:scale-105 transition-transform">
-                  <a href={kpi.link}>
-                    <KPICard key={kpi.label} data={kpi} index={idx} />
-                  </a>
+          <Content className="p-4 md:p-6">
+            <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <Title level={4} style={{ margin: 0 }}>
+                    Performance Report
+                  </Title>
+                  <Text type="secondary">Track yearly KPIs and trends in one view.</Text>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <DatePicker
+                    picker="year"
+                    allowClear={false}
+                    value={selectedYearValue}
+                    onChange={handleYearChange}
+                  />
+                  <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetYear}>
+                    Current Year
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+              {kpiData.map((kpi, idx) => (
+                <Link key={kpi.label} to={kpi.link} className="block transition-transform duration-200 hover:-translate-y-0.5">
+                  <KPICard data={kpi} index={idx} />
+                </Link>
               ))}
             </section>
 
-            {/* Charts Section */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-              <div className="lg:col-span-2">
-                <DailyDetailsChart />
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                <DailyDetailsChart selectedYear={selectedYear} />
               </div>
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
                 <PerformanceCharts />
               </div>
             </section>
-
           </Content>
         </Layout>
-
-
       </ConfigProvider>
     </ProtectedRoute>
   );
