@@ -279,7 +279,7 @@ export default function PerformanceReportLayoutIndex() {
                 <DailyDetailsChart selectedYear={selectedYear} />
               </div>
               <div className="lg:col-span-1 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-                <PerformanceCharts />
+                <PerformanceCharts selectedYear={selectedYear} />
               </div>
             </section>
           </Content>
