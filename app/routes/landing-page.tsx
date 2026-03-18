@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { ConfigProvider, Layout, Avatar, message, Button } from 'antd';
 import {
     Home,
@@ -14,6 +15,7 @@ import {
 import MetricCard from '~/components/MetricCard';
 import { useAuth } from '~/auth/AuthContext';
 import { UserService } from '~/services/user.service';
+import { BudgetService } from '~/services/budget.service';
 import { FaDollarSign, FaRegUser } from 'react-icons/fa';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
@@ -38,10 +40,16 @@ export default function LandingPage2() {
     const [dataHR, setDataHR] = useState(false);
     const [dataAdmin, setDataAdmin] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [budgetedTotal, setBudgetedTotal] = useState(0);
+    const [unbudgetedTotal, setUnbudgetedTotal] = useState(0);
+    const [newMembershipTotal, setNewMembershipTotal] = useState(0);
+    const [loanReleaseTotal, setLoanReleaseTotal] = useState(0);
+    const [collectionTotal, setCollectionTotal] = useState(0);
     const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
     const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
     const { signOut, getUser } = useAuth();
     const navigate = useNavigate();
+    const currentYear = new Date().getFullYear();
 
     const handleSignout = async () => {
         // Clear all relevant localStorage data
@@ -68,6 +76,15 @@ export default function LandingPage2() {
         await signOut();
         // setLoading(false);
         navigate("/");
+    };
+
+    const formatCompactCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+            notation: 'compact',
+            maximumFractionDigits: 1,
+        }).format(amount || 0);
     };
 
     // Fetch data from Supabase
@@ -108,9 +125,99 @@ export default function LandingPage2() {
         }
     };
 
-    useMemo(() => {
-        fetchDataByUUID();
-    }, []);
+    const fetchNewMembershipTotal = async () => {
+        try {
+            const userId = Number(localStorage.getItem("ab_id"));
+            const username = localStorage.getItem("username") || "";
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/newmembers/branch-data/${currentYear}`,
+                {
+                    params: { userid: userId, username },
+                }
+            );
+
+            setNewMembershipTotal(Number(response.data?.total_count ?? 0));
+        } catch (error) {
+            setNewMembershipTotal(0);
+        }
+    };
+
+    const fetchLoanReleaseTotal = async () => {
+        try {
+            const userId = Number(localStorage.getItem("ab_id"));
+            const username = localStorage.getItem("username") || "";
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/loanprocessingv2/branch-data/${currentYear}`,
+                {
+                    params: { userid: userId, username },
+                }
+            );
+
+            setLoanReleaseTotal(Number(response.data?.total_count ?? 0));
+        } catch (error) {
+            setLoanReleaseTotal(0);
+        }
+    };
+
+    const fetchCollectionTotal = async () => {
+        try {
+            const userId = Number(localStorage.getItem("ab_id"));
+            const username = localStorage.getItem("username") || "";
+            const [remittanceCollectionsResponse, branchRemittanceCollectionResponse] = await Promise.all([
+                axios.get(
+                    `${import.meta.env.VITE_API_BASE_URL}/remittancecollections/branch-data/${currentYear}`,
+                    {
+                        params: { userid: userId, username },
+                    }
+                ),
+                axios.get(
+                    `${import.meta.env.VITE_API_BASE_URL}/branchremittancecollection/branch-data/${currentYear}`,
+                    {
+                        params: { userid: userId, username },
+                    }
+                ),
+            ]);
+
+            const remittanceCollectionsTotal = Number(remittanceCollectionsResponse.data?.total_count ?? 0);
+            const branchRemittanceCollectionTotal = Number(branchRemittanceCollectionResponse.data?.total_count ?? 0);
+
+            setCollectionTotal(remittanceCollectionsTotal + branchRemittanceCollectionTotal);
+        } catch (error) {
+            setCollectionTotal(0);
+        }
+    };
+
+    const fetchBudgetSummary = async () => {
+        try {
+            const [budgetData, unbudgetData] = await Promise.all([
+                BudgetService.getByData(),
+                BudgetService.getAllUnbudgeted(),
+            ]);
+
+            const totalBudgeted = budgetData?.reduce((sum: number, item: any) => sum + Number(item?.budget || 0), 0) || 0;
+            const totalUnbudgeted = unbudgetData?.reduce((sum: number, item: any) => sum + Number(item?.amount || 0), 0) || 0;
+
+            setBudgetedTotal(totalBudgeted);
+            setUnbudgetedTotal(totalUnbudgeted);
+        } catch (error) {
+            setBudgetedTotal(0);
+            setUnbudgetedTotal(0);
+        }
+    };
+
+    useEffect(() => {
+        const initializeLandingPage = async () => {
+            await fetchDataByUUID();
+            await Promise.all([
+                fetchBudgetSummary(),
+                fetchNewMembershipTotal(),
+                fetchLoanReleaseTotal(),
+                fetchCollectionTotal(),
+            ]);
+        };
+
+        initializeLandingPage();
+    }, [user?.id]);
 
     const sidebarItems: SidebarItemType[] = [
         { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" />, badge: 3 },
@@ -137,15 +244,6 @@ export default function LandingPage2() {
                             <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400 bg-blue-700">
                                 <Home className="text-white w-5 h-5" />
                             </button>
-                            {/* <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400">
-                                <MapIcon className="text-white w-5 h-5" />
-                            </button>
-                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400">
-                                <FileText className="text-white w-5 h-5" />
-                            </button>
-                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors">
-                                <Plus className="text-white w-5 h-5" />
-                            </button> */}
                         </div>
                     </div>
                     <div className="flex items-center px-6 gap-4">
@@ -230,14 +328,14 @@ export default function LandingPage2() {
                                     title="Budget Monitoring"
                                     link="/budget"
                                     data={[
-                                        { name: 'Unbudgeted', value: 35, color: '#bdc3c7' },
-                                        { name: 'Budget', value: 65, color: '#9cc332' }
+                                        { name: 'Unbudgeted', value: unbudgetedTotal, color: '#bdc3c7' },
+                                        { name: 'Budget', value: budgetedTotal, color: '#9cc332' }
                                     ]}
-                                    centerLabel="unbudget / budget"
+                                    centerLabel={`unbudget / budget / ${currentYear}`}
                                     icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
                                     legend={[
-                                        { label: 'unbudget', value: 35, color: '#bdc3c7' },
-                                        { label: 'budget', value: 65, color: '#9cc332' }
+                                        { label: 'unbudget', value: formatCompactCurrency(unbudgetedTotal), color: '#bdc3c7' },
+                                        { label: 'budget', value: formatCompactCurrency(budgetedTotal), color: '#9cc332' }
                                     ]}
                                 />
                             )}
@@ -247,16 +345,16 @@ export default function LandingPage2() {
                                     title="Performance Report"
                                     link="/performancereport"
                                     data={[
-                                        { name: 'Membership', value: 35, color: '#bdc3c7' },
-                                        { name: 'Loan Release', value: 65, color: '#9cc332' },
-                                        { name: 'Collection', value: 65, color: '#1890ff' }
+                                        { name: 'Membership', value: newMembershipTotal, color: '#bdc3c7' },
+                                        { name: 'Loan Release', value: loanReleaseTotal, color: '#9cc332' },
+                                        { name: 'Collection', value: collectionTotal, color: '#1890ff' }
                                     ]}
                                     centerLabel="membership / loan release / collection"
                                     icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
                                     legend={[
-                                        { label: 'membership', value: 35, color: '#bdc3c7' },
-                                        { label: 'loan release', value: 65, color: '#9cc332' },
-                                        { label: 'collection', value: 65, color: '#1890ff' }
+                                        { label: 'membership', value: newMembershipTotal.toLocaleString(), color: '#bdc3c7' },
+                                        { label: 'loan release', value: loanReleaseTotal.toLocaleString(), color: '#9cc332' },
+                                        { label: 'collection', value: collectionTotal.toLocaleString(), color: '#1890ff' }
                                     ]}
                                 />
                             )}
@@ -330,36 +428,6 @@ export default function LandingPage2() {
                         </div>
                     </Content>
                 </Layout>
-
-                {/* Footer */}
-                {/* <Footer className="bg-[#34495e] text-white p-10">
-                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-10">
-                        <div>
-                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">Contacts</h3>
-                            <div className="text-xs text-gray-400 space-y-2">
-                                <p>Support Line: (032) 255-2525</p>
-                                <p>Email: it.department@cebucficoop.com</p>
-                                <p>© 2026 CFI. All rights reserved.</p>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">OPEN HOURS</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <ul className="text-xs text-gray-400 space-y-2">
-                                    <li className="hover:text-white cursor-pointer">• Monday to Saturday</li>
-                                    <li className="hover:text-white cursor-pointer">• 8:00AM-6:30PM</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="text-white border-b border-gray-600 pb-2 mb-4 font-bold uppercase text-sm">ADDRESS</h3>
-                            <div className="text-xs text-gray-400 space-y-2">
-                                <p>Address: Esperanza Fiel Garcia Bldg., Capitol Compound (Capitol Site),
-                                    N Escario St, Cebu City, 6000 Cebu</p>
-                            </div>
-                        </div>
-                    </div>
-                </Footer> */}
             </Layout>
         </ConfigProvider>
     );

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, Button } from 'antd';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Eye } from 'lucide-react';
 
 export interface ChartDataItem {
@@ -37,6 +37,21 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   legend,
   icon
 }) => {
+  const formatTooltipValue = (value: number | string, name: string) => {
+    const numericValue = Number(value) || 0;
+
+    const formattedValue = numericValue >= 1000
+      ? new Intl.NumberFormat('en-PH', {
+          style: 'currency',
+          currency: 'PHP',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(numericValue)
+      : new Intl.NumberFormat('en-US').format(numericValue);
+
+    return [formattedValue, name];
+  };
+
   return (
     <Card
       title={<span className="text-sm font-bold text-gray-700 uppercase tracking-tight">{title}</span>}
@@ -49,6 +64,16 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         <div className="w-full h-40 relative">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              <Tooltip
+                formatter={formatTooltipValue}
+                contentStyle={{
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+              />
               <Pie
                 data={data}
                 cx="50%"
@@ -58,6 +83,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
                 paddingAngle={2}
                 dataKey="value"
                 stroke="none"
+                cursor="pointer"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

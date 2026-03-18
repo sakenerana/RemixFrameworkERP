@@ -100,7 +100,7 @@ export default function WorkflowTracker() {
       // Update state with fresh data
       const responseData = response.data.data;
       setData(responseData);
-
+      console.log("Fetched data:", responseData);
       // Update cache
       localStorage.setItem(CACHE_KEY, JSON.stringify({
         data: responseData,
