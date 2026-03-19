@@ -34,31 +34,44 @@ interface NewMembershipApiResponse {
 interface KpiDefinition {
   label: string;
   link: string;
-  endpoint: string;
+  endpoints: string[];
 }
 
 const KPI_DEFINITIONS: KpiDefinition[] = [
   {
     label: "NEW MEMBERSHIP",
     link: "/newmembership",
-    endpoint: "newmembers/count",
+    endpoints: ["newmembers/count"],
   },
   {
     label: "LOAN RELEASE",
     link: "/loanrelease",
-    endpoint: "loanprocessingv2/count",
+    endpoints: ["loanprocessingv2/count"],
   },
   {
     label: "COLLECTION",
     link: "/collections",
-    endpoint: "collections/count",
+    endpoints: [
+      "branchremittancecollection/count",
+      "remittancecollections/count",
+    ],
   },
   {
     label: "PERSONNEL TASK COMPLETION",
     link: "/personnel",
-    endpoint: "personnel/count",
+    endpoints: ["personnel/count"],
   },
 ];
+
+const mergeMonthlyCounts = (responses: NewMembershipApiResponse[]) => {
+  return responses.reduce<Record<string, number>>((acc, response) => {
+    Object.entries(response?.monthly_counts ?? {}).forEach(([month, value]) => {
+      acc[month] = (acc[month] ?? 0) + Number(value ?? 0);
+    });
+
+    return acc;
+  }, {});
+};
 
 export default function PerformanceReportLayoutIndex() {
   const currentYear = dayjs().year();
@@ -108,10 +121,14 @@ export default function PerformanceReportLayoutIndex() {
 
       return KPI_DEFINITIONS.map((kpi) => {
         const apiData = kpiApiData[kpi.label];
+        const link =
+          kpi.label === "LOAN RELEASE" || kpi.label === "NEW MEMBERSHIP" || kpi.label === "COLLECTION"
+            ? `${kpi.link}?year=${selectedYear}`
+            : kpi.link;
 
         return {
           label: kpi.label,
-          link: kpi.link,
+          link,
           value: isKpiLoading
             ? "..."
             : (apiData?.totalCount ?? 0).toLocaleString(),
@@ -139,17 +156,37 @@ export default function PerformanceReportLayoutIndex() {
       try {
         const responses = await Promise.allSettled(
           KPI_DEFINITIONS.map(async (kpi) => {
-            const response = await axios.get<NewMembershipApiResponse>(
-              `${import.meta.env.VITE_API_BASE_URL}/${kpi.endpoint}/${selectedYear}`,
-              {
-                params: { userid: userId, username },
-                signal: controller.signal,
-              }
+            const endpointResults = await Promise.allSettled(
+              kpi.endpoints.map(async (endpoint) => {
+                const response = await axios.get<NewMembershipApiResponse>(
+                  `${import.meta.env.VITE_API_BASE_URL}/${endpoint}/${selectedYear}`,
+                  {
+                    params: { userid: userId, username },
+                    signal: controller.signal,
+                  }
+                );
+
+                return response.data;
+              })
             );
+            const endpointResponses = endpointResults
+              .filter(
+                (
+                  result
+                ): result is PromiseFulfilledResult<NewMembershipApiResponse> =>
+                  result.status === "fulfilled"
+              )
+              .map((result) => result.value);
 
             return {
               label: kpi.label,
-              payload: response.data,
+              payload: {
+                total_count: endpointResponses.reduce(
+                  (sum, response) => sum + Number(response?.total_count ?? 0),
+                  0
+                ),
+                monthly_counts: mergeMonthlyCounts(endpointResponses),
+              },
             };
           })
         );
@@ -243,23 +280,33 @@ export default function PerformanceReportLayoutIndex() {
           </Header>
 
           <Content className="p-4 md:p-6">
-            <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <Title level={4} style={{ margin: 0 }}>
-                    Performance Report
-                  </Title>
-                  <Text type="secondary">Track yearly KPIs and trends in one view.</Text>
+            <div className="mb-4 rounded-sm border border-gray-300 bg-white px-4 py-3 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
+                    <Title level={4} style={{ margin: 0 }} className="!mb-0 !text-[24px]">
+                      Performance Report
+                    </Title>
+                    <Text type="secondary" className="text-sm">
+                      Track yearly KPIs and trends in one view.
+                    </Text>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-start md:self-auto">
                   <DatePicker
                     picker="year"
                     allowClear={false}
                     value={selectedYearValue}
                     onChange={handleYearChange}
+                    className="min-w-[132px]"
+                    size="middle"
                   />
-                  <Button icon={<RotateCcw className="h-4 w-4" />} onClick={resetYear}>
+                  <Button
+                    icon={<RotateCcw className="h-4 w-4" />}
+                    onClick={resetYear}
+                    size="middle"
+                  >
                     Current Year
                   </Button>
                 </div>

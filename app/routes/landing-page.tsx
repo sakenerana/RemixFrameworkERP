@@ -16,6 +16,9 @@ import MetricCard from '~/components/MetricCard';
 import { useAuth } from '~/auth/AuthContext';
 import { UserService } from '~/services/user.service';
 import { BudgetService } from '~/services/budget.service';
+import { LicenseService } from '~/services/license.service';
+import { AssetService } from '~/services/asset.service';
+import { AccessoryService } from '~/services/accessory.service';
 import { FaDollarSign, FaRegUser } from 'react-icons/fa';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +48,10 @@ export default function LandingPage2() {
     const [newMembershipTotal, setNewMembershipTotal] = useState(0);
     const [loanReleaseTotal, setLoanReleaseTotal] = useState(0);
     const [collectionTotal, setCollectionTotal] = useState(0);
+    const [workflowRequestTotal, setWorkflowRequestTotal] = useState(0);
+    const [licenseTotal, setLicenseTotal] = useState(0);
+    const [assetTotal, setAssetTotal] = useState(0);
+    const [accessoryTotal, setAccessoryTotal] = useState(0);
     const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
     const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
     const { signOut, getUser } = useAuth();
@@ -187,6 +194,54 @@ export default function LandingPage2() {
         }
     };
 
+    const fetchWorkflowRequestTotal = async () => {
+        try {
+            const userId = Number(localStorage.getItem("ab_id"));
+            const username = localStorage.getItem("username") || "";
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_BASE_URL}/user-active-activities`,
+                {
+                    userid: userId,
+                    username,
+                    tracked_user_id: userId,
+                }
+            );
+
+            const requestData = Array.isArray(response.data?.data) ? response.data.data : [];
+            setWorkflowRequestTotal(requestData.length);
+        } catch (error) {
+            setWorkflowRequestTotal(0);
+        }
+    };
+
+    const fetchInventoryTotals = async () => {
+        try {
+            const departmentId = Number(localStorage.getItem("userDept"));
+
+            if (!departmentId) {
+                setLicenseTotal(0);
+                setAssetTotal(0);
+                setAccessoryTotal(0);
+                return;
+            }
+
+            const [licenses, assets, accessories] = await Promise.all([
+                LicenseService.getAllPosts(departmentId),
+                AssetService.getAllPosts(departmentId),
+                AccessoryService.getAllPosts(departmentId),
+            ]);
+
+            setLicenseTotal(Array.isArray(licenses) ? licenses.length : 0);
+            setAssetTotal(Array.isArray(assets) ? assets.length : 0);
+            setAccessoryTotal(Array.isArray(accessories) ? accessories.length : 0);
+        } catch (error) {
+            setLicenseTotal(0);
+            setAssetTotal(0);
+            setAccessoryTotal(0);
+        }
+    };
+
     const fetchBudgetSummary = async () => {
         try {
             const [budgetData, unbudgetData] = await Promise.all([
@@ -213,6 +268,8 @@ export default function LandingPage2() {
                 fetchNewMembershipTotal(),
                 fetchLoanReleaseTotal(),
                 fetchCollectionTotal(),
+                fetchWorkflowRequestTotal(),
+                fetchInventoryTotals(),
             ]);
         };
 
@@ -364,12 +421,12 @@ export default function LandingPage2() {
                                     title="Performance Metric Report"
                                     link="/workflow"
                                     data={[
-                                        { name: 'Requests', value: 65, color: '#9cc332' }
+                                        { name: 'Requests', value: workflowRequestTotal, color: '#9cc332' }
                                     ]}
                                     centerLabel="requests"
                                     icon={<FileText className="w-8 h-8 text-gray-400" />}
                                     legend={[
-                                        { label: 'requests', value: 65, color: '#9cc332' },
+                                        { label: 'requests', value: workflowRequestTotal, color: '#9cc332' },
                                     ]}
                                 />
                             )}
@@ -379,14 +436,16 @@ export default function LandingPage2() {
                                     title="CFI Asset Management"
                                     link="/inventory"
                                     data={[
-                                        { name: 'Licenses', value: 35, color: '#bdc3c7' },
-                                        { name: 'Assets', value: 65, color: '#9cc332' }
+                                        { name: 'Licenses', value: licenseTotal, color: '#bdc3c7' },
+                                        { name: 'Assets', value: assetTotal, color: '#9cc332' },
+                                        { name: 'Accessories', value: accessoryTotal, color: '#1890ff' }
                                     ]}
-                                    centerLabel="licenses / assets"
+                                    centerLabel="licenses / assets / accessories"
                                     icon={<BaggageClaim className="w-8 h-8 text-gray-400" />}
                                     legend={[
-                                        { label: 'licenses', value: 35, color: '#bdc3c7' },
-                                        { label: 'assets', value: 65, color: '#9cc332' }
+                                        { label: 'licenses', value: licenseTotal, color: '#bdc3c7' },
+                                        { label: 'assets', value: assetTotal, color: '#9cc332' },
+                                        { label: 'accessories', value: accessoryTotal, color: '#1890ff' }
                                     ]}
                                 />
                             )}

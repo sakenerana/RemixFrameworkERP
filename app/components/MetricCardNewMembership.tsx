@@ -119,7 +119,7 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
               <tr>
                 <th className="text-left font-normal py-1">Satellite Name</th>
                 <th className="text-center font-normal py-1">
-                  {type === 'tasks' ? 'Number of Tasks' : 'Avg Daily Sales'}
+                  {type === 'tasks' ? 'Avg. Monthly' : 'Avg Daily Sales'}
                 </th>
                 <th className="text-right font-normal py-1">
                   {type === 'tasks' ? 'Overall (Completed)' : 'Replenishment'}
@@ -239,7 +239,7 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
                     <th className="text-left p-3 font-semibold text-gray-700">Staff Name</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Department</th>
                     <th className="text-left p-3 font-semibold text-gray-700">
-                      {type === 'tasks' ? 'Total Tasks' : 'Avg Daily Sales'}
+                      {type === 'tasks' ? 'Avg. Monthly' : 'Avg Daily Sales'}
                     </th>
                     <th className="text-left p-3 font-semibold text-gray-700">
                       {type === 'tasks' ? 'Completed' : 'Replenishment Days'}
