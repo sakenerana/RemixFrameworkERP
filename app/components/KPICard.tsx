@@ -8,7 +8,9 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
-  history: { month: string; value: number }[];
+  history: { month: string; fullMonth?: string; value: number }[];
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 export const COLORS = {
@@ -75,21 +77,32 @@ interface Props {
     index: number;
 }
 
-const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value?: number; payload?: { month?: string } }> }) => {
+const formatTooltipValue = (value: number) => {
+    return value.toLocaleString('en-PH', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+};
+
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value?: number; payload?: { month?: string; fullMonth?: string } }> }) => {
     if (!active || !payload?.length) {
         return null;
     }
 
+    const point = payload[0];
+
     return (
         <div className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] shadow-sm">
-            <p className="font-semibold text-slate-700">{payload[0].payload?.month}</p>
-            <p className="text-slate-500">{payload[0].value ?? 0}</p>
+            <p className="font-semibold text-slate-700">{point.payload?.fullMonth ?? point.payload?.month}</p>
+            <p className="text-slate-500">{formatTooltipValue(Number(point.value ?? 0))}</p>
         </div>
     );
 };
 
 const KPICard: React.FC<Props> = ({ data, index }) => {
     const isPositive = data.trend >= 0;
+    const showLoading = Boolean(data.isLoading);
+    const showError = Boolean(data.isError);
 
     const getIcon = () => {
         switch (data.label) {
@@ -111,37 +124,67 @@ const KPICard: React.FC<Props> = ({ data, index }) => {
                 {getIcon()}
             </div>
 
-            <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-2xl font-bold text-gray-800">{data.value}</span>
-                <div className={`flex items-center text-xs font-semibold ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {isPositive ? <TrendingUp size={12} className="mr-1" /> : <TrendingDown size={12} className="mr-1" />}
-                    {Math.abs(data.trend)}%
-                </div>
-            </div>
-
-            <p className="text-[10px] text-gray-400 font-medium mb-6 uppercase tracking-tight">{data.comparison}</p>
-
-            <div className="h-16 w-full mt-auto">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.history}>
-                        <Tooltip
-                            content={<CustomTooltip />}
-                            cursor={{ fill: 'rgba(148, 163, 184, 0.12)' }}
-                        />
-                        <Bar dataKey="value" radius={[2, 2, 0, 0]}>
-                            {data.history.map((entry, i) => (
-                                <Cell
-                                    key={`cell-${i}`}
-                                    fill={i === data.history.length - 1 ? COLORS.primary : '#E2E8F0'}
+            {showLoading ? (
+                <>
+                    <div className="mb-1 h-8 w-24 animate-pulse rounded bg-slate-200" />
+                    <div className="mb-6 h-3 w-28 animate-pulse rounded bg-slate-100" />
+                    <div className="mt-auto">
+                        <div className="flex h-16 w-full items-end gap-1">
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <div
+                                    key={i}
+                                    className="animate-pulse rounded-t bg-slate-200"
+                                    style={{
+                                        height: `${20 + ((i % 5) * 8)}px`,
+                                        width: '100%',
+                                    }}
                                 />
                             ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-                <div className="flex justify-between mt-1 text-[8px] text-gray-400 font-bold px-1 uppercase">
-                    {data.history.map((h, i) => <span key={i}>{h.month}</span>)}
-                </div>
-            </div>
+                        </div>
+                        <div className="flex justify-between mt-1 text-[8px] text-gray-300 font-bold px-1 uppercase">
+                            {data.history.map((h, i) => <span key={i}>{h.month}</span>)}
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-2xl font-bold text-gray-800">{data.value}</span>
+                        {!showError && (
+                            <div className={`flex items-center text-xs font-semibold ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                {isPositive ? <TrendingUp size={12} className="mr-1" /> : <TrendingDown size={12} className="mr-1" />}
+                                {Math.abs(data.trend)}%
+                            </div>
+                        )}
+                    </div>
+
+                    <p className={`text-[10px] font-medium mb-6 uppercase tracking-tight ${showError ? 'text-rose-400' : 'text-gray-400'}`}>
+                        {data.comparison}
+                    </p>
+
+                    <div className="h-16 w-full mt-auto">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={data.history}>
+                                <Tooltip
+                                    content={<CustomTooltip />}
+                                    cursor={{ fill: 'rgba(148, 163, 184, 0.12)' }}
+                                />
+                                <Bar dataKey="value" radius={[2, 2, 0, 0]}>
+                                    {data.history.map((entry, i) => (
+                                        <Cell
+                                            key={`cell-${i}`}
+                                            fill={showError ? '#FECACA' : i === data.history.length - 1 ? COLORS.primary : '#E2E8F0'}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                        <div className="flex justify-between mt-1 text-[8px] text-gray-400 font-bold px-1 uppercase">
+                            {data.history.map((h, i) => <span key={i}>{h.month}</span>)}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

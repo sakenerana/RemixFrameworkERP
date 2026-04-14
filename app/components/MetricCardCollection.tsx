@@ -12,6 +12,7 @@ export interface Staff {
   avgDailySales?: number;
   totalSales?: string;
   status: 'critical' | 'warning' | 'stable' | 'good';
+  geos?: string[];
   department?: string;
   position?: string;
   efficiency?: number;
@@ -30,7 +31,23 @@ export interface MetricCardProps {
   staffs: Staff[];
   type: 'tasks' | 'inventory';
   branchName?: string;
+  selectedYear?: number;
+  selectedMonthLabel?: string;
 }
+
+const formatPesoValue = (value: number | string) => {
+  const numericValue = Number(value ?? 0);
+  const sign = numericValue < 0 ? '-' : '';
+  return `${sign}₱${Math.abs(numericValue).toLocaleString()}`;
+};
+
+const formatCollectionPesoValue = (value: number | string) => {
+  const sanitizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
+  const numericValue = Number(sanitizedValue ?? 0);
+  const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
+  const sign = safeValue < 0 ? '-' : '';
+  return `${sign}\u20B1${Math.abs(safeValue).toLocaleString()}`;
+};
 
 const MetricCardCollection: React.FC<MetricCardProps> = ({
   title,
@@ -43,7 +60,9 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
   topStaffName,
   staffs,
   type,
-  branchName = 'Main Branch'
+  branchName = 'Main Branch',
+  selectedYear,
+  selectedMonthLabel = ''
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
@@ -76,6 +95,20 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
     setSelectedStaff(staff);
   };
 
+  const getCollectionLGULink = (staff: Staff) => {
+    const params = new URLSearchParams({
+      branch: branchName,
+      department: staff.name,
+      paid: String(staff.tasks ?? 0),
+      billed: String(staff.taskCompleted ?? 0),
+      year: String(selectedYear ?? ''),
+      month: selectedMonthLabel,
+      geos: JSON.stringify(staff.geos ?? []),
+    });
+
+    return `/collection-staff?${params.toString()}`;
+  };
+
   return (
     <>
       <div className="bg-[#1e293b] text-white rounded-sm shadow-sm flex flex-col h-full overflow-hidden">
@@ -93,7 +126,12 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
               </span>
             </div>
           </div>
-          <div className="text-3xl font-light mb-4">{value}</div>
+          <div className="mb-4">
+            <div className="text-3xl font-light">{formatCollectionPesoValue(value)}</div>
+            <div className="text-[9px] font-semibold uppercase tracking-wider text-gray-400">
+              {subtitle}
+            </div>
+          </div>
 
           <div className="flex justify-between items-end">
             <div className="flex flex-col">
@@ -101,8 +139,8 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
               <span className="text-[10px] font-bold text-blue-400 uppercase">{topStaffName}</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] text-gray-400">Total of Satellites</span>
-              <span className="text-[10px] font-bold">{subtitleValue}</span>
+              <span className="text-[9px] text-gray-400">Total Billed</span>
+              <span className="text-[10px] font-bold">{formatCollectionPesoValue(subtitleValue)}</span>
             </div>
           </div>
         </div>
@@ -118,10 +156,10 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
               <tr>
                 <th className="text-left font-normal py-1">Satellite Name</th>
                 <th className="text-center font-normal py-1">
-                  {type === 'tasks' ? 'Avg. Monthly' : 'Avg Daily Sales'}
+                  {type === 'tasks' ? 'Paid' : 'Avg Daily Sales'}
                 </th>
                 <th className="text-right font-normal py-1">
-                  {type === 'tasks' ? 'Overall (Completed)' : 'Replenishment'}
+                  {type === 'tasks' ? 'Billed' : 'Replenishment'}
                 </th>
               </tr>
             </thead>
@@ -141,7 +179,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                           style={{ width: `${(type === 'tasks' ? (p.tasks || 0) / 100 : (p.avgDailySales || 0))}%` }}
                         />
                       </div>
-                      <span>{type === 'tasks' ? p.tasks : p.avgDailySales}</span>
+                      <span>{type === 'tasks' ? formatCollectionPesoValue(p.tasks ?? 0) : p.avgDailySales}</span>
                     </div>
                   </td>
                   <td className="py-2 text-right">
@@ -150,7 +188,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                         p.status === 'stable' ? 'bg-green-100 text-green-600' :
                           'bg-blue-100 text-blue-600'
                       }`}>
-                      {type === 'tasks' ? p.taskCompleted : p.replenishmentDays}
+                      {type === 'tasks' ? formatCollectionPesoValue(p.taskCompleted) : p.replenishmentDays}
                     </span>
                   </td>
                 </tr>
@@ -204,16 +242,10 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
             {/* Modal Content */}
             <div className="overflow-auto max-h-[calc(90vh-180px)] p-4">
               {/* Summary Stats */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
                   <p className="text-xs text-gray-600">Total Satellites</p>
                   <p className="text-xl font-bold text-blue-700">{staffs.length}</p>
-                </div>
-                <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                  <p className="text-xs text-gray-600">Average Completion</p>
-                  <p className="text-xl font-bold text-green-700">
-                    {Math.round(staffs.reduce((acc, s) => acc + s.taskCompleted, 0) / staffs.length)}%
-                  </p>
                 </div>
                 <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
                   <p className="text-xs text-gray-600">Best Performer</p>
@@ -223,7 +255,9 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                   <p className="text-xs text-gray-600">Department Avg.</p>
                   <p className="text-xl font-bold text-orange-700">
                     {type === 'tasks' ?
-                      Math.round(staffs.reduce((acc, s) => acc + (s.tasks || 0), 0) / staffs.length) :
+                      formatCollectionPesoValue(
+                        Math.round(staffs.reduce((acc, s) => acc + (s.tasks || 0), 0) / Math.max(staffs.length, 1))
+                      ) :
                       Math.round(staffs.reduce((acc, s) => acc + (s.avgDailySales || 0), 0) / staffs.length)
                     }
                   </p>
@@ -235,15 +269,13 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="text-left p-3 font-semibold text-gray-700">Rank</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Staff Name</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Department</th>
                     <th className="text-left p-3 font-semibold text-gray-700">
-                      {type === 'tasks' ? 'Avg. Monthly' : 'Avg Daily Sales'}
+                      {type === 'tasks' ? 'Paid' : 'Avg Daily Sales'}
                     </th>
                     <th className="text-left p-3 font-semibold text-gray-700">
-                      {type === 'tasks' ? 'Completed' : 'Replenishment Days'}
+                      {type === 'tasks' ? 'Billed' : 'Replenishment Days'}
                     </th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Efficiency</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Status</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Action</th>
                   </tr>
@@ -251,7 +283,6 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                 <tbody>
                   {sortedStaff.map((staff, index) => {
                     const rank = index + 1;
-                    const efficiency = staff.efficiency || Math.floor(Math.random() * 30) + 70;
 
                     return (
                       <tr
@@ -269,7 +300,6 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                           </div>
                         </td>
                         <td className="p-3 font-medium">{staff.name}</td>
-                        <td className="p-3 text-gray-600">{staff.department || 'General'}</td>
                         <td className="p-3">
                           <div className="flex items-center">
                             <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
@@ -286,32 +316,13 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                                 }}
                               />
                             </div>
-                            <span>{type === 'tasks' ? staff.tasks : staff.avgDailySales}</span>
+                            <span>{type === 'tasks' ? formatCollectionPesoValue(staff.tasks ?? 0) : staff.avgDailySales}</span>
                           </div>
                         </td>
                         <td className="p-3">
-                          <span className={`px-3 py-1 rounded-full font-medium ${staff.status === 'critical' ? 'bg-red-100 text-red-800' :
-                            staff.status === 'warning' ? 'bg-orange-100 text-orange-800' :
-                              staff.status === 'stable' ? 'bg-green-100 text-green-800' :
-                                'bg-blue-100 text-blue-800'
-                            }`}>
-                            {type === 'tasks' ? `${staff.taskCompleted}%` : `${staff.replenishmentDays} days`}
+                          <span className="font-medium text-gray-800">
+                            {type === 'tasks' ? formatCollectionPesoValue(staff.taskCompleted) : `${staff.replenishmentDays} days`}
                           </span>
-                        </td>
-                        <td className="p-3">
-                          <div className="flex items-center">
-                            <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
-                              <div
-                                className={`h-full ${efficiency >= 90 ? 'bg-green-500' :
-                                  efficiency >= 80 ? 'bg-blue-500' :
-                                    efficiency >= 70 ? 'bg-yellow-500' :
-                                      'bg-red-500'
-                                  }`}
-                                style={{ width: `${efficiency}%` }}
-                              />
-                            </div>
-                            <span>{efficiency}%</span>
-                          </div>
                         </td>
                         <td className="p-3">
                           <div className="flex items-center">
@@ -325,12 +336,12 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                         </td>
                         <td className="p-3">
                           <Link
-                            to={"/collection-staff"}
+                            to={getCollectionLGULink(staff)}
                             className="inline-flex items-center px-3 py-1.5 text-xs font-semibold
                bg-blue-600 text-white rounded-md
                hover:bg-blue-700 transition-colors duration-200"
                           >
-                            View
+                            View LGU's
                           </Link>
                         </td>
                       </tr>

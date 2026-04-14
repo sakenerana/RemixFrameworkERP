@@ -56,6 +56,33 @@ interface SatelliteDataResponse {
     data: SatelliteBranch[];
 }
 
+interface CollectionDepartmentEntry {
+    department: string;
+    billed: number;
+    paid: number;
+}
+
+interface CollectionGeoEntry {
+    geo: string;
+    departments: CollectionDepartmentEntry[];
+}
+
+interface CollectionBranchEntry {
+    branch: string;
+    total_billed: number;
+    total_paid: number;
+    geos: CollectionGeoEntry[];
+}
+
+interface CollectionDepartmentResponse {
+    error: boolean;
+    data: {
+        year: string;
+        month: string | number;
+        branches: CollectionBranchEntry[];
+    };
+}
+
 interface PerformanceChartsProps {
     selectedYear: number;
 }
@@ -94,6 +121,8 @@ interface ChartCardProps {
     title: string;
     data: PerformanceData[];
     isLoading?: boolean;
+    isError?: boolean;
+    isCurrency?: boolean;
 }
 
 const chartLabelFormatter = (
@@ -118,7 +147,18 @@ const chartLabelFormatter = (
     return '';
 };
 
-const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false }) => (
+const formatChartMetricValue = (value: number, isCurrency = false) => {
+    const safeValue = Number.isFinite(value) ? value : 0;
+
+    if (!isCurrency) {
+        return safeValue.toLocaleString();
+    }
+
+    const sign = safeValue < 0 ? '-' : '';
+    return `${sign}\u20B1${Math.abs(safeValue).toLocaleString()}`;
+};
+
+const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false, isError = false, isCurrency = false }) => (
     <div className="bg-white p-6 shadow-sm border border-gray-300">
         <div className="flex justify-between items-center mb-6">
             <h3 className="text-xs font-bold text-gray-500 tracking-widest uppercase">{title}</h3>
@@ -133,8 +173,23 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false })
         </p>
         <div className="h-[220px]">
             {isLoading ? (
-                <div className="flex h-full items-center justify-center text-sm text-gray-400">
-                    Loading data...
+                <div className="flex h-full flex-col justify-end gap-3">
+                    <div className="space-y-3">
+                        {Array.from({ length: 5 }, (_, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                                <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                                <div
+                                    className="h-4 animate-pulse rounded bg-slate-200"
+                                    style={{ width: `${45 + index * 12}%` }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-center text-sm text-gray-400">Loading data...</p>
+                </div>
+            ) : isError ? (
+                <div className="flex h-full items-center justify-center text-sm text-rose-400">
+                    Unable to sync chart data
                 </div>
             ) : data.length === 0 ? (
                 <div className="flex h-full items-center justify-center text-sm text-gray-400">
@@ -152,7 +207,10 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false })
                             width={120}
                             tick={{ fontSize: 10, fill: '#64748B', fontWeight: 600 }}
                         />
-                        <Tooltip cursor={{ fill: 'transparent' }} formatter={(value) => chartLabelFormatter(value)} />
+                        <Tooltip
+                            cursor={{ fill: 'transparent' }}
+                            formatter={(value) => formatChartMetricValue(Number(value ?? 0), isCurrency)}
+                        />
                         <Bar
                             dataKey="value"
                             radius={[0, 4, 4, 0]}
@@ -162,7 +220,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false })
                                 fontSize: 10,
                                 fill: '#1E293B',
                                 fontWeight: 700,
-                                formatter: chartLabelFormatter,
+                                formatter: (value: number) => formatChartMetricValue(Number(value ?? 0), isCurrency),
                             }}
                         >
                             {data.map((_, index) => (
@@ -180,90 +238,186 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({ selectedYear }) =
     const [selectedMetric, setSelectedMetric] = useState<PerformanceMetric>('newMembership');
     const [metricBranchData, setMetricBranchData] = useState<PerformanceData[]>([]);
     const [metricSatelliteData, setMetricSatelliteData] = useState<PerformanceData[]>([]);
-    const [isMetricLoading, setIsMetricLoading] = useState(false);
+    const [isBranchLoading, setIsBranchLoading] = useState(false);
+    const [isSatelliteLoading, setIsSatelliteLoading] = useState(false);
+    const [branchError, setBranchError] = useState(false);
+    const [satelliteError, setSatelliteError] = useState(false);
 
     const activeMetric = PERFORMANCE_DATA[selectedMetric];
     const activeBranchData = useMemo(() => {
-        if (activeMetric.branchEndpoint) {
+        if (selectedMetric === 'collection' || activeMetric.branchEndpoint) {
             return metricBranchData;
         }
 
         return [];
-    }, [activeMetric.branchEndpoint, metricBranchData]);
+    }, [activeMetric.branchEndpoint, metricBranchData, selectedMetric]);
 
     const activeSatelliteData = useMemo(() => {
-        if (activeMetric.satelliteEndpoint) {
+        if (selectedMetric === 'collection' || activeMetric.satelliteEndpoint) {
             return metricSatelliteData;
         }
 
         return [];
-    }, [activeMetric.satelliteEndpoint, metricSatelliteData]);
+    }, [activeMetric.satelliteEndpoint, metricSatelliteData, selectedMetric]);
 
     useEffect(() => {
         let ignore = false;
         const controller = new AbortController();
 
         const fetchMetricData = async () => {
-            if (!activeMetric.branchEndpoint || !activeMetric.satelliteEndpoint) {
-                setMetricBranchData([]);
-                setMetricSatelliteData([]);
-                setIsMetricLoading(false);
+            const userId = Number(localStorage.getItem("ab_id"));
+            const username = localStorage.getItem("username") || "";
+            setIsBranchLoading(true);
+            setIsSatelliteLoading(true);
+            setBranchError(false);
+            setSatelliteError(false);
+
+            if (selectedMetric === 'collection') {
+                axios.get<CollectionDepartmentResponse>(
+                    `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/department`,
+                    {
+                        params: {
+                            year: selectedYear,
+                            month: 0,
+                            userid: userId,
+                            username,
+                        },
+                        signal: controller.signal,
+                    }
+                )
+                    .then((response) => {
+                        if (ignore) {
+                            return;
+                        }
+
+                        const branches = response.data?.data?.branches ?? [];
+                        console.log('Fetched collection department data:', branches);
+                        const nextBranchData = branches
+                            .map((branch) => ({
+                                name: branch.branch,
+                                value: Number(branch.total_paid ?? 0),
+                            }))
+                            .sort((a, b) => b.value - a.value)
+                            .slice(0, 6);
+
+                        const departmentTotals = new Map<string, number>();
+                        branches.forEach((branch) => {
+                            (branch.geos ?? []).forEach((geo) => {
+                                (geo.departments ?? []).forEach((department) => {
+                                    departmentTotals.set(
+                                        department.department,
+                                        (departmentTotals.get(department.department) ?? 0) + Number(department.paid ?? 0)
+                                    );
+                                });
+                            });
+                        });
+
+                        const nextSatelliteData = Array.from(departmentTotals.entries())
+                            .map(([name, value]) => ({ name, value }))
+                            .sort((a, b) => b.value - a.value)
+                            .slice(0, 6);
+
+                        setMetricBranchData(nextBranchData);
+                        setMetricSatelliteData(nextSatelliteData);
+                        setBranchError(false);
+                        setSatelliteError(false);
+                    })
+                    .catch(() => {
+                        if (!ignore) {
+                            setMetricBranchData([]);
+                            setMetricSatelliteData([]);
+                            setBranchError(true);
+                            setSatelliteError(true);
+                        }
+                    })
+                    .finally(() => {
+                        if (!ignore) {
+                            setIsBranchLoading(false);
+                            setIsSatelliteLoading(false);
+                        }
+                    });
+
                 return;
             }
 
-            setIsMetricLoading(true);
-            const userId = Number(localStorage.getItem("ab_id"));
-            const username = localStorage.getItem("username") || "";
-
-            try {
-                const [branchResponse, satelliteResponse] = await Promise.all([
-                    axios.get<BranchDataResponse>(
-                        `${import.meta.env.VITE_API_BASE_URL}/${activeMetric.branchEndpoint}/${selectedYear}`,
-                        {
-                            params: { userid: userId, username },
-                            signal: controller.signal,
-                        }
-                    ),
-                    axios.get<SatelliteDataResponse>(
-                        `${import.meta.env.VITE_API_BASE_URL}/${activeMetric.satelliteEndpoint}/${selectedYear}`,
-                        {
-                            params: { userid: userId, username },
-                            signal: controller.signal,
-                        }
-                    ),
-                ]);
-
-                if (ignore) {
-                    return;
-                }
-
-                const nextBranchData = Object.entries(branchResponse.data?.data ?? {})
-                    .map(([name, value]) => ({ name, value: Number(value ?? 0) }))
-                    .sort((a, b) => b.value - a.value)
-                    .slice(0, 6);
-
-                const nextSatelliteData = (satelliteResponse.data?.data ?? [])
-                    .flatMap((branch) => branch.satellites ?? [])
-                    .filter((satellite) => satellite.satellite_name?.toLowerCase() !== 'no satellite')
-                    .map((satellite) => ({
-                        name: satellite.satellite_name,
-                        value: Number(satellite.satellite_total ?? 0),
-                    }))
-                    .sort((a, b) => b.value - a.value)
-                    .slice(0, 6);
-
-                setMetricBranchData(nextBranchData);
-                setMetricSatelliteData(nextSatelliteData);
-            } catch {
-                if (!ignore) {
-                    setMetricBranchData([]);
-                    setMetricSatelliteData([]);
-                }
-            } finally {
-                if (!ignore) {
-                    setIsMetricLoading(false);
-                }
+            if (!activeMetric.branchEndpoint || !activeMetric.satelliteEndpoint) {
+                setMetricBranchData([]);
+                setMetricSatelliteData([]);
+                setIsBranchLoading(false);
+                setIsSatelliteLoading(false);
+                setBranchError(false);
+                setSatelliteError(false);
+                return;
             }
+
+            axios.get<BranchDataResponse>(
+                `${import.meta.env.VITE_API_BASE_URL}/${activeMetric.branchEndpoint}/${selectedYear}`,
+                {
+                    params: { userid: userId, username },
+                    signal: controller.signal,
+                }
+            )
+                .then((branchResponse) => {
+                    if (ignore) {
+                        return;
+                    }
+
+                    const nextBranchData = Object.entries(branchResponse.data?.data ?? {})
+                        .map(([name, value]) => ({ name, value: Number(value ?? 0) }))
+                        .sort((a, b) => b.value - a.value)
+                        .slice(0, 6);
+
+                    setMetricBranchData(nextBranchData);
+                    setBranchError(false);
+                })
+                .catch(() => {
+                    if (!ignore) {
+                        setMetricBranchData([]);
+                        setBranchError(true);
+                    }
+                })
+                .finally(() => {
+                    if (!ignore) {
+                        setIsBranchLoading(false);
+                    }
+                });
+
+            axios.get<SatelliteDataResponse>(
+                `${import.meta.env.VITE_API_BASE_URL}/${activeMetric.satelliteEndpoint}/${selectedYear}`,
+                {
+                    params: { userid: userId, username },
+                    signal: controller.signal,
+                }
+            )
+                .then((satelliteResponse) => {
+                    if (ignore) {
+                        return;
+                    }
+
+                    const nextSatelliteData = (satelliteResponse.data?.data ?? [])
+                        .flatMap((branch) => branch.satellites ?? [])
+                        .filter((satellite) => satellite.satellite_name?.toLowerCase() !== 'no satellite')
+                        .map((satellite) => ({
+                            name: satellite.satellite_name,
+                            value: Number(satellite.satellite_total ?? 0),
+                        }))
+                        .sort((a, b) => b.value - a.value)
+                        .slice(0, 6);
+
+                    setMetricSatelliteData(nextSatelliteData);
+                    setSatelliteError(false);
+                })
+                .catch(() => {
+                    if (!ignore) {
+                        setMetricSatelliteData([]);
+                        setSatelliteError(true);
+                    }
+                })
+                .finally(() => {
+                    if (!ignore) {
+                        setIsSatelliteLoading(false);
+                    }
+                });
         };
 
         fetchMetricData();
@@ -272,7 +426,7 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({ selectedYear }) =
             ignore = true;
             controller.abort();
         };
-    }, [activeMetric.branchEndpoint, activeMetric.satelliteEndpoint, selectedYear]);
+    }, [activeMetric.branchEndpoint, activeMetric.satelliteEndpoint, selectedMetric, selectedYear]);
 
     return (
         <div className="space-y-6">
@@ -296,12 +450,16 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({ selectedYear }) =
             <ChartCard
                 title={activeMetric.branchTitle}
                 data={activeBranchData}
-                isLoading={Boolean(activeMetric.branchEndpoint) && isMetricLoading}
+                isLoading={selectedMetric === 'collection' ? isBranchLoading : Boolean(activeMetric.branchEndpoint) && isBranchLoading}
+                isError={selectedMetric === 'collection' ? branchError : Boolean(activeMetric.branchEndpoint) && branchError}
+                isCurrency={selectedMetric === 'collection'}
             />
             <ChartCard
                 title={activeMetric.satelliteTitle}
                 data={activeSatelliteData}
-                isLoading={Boolean(activeMetric.satelliteEndpoint) && isMetricLoading}
+                isLoading={selectedMetric === 'collection' ? isSatelliteLoading : Boolean(activeMetric.satelliteEndpoint) && isSatelliteLoading}
+                isError={selectedMetric === 'collection' ? satelliteError : Boolean(activeMetric.satelliteEndpoint) && satelliteError}
+                isCurrency={selectedMetric === 'collection'}
             />
         </div>
     );

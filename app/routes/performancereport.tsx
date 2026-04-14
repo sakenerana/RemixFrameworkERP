@@ -19,7 +19,9 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
-  history: { month: string; value: number }[];
+  history: { month: string; fullMonth?: string; value: number }[];
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 interface NewMembershipApiResponse {
@@ -29,6 +31,22 @@ interface NewMembershipApiResponse {
   year: number;
   total_count: number;
   monthly_counts: Record<string, number>;
+}
+
+interface BillingMonthEntry {
+  month: number;
+  billed: number;
+  paid: number;
+}
+
+interface BillingByDateApiResponse {
+  error: boolean;
+  data: {
+    year: number;
+    total_billed: number;
+    total_paid: number;
+    months: BillingMonthEntry[];
+  };
 }
 
 interface KpiDefinition {
@@ -73,6 +91,40 @@ const mergeMonthlyCounts = (responses: NewMembershipApiResponse[]) => {
   }, {});
 };
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const mapBillingMonthsToMonthlyCounts = (months: BillingMonthEntry[] = []) => {
+  const paidByMonth = new Map<number, number>(
+    months.map((item) => [Number(item.month), Number(item.paid ?? 0)])
+  );
+
+  return MONTH_NAMES.reduce<Record<string, number>>((acc, monthName, index) => {
+    acc[monthName] = paidByMonth.get(index + 1) ?? 0;
+    return acc;
+  }, {});
+};
+
+const formatPeso = (value: number) =>
+  new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value ?? 0);
+
 export default function PerformanceReportLayoutIndex() {
   const currentYear = dayjs().year();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
@@ -82,10 +134,31 @@ export default function PerformanceReportLayoutIndex() {
       {
         totalCount: number;
         monthlyCounts: Record<string, number>;
-      } | null
+        isLoading: boolean;
+        isError: boolean;
+      }
     >
-  >({});
-  const [isKpiLoading, setIsKpiLoading] = useState(false);
+  >(
+    KPI_DEFINITIONS.reduce<
+      Record<
+        string,
+        {
+          totalCount: number;
+          monthlyCounts: Record<string, number>;
+          isLoading: boolean;
+          isError: boolean;
+        }
+      >
+    >((acc, kpi) => {
+      acc[kpi.label] = {
+        totalCount: 0,
+        monthlyCounts: {},
+        isLoading: true,
+        isError: false,
+      };
+      return acc;
+    }, {})
+  );
 
   const selectedYearValue = useMemo(() => dayjs().year(selectedYear), [selectedYear]);
   const kpiData = useMemo(
@@ -129,19 +202,24 @@ export default function PerformanceReportLayoutIndex() {
         return {
           label: kpi.label,
           link,
-          value: isKpiLoading
+          value: apiData?.isLoading
             ? "..."
-            : (apiData?.totalCount ?? 0).toLocaleString(),
+            : kpi.label === "COLLECTION"
+              ? formatPeso(apiData?.totalCount ?? 0)
+              : (apiData?.totalCount ?? 0).toLocaleString(),
           trend: 0,
           history: monthOrder.map((month) => ({
             month: monthLabelMap[month],
+            fullMonth: month,
             value: apiData?.monthlyCounts[month] ?? 0,
           })),
-          comparison: `per year - ${selectedYear}`,
+          comparison: apiData?.isError ? "unable to sync data" : `per year - ${selectedYear}`,
+          isLoading: apiData?.isLoading ?? false,
+          isError: apiData?.isError ?? false,
         };
       });
     },
-    [isKpiLoading, kpiApiData, selectedYear]
+    [kpiApiData, selectedYear]
   );
 
   useEffect(() => {
@@ -149,13 +227,61 @@ export default function PerformanceReportLayoutIndex() {
     const controller = new AbortController();
 
     const fetchKpiCounts = async () => {
-      setIsKpiLoading(true);
       const userId = Number(localStorage.getItem("ab_id"));
       const username = localStorage.getItem("username") || "";
+      const baseLoadingState = KPI_DEFINITIONS.reduce<
+        Record<
+          string,
+          {
+            totalCount: number;
+            monthlyCounts: Record<string, number>;
+            isLoading: boolean;
+            isError: boolean;
+          }
+        >
+      >((acc, kpi) => {
+        acc[kpi.label] = {
+          totalCount: 0,
+          monthlyCounts: {},
+          isLoading: true,
+          isError: false,
+        };
+        return acc;
+      }, {});
 
-      try {
-        const responses = await Promise.allSettled(
-          KPI_DEFINITIONS.map(async (kpi) => {
+      if (!ignore) {
+        setKpiApiData(baseLoadingState);
+      }
+
+      KPI_DEFINITIONS.forEach(async (kpi) => {
+        try {
+            if (kpi.label === "COLLECTION") {
+              const response = await axios.get<BillingByDateApiResponse>(
+                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
+                {
+                  params: {
+                    year: selectedYear,
+                    month: 0,
+                  },
+                  signal: controller.signal,
+                },
+              );
+
+              if (!ignore) {
+                setKpiApiData((prev) => ({
+                  ...prev,
+                  [kpi.label]: {
+                    totalCount: Number(response.data?.data?.total_paid ?? 0),
+                    monthlyCounts: mapBillingMonthsToMonthlyCounts(response.data?.data?.months),
+                    isLoading: false,
+                    isError: false,
+                  },
+                }));
+              }
+
+              return;
+            }
+
             const endpointResults = await Promise.allSettled(
               kpi.endpoints.map(async (endpoint) => {
                 const response = await axios.get<NewMembershipApiResponse>(
@@ -178,53 +304,34 @@ export default function PerformanceReportLayoutIndex() {
               )
               .map((result) => result.value);
 
-            return {
-              label: kpi.label,
-              payload: {
-                total_count: endpointResponses.reduce(
-                  (sum, response) => sum + Number(response?.total_count ?? 0),
-                  0
-                ),
-                monthly_counts: mergeMonthlyCounts(endpointResponses),
-              },
-            };
-          })
-        );
-
-        if (!ignore) {
-          const nextData = KPI_DEFINITIONS.reduce<
-            Record<string, { totalCount: number; monthlyCounts: Record<string, number> } | null>
-          >((acc, kpi, index) => {
-            const result = responses[index];
-
-            if (result.status === "fulfilled") {
-              acc[kpi.label] = {
-                totalCount: Number(result.value.payload?.total_count ?? 0),
-                monthlyCounts: result.value.payload?.monthly_counts ?? {},
-              };
-              return acc;
+            if (!ignore) {
+              setKpiApiData((prev) => ({
+                ...prev,
+                [kpi.label]: {
+                  totalCount: endpointResponses.reduce(
+                    (sum, response) => sum + Number(response?.total_count ?? 0),
+                    0
+                  ),
+                  monthlyCounts: mergeMonthlyCounts(endpointResponses),
+                  isLoading: false,
+                  isError: false,
+                },
+              }));
             }
-
-            acc[kpi.label] = null;
-            return acc;
-          }, {});
-
-          setKpiApiData(nextData);
+        } catch {
+          if (!ignore) {
+            setKpiApiData((prev) => ({
+              ...prev,
+              [kpi.label]: {
+                totalCount: 0,
+                monthlyCounts: {},
+                isLoading: false,
+                isError: true,
+              },
+            }));
+          }
         }
-      } catch {
-        if (!ignore) {
-          setKpiApiData(
-            KPI_DEFINITIONS.reduce<Record<string, null>>((acc, kpi) => {
-              acc[kpi.label] = null;
-              return acc;
-            }, {})
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setIsKpiLoading(false);
-        }
-      }
+      });
     };
 
     fetchKpiCounts();

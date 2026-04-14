@@ -56,7 +56,9 @@ export default function LandingPage2() {
     const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
     const { signOut, getUser } = useAuth();
     const navigate = useNavigate();
-    const currentYear = new Date().getFullYear();
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
 
     const handleSignout = async () => {
         // Clear all relevant localStorage data
@@ -168,27 +170,17 @@ export default function LandingPage2() {
 
     const fetchCollectionTotal = async () => {
         try {
-            const userId = Number(localStorage.getItem("ab_id"));
-            const username = localStorage.getItem("username") || "";
-            const [remittanceCollectionsResponse, branchRemittanceCollectionResponse] = await Promise.all([
-                axios.get(
-                    `${import.meta.env.VITE_API_BASE_URL}/remittancecollections/branch-data/${currentYear}`,
-                    {
-                        params: { userid: userId, username },
-                    }
-                ),
-                axios.get(
-                    `${import.meta.env.VITE_API_BASE_URL}/branchremittancecollection/branch-data/${currentYear}`,
-                    {
-                        params: { userid: userId, username },
-                    }
-                ),
-            ]);
+            const response = await axios.get(
+                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
+                {
+                    params: {
+                        year: currentYear,
+                        month: 0,
+                    },
+                }
+            );
 
-            const remittanceCollectionsTotal = Number(remittanceCollectionsResponse.data?.total_count ?? 0);
-            const branchRemittanceCollectionTotal = Number(branchRemittanceCollectionResponse.data?.total_count ?? 0);
-
-            setCollectionTotal(remittanceCollectionsTotal + branchRemittanceCollectionTotal);
+            setCollectionTotal(Number(response.data?.data?.total_paid ?? 0));
         } catch (error) {
             setCollectionTotal(0);
         }
@@ -411,7 +403,7 @@ export default function LandingPage2() {
                                     legend={[
                                         { label: 'membership', value: newMembershipTotal.toLocaleString(), color: '#bdc3c7' },
                                         { label: 'loan release', value: loanReleaseTotal.toLocaleString(), color: '#9cc332' },
-                                        { label: 'collection', value: collectionTotal.toLocaleString(), color: '#1890ff' }
+                                        { label: 'collection', value: formatCompactCurrency(collectionTotal), color: '#1890ff' }
                                     ]}
                                 />
                             )}

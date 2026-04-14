@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Layout, ConfigProvider, Avatar } from "antd";
+import { ConfigProvider, Avatar, DatePicker, Spin } from "antd";
 import axios from "axios";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useSearchParams } from "@remix-run/react";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { ArrowLeftFromLine, Home } from "lucide-react";
 import MetricCardCollection from "~/components/MetricCardCollection";
 import BranchTopRightSider from "~/components/BranchTopRightSider";
-
-const { Header } = Layout;
 
 interface Staff {
     id: string;
@@ -20,26 +18,34 @@ interface Staff {
     avgDailySales?: number;
     totalSales?: string;
     status: "critical" | "warning" | "stable" | "good";
+    geos?: string[];
 }
 
-interface SatelliteEntry {
-    satellite_name: string;
-    satellite_total: number;
+interface CollectionGeoEntry {
+    geo: string;
+    departments: CollectionDepartmentEntry[];
+}
+
+interface CollectionDepartmentEntry {
+    department: string;
+    billed: number;
+    paid: number;
 }
 
 interface CollectionBranch {
-    branch_name: string;
-    branch_total: number;
-    satellites: SatelliteEntry[];
+    branch: string;
+    total_billed: number;
+    total_paid: number;
+    geos: CollectionGeoEntry[];
 }
 
 interface CollectionBranchResponse {
     error: boolean;
-    message: string;
-    workflow_name: string;
-    year: number;
-    overall_total?: number;
-    data: CollectionBranch[];
+    data: {
+        year: string;
+        month: string;
+        branches: CollectionBranch[];
+    };
 }
 
 interface BranchCardData {
@@ -55,12 +61,9 @@ interface BranchCardData {
     staffs: Staff[];
     type: "tasks";
     branchName: string;
+    selectedYear: number;
+    selectedMonthLabel: string;
 }
-
-const COLLECTION_BRANCH_ENDPOINTS = [
-    "branchremittancecollection/branch-satellite-data",
-    "remittancecollections/branch-satellite-data",
-];
 
 const getPercentageColor = (rank: number) => {
     if (rank === 0) return "bg-green-500";
@@ -75,22 +78,37 @@ const getStatusByRank = (rank: number): Staff["status"] => {
     return "critical";
 };
 
-const getMonthsDivisor = (year: number) => {
-    const currentDate = dayjs();
-    return year === currentDate.year() ? currentDate.month() + 1 : 12;
+const getRangeMonthParam = (months: [number, number]) => {
+    const [startMonth, endMonth] = months;
+    const startValue = startMonth + 1;
+    const endValue = endMonth + 1;
+
+    return startValue === endValue ? `${startValue}` : `${startValue}-${endValue}`;
+};
+
+const getMonthsDivisorForRange = (months: [number, number]) => {
+    const [startMonth, endMonth] = months;
+    return endMonth - startMonth + 1;
 };
 
 export default function CollectionsLayoutIndex() {
     const [searchParams] = useSearchParams();
     const currentYear = dayjs().year();
     const queryYear = Number(searchParams.get("year"));
-    const selectedYear =
+    const initialYear =
         Number.isInteger(queryYear) && queryYear > 0 ? queryYear : currentYear;
+    const [selectedYear, setSelectedYear] = useState(initialYear);
 
     const [branches, setBranches] = useState<BranchCardData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
-    const monthsDivisor = getMonthsDivisor(selectedYear);
+    const defaultMonth = initialYear === currentYear ? dayjs().month() : 0;
+    const [selectedMonthRange, setSelectedMonthRange] = useState<[number, number]>([defaultMonth, defaultMonth]);
+    const monthParam = useMemo(() => getRangeMonthParam(selectedMonthRange), [selectedMonthRange]);
+    const monthsDivisor = useMemo(
+        () => getMonthsDivisorForRange(selectedMonthRange),
+        [selectedMonthRange]
+    );
 
     useEffect(() => {
         let ignore = false;
@@ -104,16 +122,17 @@ export default function CollectionsLayoutIndex() {
             const username = localStorage.getItem("username") || "";
 
             try {
-                const responses = await Promise.all(
-                    COLLECTION_BRANCH_ENDPOINTS.map((endpoint) =>
-                        axios.get<CollectionBranchResponse>(
-                            `${import.meta.env.VITE_API_BASE_URL}/${endpoint}/${selectedYear}`,
-                            {
-                                params: { userid: userId, username },
-                                signal: controller.signal,
-                            }
-                        )
-                    )
+                const response = await axios.get<CollectionBranchResponse>(
+                    `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/department`,
+                    {
+                        params: {
+                            year: selectedYear,
+                            month: monthParam,
+                            userid: userId,
+                            username,
+                        },
+                        signal: controller.signal,
+                    }
                 );
 
                 if (ignore) {
@@ -124,46 +143,61 @@ export default function CollectionsLayoutIndex() {
                     string,
                     {
                         branchTotal: number;
-                        satellites: Map<string, number>;
+                        branchBilled: number;
+                        satellites: Map<string, { paid: number; billed: number; geos: string[] }>;
                     }
                 >();
 
-                let overallTotal = 0;
+                const apiBranches = Array.isArray(response.data?.data?.branches) ? response.data.data.branches : [];
+                const overallTotal = apiBranches.reduce(
+                    (sum, branch) => sum + Number(branch.total_paid ?? 0),
+                    0
+                );
 
-                responses.forEach((response) => {
-                    const apiBranches = Array.isArray(response.data?.data) ? response.data.data : [];
-                    overallTotal +=
-                        Number(response.data?.overall_total ?? 0) ||
-                        apiBranches.reduce((sum, branch) => sum + Number(branch.branch_total ?? 0), 0);
+                apiBranches.forEach((branch) => {
+                    const branchName = branch.branch;
+                    const existingBranch = branchMap.get(branchName) ?? {
+                        branchTotal: 0,
+                        branchBilled: 0,
+                        satellites: new Map<string, { paid: number; billed: number; geos: string[] }>(),
+                    };
 
-                    apiBranches.forEach((branch) => {
-                        const branchName = branch.branch_name;
-                        const existingBranch = branchMap.get(branchName) ?? {
-                            branchTotal: 0,
-                            satellites: new Map<string, number>(),
-                        };
+                    existingBranch.branchTotal += Number(branch.total_paid ?? 0);
+                    existingBranch.branchBilled += Number(branch.total_billed ?? 0);
 
-                        existingBranch.branchTotal += Number(branch.branch_total ?? 0);
-
-                        (branch.satellites ?? []).forEach((satellite) => {
-                            const satelliteName = satellite.satellite_name;
-                            const currentTotal = existingBranch.satellites.get(satelliteName) ?? 0;
+                    (branch.geos ?? []).forEach((geo) => {
+                        (geo.departments ?? []).forEach((department) => {
+                            const departmentName = department.department;
+                            const currentTotal = existingBranch.satellites.get(departmentName) ?? {
+                                paid: 0,
+                                billed: 0,
+                                geos: [],
+                            };
+                            const nextGeos = currentTotal.geos.includes(geo.geo)
+                                ? currentTotal.geos
+                                : [...currentTotal.geos, geo.geo];
                             existingBranch.satellites.set(
-                                satelliteName,
-                                currentTotal + Number(satellite.satellite_total ?? 0)
+                                departmentName,
+                                {
+                                    paid: currentTotal.paid + Number(department.paid ?? 0),
+                                    billed: currentTotal.billed + Number(department.billed ?? 0),
+                                    geos: nextGeos,
+                                }
                             );
                         });
-
-                        branchMap.set(branchName, existingBranch);
                     });
+
+                    branchMap.set(branchName, existingBranch);
                 });
 
                 const mappedBranches = Array.from(branchMap.entries())
                     .map(([branchName, branchData]) => {
                         const sortedSatellites = Array.from(branchData.satellites.entries())
-                            .map(([satelliteName, satelliteTotal]) => ({
+                            .map(([satelliteName, satelliteTotals]) => ({
                                 satellite_name: satelliteName,
-                                satellite_total: satelliteTotal,
+                                satellite_total: satelliteTotals.paid,
+                                satellite_billed: satelliteTotals.billed,
+                                geos: satelliteTotals.geos,
                             }))
                             .sort((a, b) => b.satellite_total - a.satellite_total);
 
@@ -172,10 +206,11 @@ export default function CollectionsLayoutIndex() {
                                 ? sortedSatellites.map((satellite, index) => ({
                                       id: `${branchName}-${satellite.satellite_name}-${index}`,
                                       name: satellite.satellite_name,
-                                      tasks: Number((satellite.satellite_total / monthsDivisor).toFixed(1)),
-                                      taskCompleted: satellite.satellite_total,
+                                      tasks: Number(satellite.satellite_total ?? 0),
+                                      taskCompleted: Number(satellite.satellite_billed ?? 0),
                                       replenishmentDays: 0,
                                       status: getStatusByRank(index),
+                                      geos: satellite.geos,
                                   }))
                                 : [
                                       {
@@ -185,6 +220,7 @@ export default function CollectionsLayoutIndex() {
                                           taskCompleted: 0,
                                           replenishmentDays: 0,
                                           status: "good",
+                                          geos: [],
                                       },
                                   ];
 
@@ -196,7 +232,7 @@ export default function CollectionsLayoutIndex() {
                         return {
                             branchName,
                             branchTotal: branchData.branchTotal,
-                            satelliteTotal,
+                            branchBilled: branchData.branchBilled,
                             topSatellite: sortedSatellites[0]?.satellite_name ?? "N/A",
                             staffs,
                         };
@@ -205,19 +241,21 @@ export default function CollectionsLayoutIndex() {
                     .map((branch, index) => ({
                         id: index + 1,
                         title: branch.branchName,
-                        subtitle: "Collection",
+                        subtitle: "Total Collection",
                         value: branch.branchTotal.toLocaleString(),
                         percentage:
                             overallTotal > 0
                                 ? Math.round((branch.branchTotal / overallTotal) * 100)
                                 : 0,
                         percentageColor: getPercentageColor(index),
-                        subtitleValue: branch.satelliteTotal.toLocaleString(),
-                        topStaffLabel: "Most Active Satellite",
+                        subtitleValue: branch.branchBilled.toLocaleString(),
+                        topStaffLabel: "Most Active Department",
                         topStaffName: branch.topSatellite,
                         staffs: branch.staffs,
                         type: "tasks" as const,
                         branchName: branch.branchName,
+                        selectedYear,
+                        selectedMonthLabel: monthParam,
                     }));
 
                 setBranches(mappedBranches);
@@ -239,13 +277,54 @@ export default function CollectionsLayoutIndex() {
             ignore = true;
             controller.abort();
         };
-    }, [monthsDivisor, selectedYear]);
+    }, [monthParam, monthsDivisor, selectedYear]);
+
+    useEffect(() => {
+        setSelectedMonthRange((currentRange) => {
+            const fallbackMonth = selectedYear === currentYear ? dayjs().month() : 0;
+
+            if (selectedYear === currentYear) {
+                const clampedEnd = Math.min(currentRange[1], dayjs().month());
+                const clampedStart = Math.min(currentRange[0], clampedEnd);
+                return [clampedStart, clampedEnd];
+            }
+
+            if (currentRange[0] === currentRange[1] && currentRange[0] === fallbackMonth) {
+                return [fallbackMonth, fallbackMonth];
+            }
+
+            return currentRange;
+        });
+    }, [currentYear, selectedYear]);
+
+    const selectedRangeValue = useMemo<[Dayjs, Dayjs]>(
+        () => [
+            dayjs().year(selectedYear).month(selectedMonthRange[0]).startOf("month"),
+            dayjs().year(selectedYear).month(selectedMonthRange[1]).startOf("month"),
+        ],
+        [selectedMonthRange, selectedYear]
+    );
+
+    const handleRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
+        if (!dates || !dates[0] || !dates[1]) {
+            return;
+        }
+
+        const rangeYear = dates[0].year();
+        const startMonth = dates[0].month();
+        const endMonth = dates[1].month();
+
+        setSelectedYear(rangeYear);
+        setSelectedMonthRange(startMonth <= endMonth ? [startMonth, endMonth] : [endMonth, startMonth]);
+    };
 
     const content = useMemo(() => {
         if (isLoading) {
             return (
-                <div className="rounded-sm border border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500 shadow-sm">
-                    Loading collection branch cards...
+                <div className="rounded-sm border border-gray-300 bg-white px-6 py-16 shadow-sm">
+                    <div className="flex items-center justify-center">
+                        <Spin size="large" />
+                    </div>
                 </div>
             );
         }
@@ -282,6 +361,8 @@ export default function CollectionsLayoutIndex() {
                         staffs={branch.staffs}
                         type={branch.type}
                         branchName={branch.branchName}
+                        selectedYear={branch.selectedYear}
+                        selectedMonthLabel={branch.selectedMonthLabel}
                     />
                 ))}
             </div>
@@ -326,19 +407,27 @@ export default function CollectionsLayoutIndex() {
 
                         <main className="p-6 space-y-8">
                             <section>
-                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
-                                    Collections by Branches
-                                </h2>
+                                <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                    <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                                        Collections by Branches
+                                    </h2>
+                                    <DatePicker.RangePicker
+                                        picker="month"
+                                        allowClear={false}
+                                        value={selectedRangeValue}
+                                        onChange={handleRangeChange}
+                                        className="self-start md:self-auto"
+                                    />
+                                </div>
                                 {content}
                             </section>
                         </main>
                     </div>
 
                     <BranchTopRightSider
-                        branchEndpoints={[
-                            "branchremittancecollection/branch-data",
-                            "remittancecollections/branch-data",
-                        ]}
+                        selectedYear={selectedYear}
+                        selectedMonthRange={selectedMonthRange}
+                        useBillingBranchApi
                         metricLabel="collection"
                     />
                 </div>
