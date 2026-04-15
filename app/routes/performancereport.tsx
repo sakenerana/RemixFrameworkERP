@@ -33,6 +33,20 @@ interface NewMembershipApiResponse {
   monthly_counts: Record<string, number>;
 }
 
+interface PersonnelMonthlyTotalsEntry {
+  user_id: number;
+  name: string;
+  monthly_totals: Record<string, number>;
+  year_total: number;
+}
+
+interface PersonnelMonthlyTotalsResponse {
+  error: boolean;
+  message: string;
+  year: number;
+  data: PersonnelMonthlyTotalsEntry[];
+}
+
 interface BillingMonthEntry {
   month: number;
   billed: number;
@@ -89,6 +103,34 @@ const mergeMonthlyCounts = (responses: NewMembershipApiResponse[]) => {
 
     return acc;
   }, {});
+};
+
+const MONTH_ABBR_TO_FULL: Record<string, string> = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  Jun: "June",
+  Jul: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
+
+const mapPersonnelMonthlyTotalsToMonthlyCounts = (
+  monthlyTotals: Record<string, number> = {}
+) => {
+  return Object.entries(monthlyTotals).reduce<Record<string, number>>(
+    (acc, [month, value]) => {
+      const mappedMonth = MONTH_ABBR_TO_FULL[month] ?? month;
+      acc[mappedMonth] = Number(value ?? 0);
+      return acc;
+    },
+    {}
+  );
 };
 
 const MONTH_NAMES = [
@@ -255,6 +297,37 @@ export default function PerformanceReportLayoutIndex() {
 
       KPI_DEFINITIONS.forEach(async (kpi) => {
         try {
+            if (kpi.label === "PERSONNEL TASK COMPLETION") {
+              const response = await axios.get<PersonnelMonthlyTotalsResponse>(
+                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/activitybuilder/monthly-completed-totals/${selectedYear}`,
+                {
+                  params: { userid: userId, username },
+                  signal: controller.signal,
+                }
+              );
+
+              const personnelRows = response.data?.data ?? [];
+              const matchedPersonnel = personnelRows.find(
+                (row) => Number(row.user_id) === Number(userId)
+              );
+
+              if (!ignore) {
+                setKpiApiData((prev) => ({
+                  ...prev,
+                  [kpi.label]: {
+                    totalCount: Number(matchedPersonnel?.year_total ?? 0),
+                    monthlyCounts: mapPersonnelMonthlyTotalsToMonthlyCounts(
+                      matchedPersonnel?.monthly_totals
+                    ),
+                    isLoading: false,
+                    isError: false,
+                  },
+                }));
+              }
+
+              return;
+            }
+
             if (kpi.label === "COLLECTION") {
               const response = await axios.get<BillingByDateApiResponse>(
                 `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
