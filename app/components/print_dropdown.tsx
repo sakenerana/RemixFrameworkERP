@@ -4,14 +4,104 @@ import { FcExport } from "react-icons/fc";
 import { AlignmentType, BorderStyle, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import * as XLSX from 'xlsx';
 import { useEffect } from "react";
+import dayjs from "dayjs";
 
 export default function PrintDropdownComponent(stateData: any) {
 
   // EXPORT TO EXCEL
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(stateData.stateData); //data []
+    const selectedData = Array.isArray(stateData.stateData) ? stateData.stateData : [];
+    const exportVariant = stateData?.exportVariant || "default";
+
+    if (exportVariant === "workflow_assigned_like") {
+      const assignedDetails = selectedData.flatMap((user: any) => {
+        const profileRows = [
+          { section: "User Profile", field: "User ID", value: user.id },
+          { section: "User Profile", field: "Username", value: user.username },
+          { section: "User Profile", field: "Full Name", value: `${user.firstname || ""} ${user.lastname || ""}`.trim() },
+          { section: "User Profile", field: "Activities", value: user.activities_count },
+        ];
+
+        const workflowRows = Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+          section: "Workflow Breakdown",
+          field: workflow,
+          value: count,
+        }));
+
+        return [...profileRows, ...workflowRows, { section: "", field: "", value: "" }];
+      });
+
+      const userSummary = selectedData.map((user: any) => ({
+        id: user.id,
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        activities_count: user.activities_count,
+        workflow_types: Object.keys(user.workflows_breakdown || {}).length,
+      }));
+
+      const workflowBreakdown = selectedData.flatMap((user: any) =>
+        Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+          user_id: user.id,
+          username: user.username,
+          workflow,
+          tasks: count,
+        }))
+      );
+
+      const wb = XLSX.utils.book_new();
+
+      const assignedDetailsSheet = XLSX.utils.json_to_sheet(assignedDetails);
+      XLSX.utils.book_append_sheet(wb, assignedDetailsSheet, "Assigned Details");
+
+      const userSummarySheet = XLSX.utils.json_to_sheet(userSummary);
+      XLSX.utils.book_append_sheet(wb, userSummarySheet, "User Summary");
+
+      const workflowBreakdownSheet = XLSX.utils.json_to_sheet(workflowBreakdown);
+      XLSX.utils.book_append_sheet(wb, workflowBreakdownSheet, "Workflow Breakdown");
+
+      const dateString = dayjs().format("YYYY-MM-DD_HH-mm-ss");
+      XLSX.writeFile(wb, `workflow-workflows-selected-${dateString}.xlsx`);
+      return;
+    }
+
+    const usersSheetRows = selectedData.map((item: any) => ({
+      id: item.id,
+      username: item.username,
+      firstname: item.firstname,
+      lastname: item.lastname,
+      activities_count: item.activities_count,
+      workflow_types: item.workflows_breakdown ? Object.keys(item.workflows_breakdown).length : 0,
+    }));
+
+    const workflowBreakdownRows = selectedData.flatMap((item: any) => {
+      const breakdown = item.workflows_breakdown || {};
+
+      if (Array.isArray(breakdown)) {
+        return breakdown.map((entry: any, index: number) => ({
+          user_id: item.id,
+          username: item.username,
+          workflow: entry?.workflow || entry?.name || `Workflow ${index + 1}`,
+          tasks: entry?.count ?? entry?.tasks ?? entry?.value ?? 0,
+        }));
+      }
+
+      return Object.entries(breakdown).map(([workflow, tasks]) => ({
+        user_id: item.id,
+        username: item.username,
+        workflow,
+        tasks,
+      }));
+    });
+
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    const usersSheet = XLSX.utils.json_to_sheet(usersSheetRows);
+    XLSX.utils.book_append_sheet(wb, usersSheet, "Users");
+
+    const workflowBreakdownSheet = XLSX.utils.json_to_sheet(workflowBreakdownRows);
+    XLSX.utils.book_append_sheet(wb, workflowBreakdownSheet, "Workflow Breakdown");
+
     XLSX.writeFile(wb, "rename_this_file.xlsx");
   };
 
@@ -149,8 +239,13 @@ export default function PrintDropdownComponent(stateData: any) {
   }, []); // Empty dependency array means this runs once on mount
 
   return (
-    <Dropdown menu={{ items }} placement="bottomLeft">
-      <Button icon={<FcExport />}>Export</Button>
+    <Dropdown menu={{ items }} placement="bottomLeft" trigger={["click"]}>
+      <Button
+        icon={<FcExport />}
+        {...(stateData.buttonProps || {})}
+      >
+        Export
+      </Button>
     </Dropdown>
   );
 }

@@ -1,4 +1,4 @@
-import { FileSearchOutlined, HomeOutlined, LoadingOutlined, UserOutlined, CalendarOutlined, BarChartOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, UserOutlined, CalendarOutlined, BarChartOutlined } from "@ant-design/icons";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import {
     Alert,
@@ -18,6 +18,7 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "~/auth/AuthContext";
 import dayjs from 'dayjs';
+import * as XLSX from 'xlsx';
 
 const { Option } = Select;
 
@@ -242,6 +243,57 @@ export default function Assigned() {
         workflows: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'   // Teal to green
     };
 
+    const exportToExcel = () => {
+        const assignedDetails = data.flatMap((user) => {
+            const profileRows = [
+                { section: "User Profile", field: "User ID", value: user.id },
+                { section: "User Profile", field: "Username", value: user.username },
+                { section: "User Profile", field: "Full Name", value: `${user.firstname} ${user.lastname}` },
+                { section: "User Profile", field: "Activities", value: user.activities_count },
+            ];
+
+            const workflowRows = Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+                section: "Workflow Breakdown",
+                field: workflow,
+                value: count,
+            }));
+
+            return [...profileRows, ...workflowRows, { section: "", field: "", value: "" }];
+        });
+
+        const userSummary = data.map((user) => ({
+            id: user.id,
+            username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            activities_count: user.activities_count,
+            workflow_types: Object.keys(user.workflows_breakdown || {}).length,
+        }));
+
+        const workflowBreakdown = data.flatMap((user) =>
+            Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+                user_id: user.id,
+                username: user.username,
+                workflow,
+                tasks: count,
+            }))
+        );
+
+        const wb = XLSX.utils.book_new();
+
+        const assignedDetailsSheet = XLSX.utils.json_to_sheet(assignedDetails);
+        XLSX.utils.book_append_sheet(wb, assignedDetailsSheet, "Assigned Details");
+
+        const userSummarySheet = XLSX.utils.json_to_sheet(userSummary);
+        XLSX.utils.book_append_sheet(wb, userSummarySheet, "User Summary");
+
+        const workflowBreakdownSheet = XLSX.utils.json_to_sheet(workflowBreakdown);
+        XLSX.utils.book_append_sheet(wb, workflowBreakdownSheet, "Workflow Breakdown");
+
+        const dateString = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+        XLSX.writeFile(wb, `workflow-assigned-${id || 'all'}-${dateString}.xlsx`);
+    };
+
     return (
         <div className="w-full rounded-lg shadow-sm">
             {/* Header Section */}
@@ -273,6 +325,9 @@ export default function Assigned() {
                     showIcon
                     className="w-full lg:w-auto"
                 />
+                <Button type="primary" icon={<FileExcelOutlined />} onClick={exportToExcel}>
+                    Export to Excel
+                </Button>
             </div>
 
             {/* Main Content - Full Width */}

@@ -18,7 +18,7 @@ import {
   Tag,
 } from "antd";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { Key, useEffect, useMemo, useState } from "react";
 import { AiFillProfile } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
@@ -50,6 +50,8 @@ export default function Workflows() {
   const [error, setError] = useState<string | null>(null);
   const { user, token } = useAuth();
   const [topThreeUserIds, setTopThreeUserIds] = useState<number[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
 
   const navigate = useNavigate();
 
@@ -140,6 +142,15 @@ export default function Workflows() {
   const handleShowWorkflows = (value: DataType) => {
     // console.log("value", value)
     navigate("/workflow/assigned/id?id=" + value.id);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (newSelectedRowKeys: Key[], newSelectedRows: DataType[]) => {
+      setSelectedRowKeys(newSelectedRowKeys);
+      setSelectedRows(newSelectedRows);
+    },
+    preserveSelectedRowKeys: true,
   };
 
   // State for column visibility
@@ -286,6 +297,10 @@ export default function Workflows() {
           />
 
           <Space>
+            <Tag color={selectedRows.length > 0 ? "blue" : "default"} className="m-0">
+              Checked: {selectedRows.length}
+            </Tag>
+
             <Button
               onClick={handleRefetch}
               icon={<FcRefresh className="text-blue-500" />}
@@ -311,9 +326,11 @@ export default function Workflows() {
             </Dropdown>
 
             <PrintDropdownComponent
-              stateData={data}
+              stateData={selectedRows}
+              exportVariant="workflow_assigned_like"
               buttonProps={{
                 className: "flex items-center gap-2 hover:border-blue-500",
+                disabled: selectedRows.length === 0,
               }}
             />
           </Space>
@@ -334,6 +351,7 @@ export default function Workflows() {
           size="middle"
           columns={filteredColumns}
           dataSource={searchText ? filteredData : data}
+          rowSelection={rowSelection}
           className="shadow-sm rounded-lg overflow-hidden"
           bordered
           scroll={{ x: "max-content" }}
