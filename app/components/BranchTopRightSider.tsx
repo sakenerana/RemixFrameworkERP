@@ -45,6 +45,19 @@ interface BillingBranchResponse {
   };
 }
 
+interface PersonnelSummaryBranchEntry {
+  branch_name: string;
+  branch_total_activities: number;
+}
+
+interface PersonnelSummaryResponse {
+  error: boolean;
+  message: string;
+  year: number;
+  grand_total?: number;
+  data: PersonnelSummaryBranchEntry[];
+}
+
 interface BranchTopRightSiderProps {
     branchEndpoint?: string;
     branchEndpoints?: string[];
@@ -52,6 +65,7 @@ interface BranchTopRightSiderProps {
     selectedYear?: number;
     selectedMonthRange?: [number, number];
     useBillingBranchApi?: boolean;
+    usePersonnelSummaryApi?: boolean;
 }
 
 const formatPesoValue = (value: number) => {
@@ -66,6 +80,7 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
     selectedYear: selectedYearProp,
     selectedMonthRange,
     useBillingBranchApi = false,
+    usePersonnelSummaryApi = false,
 }) => {
     const [searchParams] = useSearchParams();
     const currentYear = dayjs().year();
@@ -92,7 +107,24 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
             try {
                 let mergedBranchTotals: Record<string, { total: number; billed?: number; paid?: number }> = {};
 
-                if (useBillingBranchApi) {
+                if (usePersonnelSummaryApi) {
+                    const response = await axios.get<PersonnelSummaryResponse>(
+                        `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/activitybuilder/branches-satellites-summary/${selectedYear}`,
+                        {
+                            params: { userid: userId, username },
+                            signal: controller.signal,
+                        }
+                    );
+
+                    mergedBranchTotals = (response.data?.data ?? []).reduce<Record<string, { total: number }>>((acc, branch) => {
+                        const branchName = branch.branch_name ?? 'No branch';
+                        const currentBranch = acc[branchName] ?? { total: 0 };
+                        acc[branchName] = {
+                            total: currentBranch.total + Number(branch.branch_total_activities ?? 0),
+                        };
+                        return acc;
+                    }, {});
+                } else if (useBillingBranchApi) {
                     const monthParam = selectedMonthRange
                         ? selectedMonthRange[0] === selectedMonthRange[1]
                             ? `${selectedMonthRange[0] + 1}`
@@ -192,7 +224,7 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
             ignore = true;
             controller.abort();
         };
-    }, [branchEndpoint, branchEndpoints, selectedMonthRange, selectedYear, useBillingBranchApi]);
+    }, [branchEndpoint, branchEndpoints, selectedMonthRange, selectedYear, useBillingBranchApi, usePersonnelSummaryApi]);
 
     const leadingBranch = branches[0]?.name ?? 'No data';
     const metricLabelLower = metricLabel.toLowerCase();

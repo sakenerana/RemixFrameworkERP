@@ -237,7 +237,10 @@ export default function PerformanceReportLayoutIndex() {
       return KPI_DEFINITIONS.map((kpi) => {
         const apiData = kpiApiData[kpi.label];
         const link =
-          kpi.label === "LOAN RELEASE" || kpi.label === "NEW MEMBERSHIP" || kpi.label === "COLLECTION"
+          kpi.label === "LOAN RELEASE" ||
+          kpi.label === "NEW MEMBERSHIP" ||
+          kpi.label === "COLLECTION" ||
+          kpi.label === "PERSONNEL TASK COMPLETION"
             ? `${kpi.link}?year=${selectedYear}`
             : kpi.link;
 
@@ -247,13 +250,16 @@ export default function PerformanceReportLayoutIndex() {
           value: apiData?.isLoading
             ? "..."
             : kpi.label === "COLLECTION"
-              ? formatPeso(apiData?.totalCount ?? 0)
+              ? formatPeso(Math.abs(apiData?.totalCount ?? 0))
               : (apiData?.totalCount ?? 0).toLocaleString(),
           trend: 0,
           history: monthOrder.map((month) => ({
             month: monthLabelMap[month],
             fullMonth: month,
-            value: apiData?.monthlyCounts[month] ?? 0,
+            value:
+              kpi.label === "COLLECTION"
+                ? Math.abs(apiData?.monthlyCounts[month] ?? 0)
+                : (apiData?.monthlyCounts[month] ?? 0),
           })),
           comparison: apiData?.isError ? "unable to sync data" : `per year - ${selectedYear}`,
           isLoading: apiData?.isLoading ?? false,

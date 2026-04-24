@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ChevronDown, X, Trophy, Award, TrendingUp, TrendingDown } from 'lucide-react';
-import { Link } from '@remix-run/react';
 
 export interface Staff {
   id: string;
@@ -12,9 +11,7 @@ export interface Staff {
   avgDailySales?: number;
   totalSales?: string;
   status: 'critical' | 'warning' | 'stable' | 'good';
-  department?: string;
   position?: string;
-  efficiency?: number;
   lastUpdated?: string;
 }
 
@@ -47,6 +44,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const maxTaskValue = Math.max(...staffs.map((staff) => Number(staff.tasks ?? 0)), 0);
 
   // Sort staff by performance (for ranking)
   const sortedStaff = [...staffs].sort((a, b) => {
@@ -101,7 +99,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
               <span className="text-[10px] font-bold text-blue-400 uppercase">{topStaffName}</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] text-gray-400">Total of Satellites</span>
+              <span className="text-[9px] text-gray-400">Total of Staffs</span>
               <span className="text-[10px] font-bold">{subtitleValue}</span>
             </div>
           </div>
@@ -116,9 +114,9 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
           <table className="w-full text-[9px]">
             <thead className="text-gray-400 border-b border-gray-50">
               <tr>
-                <th className="text-left font-normal py-1">Satellite Name</th>
+                <th className="text-left font-normal py-1">Staff Name</th>
                 <th className="text-center font-normal py-1">
-                  {type === 'tasks' ? 'Number of Tasks' : 'Avg Daily Sales'}
+                  {type === 'tasks' ? 'Avg Daily' : 'Avg Daily Sales'}
                 </th>
                 <th className="text-right font-normal py-1">
                   {type === 'tasks' ? 'Overall (Completed)' : 'Replenishment'}
@@ -138,10 +136,15 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                       <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-indigo-400"
-                          style={{ width: `${(type === 'tasks' ? (p.tasks || 0) / 100 : (p.avgDailySales || 0))}%` }}
+                          style={{
+                            width: `${type === 'tasks'
+                              ? (maxTaskValue > 0 ? ((p.tasks || 0) / maxTaskValue) * 100 : 0)
+                              : (p.avgDailySales || 0)
+                              }%`
+                          }}
                         />
                       </div>
-                      <span>{type === 'tasks' ? p.tasks : p.avgDailySales}</span>
+                      <span>{type === 'tasks' ? Number(p.tasks || 0).toFixed(1) : p.avgDailySales}</span>
                     </div>
                   </td>
                   <td className="py-2 text-right">
@@ -162,7 +165,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
               onClick={() => setIsModalOpen(true)}
               className="text-[8px] font-bold text-gray-400 border border-gray-200 px-4 py-1 rounded hover:bg-gray-50 transition-colors"
             >
-              View All Satellites
+              View All Staffs
             </button>
           </div>
         </div>
@@ -175,7 +178,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
             {/* Modal Header */}
             <div className="bg-[#1e293b] text-white p-4 flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-bold">All Satellites Performance - {branchName}</h2>
+                <h2 className="text-lg font-bold">All Staffs Performance - {branchName}</h2>
                 <p className="text-sm text-gray-300">
                   {type === 'tasks' ? 'Task Completion Metrics' : 'Sales & Inventory Metrics'}
                 </p>
@@ -193,7 +196,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
               <div className="flex items-center justify-center">
                 <Award className="w-6 h-6 text-yellow-600 mr-2" />
                 <span className="font-bold text-yellow-800 text-lg">
-                  Top 5 Satellites Will Receive Monthly Rewards!
+                  Top 5 Staffs Will Receive Monthly Rewards!
                 </span>
               </div>
               <p className="text-center text-sm text-yellow-700 mt-1">
@@ -206,7 +209,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
               {/* Summary Stats */}
               <div className="grid grid-cols-4 gap-4 mb-6">
                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <p className="text-xs text-gray-600">Total Satellites</p>
+                  <p className="text-xs text-gray-600">Total Staffs</p>
                   <p className="text-xl font-bold text-blue-700">{staffs.length}</p>
                 </div>
                 <div className="bg-green-50 p-3 rounded-lg border border-green-100">
@@ -220,7 +223,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                   <p className="text-xl font-bold text-purple-700">{topStaffName}</p>
                 </div>
                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                  <p className="text-xs text-gray-600">Department Avg.</p>
+                  <p className="text-xs text-gray-600">Avg Daily</p>
                   <p className="text-xl font-bold text-orange-700">
                     {type === 'tasks' ?
                       Math.round(staffs.reduce((acc, s) => acc + (s.tasks || 0), 0) / staffs.length) :
@@ -236,22 +239,18 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                   <tr>
                     <th className="text-left p-3 font-semibold text-gray-700">Rank</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Staff Name</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Department</th>
                     <th className="text-left p-3 font-semibold text-gray-700">
-                      {type === 'tasks' ? 'Total Tasks' : 'Avg Daily Sales'}
+                      {type === 'tasks' ? 'Avg Daily' : 'Avg Daily Sales'}
                     </th>
                     <th className="text-left p-3 font-semibold text-gray-700">
                       {type === 'tasks' ? 'Completed' : 'Replenishment Days'}
                     </th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Efficiency</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Status</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Reward Tier</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedStaff.map((staff, index) => {
                     const rank = index + 1;
-                    const efficiency = staff.efficiency || Math.floor(Math.random() * 30) + 70;
 
                     return (
                       <tr
@@ -269,7 +268,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                           </div>
                         </td>
                         <td className="p-3 font-medium">{staff.name}</td>
-                        <td className="p-3 text-gray-600">{staff.department || 'General'}</td>
                         <td className="p-3">
                           <div className="flex items-center">
                             <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
@@ -280,13 +278,13 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                                   }`}
                                 style={{
                                   width: `${type === 'tasks' ?
-                                    (staff.tasks || 0) / 100 * 100 :
+                                    (maxTaskValue > 0 ? ((staff.tasks || 0) / maxTaskValue) * 100 : 0) :
                                     (staff.avgDailySales || 0) / 200 * 100
                                     }%`
                                 }}
                               />
                             </div>
-                            <span>{type === 'tasks' ? staff.tasks : staff.avgDailySales}</span>
+                            <span>{type === 'tasks' ? Number(staff.tasks || 0).toFixed(1) : staff.avgDailySales}</span>
                           </div>
                         </td>
                         <td className="p-3">
@@ -295,23 +293,8 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                                 staff.status === 'stable' ? 'bg-green-100 text-green-800' :
                                   'bg-blue-100 text-blue-800'
                             }`}>
-                            {type === 'tasks' ? `${staff.taskCompleted}%` : `${staff.replenishmentDays} days`}
+                            {type === 'tasks' ? staff.taskCompleted : `${staff.replenishmentDays} days`}
                           </span>
-                        </td>
-                        <td className="p-3">
-                          <div className="flex items-center">
-                            <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
-                              <div
-                                className={`h-full ${efficiency >= 90 ? 'bg-green-500' :
-                                    efficiency >= 80 ? 'bg-blue-500' :
-                                      efficiency >= 70 ? 'bg-yellow-500' :
-                                        'bg-red-500'
-                                  }`}
-                                style={{ width: `${efficiency}%` }}
-                              />
-                            </div>
-                            <span>{efficiency}%</span>
-                          </div>
                         </td>
                         <td className="p-3">
                           <div className="flex items-center">
@@ -323,44 +306,11 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                             <span className="capitalize">{staff.status}</span>
                           </div>
                         </td>
-                        <td className="p-3">
-                          <Link
-                            to={"/personnel-staff"}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold
-               bg-blue-600 text-white rounded-md
-               hover:bg-blue-700 transition-colors duration-200"
-                          >
-                            View
-                          </Link>
-                        </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-
-              {/* Legend */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h4 className="font-semibold mb-2">Reward Tiers Legend:</h4>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded mr-2"></div>
-                    <span className="text-sm">Gold (1st) - 500 Bonus</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded mr-2"></div>
-                    <span className="text-sm">Silver (2nd) - 300 Bonus</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-orange-100 border border-orange-300 rounded mr-2"></div>
-                    <span className="text-sm">Bronze (3rd) - 200 Bonus</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded mr-2"></div>
-                    <span className="text-sm">Top 5 (4th-5th) - 100 Bonus</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Modal Footer */}
