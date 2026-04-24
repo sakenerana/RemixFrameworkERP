@@ -171,7 +171,7 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                 if (!ignore) {
                     const collectionDays = collectionResponse.data?.data?.days ?? [];
                     const collectionDailyCounts = collectionDays.reduce<Record<string, number>>((acc, item) => {
-                        acc[String(item.day)] = Number(item.paid ?? 0);
+                        acc[String(item.day)] = Math.abs(Number(item.paid ?? 0));
                         return acc;
                     }, {});
 
@@ -180,7 +180,7 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                         loanreleases: loanReleaseResponse.data?.daily_counts ?? {},
                         collections: collectionDailyCounts,
                     });
-                    setCollectionTotalPaid(Number(collectionResponse.data?.data?.total_paid ?? 0));
+                    setCollectionTotalPaid(Math.abs(Number(collectionResponse.data?.data?.total_paid ?? 0)));
                 }
             } catch {
                 if (!ignore) {

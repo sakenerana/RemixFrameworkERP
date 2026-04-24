@@ -37,16 +37,14 @@ export interface MetricCardProps {
 
 const formatPesoValue = (value: number | string) => {
   const numericValue = Number(value ?? 0);
-  const sign = numericValue < 0 ? '-' : '';
-  return `${sign}₱${Math.abs(numericValue).toLocaleString()}`;
+  return `\u20B1${Math.abs(numericValue).toLocaleString()}`;
 };
 
 const formatCollectionPesoValue = (value: number | string) => {
   const sanitizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
   const numericValue = Number(sanitizedValue ?? 0);
   const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
-  const sign = safeValue < 0 ? '-' : '';
-  return `${sign}\u20B1${Math.abs(safeValue).toLocaleString()}`;
+  return `\u20B1${Math.abs(safeValue).toLocaleString()}`;
 };
 
 const MetricCardCollection: React.FC<MetricCardProps> = ({
@@ -176,7 +174,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                       <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-indigo-400"
-                          style={{ width: `${(type === 'tasks' ? (p.tasks || 0) / 100 : (p.avgDailySales || 0))}%` }}
+                          style={{ width: `${(type === 'tasks' ? Math.abs(p.tasks || 0) / 100 : Math.abs(p.avgDailySales || 0))}%` }}
                         />
                       </div>
                       <span>{type === 'tasks' ? formatCollectionPesoValue(p.tasks ?? 0) : p.avgDailySales}</span>
@@ -310,8 +308,8 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                                   }`}
                                 style={{
                                   width: `${type === 'tasks' ?
-                                    (staff.tasks || 0) / 100 * 100 :
-                                    (staff.avgDailySales || 0) / 200 * 100
+                                    Math.abs(staff.tasks || 0) / 100 * 100 :
+                                    Math.abs(staff.avgDailySales || 0) / 200 * 100
                                     }%`
                                 }}
                               />
@@ -402,3 +400,4 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
 };
 
 export default MetricCardCollection;
+

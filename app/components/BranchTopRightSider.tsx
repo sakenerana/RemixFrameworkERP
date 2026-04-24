@@ -69,8 +69,7 @@ interface BranchTopRightSiderProps {
 }
 
 const formatPesoValue = (value: number) => {
-    const sign = value < 0 ? '-' : '';
-    return `${sign}₱${Math.abs(value).toLocaleString()}`;
+    return `\u20B1${Math.abs(value).toLocaleString()}`;
 };
 
 const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
@@ -148,9 +147,9 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
                         const branchName = branch.branch ?? 'No branch';
                         const currentBranch = acc[branchName] ?? { total: 0, billed: 0, paid: 0 };
                         acc[branchName] = {
-                            total: currentBranch.total + Number(branch.total_paid ?? 0),
-                            paid: (currentBranch.paid ?? 0) + Number(branch.total_paid ?? 0),
-                            billed: (currentBranch.billed ?? 0) + Number(branch.total_billed ?? 0),
+                            total: currentBranch.total + Math.abs(Number(branch.total_paid ?? 0)),
+                            paid: (currentBranch.paid ?? 0) + Math.abs(Number(branch.total_paid ?? 0)),
+                            billed: (currentBranch.billed ?? 0) + Math.abs(Number(branch.total_billed ?? 0)),
                         };
                         return acc;
                     }, {});
@@ -231,7 +230,7 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
     const isCollectionBillingView = useBillingBranchApi && metricLabelLower === 'collection';
     const maxAvgDaily = useMemo(
         () => Math.max(
-            ...branches.map((branch) => (isCollectionBillingView ? Number(branch.paid ?? 0) : branch.avgDaily)),
+            ...branches.map((branch) => (isCollectionBillingView ? Math.abs(Number(branch.paid ?? 0)) : branch.avgDaily)),
             0
         ),
         [branches, isCollectionBillingView]
@@ -281,7 +280,7 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
                                             <div
                                                 className="h-full bg-blue-500"
                                                 style={{
-                                                    width: `${maxAvgDaily > 0 ? ((isCollectionBillingView ? Number(branch.paid ?? 0) : branch.avgDaily) / maxAvgDaily) * 100 : 0}%`,
+                                                    width: `${maxAvgDaily > 0 ? ((isCollectionBillingView ? Math.abs(Number(branch.paid ?? 0)) : branch.avgDaily) / maxAvgDaily) * 100 : 0}%`,
                                                 }}
                                             />
                                         </div>
@@ -316,3 +315,4 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
 };
 
 export default BranchTopRightSider;
+

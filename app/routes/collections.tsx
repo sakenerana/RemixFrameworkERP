@@ -150,7 +150,7 @@ export default function CollectionsLayoutIndex() {
 
                 const apiBranches = Array.isArray(response.data?.data?.branches) ? response.data.data.branches : [];
                 const overallTotal = apiBranches.reduce(
-                    (sum, branch) => sum + Number(branch.total_paid ?? 0),
+                    (sum, branch) => sum + Math.abs(Number(branch.total_paid ?? 0)),
                     0
                 );
 
@@ -162,8 +162,8 @@ export default function CollectionsLayoutIndex() {
                         satellites: new Map<string, { paid: number; billed: number; geos: string[] }>(),
                     };
 
-                    existingBranch.branchTotal += Number(branch.total_paid ?? 0);
-                    existingBranch.branchBilled += Number(branch.total_billed ?? 0);
+                    existingBranch.branchTotal += Math.abs(Number(branch.total_paid ?? 0));
+                    existingBranch.branchBilled += Math.abs(Number(branch.total_billed ?? 0));
 
                     (branch.geos ?? []).forEach((geo) => {
                         (geo.departments ?? []).forEach((department) => {
@@ -179,8 +179,8 @@ export default function CollectionsLayoutIndex() {
                             existingBranch.satellites.set(
                                 departmentName,
                                 {
-                                    paid: currentTotal.paid + Number(department.paid ?? 0),
-                                    billed: currentTotal.billed + Number(department.billed ?? 0),
+                                    billed: currentTotal.billed + Math.abs(Number(department.billed ?? 0)),
+                                    paid: currentTotal.paid + Math.abs(Number(department.paid ?? 0)),
                                     geos: nextGeos,
                                 }
                             );
