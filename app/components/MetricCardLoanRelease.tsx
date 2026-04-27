@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, X, Trophy, Award, TrendingUp, TrendingDown } from 'lucide-react';
-import { Link } from '@remix-run/react';
+import { X, Trophy, Award, TrendingUp } from 'lucide-react';
 
 export interface Staff {
   id: string;
@@ -235,23 +234,19 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="text-left p-3 font-semibold text-gray-700">Rank</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Staff Name</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Department</th>
+                    <th className="text-left p-3 font-semibold text-gray-700">Satellite Name</th>
                     <th className="text-left p-3 font-semibold text-gray-700">
                       {type === 'tasks' ? 'Avg. Monthly' : 'Avg Daily Sales'}
                     </th>
                     <th className="text-left p-3 font-semibold text-gray-700">
                       {type === 'tasks' ? 'Completed' : 'Replenishment Days'}
                     </th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Efficiency</th>
                     <th className="text-left p-3 font-semibold text-gray-700">Status</th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedStaff.map((staff, index) => {
                     const rank = index + 1;
-                    const efficiency = staff.efficiency || Math.floor(Math.random() * 30) + 70;
 
                     return (
                       <tr
@@ -269,7 +264,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
                           </div>
                         </td>
                         <td className="p-3 font-medium">{staff.name}</td>
-                        <td className="p-3 text-gray-600">{staff.department || 'General'}</td>
                         <td className="p-3">
                           <div className="flex items-center">
                             <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
@@ -295,23 +289,8 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
                               staff.status === 'stable' ? 'bg-green-100 text-green-800' :
                                 'bg-blue-100 text-blue-800'
                             }`}>
-                            {type === 'tasks' ? `${staff.taskCompleted}%` : `${staff.replenishmentDays} days`}
+                            {type === 'tasks' ? staff.taskCompleted : `${staff.replenishmentDays} days`}
                           </span>
-                        </td>
-                        <td className="p-3">
-                          <div className="flex items-center">
-                            <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
-                              <div
-                                className={`h-full ${efficiency >= 90 ? 'bg-green-500' :
-                                  efficiency >= 80 ? 'bg-blue-500' :
-                                    efficiency >= 70 ? 'bg-yellow-500' :
-                                      'bg-red-500'
-                                  }`}
-                                style={{ width: `${efficiency}%` }}
-                              />
-                            </div>
-                            <span>{efficiency}%</span>
-                          </div>
                         </td>
                         <td className="p-3">
                           <div className="flex items-center">
@@ -322,16 +301,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
                               }`} />
                             <span className="capitalize">{staff.status}</span>
                           </div>
-                        </td>
-                        <td className="p-3">
-                          <Link
-                            to={"/loanrelease-staff"}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold
-               bg-blue-600 text-white rounded-md
-               hover:bg-blue-700 transition-colors duration-200"
-                          >
-                            View
-                          </Link>
                         </td>
                       </tr>
                     );

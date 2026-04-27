@@ -108,7 +108,7 @@ const SummaryStat: React.FC<SummaryStatProps> = ({ label, value, isLoading, form
 );
 
 const DETAIL_FILTER_OPTIONS = [
-    { label: 'Overall', value: 'overall' },
+    { label: 'All', value: 'overall' },
     { label: 'New Membership', value: 'newmembership' },
     { label: 'Loan Release', value: 'loanreleases' },
     { label: 'Collection', value: 'collections' },

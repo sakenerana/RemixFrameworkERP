@@ -180,7 +180,7 @@ export default function LandingPage2() {
                 }
             );
 
-            setCollectionTotal(Number(response.data?.data?.total_paid ?? 0));
+            setCollectionTotal(Math.abs(Number(response.data?.data?.total_paid ?? 0)));
         } catch (error) {
             setCollectionTotal(0);
         }

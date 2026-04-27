@@ -125,28 +125,6 @@ interface ChartCardProps {
     isCurrency?: boolean;
 }
 
-const chartLabelFormatter = (
-    value: string | number | boolean | null | undefined | readonly (string | number)[]
-) => {
-    if (Array.isArray(value)) {
-        return value.join(', ');
-    }
-
-    if (typeof value === 'number') {
-        return value.toLocaleString();
-    }
-
-    if (typeof value === 'string') {
-        return value;
-    }
-
-    if (typeof value === 'boolean') {
-        return String(value);
-    }
-
-    return '';
-};
-
 const formatChartMetricValue = (value: number, isCurrency = false) => {
     const safeValue = Number.isFinite(value) ? value : 0;
 
@@ -156,6 +134,29 @@ const formatChartMetricValue = (value: number, isCurrency = false) => {
 
     const sign = safeValue < 0 ? '-' : '';
     return `${sign}\u20B1${Math.abs(safeValue).toLocaleString()}`;
+};
+
+const renderBarLabel = (props: any, isCurrency: boolean) => {
+    const {
+        x = 0,
+        y = 0,
+        width = 0,
+        height = 0,
+        value = 0,
+    } = props;
+
+    return (
+        <text
+            x={x + width + 6}
+            y={y + height / 2}
+            fill="#1E293B"
+            fontSize={10}
+            fontWeight={700}
+            dominantBaseline="middle"
+        >
+            {formatChartMetricValue(Number(value ?? 0), isCurrency)}
+        </text>
+    );
 };
 
 const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false, isError = false, isCurrency = false }) => (
@@ -215,13 +216,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, data, isLoading = false, i
                             dataKey="value"
                             radius={[0, 4, 4, 0]}
                             barSize={16}
-                            label={{
-                                position: 'right',
-                                fontSize: 10,
-                                fill: '#1E293B',
-                                fontWeight: 700,
-                                formatter: (value: number) => formatChartMetricValue(Number(value ?? 0), isCurrency),
-                            }}
+                            label={(props) => renderBarLabel(props, isCurrency)}
                         >
                             {data.map((_, index) => (
                                 <Cell key={index} fill={index < 3 ? COLORS.primary : '#E2E8F0'} />
