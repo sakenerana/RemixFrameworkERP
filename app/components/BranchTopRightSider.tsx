@@ -26,13 +26,17 @@ interface RankedBranch {
 interface BillingBranchGeo {
   geo: string;
   billed: number;
-  paid: number;
+  cash_payment?: number;
+  non_cash_payment?: number;
+  paid?: number;
 }
 
 interface BillingBranchEntry {
   branch: string;
   total_billed: number;
-  total_paid: number;
+  total_cash_payment?: number;
+  total_non_cash_payment?: number;
+  total_paid?: number;
   geos: BillingBranchGeo[];
 }
 
@@ -70,6 +74,28 @@ interface BranchTopRightSiderProps {
 
 const formatPesoValue = (value: number) => {
     return `\u20B1${Math.abs(value).toLocaleString()}`;
+};
+
+const getPaidAmount = (source: {
+    total_cash_payment?: number;
+    total_non_cash_payment?: number;
+    total_paid?: number;
+    cash_payment?: number;
+    non_cash_payment?: number;
+    paid?: number;
+}) => {
+    const hasCashNonCash =
+        source.total_cash_payment !== undefined ||
+        source.total_non_cash_payment !== undefined ||
+        source.cash_payment !== undefined ||
+        source.non_cash_payment !== undefined;
+
+    if (hasCashNonCash) {
+        return Number(source.total_cash_payment ?? source.cash_payment ?? 0) +
+            Number(source.total_non_cash_payment ?? source.non_cash_payment ?? 0);
+    }
+
+    return Number(source.total_paid ?? source.paid ?? 0);
 };
 
 const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
@@ -146,9 +172,10 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
                     mergedBranchTotals = (response.data?.data?.branches ?? []).reduce<Record<string, { total: number; billed?: number; paid?: number }>>((acc, branch) => {
                         const branchName = branch.branch ?? 'No branch';
                         const currentBranch = acc[branchName] ?? { total: 0, billed: 0, paid: 0 };
+                        const paidAmount = Math.abs(getPaidAmount(branch));
                         acc[branchName] = {
-                            total: currentBranch.total + Math.abs(Number(branch.total_paid ?? 0)),
-                            paid: (currentBranch.paid ?? 0) + Math.abs(Number(branch.total_paid ?? 0)),
+                            total: currentBranch.total + paidAmount,
+                            paid: (currentBranch.paid ?? 0) + paidAmount,
                             billed: (currentBranch.billed ?? 0) + Math.abs(Number(branch.total_billed ?? 0)),
                         };
                         return acc;
@@ -276,14 +303,6 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
                                         {branch.name}
                                     </div>
                                     <div className="flex justify-center items-center gap-1">
-                                        <div className="w-8 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-blue-500"
-                                                style={{
-                                                    width: `${maxAvgDaily > 0 ? ((isCollectionBillingView ? Math.abs(Number(branch.paid ?? 0)) : branch.avgDaily) / maxAvgDaily) * 100 : 0}%`,
-                                                }}
-                                            />
-                                        </div>
                                         <span className="text-[9px]">
                                             {isCollectionBillingView ? formatPesoValue(Number(branch.paid ?? 0)) : branch.avgDaily}
                                         </span>

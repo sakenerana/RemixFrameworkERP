@@ -63,7 +63,8 @@ interface DailyCountApiResponse {
 interface BillingDayEntry {
     day: number;
     billed: number;
-    paid: number;
+    cash_payment?: number;
+    non_cash_payment?: number;
 }
 
 interface BillingByDateDailyResponse {
@@ -72,7 +73,8 @@ interface BillingByDateDailyResponse {
         year: number;
         month: number;
         total_billed: number;
-        total_paid: number;
+        total_cash_payment?: number;
+        total_non_cash_payment?: number;
         days: BillingDayEntry[];
     };
 }
@@ -89,6 +91,13 @@ const formatPeso = (value: number) => new Intl.NumberFormat('en-PH', {
     currency: 'PHP',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+}).format(value ?? 0);
+
+const formatPesoCompact = (value: number) => new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    notation: 'compact',
+    maximumFractionDigits: 1,
 }).format(value ?? 0);
 
 const SummaryStat: React.FC<SummaryStatProps> = ({ label, value, isLoading, formatter }) => (
@@ -128,6 +137,8 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
         collections: {},
     });
     const [collectionTotalPaid, setCollectionTotalPaid] = useState(0);
+    const [collectionCashPayment, setCollectionCashPayment] = useState(0);
+    const [collectionNonCashPayment, setCollectionNonCashPayment] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -171,7 +182,9 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                 if (!ignore) {
                     const collectionDays = collectionResponse.data?.data?.days ?? [];
                     const collectionDailyCounts = collectionDays.reduce<Record<string, number>>((acc, item) => {
-                        acc[String(item.day)] = Math.abs(Number(item.paid ?? 0));
+                        acc[String(item.day)] = Math.abs(
+                            Number(item.cash_payment ?? 0) + Number(item.non_cash_payment ?? 0)
+                        );
                         return acc;
                     }, {});
 
@@ -180,7 +193,13 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                         loanreleases: loanReleaseResponse.data?.daily_counts ?? {},
                         collections: collectionDailyCounts,
                     });
-                    setCollectionTotalPaid(Math.abs(Number(collectionResponse.data?.data?.total_paid ?? 0)));
+                    const totalCashPayment = Math.abs(Number(collectionResponse.data?.data?.total_cash_payment ?? 0));
+                    const totalNonCashPayment = Math.abs(Number(collectionResponse.data?.data?.total_non_cash_payment ?? 0));
+                    setCollectionTotalPaid(
+                        totalCashPayment + totalNonCashPayment
+                    );
+                    setCollectionCashPayment(totalCashPayment);
+                    setCollectionNonCashPayment(totalNonCashPayment);
                 }
             } catch {
                 if (!ignore) {
@@ -190,6 +209,8 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                         collections: {},
                     });
                     setCollectionTotalPaid(0);
+                    setCollectionCashPayment(0);
+                    setCollectionNonCashPayment(0);
                 }
             } finally {
                 if (!ignore) {
@@ -274,12 +295,19 @@ const DailyDetailsChart: React.FC<Props> = ({ selectedYear }) => {
                             value={monthTotals.loanreleases}
                             isLoading={isLoading}
                         />
-                        <SummaryStat
-                            label="Collection"
-                            value={collectionTotalPaid}
-                            isLoading={isLoading}
-                            formatter={formatPeso}
-                        />
+                        <div>
+                            <SummaryStat
+                                label="Collection"
+                                value={collectionTotalPaid}
+                                isLoading={isLoading}
+                                formatter={formatPeso}
+                            />
+                            {!isLoading && (
+                                <p className="mt-1 text-[11px] text-gray-500">
+                                    Cash {formatPesoCompact(collectionCashPayment)} | Non-Cash {formatPesoCompact(collectionNonCashPayment)}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 

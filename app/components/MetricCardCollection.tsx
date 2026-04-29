@@ -26,6 +26,8 @@ export interface MetricCardProps {
   percentageColor: string;
   subtitle: string;
   subtitleValue: string;
+  totalCashPaymentValue?: string;
+  totalNonCashPaymentValue?: string;
   topStaffLabel: string;
   topStaffName: string;
   staffs: Staff[];
@@ -54,6 +56,8 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
   percentageColor,
   subtitle,
   subtitleValue,
+  totalCashPaymentValue = '0',
+  totalNonCashPaymentValue = '0',
   topStaffLabel,
   topStaffName,
   staffs,
@@ -68,7 +72,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
   // Sort staff by performance (for ranking)
   const sortedStaff = [...staffs].sort((a, b) => {
     if (type === 'tasks') {
-      return b.taskCompleted - a.taskCompleted;
+      return Number(b.tasks ?? 0) - Number(a.tasks ?? 0);
     }
     return (b.avgDailySales || 0) - (a.avgDailySales || 0);
   });
@@ -137,7 +141,11 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
               <span className="text-[10px] font-bold text-blue-400 uppercase">{topStaffName}</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] text-gray-400">Total Billed</span>
+              <span className="text-[9px] text-gray-400">Total Cash Payment</span>
+              <span className="text-[10px] font-bold">{formatCollectionPesoValue(totalCashPaymentValue)}</span>
+              <span className="text-[9px] text-gray-400 mt-1">Total Non-Cash Payment</span>
+              <span className="text-[10px] font-bold">{formatCollectionPesoValue(totalNonCashPaymentValue)}</span>
+              <span className="text-[9px] text-gray-400 mt-1">Total Billed</span>
               <span className="text-[10px] font-bold">{formatCollectionPesoValue(subtitleValue)}</span>
             </div>
           </div>
@@ -171,12 +179,6 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                   <td className="py-2 text-[10px]">{p.name}</td>
                   <td className="py-2">
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-indigo-400"
-                          style={{ width: `${(type === 'tasks' ? Math.abs(p.tasks || 0) / 100 : Math.abs(p.avgDailySales || 0))}%` }}
-                        />
-                      </div>
                       <span>{type === 'tasks' ? formatCollectionPesoValue(p.tasks ?? 0) : p.avgDailySales}</span>
                     </div>
                   </td>
@@ -300,20 +302,6 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                         <td className="p-3 font-medium">{staff.name}</td>
                         <td className="p-3">
                           <div className="flex items-center">
-                            <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
-                              <div
-                                className={`h-full ${rank <= 3 ? 'bg-green-500' :
-                                  rank <= 8 ? 'bg-blue-500' :
-                                    'bg-gray-400'
-                                  }`}
-                                style={{
-                                  width: `${type === 'tasks' ?
-                                    Math.abs(staff.tasks || 0) / 100 * 100 :
-                                    Math.abs(staff.avgDailySales || 0) / 200 * 100
-                                    }%`
-                                }}
-                              />
-                            </div>
                             <span>{type === 'tasks' ? formatCollectionPesoValue(staff.tasks ?? 0) : staff.avgDailySales}</span>
                           </div>
                         </td>

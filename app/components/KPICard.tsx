@@ -8,6 +8,8 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
+  cashPayment?: number;
+  nonCashPayment?: number;
   history: { month: string; fullMonth?: string; value: number }[];
   isLoading?: boolean;
   isError?: boolean;
@@ -84,6 +86,14 @@ const formatTooltipValue = (value: number) => {
     });
 };
 
+const formatPesoCompact = (value: number) =>
+    new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+        notation: 'compact',
+        maximumFractionDigits: 1,
+    }).format(value ?? 0);
+
 const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ value?: number; payload?: { month?: string; fullMonth?: string } }> }) => {
     if (!active || !payload?.length) {
         return null;
@@ -159,7 +169,14 @@ const KPICard: React.FC<Props> = ({ data, index }) => {
                     </div>
 
                     <p className={`text-[10px] font-medium mb-6 uppercase tracking-tight ${showError ? 'text-rose-400' : 'text-gray-400'}`}>
-                        {data.comparison}
+                        <span className="flex items-center justify-between gap-2">
+                            <span>{data.comparison}</span>
+                            {data.label === 'COLLECTION' && !showError && (
+                                <span className="text-[9px] normal-case tracking-normal text-gray-500 text-right">
+                                    Cash {formatPesoCompact(Math.abs(Number(data.cashPayment ?? 0)))} | Non-Cash {formatPesoCompact(Math.abs(Number(data.nonCashPayment ?? 0)))}
+                                </span>
+                            )}
+                        </span>
                     </p>
 
                     <div className="h-16 w-full mt-auto">

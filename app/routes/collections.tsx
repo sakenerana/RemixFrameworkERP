@@ -29,13 +29,17 @@ interface CollectionGeoEntry {
 interface CollectionDepartmentEntry {
     department: string;
     billed: number;
-    paid: number;
+    cash_payment?: number;
+    non_cash_payment?: number;
+    paid?: number;
 }
 
 interface CollectionBranch {
     branch: string;
     total_billed: number;
-    total_paid: number;
+    total_cash_payment?: number;
+    total_non_cash_payment?: number;
+    total_paid?: number;
     geos: CollectionGeoEntry[];
 }
 
@@ -56,6 +60,8 @@ interface BranchCardData {
     percentage: number;
     percentageColor: string;
     subtitleValue: string;
+    totalCashPaymentValue: string;
+    totalNonCashPaymentValue: string;
     topStaffLabel: string;
     topStaffName: string;
     staffs: Staff[];
@@ -71,10 +77,14 @@ const getPercentageColor = (rank: number) => {
     return "bg-red-500";
 };
 
-const getStatusByRank = (rank: number): Staff["status"] => {
-    if (rank === 0) return "good";
-    if (rank === 1) return "stable";
-    if (rank === 2) return "warning";
+const getStatusByPerformance = (paid: number, billed: number): Staff["status"] => {
+    const safeBilled = Math.abs(Number(billed ?? 0));
+    const safePaid = Math.abs(Number(paid ?? 0));
+    const collectionRate = safeBilled > 0 ? safePaid / safeBilled : 0;
+
+    if (collectionRate >= 0.9) return "good";
+    if (collectionRate >= 0.75) return "stable";
+    if (collectionRate >= 0.5) return "warning";
     return "critical";
 };
 
@@ -89,6 +99,28 @@ const getRangeMonthParam = (months: [number, number]) => {
 const getMonthsDivisorForRange = (months: [number, number]) => {
     const [startMonth, endMonth] = months;
     return endMonth - startMonth + 1;
+};
+
+const getPaidAmount = (source: {
+    total_cash_payment?: number;
+    total_non_cash_payment?: number;
+    total_paid?: number;
+    cash_payment?: number;
+    non_cash_payment?: number;
+    paid?: number;
+}) => {
+    const hasCashNonCash =
+        source.total_cash_payment !== undefined ||
+        source.total_non_cash_payment !== undefined ||
+        source.cash_payment !== undefined ||
+        source.non_cash_payment !== undefined;
+
+    if (hasCashNonCash) {
+        return Number(source.total_cash_payment ?? source.cash_payment ?? 0) +
+            Number(source.total_non_cash_payment ?? source.non_cash_payment ?? 0);
+    }
+
+    return Number(source.total_paid ?? source.paid ?? 0);
 };
 
 export default function CollectionsLayoutIndex() {
@@ -144,13 +176,15 @@ export default function CollectionsLayoutIndex() {
                     {
                         branchTotal: number;
                         branchBilled: number;
+                        branchCashPayment: number;
+                        branchNonCashPayment: number;
                         satellites: Map<string, { paid: number; billed: number; geos: string[] }>;
                     }
                 >();
 
                 const apiBranches = Array.isArray(response.data?.data?.branches) ? response.data.data.branches : [];
                 const overallTotal = apiBranches.reduce(
-                    (sum, branch) => sum + Math.abs(Number(branch.total_paid ?? 0)),
+                    (sum, branch) => sum + Math.abs(getPaidAmount(branch)),
                     0
                 );
 
@@ -159,11 +193,15 @@ export default function CollectionsLayoutIndex() {
                     const existingBranch = branchMap.get(branchName) ?? {
                         branchTotal: 0,
                         branchBilled: 0,
+                        branchCashPayment: 0,
+                        branchNonCashPayment: 0,
                         satellites: new Map<string, { paid: number; billed: number; geos: string[] }>(),
                     };
 
-                    existingBranch.branchTotal += Math.abs(Number(branch.total_paid ?? 0));
+                    existingBranch.branchTotal += Math.abs(getPaidAmount(branch));
                     existingBranch.branchBilled += Math.abs(Number(branch.total_billed ?? 0));
+                    existingBranch.branchCashPayment += Math.abs(Number(branch.total_cash_payment ?? 0));
+                    existingBranch.branchNonCashPayment += Math.abs(Number(branch.total_non_cash_payment ?? 0));
 
                     (branch.geos ?? []).forEach((geo) => {
                         (geo.departments ?? []).forEach((department) => {
@@ -180,7 +218,7 @@ export default function CollectionsLayoutIndex() {
                                 departmentName,
                                 {
                                     billed: currentTotal.billed + Math.abs(Number(department.billed ?? 0)),
-                                    paid: currentTotal.paid + Math.abs(Number(department.paid ?? 0)),
+                                    paid: currentTotal.paid + Math.abs(getPaidAmount(department)),
                                     geos: nextGeos,
                                 }
                             );
@@ -209,7 +247,10 @@ export default function CollectionsLayoutIndex() {
                                       tasks: Number(satellite.satellite_total ?? 0),
                                       taskCompleted: Number(satellite.satellite_billed ?? 0),
                                       replenishmentDays: 0,
-                                      status: getStatusByRank(index),
+                                      status: getStatusByPerformance(
+                                          Number(satellite.satellite_total ?? 0),
+                                          Number(satellite.satellite_billed ?? 0)
+                                      ),
                                       geos: satellite.geos,
                                   }))
                                 : [
@@ -233,6 +274,8 @@ export default function CollectionsLayoutIndex() {
                             branchName,
                             branchTotal: branchData.branchTotal,
                             branchBilled: branchData.branchBilled,
+                            branchCashPayment: branchData.branchCashPayment,
+                            branchNonCashPayment: branchData.branchNonCashPayment,
                             topSatellite: sortedSatellites[0]?.satellite_name ?? "N/A",
                             staffs,
                         };
@@ -249,6 +292,8 @@ export default function CollectionsLayoutIndex() {
                                 : 0,
                         percentageColor: getPercentageColor(index),
                         subtitleValue: branch.branchBilled.toLocaleString(),
+                        totalCashPaymentValue: branch.branchCashPayment.toLocaleString(),
+                        totalNonCashPaymentValue: branch.branchNonCashPayment.toLocaleString(),
                         topStaffLabel: "Most Active Department",
                         topStaffName: branch.topSatellite,
                         staffs: branch.staffs,
@@ -356,6 +401,8 @@ export default function CollectionsLayoutIndex() {
                         percentage={branch.percentage}
                         percentageColor={branch.percentageColor}
                         subtitleValue={branch.subtitleValue}
+                        totalCashPaymentValue={branch.totalCashPaymentValue}
+                        totalNonCashPaymentValue={branch.totalNonCashPaymentValue}
                         topStaffLabel={branch.topStaffLabel}
                         topStaffName={branch.topStaffName}
                         staffs={branch.staffs}

@@ -19,6 +19,8 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
+  cashPayment?: number;
+  nonCashPayment?: number;
   history: { month: string; fullMonth?: string; value: number }[];
   isLoading?: boolean;
   isError?: boolean;
@@ -50,7 +52,9 @@ interface PersonnelMonthlyTotalsResponse {
 interface BillingMonthEntry {
   month: number;
   billed: number;
-  paid: number;
+  cash_payment?: number;
+  non_cash_payment?: number;
+  paid?: number;
 }
 
 interface BillingByDateApiResponse {
@@ -58,7 +62,9 @@ interface BillingByDateApiResponse {
   data: {
     year: number;
     total_billed: number;
-    total_paid: number;
+    total_cash_payment?: number;
+    total_non_cash_payment?: number;
+    total_paid?: number;
     months: BillingMonthEntry[];
   };
 }
@@ -148,9 +154,45 @@ const MONTH_NAMES = [
   "December",
 ];
 
+const toNumberSafe = (value: unknown) => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const cleaned = value.replace(/,/g, "").trim();
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getBillingPaidValue = (source: {
+  total_cash_payment?: unknown;
+  total_non_cash_payment?: unknown;
+  total_paid?: unknown;
+  cash_payment?: unknown;
+  non_cash_payment?: unknown;
+  paid?: unknown;
+}) => {
+  const hasCashNonCash =
+    source.total_cash_payment !== undefined ||
+    source.total_non_cash_payment !== undefined ||
+    source.cash_payment !== undefined ||
+    source.non_cash_payment !== undefined;
+
+  if (hasCashNonCash) {
+    return toNumberSafe(source.total_cash_payment ?? source.cash_payment) +
+      toNumberSafe(source.total_non_cash_payment ?? source.non_cash_payment);
+  }
+
+  return toNumberSafe(source.total_paid ?? source.paid);
+};
+
 const mapBillingMonthsToMonthlyCounts = (months: BillingMonthEntry[] = []) => {
   const paidByMonth = new Map<number, number>(
-    months.map((item) => [Number(item.month), Number(item.paid ?? 0)])
+    months.map((item) => [
+      Number(item.month),
+      getBillingPaidValue(item),
+    ])
   );
 
   return MONTH_NAMES.reduce<Record<string, number>>((acc, monthName, index) => {
@@ -176,6 +218,8 @@ export default function PerformanceReportLayoutIndex() {
       {
         totalCount: number;
         monthlyCounts: Record<string, number>;
+        cashPayment: number;
+        nonCashPayment: number;
         isLoading: boolean;
         isError: boolean;
       }
@@ -187,6 +231,8 @@ export default function PerformanceReportLayoutIndex() {
         {
           totalCount: number;
           monthlyCounts: Record<string, number>;
+          cashPayment: number;
+          nonCashPayment: number;
           isLoading: boolean;
           isError: boolean;
         }
@@ -195,6 +241,8 @@ export default function PerformanceReportLayoutIndex() {
       acc[kpi.label] = {
         totalCount: 0,
         monthlyCounts: {},
+        cashPayment: 0,
+        nonCashPayment: 0,
         isLoading: true,
         isError: false,
       };
@@ -262,6 +310,8 @@ export default function PerformanceReportLayoutIndex() {
                 : (apiData?.monthlyCounts[month] ?? 0),
           })),
           comparison: apiData?.isError ? "unable to sync data" : `per year - ${selectedYear}`,
+          cashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.cashPayment ?? 0) : undefined,
+          nonCashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.nonCashPayment ?? 0) : undefined,
           isLoading: apiData?.isLoading ?? false,
           isError: apiData?.isError ?? false,
         };
@@ -283,6 +333,8 @@ export default function PerformanceReportLayoutIndex() {
           {
             totalCount: number;
             monthlyCounts: Record<string, number>;
+            cashPayment: number;
+            nonCashPayment: number;
             isLoading: boolean;
             isError: boolean;
           }
@@ -291,6 +343,8 @@ export default function PerformanceReportLayoutIndex() {
         acc[kpi.label] = {
           totalCount: 0,
           monthlyCounts: {},
+          cashPayment: 0,
+          nonCashPayment: 0,
           isLoading: true,
           isError: false,
         };
@@ -325,6 +379,8 @@ export default function PerformanceReportLayoutIndex() {
                     monthlyCounts: mapPersonnelMonthlyTotalsToMonthlyCounts(
                       matchedPersonnel?.monthly_totals
                     ),
+                    cashPayment: 0,
+                    nonCashPayment: 0,
                     isLoading: false,
                     isError: false,
                   },
@@ -347,11 +403,24 @@ export default function PerformanceReportLayoutIndex() {
               );
 
               if (!ignore) {
+                const months = response.data?.data?.months ?? [];
+                const totalFromTopLevel = getBillingPaidValue(response.data?.data ?? {});
+                const totalFromMonths = months.reduce(
+                  (sum, month) => sum + getBillingPaidValue(month),
+                  0
+                );
+                const cashFromTopLevel = toNumberSafe(response.data?.data?.total_cash_payment);
+                const nonCashFromTopLevel = toNumberSafe(response.data?.data?.total_non_cash_payment);
+                const cashFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.cash_payment), 0);
+                const nonCashFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.non_cash_payment), 0);
+
                 setKpiApiData((prev) => ({
                   ...prev,
                   [kpi.label]: {
-                    totalCount: Number(response.data?.data?.total_paid ?? 0),
-                    monthlyCounts: mapBillingMonthsToMonthlyCounts(response.data?.data?.months),
+                    totalCount: totalFromTopLevel !== 0 ? totalFromTopLevel : totalFromMonths,
+                    monthlyCounts: mapBillingMonthsToMonthlyCounts(months),
+                    cashPayment: cashFromTopLevel !== 0 ? cashFromTopLevel : cashFromMonths,
+                    nonCashPayment: nonCashFromTopLevel !== 0 ? nonCashFromTopLevel : nonCashFromMonths,
                     isLoading: false,
                     isError: false,
                   },
@@ -392,6 +461,8 @@ export default function PerformanceReportLayoutIndex() {
                     0
                   ),
                   monthlyCounts: mergeMonthlyCounts(endpointResponses),
+                  cashPayment: 0,
+                  nonCashPayment: 0,
                   isLoading: false,
                   isError: false,
                 },
@@ -404,6 +475,8 @@ export default function PerformanceReportLayoutIndex() {
               [kpi.label]: {
                 totalCount: 0,
                 monthlyCounts: {},
+                cashPayment: 0,
+                nonCashPayment: 0,
                 isLoading: false,
                 isError: true,
               },

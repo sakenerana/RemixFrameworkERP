@@ -180,7 +180,10 @@ export default function LandingPage2() {
                 }
             );
 
-            setCollectionTotal(Math.abs(Number(response.data?.data?.total_paid ?? 0)));
+            const totalPaid =
+                Number(response.data?.data?.total_cash_payment ?? 0) +
+                Number(response.data?.data?.total_non_cash_payment ?? 0);
+            setCollectionTotal(Math.abs(totalPaid));
         } catch (error) {
             setCollectionTotal(0);
         }
