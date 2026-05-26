@@ -117,6 +117,7 @@ export default function PersonnelLayoutIndex() {
                     );
 
                 const mappedBranches = apiBranches
+                    .filter((branch) => branch.branch_name?.trim().toLowerCase() !== "no branch")
                     .map((branch) => {
                         const sortedUsers = [...(branch.users ?? [])].sort(
                             (a, b) => Number(b.completed ?? 0) - Number(a.completed ?? 0)

@@ -359,6 +359,7 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({ selectedYear }) =
 
                     const nextBranchData = Object.entries(branchResponse.data?.data ?? {})
                         .map(([name, value]) => ({ name, value: Number(value ?? 0) }))
+                        .filter((branch) => branch.name?.trim().toLowerCase() !== 'no branch')
                         .sort((a, b) => b.value - a.value)
                         .slice(0, 6);
 

@@ -121,6 +121,7 @@ export default function NewMembershipLayoutIndex() {
                     apiBranches.reduce((sum, branch) => sum + Number(branch.branch_total ?? 0), 0);
 
                 const mappedBranches = apiBranches
+                    .filter((branch) => branch.branch_name?.trim().toLowerCase() !== "no branch")
                     .map((branch) => {
                         const sortedSatellites = [...(branch.satellites ?? [])].sort(
                             (a, b) => Number(b.satellite_total ?? 0) - Number(a.satellite_total ?? 0)

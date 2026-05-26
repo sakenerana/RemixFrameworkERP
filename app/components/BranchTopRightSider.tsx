@@ -214,6 +214,7 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
                         billed: totals.billed,
                         paid: totals.paid,
                     }))
+                    .filter((branch) => branch.name?.trim().toLowerCase() !== 'no branch')
                     .sort((a, b) => b.total - a.total)
                     .slice(0, 10);
 

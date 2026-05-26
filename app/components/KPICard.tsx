@@ -8,6 +8,8 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
+  rawCollectionRatio?: number;
+  totalBilled?: number;
   cashPayment?: number;
   nonCashPayment?: number;
   history: { month: string; fullMonth?: string; value: number }[];
@@ -173,7 +175,7 @@ const KPICard: React.FC<Props> = ({ data, index }) => {
                             <span>{data.comparison}</span>
                             {data.label === 'COLLECTION' && !showError && (
                                 <span className="text-[9px] normal-case tracking-normal text-gray-500 text-right">
-                                    Cash {formatPesoCompact(Math.abs(Number(data.cashPayment ?? 0)))} | Non-Cash {formatPesoCompact(Math.abs(Number(data.nonCashPayment ?? 0)))}
+                                    Billed {formatPesoCompact(Math.abs(Number(data.totalBilled ?? 0)))} | Cash {formatPesoCompact(Math.abs(Number(data.cashPayment ?? 0)))} | Non-Cash {formatPesoCompact(Math.abs(Number(data.nonCashPayment ?? 0)))}
                                 </span>
                             )}
                         </span>

@@ -55,7 +55,7 @@ export default function CollectionLgu() {
 
             <div className="bg-slate-800 text-white py-6 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 text-center">
-                    <h2 className="text-2xl font-semibold tracking-wide">Collection LGU Details</h2>
+                    <h2 className="text-2xl font-semibold tracking-wide">Collection Groupings Details</h2>
                     <p className="text-sm text-gray-300 mt-1">
                         {departmentName} • {branchName}
                     </p>
@@ -75,22 +75,22 @@ export default function CollectionLgu() {
 
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div className="border-b border-gray-200 px-6 py-4">
-                        <h3 className="text-lg font-semibold text-gray-800">LGU List</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Groupings List</h3>
                         <p className="text-sm text-gray-500 mt-1">
-                            Showing all GEO entries that belong to {departmentName}.
+                            Showing all grouping entries that belong to {departmentName}.
                         </p>
                     </div>
 
                     {geos.length === 0 ? (
                         <div className="px-6 py-10 text-center text-sm text-gray-500">
-                            No LGU data available for this department.
+                            No grouping data available for this department.
                         </div>
                     ) : (
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50 border-b">
                                 <tr className="text-gray-600">
                                     <th className="p-4 text-left">#</th>
-                                    <th className="p-4 text-left">LGU Name</th>
+                                    <th className="p-4 text-left">Grouping Name</th>
                                 </tr>
                             </thead>
                             <tbody>

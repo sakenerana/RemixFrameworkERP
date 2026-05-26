@@ -19,6 +19,8 @@ export interface KPIData {
   value: string;
   trend: number;
   comparison: string;
+  rawCollectionRatio?: number;
+  totalBilled?: number;
   cashPayment?: number;
   nonCashPayment?: number;
   history: { month: string; fullMonth?: string; value: number }[];
@@ -209,6 +211,13 @@ const formatPeso = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value ?? 0);
 
+const toPercentRatio = (numerator: number, denominator: number) => {
+  const safeNumerator = Math.abs(toNumberSafe(numerator));
+  const safeDenominator = Math.abs(toNumberSafe(denominator));
+  if (safeDenominator <= 0) return 0;
+  return Number(((safeNumerator / safeDenominator) * 100).toFixed(2));
+};
+
 export default function PerformanceReportLayoutIndex() {
   const currentYear = dayjs().year();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
@@ -218,6 +227,7 @@ export default function PerformanceReportLayoutIndex() {
       {
         totalCount: number;
         monthlyCounts: Record<string, number>;
+        totalBilled: number;
         cashPayment: number;
         nonCashPayment: number;
         isLoading: boolean;
@@ -231,6 +241,7 @@ export default function PerformanceReportLayoutIndex() {
         {
           totalCount: number;
           monthlyCounts: Record<string, number>;
+          totalBilled: number;
           cashPayment: number;
           nonCashPayment: number;
           isLoading: boolean;
@@ -241,6 +252,7 @@ export default function PerformanceReportLayoutIndex() {
       acc[kpi.label] = {
         totalCount: 0,
         monthlyCounts: {},
+        totalBilled: 0,
         cashPayment: 0,
         nonCashPayment: 0,
         isLoading: true,
@@ -291,6 +303,10 @@ export default function PerformanceReportLayoutIndex() {
           kpi.label === "PERSONNEL TASK COMPLETION"
             ? `${kpi.link}?year=${selectedYear}`
             : kpi.link;
+        const rawCollectionRatio =
+          kpi.label === "COLLECTION"
+            ? toPercentRatio(apiData?.totalCount ?? 0, apiData?.totalBilled ?? 0)
+            : undefined;
 
         return {
           label: kpi.label,
@@ -300,7 +316,11 @@ export default function PerformanceReportLayoutIndex() {
             : kpi.label === "COLLECTION"
               ? formatPeso(Math.abs(apiData?.totalCount ?? 0))
               : (apiData?.totalCount ?? 0).toLocaleString(),
-          trend: 0,
+          trend:
+            kpi.label === "COLLECTION"
+              ? Math.min(100, rawCollectionRatio ?? 0)
+              : 0,
+          rawCollectionRatio,
           history: monthOrder.map((month) => ({
             month: monthLabelMap[month],
             fullMonth: month,
@@ -310,6 +330,7 @@ export default function PerformanceReportLayoutIndex() {
                 : (apiData?.monthlyCounts[month] ?? 0),
           })),
           comparison: apiData?.isError ? "unable to sync data" : `per year - ${selectedYear}`,
+          totalBilled: kpi.label === "COLLECTION" ? Math.abs(apiData?.totalBilled ?? 0) : undefined,
           cashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.cashPayment ?? 0) : undefined,
           nonCashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.nonCashPayment ?? 0) : undefined,
           isLoading: apiData?.isLoading ?? false,
@@ -333,6 +354,7 @@ export default function PerformanceReportLayoutIndex() {
           {
             totalCount: number;
             monthlyCounts: Record<string, number>;
+            totalBilled: number;
             cashPayment: number;
             nonCashPayment: number;
             isLoading: boolean;
@@ -343,6 +365,7 @@ export default function PerformanceReportLayoutIndex() {
         acc[kpi.label] = {
           totalCount: 0,
           monthlyCounts: {},
+          totalBilled: 0,
           cashPayment: 0,
           nonCashPayment: 0,
           isLoading: true,
@@ -379,6 +402,7 @@ export default function PerformanceReportLayoutIndex() {
                     monthlyCounts: mapPersonnelMonthlyTotalsToMonthlyCounts(
                       matchedPersonnel?.monthly_totals
                     ),
+                    totalBilled: 0,
                     cashPayment: 0,
                     nonCashPayment: 0,
                     isLoading: false,
@@ -409,6 +433,8 @@ export default function PerformanceReportLayoutIndex() {
                   (sum, month) => sum + getBillingPaidValue(month),
                   0
                 );
+                const totalBilledFromTopLevel = toNumberSafe(response.data?.data?.total_billed);
+                const totalBilledFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.billed), 0);
                 const cashFromTopLevel = toNumberSafe(response.data?.data?.total_cash_payment);
                 const nonCashFromTopLevel = toNumberSafe(response.data?.data?.total_non_cash_payment);
                 const cashFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.cash_payment), 0);
@@ -419,6 +445,7 @@ export default function PerformanceReportLayoutIndex() {
                   [kpi.label]: {
                     totalCount: totalFromTopLevel !== 0 ? totalFromTopLevel : totalFromMonths,
                     monthlyCounts: mapBillingMonthsToMonthlyCounts(months),
+                    totalBilled: totalBilledFromTopLevel !== 0 ? totalBilledFromTopLevel : totalBilledFromMonths,
                     cashPayment: cashFromTopLevel !== 0 ? cashFromTopLevel : cashFromMonths,
                     nonCashPayment: nonCashFromTopLevel !== 0 ? nonCashFromTopLevel : nonCashFromMonths,
                     isLoading: false,
@@ -461,6 +488,7 @@ export default function PerformanceReportLayoutIndex() {
                     0
                   ),
                   monthlyCounts: mergeMonthlyCounts(endpointResponses),
+                  totalBilled: 0,
                   cashPayment: 0,
                   nonCashPayment: 0,
                   isLoading: false,
@@ -475,6 +503,7 @@ export default function PerformanceReportLayoutIndex() {
               [kpi.label]: {
                 totalCount: 0,
                 monthlyCounts: {},
+                totalBilled: 0,
                 cashPayment: 0,
                 nonCashPayment: 0,
                 isLoading: false,

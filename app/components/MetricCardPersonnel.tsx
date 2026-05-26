@@ -245,7 +245,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                     <th className="text-left p-3 font-semibold text-gray-700">
                       {type === 'tasks' ? 'Completed' : 'Replenishment Days'}
                     </th>
-                    <th className="text-left p-3 font-semibold text-gray-700">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -295,16 +294,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                             }`}>
                             {type === 'tasks' ? staff.taskCompleted : `${staff.replenishmentDays} days`}
                           </span>
-                        </td>
-                        <td className="p-3">
-                          <div className="flex items-center">
-                            <div className={`w-2 h-2 rounded-full mr-2 ${staff.status === 'critical' ? 'bg-red-500' :
-                                staff.status === 'warning' ? 'bg-orange-500' :
-                                  staff.status === 'stable' ? 'bg-green-500' :
-                                    'bg-blue-500'
-                              }`} />
-                            <span className="capitalize">{staff.status}</span>
-                          </div>
                         </td>
                       </tr>
                     );

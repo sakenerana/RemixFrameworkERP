@@ -123,6 +123,13 @@ const getPaidAmount = (source: {
     return Number(source.total_paid ?? source.paid ?? 0);
 };
 
+const getCollectionEfficiencyPercent = (paid: number, billed: number) => {
+    const safePaid = Math.abs(Number(paid ?? 0));
+    const safeBilled = Math.abs(Number(billed ?? 0));
+    if (safeBilled <= 0) return 0;
+    return Math.min(100, Number(((safePaid / safeBilled) * 100).toFixed(2)));
+};
+
 export default function CollectionsLayoutIndex() {
     const [searchParams] = useSearchParams();
     const currentYear = dayjs().year();
@@ -183,10 +190,6 @@ export default function CollectionsLayoutIndex() {
                 >();
 
                 const apiBranches = Array.isArray(response.data?.data?.branches) ? response.data.data.branches : [];
-                const overallTotal = apiBranches.reduce(
-                    (sum, branch) => sum + Math.abs(getPaidAmount(branch)),
-                    0
-                );
 
                 apiBranches.forEach((branch) => {
                     const branchName = branch.branch;
@@ -265,11 +268,6 @@ export default function CollectionsLayoutIndex() {
                                       },
                                   ];
 
-                        const satelliteTotal = sortedSatellites.reduce(
-                            (sum, satellite) => sum + satellite.satellite_total,
-                            0
-                        );
-
                         return {
                             branchName,
                             branchTotal: branchData.branchTotal,
@@ -286,10 +284,10 @@ export default function CollectionsLayoutIndex() {
                         title: branch.branchName,
                         subtitle: "Total Collection",
                         value: branch.branchTotal.toLocaleString(),
-                        percentage:
-                            overallTotal > 0
-                                ? Math.round((branch.branchTotal / overallTotal) * 100)
-                                : 0,
+                        percentage: getCollectionEfficiencyPercent(
+                            branch.branchTotal,
+                            branch.branchBilled
+                        ),
                         percentageColor: getPercentageColor(index),
                         subtitleValue: branch.branchBilled.toLocaleString(),
                         totalCashPaymentValue: branch.branchCashPayment.toLocaleString(),

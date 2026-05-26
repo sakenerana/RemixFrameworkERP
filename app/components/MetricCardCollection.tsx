@@ -49,6 +49,13 @@ const formatCollectionPesoValue = (value: number | string) => {
   return `\u20B1${Math.abs(safeValue).toLocaleString()}`;
 };
 
+const getEfficiencyPercent = (paid: number, billed: number) => {
+  const safePaid = Math.abs(Number(paid ?? 0));
+  const safeBilled = Math.abs(Number(billed ?? 0));
+  if (safeBilled <= 0) return 0;
+  return Math.min(100, Number(((safePaid / safeBilled) * 100).toFixed(2)));
+};
+
 const MetricCardCollection: React.FC<MetricCardProps> = ({
   title,
   value,
@@ -167,6 +174,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                 <th className="text-right font-normal py-1">
                   {type === 'tasks' ? 'Billed' : 'Replenishment'}
                 </th>
+                <th className="text-right font-normal py-1">Pct. (%)</th>
               </tr>
             </thead>
             <tbody>
@@ -190,6 +198,11 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                       }`}>
                       {type === 'tasks' ? formatCollectionPesoValue(p.taskCompleted) : p.replenishmentDays}
                     </span>
+                  </td>
+                  <td className="py-2 text-right font-semibold text-gray-700">
+                    {type === 'tasks'
+                      ? `${getEfficiencyPercent(Number(p.tasks ?? 0), Number(p.taskCompleted ?? 0))}%`
+                      : '-'}
                   </td>
                 </tr>
               ))}
@@ -327,7 +340,7 @@ const MetricCardCollection: React.FC<MetricCardProps> = ({
                bg-blue-600 text-white rounded-md
                hover:bg-blue-700 transition-colors duration-200"
                           >
-                            View LGU's
+                            View Groupings
                           </Link>
                         </td>
                       </tr>
