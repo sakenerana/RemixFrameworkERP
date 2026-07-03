@@ -202,6 +202,14 @@ export default function AdminLayoutIndex() {
     },
   ];
 
+  const selectedMenuKey = currentPath.startsWith('/admin/users')
+    ? '3'
+    : currentPath.startsWith('/admin/departments')
+      ? '4'
+      : currentPath.startsWith('/admin/groups')
+        ? '5'
+        : '1';
+
   const mobileMenuItems = [
     {
       key: '1',
@@ -323,23 +331,25 @@ export default function AdminLayoutIndex() {
                   bottom: 0,
                   height: '100vh',
                   zIndex: 200,
-                  background: isDarkMode ? '#141414' : '#ffffff',
+                  background: isDarkMode ? '#141414' : 'linear-gradient(180deg, #172554 0%, #263996 48%, #3449a8 100%)',
                   borderRight: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
-                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '2px 0 8px rgba(0, 0, 0, 0.05)',
+                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '8px 0 24px rgba(15, 23, 42, 0.12)',
                   overflow: 'hidden',
                 }}
-                className="sidebar-gradient"
+                className="admin-sidebar sidebar-gradient"
               >
                 {/* User Profile Section - Enhanced */}
                 <div
-                  className="h-20 flex items-center justify-center relative overflow-hidden"
+                  className="relative flex h-28 items-center justify-center overflow-hidden px-4"
                   style={{
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
                   }}
                 >
                   {/* Decorative accent */}
-                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-cyan-400" />
+                  <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-sky-300 to-cyan-300" />
+                  <div className="absolute -right-10 -top-16 h-36 w-36 rounded-full bg-white/10" />
+                  <div className="absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-blue-300/10" />
 
                   {collapsed ? (
                     <div className="p-3 relative group">
@@ -355,7 +365,7 @@ export default function AdminLayoutIndex() {
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
                     </div>
                   ) : (
-                    <div className="flex items-center w-full px-5 py-4">
+                    <div className="relative flex w-full items-center rounded-md border border-white/10 bg-white/10 px-4 py-3 shadow-sm backdrop-blur">
                       <div className="relative group">
                         <Avatar
                           src="/img/user.png"
@@ -370,11 +380,11 @@ export default function AdminLayoutIndex() {
                           <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                         </div>
                       </div>
-                      <div className="ml-4 overflow-hidden">
-                        <div className="font-semibold text-lg text-white truncate">
+                      <div className="ml-4 min-w-0 overflow-hidden">
+                        <div className="truncate text-base font-semibold leading-tight text-white">
                           {isFname} {isLname}
                         </div>
-                        <div className="flex items-center mt-2">
+                        <div className="mt-2 flex items-center">
                           <div className="flex-shrink-0">
                             <Tag
                               color="gold"
@@ -408,16 +418,16 @@ export default function AdminLayoutIndex() {
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
                   mode="inline"
-                  defaultSelectedKeys={['1']}
+                  selectedKeys={[selectedMenuKey]}
                   items={menuItems}
                   style={{
                     backgroundColor: isDarkMode ? '#141414' : 'transparent',
                     color: isDarkMode ? '#141414' : '#f1f1f1',
-                    height: 'calc(100vh - 80px)',
+                    height: collapsed ? 'calc(100vh - 202px)' : 'calc(100vh - 260px)',
                     overflowY: 'auto',
-                    padding: '8px 0',
+                    padding: collapsed ? '12px 8px' : '16px 12px',
                   }}
-                  className="custom-menu glass-effect"
+                  className="admin-sidebar-menu custom-menu glass-effect"
                 />
 
                 {/* Sidebar Footer / Sign Out */}
@@ -428,9 +438,9 @@ export default function AdminLayoutIndex() {
                     bottom: 0,
                     left: 0,
                     width: "100%",
-                    padding: collapsed ? "16px 8px" : "20px 16px",
+                    padding: collapsed ? "14px 10px" : "18px 20px 20px",
                     borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(15,23,42,0.18) 100%)",
                     backdropFilter: "blur(10px)",
                   }}
                 >
@@ -448,14 +458,13 @@ export default function AdminLayoutIndex() {
                     </Tooltip>
                   ) : (
                     <Button
-                      color="danger" variant="solid"
-                      
+                      danger
+                      type="primary"
                       icon={<LogoutOutlined />}
                       onClick={handleSignout}
-                      className="w-full h-12 border-red-500/30 hover:border-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group"
-                      
+                      className="group flex h-11 w-full items-center justify-center rounded-md font-semibold shadow-sm transition-all duration-300"
                     >
-                      <span className="ml-2 font-semibold text-white/90 group-hover:text-red-300 transition-colors">
+                      <span className="ml-2 text-white">
                         SIGN OUT
                       </span>
                       <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">

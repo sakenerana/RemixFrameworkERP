@@ -163,6 +163,51 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.admin-sidebar .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar-menu {
+  border-inline-end: 0 !important;
+}
+
+.admin-sidebar-menu .ant-menu-item {
+  height: 48px !important;
+  margin: 4px 0 !important;
+  border-radius: 10px !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.admin-sidebar-menu .ant-menu-item .ant-menu-title-content a {
+  color: inherit !important;
+}
+
+.admin-sidebar-menu .ant-menu-item .ant-menu-item-icon {
+  color: currentColor !important;
+}
+
+.admin-sidebar-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  transform: translateX(2px);
+  box-shadow: none;
+}
+
+.admin-sidebar-menu .ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.52) 0%, rgba(37, 99, 235, 0.34) 100%) !important;
+  color: #ffffff !important;
+  border-left: 3px solid #67e8f9;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-menu .ant-menu-item-selected::after {
+  display: none !important;
+}
+
 /* Custom menu item styling */
 /* .custom-menu .ant-menu-item {
   margin: 4px 8px !important;
@@ -208,6 +253,86 @@ body {
 
 .custom-menu::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.admin-sidebar-menu.custom-menu .ant-menu-item {
+  height: 48px !important;
+  margin: 4px 0 !important;
+  border-radius: 10px !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: none;
+}
+
+.admin-sidebar-menu.custom-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  transform: translateX(2px);
+  box-shadow: none;
+}
+
+.admin-sidebar-menu.custom-menu .ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.52) 0%, rgba(37, 99, 235, 0.34) 100%) !important;
+  border-left: 3px solid #67e8f9;
+  color: #ffffff !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.admin-users-page .ant-card-body {
+  background: #ffffff;
+}
+
+.admin-users-table .ant-table {
+  border-radius: 8px;
+}
+
+.admin-users-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.admin-users-table .ant-table-tbody > tr > td {
+  border-bottom-color: #eef2f7 !important;
+}
+
+.admin-users-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbff !important;
+}
+
+.admin-users-table .ant-pagination {
+  margin: 16px !important;
+}
+
+.admin-departments-page .ant-card-body {
+  background: #ffffff;
+}
+
+.admin-departments-table .ant-table {
+  border-radius: 8px;
+}
+
+.admin-departments-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.admin-departments-table .ant-table-tbody > tr > td {
+  border-bottom-color: #eef2f7 !important;
+}
+
+.admin-departments-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbff !important;
+}
+
+.admin-departments-table .ant-pagination {
+  margin: 16px !important;
 }
 
 /* Pulse animation for online indicator */

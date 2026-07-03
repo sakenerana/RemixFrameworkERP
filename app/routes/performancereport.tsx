@@ -77,6 +77,18 @@ interface KpiDefinition {
   endpoints: string[];
 }
 
+interface KpiApiStateItem {
+  totalCount: number;
+  monthlyCounts: Record<string, number>;
+  totalBilled: number;
+  cashPayment: number;
+  nonCashPayment: number;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+type KpiApiDataMap = Record<string, KpiApiStateItem>;
+
 const KPI_DEFINITIONS: KpiDefinition[] = [
   {
     label: "NEW MEMBERSHIP",
@@ -102,6 +114,55 @@ const KPI_DEFINITIONS: KpiDefinition[] = [
     endpoints: ["personnel/count"],
   },
 ];
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTH_LABEL_MAP: Record<string, string> = {
+  January: "Jan",
+  February: "Feb",
+  March: "Mar",
+  April: "Apr",
+  May: "May",
+  June: "Jun",
+  July: "Jul",
+  August: "Aug",
+  September: "Sep",
+  October: "Oct",
+  November: "Nov",
+  December: "Dec",
+};
+
+const EMPTY_KPI_STATE: KpiApiStateItem = {
+  totalCount: 0,
+  monthlyCounts: {},
+  totalBilled: 0,
+  cashPayment: 0,
+  nonCashPayment: 0,
+  isLoading: false,
+  isError: false,
+};
+
+const createInitialKpiApiData = (isLoading = true): KpiApiDataMap =>
+  KPI_DEFINITIONS.reduce<KpiApiDataMap>((acc, kpi) => {
+    acc[kpi.label] = {
+      ...EMPTY_KPI_STATE,
+      isLoading,
+    };
+    return acc;
+  }, {});
 
 const mergeMonthlyCounts = (responses: NewMembershipApiResponse[]) => {
   return responses.reduce<Record<string, number>>((acc, response) => {
@@ -140,21 +201,6 @@ const mapPersonnelMonthlyTotalsToMonthlyCounts = (
     {}
   );
 };
-
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 const toNumberSafe = (value: unknown) => {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
@@ -218,126 +264,186 @@ const toPercentRatio = (numerator: number, denominator: number) => {
   return Number(((safeNumerator / safeDenominator) * 100).toFixed(2));
 };
 
+const buildKpiLink = (kpi: KpiDefinition, selectedYear: number) =>
+  `${kpi.link}?year=${selectedYear}`;
+
+const mapKpiApiDataToCardData = (
+  kpiApiData: KpiApiDataMap,
+  selectedYear: number
+): KPIData[] =>
+  KPI_DEFINITIONS.map((kpi) => {
+    const apiData = kpiApiData[kpi.label] ?? EMPTY_KPI_STATE;
+    const isCollection = kpi.label === "COLLECTION";
+    const rawCollectionRatio = isCollection
+      ? toPercentRatio(apiData.totalCount, apiData.totalBilled)
+      : undefined;
+
+    return {
+      label: kpi.label,
+      link: buildKpiLink(kpi, selectedYear),
+      value: apiData.isLoading
+        ? "..."
+        : isCollection
+          ? formatPeso(Math.abs(apiData.totalCount))
+          : apiData.totalCount.toLocaleString(),
+      trend: isCollection ? Math.min(100, rawCollectionRatio ?? 0) : 0,
+      rawCollectionRatio,
+      history: MONTH_NAMES.map((month) => ({
+        month: MONTH_LABEL_MAP[month],
+        fullMonth: month,
+        value: isCollection
+          ? Math.abs(apiData.monthlyCounts[month] ?? 0)
+          : (apiData.monthlyCounts[month] ?? 0),
+      })),
+      comparison: apiData.isError ? "unable to sync data" : `per year - ${selectedYear}`,
+      totalBilled: isCollection ? Math.abs(apiData.totalBilled) : undefined,
+      cashPayment: isCollection ? Math.abs(apiData.cashPayment) : undefined,
+      nonCashPayment: isCollection ? Math.abs(apiData.nonCashPayment) : undefined,
+      isLoading: apiData.isLoading,
+      isError: apiData.isError,
+    };
+  });
+
+const fetchPersonnelKpiData = async (
+  selectedYear: number,
+  userId: number,
+  username: string,
+  signal: AbortSignal
+): Promise<KpiApiStateItem> => {
+  const response = await axios.get<PersonnelMonthlyTotalsResponse>(
+    `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/activitybuilder/monthly-completed-totals/${selectedYear}`,
+    {
+      params: { userid: userId, username },
+      signal,
+    }
+  );
+
+  const personnelRows = response.data?.data ?? [];
+  const matchedPersonnel = personnelRows.find(
+    (row) => Number(row.user_id) === Number(userId)
+  );
+
+  return {
+    ...EMPTY_KPI_STATE,
+    totalCount: Number(matchedPersonnel?.year_total ?? 0),
+    monthlyCounts: mapPersonnelMonthlyTotalsToMonthlyCounts(
+      matchedPersonnel?.monthly_totals
+    ),
+  };
+};
+
+const fetchCollectionKpiData = async (
+  selectedYear: number,
+  signal: AbortSignal
+): Promise<KpiApiStateItem> => {
+  const response = await axios.get<BillingByDateApiResponse>(
+    `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
+    {
+      params: {
+        year: selectedYear,
+        month: 0,
+      },
+      signal,
+    }
+  );
+
+  const months = response.data?.data?.months ?? [];
+  const totalFromTopLevel = getBillingPaidValue(response.data?.data ?? {});
+  const totalFromMonths = months.reduce(
+    (sum, month) => sum + getBillingPaidValue(month),
+    0
+  );
+  const totalBilledFromTopLevel = toNumberSafe(response.data?.data?.total_billed);
+  const totalBilledFromMonths = months.reduce(
+    (sum, month) => sum + toNumberSafe(month.billed),
+    0
+  );
+  const cashFromTopLevel = toNumberSafe(response.data?.data?.total_cash_payment);
+  const nonCashFromTopLevel = toNumberSafe(response.data?.data?.total_non_cash_payment);
+  const cashFromMonths = months.reduce(
+    (sum, month) => sum + toNumberSafe(month.cash_payment),
+    0
+  );
+  const nonCashFromMonths = months.reduce(
+    (sum, month) => sum + toNumberSafe(month.non_cash_payment),
+    0
+  );
+
+  return {
+    ...EMPTY_KPI_STATE,
+    totalCount: totalFromTopLevel !== 0 ? totalFromTopLevel : totalFromMonths,
+    monthlyCounts: mapBillingMonthsToMonthlyCounts(months),
+    totalBilled: totalBilledFromTopLevel !== 0 ? totalBilledFromTopLevel : totalBilledFromMonths,
+    cashPayment: cashFromTopLevel !== 0 ? cashFromTopLevel : cashFromMonths,
+    nonCashPayment: nonCashFromTopLevel !== 0 ? nonCashFromTopLevel : nonCashFromMonths,
+  };
+};
+
+const fetchEndpointKpiData = async (
+  kpi: KpiDefinition,
+  selectedYear: number,
+  userId: number,
+  username: string,
+  signal: AbortSignal
+): Promise<KpiApiStateItem> => {
+  const endpointResults = await Promise.allSettled(
+    kpi.endpoints.map(async (endpoint) => {
+      const response = await axios.get<NewMembershipApiResponse>(
+        `${import.meta.env.VITE_API_BASE_URL}/${endpoint}/${selectedYear}`,
+        {
+          params: { userid: userId, username },
+          signal,
+        }
+      );
+
+      return response.data;
+    })
+  );
+  const endpointResponses = endpointResults
+    .filter(
+      (result): result is PromiseFulfilledResult<NewMembershipApiResponse> =>
+        result.status === "fulfilled"
+    )
+    .map((result) => result.value);
+
+  return {
+    ...EMPTY_KPI_STATE,
+    totalCount: endpointResponses.reduce(
+      (sum, response) => sum + Number(response?.total_count ?? 0),
+      0
+    ),
+    monthlyCounts: mergeMonthlyCounts(endpointResponses),
+  };
+};
+
+const fetchKpiData = async (
+  kpi: KpiDefinition,
+  selectedYear: number,
+  userId: number,
+  username: string,
+  signal: AbortSignal
+): Promise<KpiApiStateItem> => {
+  if (kpi.label === "PERSONNEL TASK COMPLETION") {
+    return fetchPersonnelKpiData(selectedYear, userId, username, signal);
+  }
+
+  if (kpi.label === "COLLECTION") {
+    return fetchCollectionKpiData(selectedYear, signal);
+  }
+
+  return fetchEndpointKpiData(kpi, selectedYear, userId, username, signal);
+};
+
 export default function PerformanceReportLayoutIndex() {
   const currentYear = dayjs().year();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [kpiApiData, setKpiApiData] = useState<
-    Record<
-      string,
-      {
-        totalCount: number;
-        monthlyCounts: Record<string, number>;
-        totalBilled: number;
-        cashPayment: number;
-        nonCashPayment: number;
-        isLoading: boolean;
-        isError: boolean;
-      }
-    >
-  >(
-    KPI_DEFINITIONS.reduce<
-      Record<
-        string,
-        {
-          totalCount: number;
-          monthlyCounts: Record<string, number>;
-          totalBilled: number;
-          cashPayment: number;
-          nonCashPayment: number;
-          isLoading: boolean;
-          isError: boolean;
-        }
-      >
-    >((acc, kpi) => {
-      acc[kpi.label] = {
-        totalCount: 0,
-        monthlyCounts: {},
-        totalBilled: 0,
-        cashPayment: 0,
-        nonCashPayment: 0,
-        isLoading: true,
-        isError: false,
-      };
-      return acc;
-    }, {})
+  const [kpiApiData, setKpiApiData] = useState<KpiApiDataMap>(() =>
+    createInitialKpiApiData()
   );
 
   const selectedYearValue = useMemo(() => dayjs().year(selectedYear), [selectedYear]);
   const kpiData = useMemo(
-    () => {
-      const monthOrder = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-      const monthLabelMap: Record<string, string> = {
-        January: "Jan",
-        February: "Feb",
-        March: "Mar",
-        April: "Apr",
-        May: "May",
-        June: "Jun",
-        July: "Jul",
-        August: "Aug",
-        September: "Sep",
-        October: "Oct",
-        November: "Nov",
-        December: "Dec",
-      };
-
-      return KPI_DEFINITIONS.map((kpi) => {
-        const apiData = kpiApiData[kpi.label];
-        const link =
-          kpi.label === "LOAN RELEASE" ||
-          kpi.label === "NEW MEMBERSHIP" ||
-          kpi.label === "COLLECTION" ||
-          kpi.label === "PERSONNEL TASK COMPLETION"
-            ? `${kpi.link}?year=${selectedYear}`
-            : kpi.link;
-        const rawCollectionRatio =
-          kpi.label === "COLLECTION"
-            ? toPercentRatio(apiData?.totalCount ?? 0, apiData?.totalBilled ?? 0)
-            : undefined;
-
-        return {
-          label: kpi.label,
-          link,
-          value: apiData?.isLoading
-            ? "..."
-            : kpi.label === "COLLECTION"
-              ? formatPeso(Math.abs(apiData?.totalCount ?? 0))
-              : (apiData?.totalCount ?? 0).toLocaleString(),
-          trend:
-            kpi.label === "COLLECTION"
-              ? Math.min(100, rawCollectionRatio ?? 0)
-              : 0,
-          rawCollectionRatio,
-          history: monthOrder.map((month) => ({
-            month: monthLabelMap[month],
-            fullMonth: month,
-            value:
-              kpi.label === "COLLECTION"
-                ? Math.abs(apiData?.monthlyCounts[month] ?? 0)
-                : (apiData?.monthlyCounts[month] ?? 0),
-          })),
-          comparison: apiData?.isError ? "unable to sync data" : `per year - ${selectedYear}`,
-          totalBilled: kpi.label === "COLLECTION" ? Math.abs(apiData?.totalBilled ?? 0) : undefined,
-          cashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.cashPayment ?? 0) : undefined,
-          nonCashPayment: kpi.label === "COLLECTION" ? Math.abs(apiData?.nonCashPayment ?? 0) : undefined,
-          isLoading: apiData?.isLoading ?? false,
-          isError: apiData?.isError ?? false,
-        };
-      });
-    },
+    () => mapKpiApiDataToCardData(kpiApiData, selectedYear),
     [kpiApiData, selectedYear]
   );
 
@@ -348,171 +454,38 @@ export default function PerformanceReportLayoutIndex() {
     const fetchKpiCounts = async () => {
       const userId = Number(localStorage.getItem("ab_id"));
       const username = localStorage.getItem("username") || "";
-      const baseLoadingState = KPI_DEFINITIONS.reduce<
-        Record<
-          string,
-          {
-            totalCount: number;
-            monthlyCounts: Record<string, number>;
-            totalBilled: number;
-            cashPayment: number;
-            nonCashPayment: number;
-            isLoading: boolean;
-            isError: boolean;
-          }
-        >
-      >((acc, kpi) => {
-        acc[kpi.label] = {
-          totalCount: 0,
-          monthlyCounts: {},
-          totalBilled: 0,
-          cashPayment: 0,
-          nonCashPayment: 0,
-          isLoading: true,
-          isError: false,
-        };
-        return acc;
-      }, {});
 
       if (!ignore) {
-        setKpiApiData(baseLoadingState);
+        setKpiApiData(createInitialKpiApiData());
       }
 
-      KPI_DEFINITIONS.forEach(async (kpi) => {
-        try {
-            if (kpi.label === "PERSONNEL TASK COMPLETION") {
-              const response = await axios.get<PersonnelMonthlyTotalsResponse>(
-                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/activitybuilder/monthly-completed-totals/${selectedYear}`,
-                {
-                  params: { userid: userId, username },
-                  signal: controller.signal,
-                }
-              );
-
-              const personnelRows = response.data?.data ?? [];
-              const matchedPersonnel = personnelRows.find(
-                (row) => Number(row.user_id) === Number(userId)
-              );
-
-              if (!ignore) {
-                setKpiApiData((prev) => ({
-                  ...prev,
-                  [kpi.label]: {
-                    totalCount: Number(matchedPersonnel?.year_total ?? 0),
-                    monthlyCounts: mapPersonnelMonthlyTotalsToMonthlyCounts(
-                      matchedPersonnel?.monthly_totals
-                    ),
-                    totalBilled: 0,
-                    cashPayment: 0,
-                    nonCashPayment: 0,
-                    isLoading: false,
-                    isError: false,
-                  },
-                }));
-              }
-
-              return;
-            }
-
-            if (kpi.label === "COLLECTION") {
-              const response = await axios.get<BillingByDateApiResponse>(
-                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
-                {
-                  params: {
-                    year: selectedYear,
-                    month: 0,
-                  },
-                  signal: controller.signal,
-                },
-              );
-
-              if (!ignore) {
-                const months = response.data?.data?.months ?? [];
-                const totalFromTopLevel = getBillingPaidValue(response.data?.data ?? {});
-                const totalFromMonths = months.reduce(
-                  (sum, month) => sum + getBillingPaidValue(month),
-                  0
-                );
-                const totalBilledFromTopLevel = toNumberSafe(response.data?.data?.total_billed);
-                const totalBilledFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.billed), 0);
-                const cashFromTopLevel = toNumberSafe(response.data?.data?.total_cash_payment);
-                const nonCashFromTopLevel = toNumberSafe(response.data?.data?.total_non_cash_payment);
-                const cashFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.cash_payment), 0);
-                const nonCashFromMonths = months.reduce((sum, month) => sum + toNumberSafe(month.non_cash_payment), 0);
-
-                setKpiApiData((prev) => ({
-                  ...prev,
-                  [kpi.label]: {
-                    totalCount: totalFromTopLevel !== 0 ? totalFromTopLevel : totalFromMonths,
-                    monthlyCounts: mapBillingMonthsToMonthlyCounts(months),
-                    totalBilled: totalBilledFromTopLevel !== 0 ? totalBilledFromTopLevel : totalBilledFromMonths,
-                    cashPayment: cashFromTopLevel !== 0 ? cashFromTopLevel : cashFromMonths,
-                    nonCashPayment: nonCashFromTopLevel !== 0 ? nonCashFromTopLevel : nonCashFromMonths,
-                    isLoading: false,
-                    isError: false,
-                  },
-                }));
-              }
-
-              return;
-            }
-
-            const endpointResults = await Promise.allSettled(
-              kpi.endpoints.map(async (endpoint) => {
-                const response = await axios.get<NewMembershipApiResponse>(
-                  `${import.meta.env.VITE_API_BASE_URL}/${endpoint}/${selectedYear}`,
-                  {
-                    params: { userid: userId, username },
-                    signal: controller.signal,
-                  }
-                );
-
-                return response.data;
-              })
+      const entries = await Promise.all(
+        KPI_DEFINITIONS.map(async (kpi) => {
+          try {
+            const data = await fetchKpiData(
+              kpi,
+              selectedYear,
+              userId,
+              username,
+              controller.signal
             );
-            const endpointResponses = endpointResults
-              .filter(
-                (
-                  result
-                ): result is PromiseFulfilledResult<NewMembershipApiResponse> =>
-                  result.status === "fulfilled"
-              )
-              .map((result) => result.value);
 
-            if (!ignore) {
-              setKpiApiData((prev) => ({
-                ...prev,
-                [kpi.label]: {
-                  totalCount: endpointResponses.reduce(
-                    (sum, response) => sum + Number(response?.total_count ?? 0),
-                    0
-                  ),
-                  monthlyCounts: mergeMonthlyCounts(endpointResponses),
-                  totalBilled: 0,
-                  cashPayment: 0,
-                  nonCashPayment: 0,
-                  isLoading: false,
-                  isError: false,
-                },
-              }));
-            }
-        } catch {
-          if (!ignore) {
-            setKpiApiData((prev) => ({
-              ...prev,
-              [kpi.label]: {
-                totalCount: 0,
-                monthlyCounts: {},
-                totalBilled: 0,
-                cashPayment: 0,
-                nonCashPayment: 0,
-                isLoading: false,
+            return [kpi.label, data] as const;
+          } catch {
+            return [
+              kpi.label,
+              {
+                ...EMPTY_KPI_STATE,
                 isError: true,
               },
-            }));
+            ] as const;
           }
-        }
-      });
+        })
+      );
+
+      if (!ignore) {
+        setKpiApiData(Object.fromEntries(entries));
+      }
     };
 
     fetchKpiCounts();

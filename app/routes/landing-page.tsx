@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { ConfigProvider, Layout, Avatar, message, Button } from 'antd';
 import {
@@ -11,7 +11,11 @@ import {
     Warehouse,
     LogOut,
     BaggageClaim,
+    ShieldCheck,
 } from 'lucide-react';
+import { FaDollarSign, FaFileAlt, FaRegUser } from 'react-icons/fa';
+import { LuChartNoAxesColumn } from 'react-icons/lu';
+import { useNavigate } from 'react-router-dom';
 import MetricCard from '~/components/MetricCard';
 import { useAuth } from '~/auth/AuthContext';
 import { UserService } from '~/services/user.service';
@@ -19,206 +23,274 @@ import { BudgetService } from '~/services/budget.service';
 import { LicenseService } from '~/services/license.service';
 import { AssetService } from '~/services/asset.service';
 import { AccessoryService } from '~/services/accessory.service';
-import { FaDollarSign, FaRegUser } from 'react-icons/fa';
-import { LuChartNoAxesColumn } from 'react-icons/lu';
-import { useNavigate } from 'react-router-dom';
 
-export interface SidebarItemType {
+const { Header, Content, Sider } = Layout;
+
+const ACCESS = {
+    inventory: 1,
+    budget: 2,
+    workflow: 3,
+    admin: 4,
+    ticketing: 5,
+    performanceReport: 6,
+    hr: 7,
+    reports: 8,
+} as const;
+
+const INITIAL_ACCESS = {
+    inventory: false,
+    budget: false,
+    workflow: false,
+    admin: false,
+    ticketing: false,
+    performanceReport: false,
+    hr: false,
+    reports: false,
+};
+
+const INITIAL_TOTALS = {
+    budgeted: 0,
+    unbudgeted: 0,
+    newMembership: 0,
+    loanRelease: 0,
+    collection: 0,
+    workflowRequests: 0,
+    licenses: 0,
+    assets: 0,
+    accessories: 0,
+};
+
+const LOCAL_STORAGE_KEYS = [
+    'ab_id',
+    'username',
+    'dept',
+    'fname',
+    'lname',
+    'userAuthID',
+    'userDept',
+    'userOffice',
+    'userOfficeID',
+    'workflowDashboardData',
+    'userActivitiesData',
+];
+
+const CACHE_KEY_PREFIXES = [
+    'budgetApproved_',
+    'completedRequisition_',
+    'userActiveActivities_',
+];
+
+const PROMO_LINKS = [
+    {
+        href: 'https://webportal.cficoop.com/',
+        src: './img/cfi-bills-payment.jpg',
+        alt: 'CFI Bills Payment',
+        label: 'CFI Bills Payment Online',
+    },
+    {
+        href: 'https://webportal.cficoop.com/',
+        src: './img/cfi-cpp.jpg',
+        alt: 'CFI CPP',
+        label: 'CFI CPP Online',
+    },
+    {
+        href: 'https://webportal.cficoop.com/',
+        src: './img/cfionline.jpg',
+        alt: 'CFI Online',
+        label: 'CFI Online',
+    },
+];
+
+type AccessState = typeof INITIAL_ACCESS;
+type DashboardTotals = typeof INITIAL_TOTALS;
+
+interface SidebarItemType {
     id: string;
     label: string;
     icon: React.ReactNode;
-    badge?: number;
 }
-const { Header, Content, Sider, Footer } = Layout;
+
+interface LandingUser {
+    id: number | string;
+    email?: string;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    access?: string;
+    ab_user_id?: number | string;
+    department_id?: number | string;
+    office?: {
+        id?: number | string;
+        name?: string;
+    };
+    departments?: {
+        department?: string;
+    };
+}
+
+interface DashboardMetric {
+    title: string;
+    link: string;
+    data: Array<{ name: string; value: number; color: string }>;
+    centerLabel: string;
+    icon: React.ReactNode;
+    legend: Array<{ label: string; value: string | number; color: string }>;
+    isVisible: boolean;
+    isLoading: boolean;
+}
+
+const formatCompactCurrency = (amount: number) =>
+    new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+        notation: 'compact',
+        maximumFractionDigits: 1,
+    }).format(amount || 0);
+
+const getAccessState = (access: string | undefined): AccessState => {
+    try {
+        const accessList = JSON.parse(access || '[]');
+        const modules = Array.isArray(accessList) ? accessList.map(Number) : [];
+
+        return {
+            inventory: modules.includes(ACCESS.inventory),
+            budget: modules.includes(ACCESS.budget),
+            workflow: modules.includes(ACCESS.workflow),
+            admin: modules.includes(ACCESS.admin),
+            ticketing: modules.includes(ACCESS.ticketing),
+            performanceReport: modules.includes(ACCESS.performanceReport),
+            hr: modules.includes(ACCESS.hr),
+            reports: modules.includes(ACCESS.reports),
+        };
+    } catch {
+        return INITIAL_ACCESS;
+    }
+};
+
+const persistUserSession = (userData: LandingUser) => {
+    localStorage.setItem('userOfficeID', String(userData.office?.id ?? ''));
+    localStorage.setItem('userOffice', userData.office?.name ?? '');
+    localStorage.setItem('userDept', String(userData.department_id ?? ''));
+    localStorage.setItem('dept', userData.departments?.department ?? '');
+    localStorage.setItem('userAuthID', String(userData.id ?? ''));
+    localStorage.setItem('fname', userData.first_name ?? '');
+    localStorage.setItem('lname', userData.last_name ?? '');
+    localStorage.setItem('ab_id', String(userData.ab_user_id ?? ''));
+    localStorage.setItem('username', userData.username ?? '');
+};
+
+const clearSessionStorage = () => {
+    LOCAL_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+
+    Object.keys(localStorage)
+        .filter((key) => CACHE_KEY_PREFIXES.some((prefix) => key.startsWith(prefix)))
+        .forEach((key) => localStorage.removeItem(key));
+};
 
 export default function LandingPage2() {
-    const [activeTab, setActiveTab] = useState('events');
-    const { user } = useAuth();
-    const [dataUser, setData] = useState<any>();
-    const [dataInventory, setDataInventory] = useState(false);
-    const [dataBudget, setDataBudget] = useState(false);
-    const [dataPerformanceReport, setDataPerformanceReport] = useState(false);
-    const [dataWorkflow, setDataWorkflow] = useState(false);
-    const [dataTicketing, setDataTicketing] = useState(false);
-    const [dataHR, setDataHR] = useState(false);
-    const [dataAdmin, setDataAdmin] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [budgetedTotal, setBudgetedTotal] = useState(0);
-    const [unbudgetedTotal, setUnbudgetedTotal] = useState(0);
-    const [newMembershipTotal, setNewMembershipTotal] = useState(0);
-    const [loanReleaseTotal, setLoanReleaseTotal] = useState(0);
-    const [collectionTotal, setCollectionTotal] = useState(0);
-    const [workflowRequestTotal, setWorkflowRequestTotal] = useState(0);
-    const [licenseTotal, setLicenseTotal] = useState(0);
-    const [assetTotal, setAssetTotal] = useState(0);
-    const [accessoryTotal, setAccessoryTotal] = useState(0);
-    const apiAuthExternal = import.meta.env.VITE_AUTH_EXTERNAL;
-    const apiAuthExternalPassword = import.meta.env.VITE_AUTH_EXTERNAL_PASSWORD;
-    const { signOut, getUser } = useAuth();
+    const { user, signOut } = useAuth();
     const navigate = useNavigate();
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
 
-    const handleSignout = async () => {
-        // Clear all relevant localStorage data
-        localStorage.removeItem("ab_id");
-        localStorage.removeItem("username");
-        localStorage.removeItem("dept");
-        localStorage.removeItem("fname");
-        localStorage.removeItem("lname");
-        localStorage.removeItem("userAuthID");
-        localStorage.removeItem("userDept");
-        localStorage.removeItem("userOffice");
-        localStorage.removeItem("userOfficeID");
+    const [userData, setUserData] = useState<LandingUser>();
+    const [access, setAccess] = useState<AccessState>(INITIAL_ACCESS);
+    const [isLoading, setIsLoading] = useState(false);
+    const [totals, setTotals] = useState<DashboardTotals>(INITIAL_TOTALS);
 
-        localStorage.removeItem("workflowDashboardData");
-        localStorage.removeItem("userActivitiesData");
+    const currentYear = new Date().getFullYear();
+    const canAccessAdminPanel = access.admin;
 
-        // Clear any cached API data (remove all keys starting with your app's cache prefix)
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith("budgetApproved_") || key.startsWith("completedRequisition_") || key.startsWith("userActiveActivities_")) {
-                localStorage.removeItem(key);
-            }
-        });
-
+    const handleSignout = useCallback(async () => {
+        clearSessionStorage();
         await signOut();
-        // setLoading(false);
-        navigate("/");
-    };
+        navigate('/');
+    }, [navigate, signOut]);
 
-    const formatCompactCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-            notation: 'compact',
-            maximumFractionDigits: 1,
-        }).format(amount || 0);
-    };
-
-    // Fetch data from Supabase
-    const fetchDataByUUID = async () => {
+    const fetchUserByUuid = useCallback(async () => {
         if (!user?.id) {
-            console.error("User ID is not available");
-            return;
+            return undefined;
         }
 
-        try {
-            setLoading(true);
-            const dataFetch = await UserService.getByUuid(user.id);
-            const arr = JSON.parse(dataFetch?.access || '[]'); // Add fallback for empty access
-            localStorage.setItem('userOfficeID', dataFetch.office.id);
-            localStorage.setItem('userOffice', dataFetch.office.name);
-            localStorage.setItem('userDept', dataFetch.department_id);
-            localStorage.setItem('dept', dataFetch.departments.department);
-            localStorage.setItem('userAuthID', dataFetch.id);
-            localStorage.setItem('fname', dataFetch.first_name);
-            localStorage.setItem('lname', dataFetch.last_name);
-            localStorage.setItem('ab_id', dataFetch.ab_user_id);
-            localStorage.setItem('username', dataFetch.username);
+        const fetchedUser = await UserService.getByUuid(user.id);
+        persistUserSession(fetchedUser);
+        setUserData(fetchedUser);
+        setAccess(getAccessState(fetchedUser?.access));
 
-            // Update all states at once
-            setData(dataFetch);
-            setDataInventory(arr.includes(1));
-            setDataBudget(arr.includes(2));
-            setDataWorkflow(arr.includes(3));
-            setDataAdmin(arr.includes(4));
-            setDataTicketing(arr.includes(5));
-            setDataPerformanceReport(arr.includes(6));
-            setDataHR(arr.includes(7));
-            // console.log("User data loaded successfully", dataFetch);
-        } catch (error) {
-            message.error("Error loading user data");
-        } finally {
-            setLoading(false);
+        return fetchedUser as LandingUser;
+    }, [user?.id]);
+
+    const fetchBudgetSummary = useCallback(async () => {
+        try {
+            const [budgetData, unbudgetData] = await Promise.all([
+                BudgetService.getByData(),
+                BudgetService.getAllUnbudgeted(),
+            ]);
+
+            return {
+                budgeted: budgetData?.reduce((sum: number, item: any) => sum + Number(item?.budget || 0), 0) || 0,
+                unbudgeted: unbudgetData?.reduce((sum: number, item: any) => sum + Number(item?.amount || 0), 0) || 0,
+            };
+        } catch {
+            return { budgeted: 0, unbudgeted: 0 };
         }
-    };
+    }, []);
 
-    const fetchNewMembershipTotal = async () => {
-        try {
-            const userId = Number(localStorage.getItem("ab_id"));
-            const username = localStorage.getItem("username") || "";
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_BASE_URL}/newmembers/branch-data/${currentYear}`,
-                {
+    const fetchPerformanceTotals = useCallback(async (landingUser: LandingUser | undefined) => {
+        const userId = Number(landingUser?.ab_user_id ?? 0);
+        const username = landingUser?.username ?? '';
+
+        const [newMembership, loanRelease, collection] = await Promise.all([
+            axios
+                .get(`${import.meta.env.VITE_API_BASE_URL}/newmembers/branch-data/${currentYear}`, {
                     params: { userid: userId, username },
-                }
-            );
-
-            setNewMembershipTotal(Number(response.data?.total_count ?? 0));
-        } catch (error) {
-            setNewMembershipTotal(0);
-        }
-    };
-
-    const fetchLoanReleaseTotal = async () => {
-        try {
-            const userId = Number(localStorage.getItem("ab_id"));
-            const username = localStorage.getItem("username") || "";
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_BASE_URL}/loanprocessingv2/branch-data/${currentYear}`,
-                {
+                })
+                .then((response) => Number(response.data?.total_count ?? 0))
+                .catch(() => 0),
+            axios
+                .get(`${import.meta.env.VITE_API_BASE_URL}/loanprocessingv2/branch-data/${currentYear}`, {
                     params: { userid: userId, username },
-                }
-            );
+                })
+                .then((response) => Number(response.data?.total_count ?? 0))
+                .catch(() => 0),
+            axios
+                .get(`${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`, {
+                    params: { year: currentYear, month: 0 },
+                })
+                .then((response) => {
+                    const totalPaid =
+                        Number(response.data?.data?.total_cash_payment ?? 0) +
+                        Number(response.data?.data?.total_non_cash_payment ?? 0);
 
-            setLoanReleaseTotal(Number(response.data?.total_count ?? 0));
-        } catch (error) {
-            setLoanReleaseTotal(0);
-        }
-    };
+                    return Math.abs(totalPaid);
+                })
+                .catch(() => 0),
+        ]);
 
-    const fetchCollectionTotal = async () => {
+        return { newMembership, loanRelease, collection };
+    }, [currentYear]);
+
+    const fetchWorkflowRequestTotal = useCallback(async (landingUser: LandingUser | undefined) => {
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_IACCS_API_BASE_URL}/api/external/iaccs-monitoring/billing/date`,
-                {
-                    params: {
-                        year: currentYear,
-                        month: 0,
-                    },
-                }
-            );
+            const userId = Number(landingUser?.ab_user_id ?? 0);
+            const username = landingUser?.username ?? '';
 
-            const totalPaid =
-                Number(response.data?.data?.total_cash_payment ?? 0) +
-                Number(response.data?.data?.total_non_cash_payment ?? 0);
-            setCollectionTotal(Math.abs(totalPaid));
-        } catch (error) {
-            setCollectionTotal(0);
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user-active-activities`, {
+                userid: userId,
+                username,
+                tracked_user_id: userId,
+            });
+
+            return Array.isArray(response.data?.data) ? response.data.data.length : 0;
+        } catch {
+            return 0;
         }
-    };
+    }, []);
 
-    const fetchWorkflowRequestTotal = async () => {
+    const fetchInventoryTotals = useCallback(async (landingUser: LandingUser | undefined) => {
         try {
-            const userId = Number(localStorage.getItem("ab_id"));
-            const username = localStorage.getItem("username") || "";
-
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_BASE_URL}/user-active-activities`,
-                {
-                    userid: userId,
-                    username,
-                    tracked_user_id: userId,
-                }
-            );
-
-            const requestData = Array.isArray(response.data?.data) ? response.data.data : [];
-            setWorkflowRequestTotal(requestData.length);
-        } catch (error) {
-            setWorkflowRequestTotal(0);
-        }
-    };
-
-    const fetchInventoryTotals = async () => {
-        try {
-            const departmentId = Number(localStorage.getItem("userDept"));
+            const departmentId = Number(landingUser?.department_id ?? 0);
 
             if (!departmentId) {
-                setLicenseTotal(0);
-                setAssetTotal(0);
-                setAccessoryTotal(0);
-                return;
+                return { licenses: 0, assets: 0, accessories: 0 };
             }
 
             const [licenses, assets, accessories] = await Promise.all([
@@ -227,57 +299,204 @@ export default function LandingPage2() {
                 AccessoryService.getAllPosts(departmentId),
             ]);
 
-            setLicenseTotal(Array.isArray(licenses) ? licenses.length : 0);
-            setAssetTotal(Array.isArray(assets) ? assets.length : 0);
-            setAccessoryTotal(Array.isArray(accessories) ? accessories.length : 0);
-        } catch (error) {
-            setLicenseTotal(0);
-            setAssetTotal(0);
-            setAccessoryTotal(0);
+            return {
+                licenses: Array.isArray(licenses) ? licenses.length : 0,
+                assets: Array.isArray(assets) ? assets.length : 0,
+                accessories: Array.isArray(accessories) ? accessories.length : 0,
+            };
+        } catch {
+            return { licenses: 0, assets: 0, accessories: 0 };
         }
-    };
-
-    const fetchBudgetSummary = async () => {
-        try {
-            const [budgetData, unbudgetData] = await Promise.all([
-                BudgetService.getByData(),
-                BudgetService.getAllUnbudgeted(),
-            ]);
-
-            const totalBudgeted = budgetData?.reduce((sum: number, item: any) => sum + Number(item?.budget || 0), 0) || 0;
-            const totalUnbudgeted = unbudgetData?.reduce((sum: number, item: any) => sum + Number(item?.amount || 0), 0) || 0;
-
-            setBudgetedTotal(totalBudgeted);
-            setUnbudgetedTotal(totalUnbudgeted);
-        } catch (error) {
-            setBudgetedTotal(0);
-            setUnbudgetedTotal(0);
-        }
-    };
+    }, []);
 
     useEffect(() => {
+        let isCurrent = true;
+
         const initializeLandingPage = async () => {
-            await fetchDataByUUID();
-            await Promise.all([
-                fetchBudgetSummary(),
-                fetchNewMembershipTotal(),
-                fetchLoanReleaseTotal(),
-                fetchCollectionTotal(),
-                fetchWorkflowRequestTotal(),
-                fetchInventoryTotals(),
-            ]);
+            try {
+                setIsLoading(true);
+                const landingUser = await fetchUserByUuid();
+
+                if (!landingUser) {
+                    return;
+                }
+
+                const [budgetSummary, performanceTotals, workflowRequests, inventoryTotals] = await Promise.all([
+                    fetchBudgetSummary(),
+                    fetchPerformanceTotals(landingUser),
+                    fetchWorkflowRequestTotal(landingUser),
+                    fetchInventoryTotals(landingUser),
+                ]);
+
+                if (!isCurrent) {
+                    return;
+                }
+
+                setTotals({
+                    ...INITIAL_TOTALS,
+                    ...budgetSummary,
+                    ...performanceTotals,
+                    workflowRequests,
+                    ...inventoryTotals,
+                });
+            } catch {
+                if (isCurrent) {
+                    message.error('Error loading user data');
+                }
+            } finally {
+                if (isCurrent) {
+                    setIsLoading(false);
+                }
+            }
         };
 
         initializeLandingPage();
-    }, [user?.id]);
 
-    const sidebarItems: SidebarItemType[] = [
-        { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" />, badge: 3 },
-        { id: 'mail', label: dataUser?.email || 'N/A', icon: <Mail className="w-4 h-4" />, badge: 3 },
-        { id: 'username', label: dataUser?.username || 'Unknown Username', icon: <User className="w-4 h-4" />, badge: 5 },
-        { id: 'nickname', label: `${dataUser?.first_name || 'First'} ${dataUser?.last_name || 'Last'}`, icon: <ContactRound className="w-4 h-4" /> },
-        { id: 'department', label: `${dataUser?.departments?.department || 'Unknown Department'} Staff`, icon: <Warehouse className="w-4 h-4" />, badge: 2 },
-    ];
+        return () => {
+            isCurrent = false;
+        };
+    }, [
+        fetchBudgetSummary,
+        fetchInventoryTotals,
+        fetchPerformanceTotals,
+        fetchUserByUuid,
+        fetchWorkflowRequestTotal,
+    ]);
+
+    const sidebarItems = useMemo<SidebarItemType[]>(
+        () => [
+            { id: 'company', label: 'Cebu CFI Community Coop.', icon: <Building2 className="w-4 h-4" /> },
+            { id: 'mail', label: userData?.email || 'N/A', icon: <Mail className="w-4 h-4" /> },
+            { id: 'username', label: userData?.username || 'Unknown Username', icon: <User className="w-4 h-4" /> },
+            {
+                id: 'nickname',
+                label: `${userData?.first_name || 'First'} ${userData?.last_name || 'Last'}`,
+                icon: <ContactRound className="w-4 h-4" />,
+            },
+            {
+                id: 'department',
+                label: `${userData?.departments?.department || 'Unknown Department'} Staff`,
+                icon: <Warehouse className="w-4 h-4" />,
+            },
+        ],
+        [userData],
+    );
+
+    const dashboardMetrics = useMemo<DashboardMetric[]>(
+        () => [
+            {
+                title: 'Budget Monitoring',
+                link: '/budget',
+                isVisible: access.budget,
+                isLoading,
+                data: [
+                    { name: 'Unbudgeted', value: totals.unbudgeted, color: '#bdc3c7' },
+                    { name: 'Budget', value: totals.budgeted, color: '#9cc332' },
+                ],
+                centerLabel: `unbudget / budget / ${currentYear}`,
+                icon: <FaDollarSign className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'unbudget', value: formatCompactCurrency(totals.unbudgeted), color: '#bdc3c7' },
+                    { label: 'budget', value: formatCompactCurrency(totals.budgeted), color: '#9cc332' },
+                ],
+            },
+            {
+                title: 'Performance Report',
+                link: '/performancereport',
+                isVisible: access.performanceReport,
+                isLoading,
+                data: [
+                    { name: 'Membership', value: totals.newMembership, color: '#bdc3c7' },
+                    { name: 'Loan Release', value: totals.loanRelease, color: '#9cc332' },
+                    { name: 'Collection', value: totals.collection, color: '#1890ff' },
+                ],
+                centerLabel: 'membership / loan release / collection',
+                icon: <LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'membership', value: totals.newMembership.toLocaleString(), color: '#bdc3c7' },
+                    { label: 'loan release', value: totals.loanRelease.toLocaleString(), color: '#9cc332' },
+                    { label: 'collection', value: formatCompactCurrency(totals.collection), color: '#1890ff' },
+                ],
+            },
+            {
+                title: 'Performance Metric Report',
+                link: '/workflow',
+                isVisible: access.workflow,
+                isLoading,
+                data: [{ name: 'Requests', value: totals.workflowRequests, color: '#9cc332' }],
+                centerLabel: 'requests',
+                icon: <FileText className="w-8 h-8 text-gray-400" />,
+                legend: [{ label: 'requests', value: totals.workflowRequests, color: '#9cc332' }],
+            },
+            {
+                title: 'CFI Asset Management',
+                link: '/inventory',
+                isVisible: access.inventory,
+                isLoading,
+                data: [
+                    { name: 'Licenses', value: totals.licenses, color: '#bdc3c7' },
+                    { name: 'Assets', value: totals.assets, color: '#9cc332' },
+                    { name: 'Accessories', value: totals.accessories, color: '#1890ff' },
+                ],
+                centerLabel: 'licenses / assets / accessories',
+                icon: <BaggageClaim className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'licenses', value: totals.licenses, color: '#bdc3c7' },
+                    { label: 'assets', value: totals.assets, color: '#9cc332' },
+                    { label: 'accessories', value: totals.accessories, color: '#1890ff' },
+                ],
+            },
+            {
+                title: 'IT Support Ticket',
+                link: 'https://it-support.cficoop.com/en/',
+                isVisible: access.ticketing,
+                isLoading,
+                data: [
+                    { name: 'Offline', value: 50, color: '#bdc3c7' },
+                    { name: 'Online', value: 50, color: '#9cc332' },
+                ],
+                centerLabel: 'offline / online',
+                icon: <FaDollarSign className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'offline', value: 50, color: '#bdc3c7' },
+                    { label: 'online', value: 50, color: '#9cc332' },
+                ],
+            },
+            {
+                title: 'Human Resource Management',
+                link: '/hr',
+                isVisible: access.hr,
+                isLoading,
+                data: [
+                    { name: 'Male', value: 50, color: '#bdc3c7' },
+                    { name: 'Female', value: 50, color: '#9cc332' },
+                ],
+                centerLabel: 'male / female',
+                icon: <FaRegUser className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'male', value: 50, color: '#bdc3c7' },
+                    { label: 'female', value: 50, color: '#9cc332' },
+                ],
+            },
+            {
+                title: 'Reports',
+                link: '/reports',
+                isVisible: access.reports,
+                isLoading,
+                data: [
+                    { name: 'Generated', value: 50, color: '#bdc3c7' },
+                    { name: 'Pending', value: 50, color: '#9cc332' },
+                ],
+                centerLabel: 'generated / pending',
+                icon: <FaFileAlt className="w-8 h-8 text-gray-400" />,
+                legend: [
+                    { label: 'generated', value: 50, color: '#bdc3c7' },
+                    { label: 'pending', value: 50, color: '#9cc332' },
+                ],
+            },
+        ],
+        [access, currentYear, isLoading, totals],
+    );
 
     return (
         <ConfigProvider
@@ -289,11 +508,14 @@ export default function LandingPage2() {
             }}
         >
             <Layout className="min-h-screen">
-                {/* Top Header */}
                 <Header className="bg-[#1890ff] px-0 flex items-center justify-between h-14 sticky top-0 z-50 shadow-md">
                     <div className="flex items-center">
                         <div className="flex items-center h-14">
-                            <button className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400 bg-blue-700">
+                            <button
+                                className="h-full px-6 flex items-center justify-center hover:bg-blue-600 transition-colors border-r border-blue-400 bg-blue-700"
+                                type="button"
+                                aria-label="Home"
+                            >
                                 <Home className="text-white w-5 h-5" />
                             </button>
                         </div>
@@ -301,15 +523,14 @@ export default function LandingPage2() {
                     <div className="flex items-center px-6 gap-4">
                         <div className="hidden md:flex flex-col items-end text-white leading-tight">
                             <span className="text-xs font-bold">CFI Management System</span>
-                            <span className="text-[10px] opacity-80">Online</span>
+                            <span className="text-[10px] opacity-80">{isLoading ? 'Loading' : 'Online'}</span>
                         </div>
                         <Avatar src="./img/cfi-circle.png" />
                     </div>
                 </Header>
 
                 <Layout>
-                    {/* Sidebar */}
-                    <Sider width={260} className="bg-white border-r border-gray-200 hidden lg:block overflow-auto">
+                    <Sider width={260} className="bg-white border-r border-gray-200 hidden lg:block overflow-y-auto overflow-x-hidden">
                         <div className="bg-[#34495e] text-white p-3 flex items-center gap-2">
                             <FileText className="w-4 h-4" />
                             <span className="font-semibold text-sm">PERSONAL DETAILS</span>
@@ -318,170 +539,82 @@ export default function LandingPage2() {
                             {sidebarItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50  border-b border-gray-100 transition-colors"
+                                    className="flex min-w-0 items-center justify-between px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition-colors"
                                 >
-                                    <div className="flex items-center gap-3 text-gray-600 text-sm">
+                                    <div className="flex min-w-0 items-center gap-3 text-gray-600 text-sm">
                                         {item.icon}
-                                        <span>{item.label}</span>
+                                        <span className="min-w-0 truncate" title={item.label}>
+                                            {item.label}
+                                        </span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div>
-                            <div
-                                className="flex cursor-pointer px-4 py-3 hover:bg-gray-50  border-b border-gray-100 transition-colors"
+                        <div className="flex cursor-pointer px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition-colors">
+                            <Button
+                                type="default"
+                                className="flex items-center gap-3 text-sm cursor-pointer w-full text-left"
+                                onClick={handleSignout}
                             >
-                                <Button
-                                    type="default"
-                                    className="flex items-center gap-3 text-sm cursor-pointer w-full text-left"
-                                    onClick={handleSignout}
-                                >
-                                    <LogOut className="text-red-900 w-4 h-4" />
-                                    <span className="text-red-900">SIGN OUT</span>
-                                </Button>
-                            </div>
+                                <LogOut className="text-red-900 w-4 h-4" />
+                                <span className="text-red-900">SIGN OUT</span>
+                            </Button>
                         </div>
                         <div className="mt-8 p-4">
-                            <a href="https://webportal.cficoop.com/" className="block" target='_blank'>
-                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
-                                    <img src="./img/cfi-bills-payment.jpg" alt="CFI Bills Payment" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
-                                        CFI Bills Payment Online
+                            {PROMO_LINKS.map((link) => (
+                                <a
+                                    key={link.src}
+                                    href={link.href}
+                                    className="block mt-2 first:mt-0"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
+                                        <img
+                                            src={link.src}
+                                            alt={link.alt}
+                                            className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
+                                            {link.label}
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
-
-                            <a href="https://webportal.cficoop.com/" className="block mt-2" target='_blank'>
-                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
-                                    <img src="./img/cfi-cpp.jpg" alt="CFI CPP" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
-                                        CFI CPP Online
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="https://webportal.cficoop.com/" className="block mt-2" target='_blank'>
-                                <div className="relative rounded overflow-hidden shadow-sm group cursor-pointer">
-                                    <img src="./img/cfionline.jpg" alt="CFI Online" className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2 text-white text-[10px] font-bold uppercase tracking-wider">
-                                        CFI Online
-                                    </div>
-                                </div>
-                            </a>
+                                </a>
+                            ))}
                         </div>
                     </Sider>
 
-                    {/* Main Dashboard Content */}
                     <Content className="p-6 bg-[#ecf0f1]">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                            {dataBudget && (
-                                <MetricCard
-                                    title="Budget Monitoring"
-                                    link="/budget"
-                                    data={[
-                                        { name: 'Unbudgeted', value: unbudgetedTotal, color: '#bdc3c7' },
-                                        { name: 'Budget', value: budgetedTotal, color: '#9cc332' }
-                                    ]}
-                                    centerLabel={`unbudget / budget / ${currentYear}`}
-                                    icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'unbudget', value: formatCompactCurrency(unbudgetedTotal), color: '#bdc3c7' },
-                                        { label: 'budget', value: formatCompactCurrency(budgetedTotal), color: '#9cc332' }
-                                    ]}
-                                />
-                            )}
-
-                            {dataPerformanceReport && (
-                                <MetricCard
-                                    title="Performance Report"
-                                    link="/performancereport"
-                                    data={[
-                                        { name: 'Membership', value: newMembershipTotal, color: '#bdc3c7' },
-                                        { name: 'Loan Release', value: loanReleaseTotal, color: '#9cc332' },
-                                        { name: 'Collection', value: collectionTotal, color: '#1890ff' }
-                                    ]}
-                                    centerLabel="membership / loan release / collection"
-                                    icon={<LuChartNoAxesColumn className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'membership', value: newMembershipTotal.toLocaleString(), color: '#bdc3c7' },
-                                        { label: 'loan release', value: loanReleaseTotal.toLocaleString(), color: '#9cc332' },
-                                        { label: 'collection', value: formatCompactCurrency(collectionTotal), color: '#1890ff' }
-                                    ]}
-                                />
-                            )}
-
-                            {dataWorkflow && (
-                                <MetricCard
-                                    title="Performance Metric Report"
-                                    link="/workflow"
-                                    data={[
-                                        { name: 'Requests', value: workflowRequestTotal, color: '#9cc332' }
-                                    ]}
-                                    centerLabel="requests"
-                                    icon={<FileText className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'requests', value: workflowRequestTotal, color: '#9cc332' },
-                                    ]}
-                                />
-                            )}
-
-                            {dataInventory && (
-                                <MetricCard
-                                    title="CFI Asset Management"
-                                    link="/inventory"
-                                    data={[
-                                        { name: 'Licenses', value: licenseTotal, color: '#bdc3c7' },
-                                        { name: 'Assets', value: assetTotal, color: '#9cc332' },
-                                        { name: 'Accessories', value: accessoryTotal, color: '#1890ff' }
-                                    ]}
-                                    centerLabel="licenses / assets / accessories"
-                                    icon={<BaggageClaim className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'licenses', value: licenseTotal, color: '#bdc3c7' },
-                                        { label: 'assets', value: assetTotal, color: '#9cc332' },
-                                        { label: 'accessories', value: accessoryTotal, color: '#1890ff' }
-                                    ]}
-                                />
-                            )}
-
-                            {dataTicketing && (
-                                <MetricCard
-                                    title="IT Support Ticket"
-                                    link="https://it-support.cficoop.com/en/"
-                                    data={[
-                                        { name: 'Offline', value: 50, color: '#bdc3c7' },
-                                        { name: 'Online', value: 50, color: '#9cc332' }
-                                    ]}
-                                    centerLabel="offline / online"
-                                    icon={<FaDollarSign className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'offline', value: 50, color: '#bdc3c7' },
-                                        { label: 'online', value: 50, color: '#9cc332' }
-                                    ]}
-                                />
-                            )}
-
-                            {dataHR && (
-                                <MetricCard
-                                    title="Human Resource Management"
-                                    link="/hr"
-                                    data={[
-                                        { name: 'Male', value: 50, color: '#bdc3c7' },
-                                        { name: 'Female', value: 50, color: '#9cc332' }
-                                    ]}
-                                    centerLabel="male / female"
-                                    icon={<FaRegUser className="w-8 h-8 text-gray-400" />}
-                                    legend={[
-                                        { label: 'male', value: 50, color: '#bdc3c7' },
-                                        { label: 'female', value: 50, color: '#9cc332' }
-                                    ]}
-                                />
-                            )}
-
+                            {dashboardMetrics
+                                .filter((metric) => metric.isVisible)
+                                .map((metric) => (
+                                    <MetricCard
+                                        key={metric.title}
+                                        title={metric.title}
+                                        link={metric.link}
+                                        data={metric.data}
+                                        centerLabel={metric.centerLabel}
+                                        icon={metric.icon}
+                                        legend={metric.legend}
+                                        isLoading={metric.isLoading}
+                                    />
+                                ))}
                         </div>
                     </Content>
                 </Layout>
+
+                {canAccessAdminPanel && (
+                    <Button
+                        type="primary"
+                        size="small"
+                        className="fixed bottom-4 right-4 z-50 flex h-9 items-center gap-2 rounded-full px-4 font-semibold shadow-lg"
+                        icon={<ShieldCheck className="h-5 w-5" />}
+                        onClick={() => navigate('/admin')}
+                    >
+                        Admin Panel
+                    </Button>
+                )}
             </Layout>
         </ConfigProvider>
     );

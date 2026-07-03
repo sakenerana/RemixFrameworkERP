@@ -1,5 +1,7 @@
 import {
     CheckCircleOutlined,
+    DeleteOutlined,
+    EditOutlined,
     HomeOutlined,
     LoadingOutlined,
     SettingOutlined,
@@ -28,8 +30,9 @@ import {
     Table,
     TableColumnsType,
     Tag,
+    Typography,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     AiOutlineCheckCircle,
     AiOutlineCloseCircle,
@@ -61,6 +64,8 @@ import { Office } from "~/types/office.type";
 import { User } from "~/types/user.type";
 import supabase from "~/utils/supabase.client";
 
+const { Text, Title } = Typography;
+
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
     const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
@@ -75,7 +80,6 @@ export default function UsersRoutes() {
     const { Option } = Select;
     const { adminSignUp } = useAuth();
     const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<User[]>([]);
 
     const handleRefetch = async () => {
         setLoading(true);
@@ -119,13 +123,13 @@ export default function UsersRoutes() {
     };
 
     const handleDeleteButton = async (record: User) => {
-        if (record.status_labels.name === 'Active') {
+        if (record.status_labels?.name === 'Active') {
             const { error } = await UserService.deactivateStatus(record.id, record);
 
             if (error) throw error;
             message.success("Record deactivated successfully");
             await fetchData();
-        } else if (record.status_labels.name === 'Inactive') {
+        } else if (record.status_labels?.name === 'Inactive') {
             const { error } = await UserService.activateStatus(record.id, record);
 
             if (error) throw error;
@@ -140,7 +144,6 @@ export default function UsersRoutes() {
             setLoading(true);
             const dataFetch = await UserService.getAllPosts();
             setData(dataFetch); // Works in React state  
-            console.log("DATA FETCH", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -188,23 +191,27 @@ export default function UsersRoutes() {
     };
 
     useEffect(() => {
-        if (searchText.trim() === '') {
-            fetchData();
-        } else {
-            const filtered = data.filter(data =>
-                data.first_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                data.middle_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                data.last_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                data.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-                data.phone?.includes(searchText)
-            );
-            setFilteredData(filtered);
-        }
-
         fetchDataDepartment();
         fetchDataGroup();
         fetchDataOffice();
-    }, [searchText]); // Empty dependency array means this runs once on mount
+        fetchData();
+    }, []);
+
+    const displayedData = useMemo(() => {
+        const normalizedSearch = searchText.trim().toLowerCase();
+
+        if (!normalizedSearch) {
+            return data;
+        }
+
+        return data.filter((user) =>
+            user.first_name?.toLowerCase().includes(normalizedSearch) ||
+            user.middle_name?.toLowerCase().includes(normalizedSearch) ||
+            user.last_name?.toLowerCase().includes(normalizedSearch) ||
+            user.email?.toLowerCase().includes(normalizedSearch) ||
+            user.phone?.includes(searchText.trim())
+        );
+    }, [data, searchText]);
 
     // Create or Update record
     const onFinish = async (event: any) => {
@@ -269,7 +276,7 @@ export default function UsersRoutes() {
         {
             title: "Name",
             dataIndex: "name",
-            width: 180,
+            width: 260,
             render: (_, record) => (
                 <div className="flex items-center">
                     <Avatar
@@ -277,11 +284,11 @@ export default function UsersRoutes() {
                         size="small"
                         className="mr-3 border border-gray-200 dark:border-gray-600"
                     />
-                    <div>
-                        <p className="font-medium dark:text-gray-100">
+                    <div className="min-w-0">
+                        <p className="m-0 truncate font-semibold text-gray-900 dark:text-gray-100">
                             {record.first_name} {record.middle_name} {record.last_name}
                         </p>
-                        <p className="text-xs dark:text-gray-400">
+                        <p className="m-0 text-xs text-gray-500 dark:text-gray-400">
                             ID: {record.id}
                         </p>
                     </div>
@@ -291,13 +298,13 @@ export default function UsersRoutes() {
         {
             title: "Email",
             dataIndex: "email",
-            width: 100,
+            width: 300,
             render: (email) => (
-                <div className="flex items-center">
-                    <AiOutlineMail className="text-gray-400 mr-2" />
+                <div className="flex min-w-0 items-center">
+                    <AiOutlineMail className="mr-2 shrink-0 text-gray-400" />
                     <a
                         href={`mailto:${email}?subject=Regarding Your Account`}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200 truncate"
+                        className="truncate text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                         onClick={(e) => !email && e.preventDefault()}
                         title={email || 'No email provided'}
                     >
@@ -352,16 +359,16 @@ export default function UsersRoutes() {
             dataIndex: "status",
             width: 100,
             render: (_, record) => {
-                if (record.status_labels.name === 'Active') {
+                if (record.status_labels?.name === 'Active') {
                     return (
-                        <Tag variant="solid" color="green">
-                            <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+                        <Tag color="success" className="inline-flex items-center gap-1 rounded-full px-2">
+                            <CheckCircleOutlined /> Active
                         </Tag>
                     );
-                } else if (record.status_labels.name === 'Inactive') {
+                } else if (record.status_labels?.name === 'Inactive') {
                     return (
-                        <Tag variant="solid" color="red">
-                            <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
+                        <Tag color="error" className="inline-flex items-center gap-1 rounded-full px-2">
+                            <AiOutlineCloseCircle /> Inactive
                         </Tag>
                     );
                 }
@@ -373,7 +380,7 @@ export default function UsersRoutes() {
             width: 190,
             fixed: "right",
             render: (_, record) => (
-                <div className="flex">
+                <div className="flex items-center gap-2">
                     <Popconfirm
                         title="Do you want to update?"
                         description="Are you sure to update this user?"
@@ -381,41 +388,38 @@ export default function UsersRoutes() {
                         cancelText="No"
                         onConfirm={() => editRecord(record)}
                     >
-                        <Tag
-                            className="cursor-pointer"
-                            icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-                            color="#f7b63e"
-                            variant="solid"
+                        <Button
+                            size="small"
+                            icon={<EditOutlined />}
+                            className="border-amber-200 bg-amber-50 text-amber-700 hover:!border-amber-400 hover:!text-amber-700"
                         >
                             Update
-                        </Tag>
+                        </Button>
                     </Popconfirm>
                     <Popconfirm
-                        title="Do you want to deactivate?"
-                        description="Are you sure to deactivate this user?"
+                        title={record.status_labels?.name === 'Active' ? "Do you want to deactivate?" : "Do you want to activate?"}
+                        description={record.status_labels?.name === 'Active' ? "Are you sure to deactivate this user?" : "Are you sure to activate this user?"}
                         okText="Yes"
                         cancelText="No"
                         onConfirm={() => handleDeleteButton(record)}
                     >
-                        {record.status_labels.name === 'Active' && (
-                            <Tag
-                                className="cursor-pointer ml-2"
-                                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-                                color="#f50"
-                                variant="solid"
+                        {record.status_labels?.name === 'Active' && (
+                            <Button
+                                danger
+                                size="small"
+                                icon={<DeleteOutlined />}
                             >
                                 Deactivate
-                            </Tag>
+                            </Button>
                         )}
-                        {record.status_labels.name === 'Inactive' && (
-                            <Tag
-                                className="cursor-pointer ml-2"
-                                icon={<AiOutlineCheckCircle className="float-left mt-1 mr-1" />}
-                                color="#1677ff"
-                                variant="solid"
+                        {record.status_labels?.name === 'Inactive' && (
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon={<AiOutlineCheckCircle />}
                             >
                                 Activate
-                            </Tag>
+                            </Button>
                         )}
                     </Popconfirm>
                 </div>
@@ -462,6 +466,7 @@ export default function UsersRoutes() {
         { label: "Ticketing", value: 5 },
         { label: "Performance Report", value: 6 },
         { label: "Human Resource Management", value: 7 },
+        { label: "Reports", value: 8 },
     ];
 
     const optionsPermission: CheckboxOptionType<any>[] = [
@@ -471,11 +476,15 @@ export default function UsersRoutes() {
         { label: "View", value: 4 },
     ];
 
+    const activeCount = data.filter((user) => user.status_labels?.name === 'Active').length;
+    const inactiveCount = data.filter((user) => user.status_labels?.name === 'Inactive').length;
+
     return (
-        <Card>
+        <Card className="admin-users-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
+            <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
                     <Breadcrumb
                         items={[
                             {
@@ -491,18 +500,29 @@ export default function UsersRoutes() {
                         ]}
                         className="text-sm"
                     />
-                </div>
+                        <Title level={3} className="!mb-1 !mt-3">
+                            User Management
+                        </Title>
+                        <Text className="text-sm text-gray-500">
+                            Manage account access, office assignments, departments, and module permissions.
+                        </Text>
+                    </div>
 
-                <Space wrap className="mt-2 sm:mt-0">
+                    <Space wrap className="mt-2 sm:mt-0">
+                        <Tag className="rounded-full px-3 py-1">Total {data.length}</Tag>
+                        <Tag color="success" className="rounded-full px-3 py-1">Active {activeCount}</Tag>
+                        <Tag color="error" className="rounded-full px-3 py-1">Inactive {inactiveCount}</Tag>
                     <Button
                         onClick={() => handleTrack()}
                         icon={<AiOutlinePlus />}
                         type="primary"
+                            size="large"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                     >
                         Add User
                     </Button>
                 </Space>
+                </div>
             </div>
 
             {/* User Creation/Edit Modal */}
@@ -813,23 +833,24 @@ export default function UsersRoutes() {
             </Modal>
 
             {/* Toolbar Section */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
+            <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
                 <Alert
                     message="User Management: View and manage all user accounts and permissions."
                     type="info"
                     showIcon
+                    className="mb-4"
                 />
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                     <Input.Search
                         allowClear
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Search users..."
-                        className="w-full sm:w-64"
-                        size="middle"
+                        className="w-full xl:max-w-md"
+                        size="large"
                     />
 
-                    <Space>
+                    <Space wrap>
                         <Button
                             onClick={handleRefetch}
                             icon={<FcRefresh className="text-blue-500" />}
@@ -885,9 +906,9 @@ export default function UsersRoutes() {
                 <Table<User>
                     size="middle"
                     columns={filteredColumns}
-                    dataSource={searchText ? filteredData : data}
-                    className="shadow-sm rounded-lg overflow-hidden"
-                    bordered
+                    dataSource={displayedData}
+                    className="admin-users-table overflow-hidden rounded-md border border-gray-200"
+                    bordered={false}
                     scroll={{ x: "max-content" }}
                     rowKey="id"
                     pagination={{
@@ -896,7 +917,7 @@ export default function UsersRoutes() {
                         pageSizeOptions: ['10', '20', '50', '100'],
                         defaultPageSize: 20,
                         className: "px-4 py-2",
-                        showTotal: (total) => `Total ${total} users`,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} users`,
                     }}
                     locale={{
                         emptyText: (

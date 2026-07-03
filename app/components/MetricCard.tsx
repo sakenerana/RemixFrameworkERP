@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, Button } from 'antd';
+import { Card, Button, Spin } from 'antd';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Eye } from 'lucide-react';
 
@@ -18,6 +18,7 @@ export interface MetricCardProps {
   centerValue?: string | number;
   legend: { label: string; value: string | number; color: string }[];
   icon?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export interface SidebarItem {
@@ -35,7 +36,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   centerLabel,
   centerValue,
   legend,
-  icon
+  icon,
+  isLoading = false,
 }) => {
   const formatTooltipValue = (value: number | string, name: string) => {
     const numericValue = Number(value) || 0;
@@ -54,7 +56,12 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <Card
-      title={<span className="text-sm font-bold text-gray-700 uppercase tracking-tight">{title}</span>}
+      title={
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <span className="truncate text-sm font-bold text-gray-700 uppercase tracking-tight">{title}</span>
+          {isLoading && <Spin size="small" />}
+        </div>
+      }
       className="shadow-sm border-none hover:shadow-md transition-shadow h-full flex flex-col"
       headStyle={{ borderBottom: '1px solid #f0f0f0', minHeight: '40px', padding: '0 16px' }}
       bodyStyle={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}
