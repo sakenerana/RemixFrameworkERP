@@ -5,11 +5,10 @@ import {
   Card,
   Checkbox,
   Form,
-  Image,
   Input,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useNavigate } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import supabase from "~/utils/supabase.client";
 // import ClientOnly from "~/components/client-only";
 // import { useAuth } from "~/auth/AuthContext";
@@ -111,10 +110,7 @@ export default function LoginIndex() {
                   { value: "Centralized", label: "Operational control" },
                   { value: "Protected", label: "User authentication" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-sm border border-white/15 bg-white/10 p-5 backdrop-blur-sm"
-                  >
+                  <div key={item.label} className="rounded-md border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
                     <p className="text-2xl font-semibold text-white">{item.value}</p>
                     <p className="mt-2 text-sm leading-6 text-blue-100/85">{item.label}</p>
                   </div>
@@ -123,18 +119,17 @@ export default function LoginIndex() {
             </div>
           </section>
 
-          <Card className="overflow-hidden rounded-sm border border-white/20 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+          <Card className="overflow-hidden rounded-md border border-white/20 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl">
 
             <div className="px-6 py-7 sm:px-10 sm:py-9">
               <div className="mb-8 flex flex-col items-center text-center">
-                {/* <div className="rounded-sm border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
-                  <Image
+                <div className="rounded-md border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
+                  <img
                     width={170}
-                    preview={false}
-                    src="./img/cficoop.svg"
+                    src="/img/cficoop.svg"
                     alt="CFI Cooperative Logo"
                   />
-                </div> */}
+                </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
                   CFI Management System
                 </p>
@@ -148,7 +143,7 @@ export default function LoginIndex() {
 
               {errorAlert && (
                 <Alert
-                  className="mb-6 rounded-sm border-red-200 bg-red-50"
+                  className="mb-6 rounded-md border-red-200 bg-red-50"
                   message="Authentication failed"
                   description="The email or password you entered is incorrect. Verify your credentials and try again."
                   type="error"
@@ -183,7 +178,7 @@ export default function LoginIndex() {
                     prefix={<UserOutlined className="text-slate-400" />}
                     placeholder="your.email@example.com"
                     size="large"
-                    className="h-12 rounded-xl border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                    className="h-12 rounded-md border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
                   />
                 </Form.Item>
 
@@ -196,7 +191,7 @@ export default function LoginIndex() {
                     prefix={<LockOutlined className="text-slate-400" />}
                     placeholder="Enter your password"
                     size="large"
-                    className="h-12 rounded-xl border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                    className="h-12 rounded-md border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
                   />
                 </Form.Item>
 
@@ -205,12 +200,12 @@ export default function LoginIndex() {
                     <Checkbox className="text-sm text-slate-600">Remember me</Checkbox>
                   </Form.Item>
 
-                  <a
-                    href="/forgot-password"
+                  <Link
+                    to="/forgot-password"
                     className="text-sm font-semibold text-blue-700 transition-colors hover:text-blue-900"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
 
                 <Form.Item className="mb-0 pt-2">
@@ -219,7 +214,7 @@ export default function LoginIndex() {
                     htmlType="submit"
                     block
                     size="large"
-                    className="h-12 rounded-xl border-0 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 text-base font-semibold shadow-lg shadow-blue-900/20 transition-all hover:brightness-105"
+                    className="h-12 rounded-md border-0 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 text-base font-semibold shadow-lg shadow-blue-900/20 transition-all hover:brightness-105"
                     disabled={loading}
                   >
                     {loading ? (
@@ -243,7 +238,7 @@ export default function LoginIndex() {
                 </div>
               </div>
 
-              <div className="rounded-sm border border-slate-200 bg-slate-50 px-5 py-4 text-center text-sm text-slate-600">
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-5 py-4 text-center text-sm text-slate-600">
                 Don&apos;t have an account?{" "}
                 <a
                   href="mailto:admin@cfi.coop"

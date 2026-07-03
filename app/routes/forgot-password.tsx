@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, LoadingOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Image, Input, message } from "antd";
+import { Alert, Button, Card, Form, Input, message } from "antd";
 import { Link } from "@remix-run/react";
 import { useState } from "react";
 // import ClientOnly from "~/components/client-only";
@@ -7,19 +7,27 @@ import { useAuth } from "~/auth/AuthContext";
 
 export default function ForgotPasswordIndex() {
   const [loading, setLoading] = useState(false);
+  const [sentEmail, setSentEmail] = useState<string>();
+  const [errorAlert, setErrorAlert] = useState(false);
   const [form] = Form.useForm<any>();
   const { resetPassword } = useAuth();
 
   const onFinish = async (values: any) => {
     setLoading(true);
+    setErrorAlert(false);
+    setSentEmail(undefined);
+
     try {
       const { error } = await resetPassword(values.email);
       if (error) throw error;
 
+      setSentEmail(values.email);
       message.success("Successful. Please check your email.");
       form.resetFields();
     } catch (error) {
-      return { error };
+      setErrorAlert(true);
+      message.error("Unable to send reset instructions");
+      console.error("Password reset error:", error);
     } finally {
       setLoading(false);
     }
@@ -52,10 +60,7 @@ export default function ForgotPasswordIndex() {
                   { value: "Secure", label: "Recovery process" },
                   { value: "Fast", label: "Return to access" },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-sm border border-white/15 bg-white/10 p-5 backdrop-blur-sm"
-                  >
+                  <div key={item.label} className="rounded-md border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
                     <p className="text-2xl font-semibold text-white">{item.value}</p>
                     <p className="mt-2 text-sm leading-6 text-blue-100/85">{item.label}</p>
                   </div>
@@ -64,18 +69,17 @@ export default function ForgotPasswordIndex() {
             </div>
           </section>
 
-          <Card className="overflow-hidden rounded-sm border border-white/20 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+          <Card className="overflow-hidden rounded-md border border-white/20 bg-white/95 shadow-[0_24px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl">
 
             <div className="px-6 py-7 sm:px-10 sm:py-9">
               <div className="mb-8 flex flex-col items-center text-center">
-                {/* <div className="rounded-sm border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
-                  <Image
+                <div className="rounded-md border border-slate-200 bg-slate-50/80 px-5 py-4 shadow-sm">
+                  <img
                     width={170}
-                    preview={false}
-                    src="./img/cficoop.svg"
+                    src="/img/cficoop.svg"
                     alt="CFI Cooperative Logo"
                   />
-                </div> */}
+                </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.28em] text-blue-700">
                   CFI Management System
                 </p>
@@ -87,6 +91,30 @@ export default function ForgotPasswordIndex() {
                   instructions.
                 </p>
               </div>
+
+              {sentEmail && (
+                <Alert
+                  className="mb-6 rounded-md border-emerald-200 bg-emerald-50"
+                  message="Reset link sent"
+                  description={`Password reset instructions were sent to ${sentEmail}.`}
+                  type="success"
+                  showIcon
+                  closable
+                  onClose={() => setSentEmail(undefined)}
+                />
+              )}
+
+              {errorAlert && (
+                <Alert
+                  className="mb-6 rounded-md border-red-200 bg-red-50"
+                  message="Reset request failed"
+                  description="We could not send reset instructions right now. Check the email address or contact IT support."
+                  type="error"
+                  showIcon
+                  closable
+                  onClose={() => setErrorAlert(false)}
+                />
+              )}
 
               <Form
                 form={form}
@@ -113,11 +141,11 @@ export default function ForgotPasswordIndex() {
                     prefix={<MailOutlined className="text-slate-400" />}
                     placeholder="your.email@example.com"
                     size="large"
-                    className="h-12 rounded-sm border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                    className="h-12 rounded-md border-slate-200 px-4 text-slate-700 shadow-sm transition-all hover:border-blue-400 focus:border-blue-500 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
                   />
                 </Form.Item>
 
-                <div className="rounded-sm border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-6 text-slate-600">
+                <div className="rounded-md border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-6 text-slate-600">
                   <span className="font-semibold text-slate-800">Security note:</span> Accounts
                   without verified email addresses will not receive reset links. Contact{" "}
                   <a
@@ -135,7 +163,7 @@ export default function ForgotPasswordIndex() {
                     htmlType="submit"
                     block
                     size="large"
-                    className="h-12 rounded-sm border-0 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 text-base font-semibold shadow-lg shadow-blue-900/20 transition-all hover:brightness-105"
+                    className="h-12 rounded-md border-0 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 text-base font-semibold shadow-lg shadow-blue-900/20 transition-all hover:brightness-105"
                     disabled={loading}
                   >
                     {loading ? (
@@ -162,7 +190,7 @@ export default function ForgotPasswordIndex() {
                   <Button
                     block
                     size="large"
-                    className="h-12 mt-4 rounded-sm border-slate-200 font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-900"
+                    className="mt-4 h-12 rounded-md border-slate-200 font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-900"
                   >
                     <ArrowLeftOutlined className="mr-2" />
                     Return to Login

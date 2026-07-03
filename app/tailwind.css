@@ -277,6 +277,46 @@ body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
+.admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item {
+  color: #475569 !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item:hover {
+  background: #f1f5f9 !important;
+  color: #1e40af !important;
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item-selected {
+  background: #eff6ff !important;
+  border-left: 3px solid #2563eb;
+  color: #1d4ed8 !important;
+  box-shadow: inset 0 0 0 1px #dbeafe;
+}
+
+.admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item-selected .ant-menu-item-icon {
+  color: #2563eb !important;
+}
+
+body.dark-mode .admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+body.dark-mode .admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-menu-item-selected {
+  background: rgba(37, 99, 235, 0.28) !important;
+  border-left-color: #67e8f9;
+  color: #ffffff !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 .admin-users-page .ant-card-body {
   background: #ffffff;
 }
@@ -332,6 +372,35 @@ body {
 }
 
 .admin-departments-table .ant-pagination {
+  margin: 16px !important;
+}
+
+.admin-groups-page .ant-card-body {
+  background: #ffffff;
+}
+
+.admin-groups-table .ant-table {
+  border-radius: 8px;
+}
+
+.admin-groups-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.admin-groups-table .ant-table-tbody > tr > td {
+  border-bottom-color: #eef2f7 !important;
+}
+
+.admin-groups-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbff !important;
+}
+
+.admin-groups-table .ant-pagination {
   margin: 16px !important;
 }
 

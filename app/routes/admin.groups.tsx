@@ -1,5 +1,7 @@
 import {
   CheckCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
   HomeOutlined,
   LoadingOutlined,
   SettingOutlined,
@@ -24,12 +26,12 @@ import {
   Table,
   TableColumnsType,
   Tag,
+  Typography,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AiOutlineCloseCircle,
-  AiOutlineDelete,
-  AiOutlineEdit,
+  AiOutlineCheckCircle,
   AiOutlinePlus,
   AiOutlineSave,
   AiOutlineTeam,
@@ -41,6 +43,8 @@ import PrintDropdownComponent from "~/components/print_dropdown";
 import { GroupService } from "~/services/groups.service";
 import { Groups } from "~/types/groups.type";
 
+const { Text, Title } = Typography;
+
 export default function GroupsRoutes() {
   const [data, setData] = useState<Groups[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,7 +54,6 @@ export default function GroupsRoutes() {
   const [form] = Form.useForm<Groups>();
   const [editingId, setEditingId] = useState<number | null>(null);
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState<Groups[]>([]);
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -94,13 +97,13 @@ export default function GroupsRoutes() {
   };
 
   const handleDeleteButton = async (record: Groups) => {
-    if (record.status_labels.name === 'Active') {
+    if (record.status_labels?.name === 'Active') {
       const { error } = await GroupService.deactivateStatus(record.id, record);
 
       if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
-    } else if (record.status_labels.name === 'Inactive') {
+    } else if (record.status_labels?.name === 'Inactive') {
       const { error } = await GroupService.activateStatus(record.id, record);
 
       if (error) throw message.error(error.message);
@@ -123,16 +126,20 @@ export default function GroupsRoutes() {
   };
 
   useEffect(() => {
-    if (searchText.trim() === '') {
-      fetchData();
-    } else {
-      const filtered = data.filter(data =>
-        data.group?.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setFilteredData(filtered);
+    fetchData();
+  }, []);
+
+  const displayedData = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+
+    if (!normalizedSearch) {
+      return data;
     }
 
-  }, [searchText]); // Empty dependency array means this runs once on mount
+    return data.filter((group) =>
+      group.group?.toLowerCase().includes(normalizedSearch)
+    );
+  }, [data, searchText]);
 
   // Create or Update record
   const onFinish = async () => {
@@ -182,7 +189,7 @@ export default function GroupsRoutes() {
     {
       title: "Group Name",
       dataIndex: "group",
-      width: 120,
+      width: 320,
       render: (text) => (
         <div className="flex items-center">
           <Avatar
@@ -191,7 +198,7 @@ export default function GroupsRoutes() {
             className="mr-3 bg-blue-100 text-blue-600"
             icon={<AiOutlineTeam />}
           />
-          <span className="font-medium">
+          <span className="font-semibold text-gray-900">
             {text || <span>N/A</span>}
           </span>
         </div>
@@ -202,16 +209,16 @@ export default function GroupsRoutes() {
       dataIndex: "status",
       width: 120,
       render: (_, record) => {
-        if (record.status_labels.name === 'Active') {
+        if (record.status_labels?.name === 'Active') {
           return (
-            <Tag color="green" variant="solid">
-              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Active
+            <Tag color="success" className="inline-flex items-center gap-1 rounded-full px-2">
+              <CheckCircleOutlined /> Active
             </Tag>
           );
-        } else if (record.status_labels.name === 'Inactive') {
+        } else if (record.status_labels?.name === 'Inactive') {
           return (
-            <Tag color="red" variant="solid">
-              <AiOutlineCloseCircle className="float-left mt-1 mr-1" /> Inactive
+            <Tag color="error" className="inline-flex items-center gap-1 rounded-full px-2">
+              <AiOutlineCloseCircle /> Inactive
             </Tag>
           );
         }
@@ -220,10 +227,10 @@ export default function GroupsRoutes() {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
-        <div className="flex">
+        <div className="flex items-center gap-2">
           <Popconfirm
             title="Do you want to update?"
             description="Are you sure to update this group?"
@@ -231,41 +238,38 @@ export default function GroupsRoutes() {
             cancelText="No"
             onConfirm={() => editRecord(record)}
           >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiOutlineEdit className="float-left mt-1 mr-1" />}
-              color="#f7b63e"
-              variant="solid"
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              className="border-amber-200 bg-amber-50 text-amber-700 hover:!border-amber-400 hover:!text-amber-700"
             >
               Update
-            </Tag>
+            </Button>
           </Popconfirm>
           <Popconfirm
-            title="Do you want to delete?"
-            description="Are you sure to delete this group?"
+            title={record.status_labels?.name === 'Active' ? "Do you want to deactivate?" : "Do you want to activate?"}
+            description={record.status_labels?.name === 'Active' ? "Are you sure to deactivate this group?" : "Are you sure to activate this group?"}
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDeleteButton(record)}
           >
-            {record.status_labels.name === 'Active' && (
-              <Tag
-                className="cursor-pointer ml-2"
-                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-                color="#f50"
-                variant="solid"
+            {record.status_labels?.name === 'Active' && (
+              <Button
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
               >
                 Deactivate
-              </Tag>
+              </Button>
             )}
-            {record.status_labels.name === 'Inactive' && (
-              <Tag
-                className="cursor-pointer ml-2"
-                icon={<AiOutlineDelete className="float-left mt-1 mr-1" />}
-                color="#1677ff"
-                variant="solid"
+            {record.status_labels?.name === 'Inactive' && (
+              <Button
+                type="primary"
+                size="small"
+                icon={<AiOutlineCheckCircle />}
               >
                 Activate
-              </Tag>
+              </Button>
             )}
           </Popconfirm>
         </div>
@@ -299,38 +303,53 @@ export default function GroupsRoutes() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
-  return (
-    <Card>
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <Breadcrumb
-            items={[
-              {
-                href: "/admin/dashboard",
-                title: <HomeOutlined className="text-gray-400" />,
-              },
-              {
-                title: <span className="text-gray-500">Admin</span>,
-              },
-              {
-                title: <span className="text-blue-600 font-medium">Groups</span>,
-              },
-            ]}
-            className="text-sm"
-          />
-        </div>
+  const activeCount = data.filter((group) => group.status_labels?.name === 'Active').length;
+  const inactiveCount = data.filter((group) => group.status_labels?.name === 'Inactive').length;
 
-        <Space wrap className="mt-2 sm:mt-0">
-          <Button
-            onClick={() => handleTrack()}
-            icon={<AiOutlinePlus />}
-            type="primary"
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-          >
-            New Group
-          </Button>
-        </Space>
+  return (
+    <Card className="admin-groups-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+      {/* Header Section */}
+      <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <Breadcrumb
+              items={[
+                {
+                  href: "/admin/dashboard",
+                  title: <HomeOutlined className="text-gray-400" />,
+                },
+                {
+                  title: <span className="text-gray-500">Settings</span>,
+                },
+                {
+                  title: <span className="text-blue-600 font-medium">Groups</span>,
+                },
+              ]}
+              className="text-sm"
+            />
+            <Title level={3} className="!mb-1 !mt-3">
+              Groups
+            </Title>
+            <Text className="text-sm text-gray-500">
+              Manage permission groups used to organize users by system access level.
+            </Text>
+          </div>
+
+          <Space wrap className="mt-2 sm:mt-0">
+            <Tag className="rounded-full px-3 py-1">Total {data.length}</Tag>
+            <Tag color="success" className="rounded-full px-3 py-1">Active {activeCount}</Tag>
+            <Tag color="error" className="rounded-full px-3 py-1">Inactive {inactiveCount}</Tag>
+            <Button
+              onClick={() => handleTrack()}
+              icon={<AiOutlinePlus />}
+              type="primary"
+              size="large"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              New Group
+            </Button>
+          </Space>
+        </div>
       </div>
 
       {/* Group Creation/Edit Modal */}
@@ -390,7 +409,7 @@ export default function GroupsRoutes() {
             <Input
               placeholder="Enter group name (e.g. Finance Team, IT Admins)"
               prefix={<AiOutlineUsergroupAdd className="text-gray-400" />}
-              className="h-10 rounded-lg"
+              className="h-10"
               allowClear
             />
           </Form.Item>
@@ -402,9 +421,9 @@ export default function GroupsRoutes() {
               type="default"
               size="large"
               className="w-full sm:w-auto h-11"
-              icon={<AiOutlineUndo className="text-gray-600" />}
+              icon={<AiOutlineUndo />}
             >
-              Reset
+              Reset Form
             </Button>
             <Button
               type="primary"
@@ -421,27 +440,28 @@ export default function GroupsRoutes() {
       </Modal>
 
       {/* Toolbar Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
+      <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
         <Alert
           message="Group Structure: Organize users into functional groups for better permission management."
           type="info"
           showIcon
+          className="mb-4"
         />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <Input.Search
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search groups..."
-            className="w-full sm:w-64"
-            size="middle"
+            className="w-full xl:max-w-md"
+            size="large"
           />
 
-          <Space>
+          <Space wrap>
             <Button
               onClick={handleRefetch}
               icon={<FcRefresh className="text-blue-500" />}
-              className="flex items-center gap-2 hover:border-blue-500"
+              className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
             >
               Refresh
             </Button>
@@ -456,7 +476,7 @@ export default function GroupsRoutes() {
             >
               <Button
                 icon={<SettingOutlined />}
-                className="flex items-center gap-2 hover:border-blue-500"
+                className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
               >
                 Columns
               </Button>
@@ -465,7 +485,7 @@ export default function GroupsRoutes() {
             <PrintDropdownComponent
               stateData={data}
               buttonProps={{
-                className: "flex items-center gap-2 hover:border-blue-500",
+                className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
               }}
             />
           </Space>
@@ -493,9 +513,8 @@ export default function GroupsRoutes() {
         <Table<Groups>
           size="middle"
           columns={filteredColumns}
-          dataSource={searchText ? filteredData : data}
-          className="shadow-sm rounded-lg overflow-hidden"
-          bordered
+          dataSource={displayedData}
+          className="admin-groups-table overflow-hidden rounded-md border border-gray-200"
           scroll={{ x: "max-content" }}
           rowKey="id"
           pagination={{

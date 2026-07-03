@@ -331,57 +331,64 @@ export default function AdminLayoutIndex() {
                   bottom: 0,
                   height: '100vh',
                   zIndex: 200,
-                  background: isDarkMode ? '#141414' : 'linear-gradient(180deg, #172554 0%, #263996 48%, #3449a8 100%)',
-                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
-                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '8px 0 24px rgba(15, 23, 42, 0.12)',
+                  background: isDarkMode ? '#141414' : '#ffffff',
+                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #dbe3ef',
+                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '6px 0 20px rgba(15, 23, 42, 0.08)',
                   overflow: 'hidden',
                 }}
-                className="admin-sidebar sidebar-gradient"
+                className="admin-sidebar admin-sidebar-corporate"
               >
                 {/* User Profile Section - Enhanced */}
                 <div
-                  className="relative flex h-28 items-center justify-center overflow-hidden px-4"
+                  className="relative flex h-32 items-center justify-center overflow-hidden px-4"
                   style={{
-                    background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                    background: isDarkMode
+                      ? 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)'
+                      : 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)',
+                    borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e5edf7',
                   }}
                 >
                   {/* Decorative accent */}
-                  <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-sky-300 to-cyan-300" />
-                  <div className="absolute -right-10 -top-16 h-36 w-36 rounded-full bg-white/10" />
-                  <div className="absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-blue-300/10" />
+                  <div className="absolute left-0 top-0 h-full w-1 bg-blue-600" />
+                  <div className="absolute bottom-0 left-5 right-5 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
                   {collapsed ? (
                     <div className="p-3 relative group">
                       <Avatar
                         src="/img/user.png"
                         size={48}
-                        className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                        className="cursor-pointer transition-all duration-300 hover:ring-4 hover:ring-blue-100"
                         style={{
-                          border: '3px solid rgba(255, 255, 255, 0.2)',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                          border: isDarkMode ? '3px solid rgba(255,255,255,0.16)' : '3px solid #ffffff',
+                          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.28)' : '0 8px 18px rgba(15, 23, 42, 0.14)'
                         }}
                       />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
                     </div>
                   ) : (
-                    <div className="relative flex w-full items-center rounded-md border border-white/10 bg-white/10 px-4 py-3 shadow-sm backdrop-blur">
+                    <div
+                      className="relative flex w-full items-center rounded-md border px-4 py-3 shadow-sm"
+                      style={{
+                        background: isDarkMode ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                        borderColor: isDarkMode ? 'rgba(255,255,255,0.12)' : '#e2e8f0',
+                      }}
+                    >
                       <div className="relative group">
                         <Avatar
                           src="/img/user.png"
                           size={56}
-                          className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                          className="cursor-pointer transition-all duration-300 hover:ring-4 hover:ring-blue-100"
                           style={{
-                            border: '3px solid rgba(255, 255, 255, 0.2)',
-                            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
+                            border: isDarkMode ? '3px solid rgba(255,255,255,0.16)' : '3px solid #f8fafc',
+                            boxShadow: isDarkMode ? '0 6px 16px rgba(0,0,0,0.3)' : '0 8px 18px rgba(15, 23, 42, 0.12)'
                           }}
                         />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
                           <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                         </div>
                       </div>
                       <div className="ml-4 min-w-0 overflow-hidden">
-                        <div className="truncate text-base font-semibold leading-tight text-white">
+                        <div className={`truncate text-base font-semibold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                           {isFname} {isLname}
                         </div>
                         <div className="mt-2 flex items-center">
@@ -393,10 +400,10 @@ export default function AdminLayoutIndex() {
                                 fontWeight: 700,
                                 padding: '2px 8px',
                                 lineHeight: '20px',
-                                background: 'linear-gradient(45deg, #ffd700, #ffed4e)',
+                                background: isDarkMode ? 'rgba(250,204,21,0.16)' : '#fff7d6',
                                 color: '#8b6500',
-                                border: 'none',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                                border: '1px solid #f6d76b',
+                                boxShadow: 'none'
                               }}
                             >
                               <div className="flex items-center">
@@ -406,7 +413,7 @@ export default function AdminLayoutIndex() {
                             </Tag>
                           </div>
                         </div>
-                        <div className="text-xs text-blue-100/80 truncate mt-1">
+                        <div className={`text-xs truncate mt-1 ${isDarkMode ? 'text-blue-100/80' : 'text-slate-500'}`}>
                           CFI Cooperative
                         </div>
                       </div>
@@ -422,7 +429,7 @@ export default function AdminLayoutIndex() {
                   items={menuItems}
                   style={{
                     backgroundColor: isDarkMode ? '#141414' : 'transparent',
-                    color: isDarkMode ? '#141414' : '#f1f1f1',
+                    color: isDarkMode ? '#f1f5f9' : '#334155',
                     height: collapsed ? 'calc(100vh - 202px)' : 'calc(100vh - 260px)',
                     overflowY: 'auto',
                     padding: collapsed ? '12px 8px' : '16px 12px',
@@ -439,32 +446,31 @@ export default function AdminLayoutIndex() {
                     left: 0,
                     width: "100%",
                     padding: collapsed ? "14px 10px" : "18px 20px 20px",
-                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(15,23,42,0.18) 100%)",
-                    backdropFilter: "blur(10px)",
+                    borderTop: isDarkMode ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid #e5edf7",
+                    background: isDarkMode ? "rgba(255,255,255,0.04)" : "#f8fafc",
                   }}
                 >
                   {collapsed ? (
                     <Tooltip title="Sign Out" placement="right">
                       <Button
                         type="text"
-                        icon={<LogoutOutlined className="text-white/80 hover:text-red-400" />}
+                        icon={<LogoutOutlined className={isDarkMode ? "text-white/80 hover:text-red-400" : "text-slate-500 hover:text-red-600"} />}
                         onClick={handleSignout}
-                        className="flex items-center justify-center w-full h-12 hover:bg-red-500/20 rounded-lg transition-all duration-300"
+                        className="flex items-center justify-center w-full h-12 rounded-md transition-all duration-300"
                         style={{
-                          color: "rgba(255, 255, 255, 0.8)",
+                          color: isDarkMode ? "rgba(255, 255, 255, 0.8)" : "#475569",
                         }}
                       />
                     </Tooltip>
                   ) : (
                     <Button
                       danger
-                      type="primary"
+                      type="default"
                       icon={<LogoutOutlined />}
                       onClick={handleSignout}
-                      className="group flex h-11 w-full items-center justify-center rounded-md font-semibold shadow-sm transition-all duration-300"
+                      className="group flex h-11 w-full items-center justify-center rounded-md border-red-200 bg-white font-semibold text-red-600 shadow-sm transition-all duration-300 hover:!border-red-400 hover:!text-red-700"
                     >
-                      <span className="ml-2 text-white">
+                      <span className="ml-2">
                         SIGN OUT
                       </span>
                       <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -478,11 +484,17 @@ export default function AdminLayoutIndex() {
                   {/* Version Info (only visible when expanded) */}
                   {!collapsed && (
                     <div className="mt-4 text-center">
-                      <div className="text-xs text-white/50 font-medium tracking-wide">
+                      <div
+                        className={`inline-flex rounded border px-2 py-0.5 text-xs font-semibold tracking-wide ${
+                          isDarkMode
+                            ? 'border-white/10 bg-white/5 text-white/70'
+                            : 'border-slate-200 bg-white text-slate-700'
+                        }`}
+                      >
                         v0.0.1
                       </div>
-                      <div className="text-[10px] text-white/30 mt-1">
-                        © {new Date().getFullYear()} CFI Admin
+                      <div className={`mt-1 text-[10px] font-medium ${isDarkMode ? 'text-white/45' : 'text-slate-500'}`}>
+                        &copy; {new Date().getFullYear()} CFI Admin
                       </div>
                     </div>
                   )}
