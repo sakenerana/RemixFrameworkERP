@@ -1,9 +1,14 @@
-import { GlobalOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Alert, Button, Card, Col, Row, Spin, Tag } from "antd";
+import {
+  AppstoreOutlined,
+  BarChartOutlined,
+  GlobalOutlined,
+  LoadingOutlined,
+  ReloadOutlined,
+  TrophyOutlined,
+} from "@ant-design/icons";
+import { Alert, Button, Card, Col, Progress, Row, Spin, Statistic, Tag, Typography } from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { RiCircleFill } from "react-icons/ri";
-import { useAuth } from "~/auth/AuthContext";
+import { useEffect, useMemo, useState } from "react";
 import { CrownFilled } from '@ant-design/icons';
 
 interface Activity {
@@ -19,7 +24,7 @@ interface ApiResponse {
 // Language content
 const translations = {
   en: {
-    alertMessage: "You can see here all the status of overall workflows. Please check closely.",
+    alertMessage: "Monitor workflow usage and identify the most requested services across departments.",
     mostRequested: "Most Requested Workflows",
     readyToDeploy: "Ready to Deploy",
     pending: "Pending",
@@ -31,7 +36,7 @@ const translations = {
     toBeDetermined: "TBD"
   },
   fil: {
-    alertMessage: "Maaari mong makita dito ang lahat ng status ng kabuuang trabaho. Mangyaring suriin nang mabuti.",
+    alertMessage: "Subaybayan ang paggamit ng workflow at tukuyin ang pinaka-hinihinging serbisyo sa mga departamento.",
     mostRequested: "Pinaka-Hinihinging Workflows",
     readyToDeploy: "Handa nang I-deploy",
     pending: "Nakabinbin",
@@ -46,13 +51,13 @@ const translations = {
 
 const CACHE_KEY = 'workflowDashboardData';
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
+const { Text, Title } = Typography;
 
 export default function WorkflowDashboard() {
   const [data, setData] = useState<ApiResponse>({ data: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [language, setLanguage] = useState<'en' | 'fil'>('en');
-  const { user, token } = useAuth();
 
   const t = translations[language];
 
@@ -116,175 +121,258 @@ export default function WorkflowDashboard() {
     }
   };
 
+  const handleRefresh = () => {
+    localStorage.removeItem(CACHE_KEY);
+    fetchData();
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const topActivities = [...data.data]
-    .sort((a, b) => b.activities_count - a.activities_count)
-    .slice(0, 3)
-    .map(item => item.id);
+  const sortedActivities = useMemo(
+    () => [...data.data].sort((a, b) => b.activities_count - a.activities_count),
+    [data.data]
+  );
+  const topActivities = sortedActivities.slice(0, 3);
+  const topActivityIds = topActivities.map((item) => item.id);
+  const totalUses = data.data.reduce((sum, item) => sum + item.activities_count, 0);
+  const activeWorkflowCount = data.data.filter((item) => item.activities_count > 0).length;
+  const averageUses = data.data.length ? Math.round(totalUses / data.data.length) : 0;
+  const leaderCount = topActivities[0]?.activities_count ?? 0;
+  const lastUpdated = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-  const top5Workflows = [...data.data]
-    .sort((a, b) => b.activities_count - a.activities_count)
-    .slice(0, 5);
-
-  // Gradient backgrounds for top 3 cards
-  const rankGradients = [
-    // Gold gradient for 1st place
-    'linear-gradient(135deg, #FFA500 0%, #FFD700 100%)',
-    // Silver gradient for 2nd place
-    'linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%)',
-    // Bronze gradient for 3rd place
-    'linear-gradient(135deg, #CD7F32 0%, #B56C2A 100%)'
+  const rankStyles = [
+    {
+      label: '1st Place',
+      accent: '#d97706',
+      background: 'linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%)',
+      border: '#f59e0b',
+    },
+    {
+      label: '2nd Place',
+      accent: '#475569',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      border: '#94a3b8',
+    },
+    {
+      label: '3rd Place',
+      accent: '#0f766e',
+      background: 'linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%)',
+      border: '#14b8a6',
+    },
   ];
 
-  const rankTextColors = ['#FFFFFF', '#FFFFFF', '#FFFFFF']; // All white text
-  const rankBadgeColors = ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.2)'];
-
   return (
-    <div>
-      <div className="flex justify-between items-center mb-2">
-        <h1 className="font-bold">{t.dashboardTitle}</h1>
-        <Button
-          type="default"
-          onClick={toggleLanguage}
-          icon={<GlobalOutlined />}
-        >
-          {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
-        </Button>
-      </div>
+    <div className="workflow-dashboard-page">
+      <Card className="mb-5 rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 20 } }}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <Tag color="blue" className="mb-3 rounded-full px-3 py-1">
+              Workflow Operations
+            </Tag>
+            <Title level={2} className="!mb-1 !text-slate-900">
+              {t.dashboardTitle}
+            </Title>
+            <Text className="text-sm text-gray-500">
+              Track demand across active workflow services and identify high-volume requests.
+            </Text>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={handleRefresh}
+              icon={<ReloadOutlined />}
+              loading={loading}
+              className="border-gray-300"
+            >
+              Refresh
+            </Button>
+            <Button
+              type="default"
+              onClick={toggleLanguage}
+              icon={<GlobalOutlined />}
+            >
+              {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       {error && (
-        <Alert message={`Error: ${error}`} type="error" className="mb-4" />
+        <Alert message={`Error: ${error}`} type="error" className="mb-4 rounded-md" />
       )}
 
       <Alert
         message={t.alertMessage}
         type="info"
         showIcon
-        className="mb-3"
+        className="mb-5 rounded-md"
       />
 
-      {/* Top 3 Workflows with Gradient Backgrounds */}
-      <Row gutter={[16, 16]} className="mb-3">
-        {top5Workflows.slice(0, 3).map((workflow, index) => {
-          const ranks = ['1st', '2nd', '3rd'];
-
-          return (
-            <Col key={workflow.id} xs={24} sm={12} md={8}>
-              <Card
-                className="h-full hover:shadow-lg transition-all duration-300 border-none"
-                bodyStyle={{
-                  padding: '20px',
-                  background: rankGradients[index],
-                  color: rankTextColors[index],
-                  borderRadius: '8px'
-                }}
-              >
-                <div className="flex flex-col items-start space-y-3">
-                  {/* Rank Badge with semi-transparent background */}
-                  <span
-                    className="text-white text-xs font-semibold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: rankBadgeColors[index],
-                      backdropFilter: 'blur(4px)'
-                    }}
-                  >
-                    {ranks[index]} Place
-                  </span>
-
-                  {/* Workflow Name - White Text */}
-                  <h3 className="text-xl font-semibold line-clamp-2 text-white">
-                    {workflow.name}
-                  </h3>
-
-                  {/* Usage Tag with semi-transparent background */}
-                  <div
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      backdropFilter: 'blur(4px)',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      borderRadius: '4px',
-                      padding: '4px 12px',
-                      display: 'inline-block',
-                      color: 'white'
-                    }}
-                  >
-                    {workflow.activities_count.toLocaleString()} Uses
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          );
-        })}
+      <Row gutter={[16, 16]} className="mb-5">
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Total Uses"
+              value={totalUses}
+              prefix={<BarChartOutlined className="text-blue-600" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">All workflow requests recorded</Text>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Workflow Types"
+              value={data.data.length}
+              prefix={<AppstoreOutlined className="text-emerald-600" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">{activeWorkflowCount} with activity</Text>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Average Uses"
+              value={averageUses}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">Average per workflow type</Text>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Top Workflow Uses"
+              value={leaderCount}
+              prefix={<TrophyOutlined className="text-amber-600" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">Current leading request type</Text>
+          </Card>
+        </Col>
       </Row>
 
-      {/* Activities Grid */}
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Spin
-            size="large"
-            tip="Loading user workflows..."
-            indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
-          />
-        </div>
+        <Card className="rounded-md border border-gray-200 shadow-sm">
+          <div className="flex h-64 items-center justify-center">
+            <Spin
+              size="large"
+              tip="Loading user workflows..."
+              indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+            />
+          </div>
+        </Card>
       ) : (
         <>
-          <Row gutter={[16, 16]}>
-            {data.data.map((item) => {
-              const rank = topActivities.indexOf(item.id) + 1;
-              const crownColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
+          <div className="mb-5">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <Title level={4} className="!mb-0">
+                  {t.mostRequested}
+                </Title>
+                <Text className="text-sm text-gray-500">Ranked by total usage as of {lastUpdated}</Text>
+              </div>
+            </div>
+            <Row gutter={[16, 16]}>
+              {topActivities.map((workflow, index) => {
+                const style = rankStyles[index];
 
-              return (
-                <Col key={item.id} xs={24} sm={12} md={8} lg={6}>
-                  <Card
-                    className="h-full transition-transform hover:scale-105 hover:shadow-lg relative"
-                    bodyStyle={{ padding: '12px' }}
-                  >
-                    {/* Only show crown for top 3 rankings */}
-                    {rank <= 3 && (
-                      <div className="absolute -top-2 -right-2">
-                        <CrownFilled
-                          style={{
-                            display: rank === 0 ? 'none' : '',
-                            fontSize: '18px',
-                            color: crownColors[rank - 1],
-                            filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.3))'
-                          }}
-                        />
-                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-white">
-                          {rank === 0 ? '' : rank}
+                return (
+                  <Col key={workflow.id} xs={24} md={8}>
+                    <Card
+                      className="h-full rounded-md border shadow-sm transition-shadow hover:shadow-md"
+                      styles={{
+                        body: {
+                          padding: 20,
+                          background: style.background,
+                          borderLeft: `4px solid ${style.border}`,
+                        },
+                      }}
+                    >
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <Tag
+                          className="rounded-full px-3 py-1 font-semibold"
+                          style={{ color: style.accent, borderColor: style.border }}
+                        >
+                          {style.label}
+                        </Tag>
+                        <CrownFilled style={{ color: style.accent, fontSize: 18 }} />
+                      </div>
+                      <Title level={4} className="!mb-4 line-clamp-2 !text-slate-900">
+                        {workflow.name}
+                      </Title>
+                      <div className="flex items-end justify-between gap-4">
+                        <Text className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Usage
+                        </Text>
+                        <span className="text-2xl font-bold text-slate-900">
+                          {workflow.activities_count.toLocaleString()}
                         </span>
                       </div>
-                    )}
-                    <div className="flex items-start">
-                      <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
-                      <div className="flex-1">
-                        <h3 className="text-sm font-semibold mb-0 line-clamp-2">
-                          {item.name}
-                        </h3>
-                        <div className="text-right mt-2">
-                          <Tag
-                            color={
-                              item.activities_count === 0 ? 'red' :
-                                rank === 1 ? 'gold' :
-                                  rank === 2 ? 'default' :
-                                    rank === 3 ? 'orange' : 'green'
-                            }
-                            className="text-lg"
-                          >
-                            {item.activities_count.toLocaleString()}
-                          </Tag>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          </div>
+
+          <Card
+            title={
+              <div className="flex flex-col">
+                <span className="text-base font-semibold text-slate-900">Workflow Request Volume</span>
+                <span className="text-xs font-normal text-gray-500">All workflow services sorted by demand</span>
+              </div>
+            }
+            className="rounded-md border border-gray-200 shadow-sm"
+            styles={{ body: { padding: 16 } }}
+          >
+            <Row gutter={[12, 12]}>
+              {sortedActivities.map((item) => {
+                const rank = topActivityIds.indexOf(item.id) + 1;
+                const isTopRank = rank > 0 && rank <= 3;
+                const usagePercent = leaderCount > 0 ? Math.round((item.activities_count / leaderCount) * 100) : 0;
+
+                return (
+                  <Col key={item.id} xs={24} sm={12} lg={8} xl={6}>
+                    <Card
+                      className="h-full rounded-md border border-gray-200 transition-shadow hover:shadow-md"
+                      styles={{ body: { padding: 14 } }}
+                    >
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                            {isTopRank && (
+                              <Tag color={rank === 1 ? 'gold' : rank === 2 ? 'default' : 'cyan'} className="m-0 rounded-full">
+                                Rank {rank}
+                              </Tag>
+                            )}
+                          </div>
+                          <h3 className="mb-0 line-clamp-2 text-sm font-semibold text-slate-900">
+                            {item.name}
+                          </h3>
                         </div>
+                        <span className="shrink-0 rounded-md bg-blue-50 px-2 py-1 text-lg font-bold text-blue-700">
+                          {item.activities_count.toLocaleString()}
+                        </span>
                       </div>
-                    </div>
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
+                      <Progress
+                        percent={usagePercent}
+                        showInfo={false}
+                        strokeColor={isTopRank ? '#2563eb' : '#94a3b8'}
+                        trailColor="#eef2f7"
+                        size="small"
+                      />
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          </Card>
         </>
       )}
     </div>

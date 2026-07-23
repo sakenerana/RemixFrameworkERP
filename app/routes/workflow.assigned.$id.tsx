@@ -1,5 +1,13 @@
-import { FileExcelOutlined, FileSearchOutlined, HomeOutlined, LoadingOutlined, UserOutlined, CalendarOutlined, BarChartOutlined } from "@ant-design/icons";
-import { useNavigate, useSearchParams } from "@remix-run/react";
+import {
+    BarChartOutlined,
+    CalendarOutlined,
+    FileExcelOutlined,
+    FileSearchOutlined,
+    HomeOutlined,
+    LoadingOutlined,
+    UserOutlined,
+} from "@ant-design/icons";
+import { useSearchParams } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
@@ -11,16 +19,18 @@ import {
     Timeline,
     Tag,
     Statistic,
-    Divider,
     Button,
+    Progress,
+    Space,
+    Typography,
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "~/auth/AuthContext";
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
 
 const { Option } = Select;
+const { Text, Title } = Typography;
 
 interface DataType {
     id: number;
@@ -51,13 +61,7 @@ export default function Assigned() {
     const [loading, setLoading] = useState(true);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
     const [timeFilter, setTimeFilter] = useState<string>('day');
-
-    const { user, token } = useAuth();
-
-    const navigate = useNavigate();
 
     const fetchData = async () => {
         const getABID = localStorage.getItem('ab_id');
@@ -219,11 +223,6 @@ export default function Assigned() {
         return 'purple';
     };
 
-    useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
-    }, []);
-
     useEffect(() => {
         fetchData();
         fetchHistoryLogs();
@@ -236,12 +235,18 @@ export default function Assigned() {
     // Calculate statistics
     const totalActivities = data.reduce((sum, user) => sum + user.activities_count, 0);
     const totalWorkflows = data.reduce((sum, user) => sum + Object.keys(user.workflows_breakdown).length, 0);
+    const selectedUser = data[0];
+    const workflowEntries = useMemo(() => {
+        const entries = Object.entries(selectedUser?.workflows_breakdown || {});
 
-    // Gradient backgrounds for statistics cards
-    const statGradients = {
-        activities: 'linear-gradient(135deg, #4776E6 0%, #8E54E9 100%)', // Blue to purple
-        workflows: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'   // Teal to green
-    };
+        return entries
+            .map(([workflow, count]) => ({
+                workflow,
+                count: Number(count) || 0,
+            }))
+            .sort((a, b) => b.count - a.count);
+    }, [selectedUser]);
+    const topWorkflowCount = workflowEntries[0]?.count ?? 0;
 
     const exportToExcel = () => {
         const assignedDetails = data.flatMap((user) => {
@@ -295,195 +300,189 @@ export default function Assigned() {
     };
 
     return (
-        <div className="w-full rounded-lg shadow-sm">
+        <div className="workflow-assigned-page w-full">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                <div>
-                    <Breadcrumb
-                        items={[
-                            {
-                                href: "/workflow",
-                                title: <HomeOutlined className="text-gray-400" />,
-                            },
-                            {
-                                title: <span className="text-gray-500">Workflow</span>,
-                            },
-                            {
-                                title: <span className="text-blue-600 font-medium">Assigned</span>,
-                            },
-                        ]}
-                        className="text-sm"
-                    />
+            <Card className="mb-5 rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 20 } }}>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                        <Breadcrumb
+                            items={[
+                                {
+                                    href: "/workflow",
+                                    title: <HomeOutlined className="text-gray-400" />,
+                                },
+                                {
+                                    title: <span className="text-gray-500">Workflow</span>,
+                                },
+                                {
+                                    title: <span className="text-blue-600 font-medium">Assigned</span>,
+                                },
+                            ]}
+                            className="text-sm"
+                        />
+                        <Title level={3} className="!mb-1 !mt-3">
+                            Assigned Workflows
+                        </Title>
+                        <Text className="text-sm text-gray-500">
+                            Review the selected user's workflow activity and task distribution.
+                        </Text>
+                    </div>
+                    <Button type="primary" icon={<FileExcelOutlined />} onClick={exportToExcel}>
+                        Export to Excel
+                    </Button>
                 </div>
-            </div>
+            </Card>
+
+            {error && (
+                <Alert message={`Error: ${error}`} type="error" className="mb-4 rounded-md" />
+            )}
 
             {/* Toolbar Section */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
+            <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
                 <Alert
                     message="Review all users with assigned workflows. Monitor status and take action as needed."
                     type="info"
                     showIcon
-                    className="w-full lg:w-auto"
                 />
-                <Button type="primary" icon={<FileExcelOutlined />} onClick={exportToExcel}>
-                    Export to Excel
-                </Button>
             </div>
 
             {/* Main Content - Full Width */}
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* User Cards Section */}
                 <div>
                     {loading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <Spin
-                                size="large"
-                                tip="Loading assigned workflows..."
-                                indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
-                            />
-                        </div>
+                        <Card className="rounded-md border border-gray-200 shadow-sm">
+                            <div className="flex h-64 items-center justify-center">
+                                <Spin
+                                    size="large"
+                                    tip="Loading assigned workflows..."
+                                    indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
+                                />
+                            </div>
+                        </Card>
                     ) : (
-                        <div className="space-y-6">
-                            {/* Statistics Cards with Gradient Backgrounds */}
-                            <Row gutter={16}>
-                                <Col span={12}>
-                                    <Card
-                                        size="small"
-                                        className="border-none"
-                                        bodyStyle={{
-                                            padding: '16px',
-                                            background: statGradients.activities,
-                                            borderRadius: '8px',
-                                            color: 'white'
-                                        }}
-                                    >
+                        <div className="space-y-5">
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} md={8}>
+                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
                                         <Statistic
-                                            title={<span style={{ color: 'white' }}>Total Activities</span>}
+                                            title="Total Activities"
                                             value={totalActivities}
-                                            valueStyle={{ color: 'white' }}
-                                            prefix={<FileSearchOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
-                                            suffix={
-                                                <div style={{
-                                                    fontSize: '12px',
-                                                    color: 'rgba(255, 255, 255, 0.8)',
-                                                    marginLeft: '4px'
-                                                }}>
-                                                    activities
-                                                </div>
-                                            }
+                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+                                            prefix={<FileSearchOutlined className="text-blue-600" />}
                                         />
-                                        <div style={{
-                                            marginTop: '8px',
-                                            fontSize: '12px',
-                                            color: 'rgba(255, 255, 255, 0.8)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '4px'
-                                        }}>
-                                            <div style={{
-                                                width: '8px',
-                                                height: '8px',
-                                                borderRadius: '50%',
-                                                background: 'rgba(255, 255, 255, 0.9)'
-                                            }} />
-                                            Active workflows count
-                                        </div>
+                                        <Text className="text-xs text-gray-500">Assigned activity volume</Text>
                                     </Card>
                                 </Col>
-                                <Col span={12}>
-                                    <Card
-                                        size="small"
-                                        className="border-none"
-                                        bodyStyle={{
-                                            padding: '16px',
-                                            background: statGradients.workflows,
-                                            borderRadius: '8px',
-                                            color: 'white'
-                                        }}
-                                    >
+                                <Col xs={24} md={8}>
+                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
                                         <Statistic
-                                            title={<span style={{ color: 'white' }}>Total Workflows</span>}
+                                            title="Workflow Types"
                                             value={totalWorkflows}
-                                            valueStyle={{ color: 'white' }}
-                                            prefix={<BarChartOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
-                                            suffix={
-                                                <div style={{
-                                                    fontSize: '12px',
-                                                    color: 'rgba(255, 255, 255, 0.8)',
-                                                    marginLeft: '4px'
-                                                }}>
-                                                    workflows
-                                                </div>
-                                            }
+                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+                                            prefix={<BarChartOutlined className="text-emerald-600" />}
                                         />
-                                        <div style={{
-                                            marginTop: '8px',
-                                            fontSize: '12px',
-                                            color: 'rgba(255, 255, 255, 0.8)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '4px'
-                                        }}>
-                                            <div style={{
-                                                width: '8px',
-                                                height: '8px',
-                                                borderRadius: '50%',
-                                                background: 'rgba(255, 255, 255, 0.9)'
-                                            }} />
-                                            Unique workflow types
-                                        </div>
+                                        <Text className="text-xs text-gray-500">Unique workflow categories</Text>
+                                    </Card>
+                                </Col>
+                                <Col xs={24} md={8}>
+                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+                                        <Statistic
+                                            title="Top Workflow Tasks"
+                                            value={topWorkflowCount}
+                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+                                        />
+                                        <Text className="text-xs text-gray-500">
+                                            {workflowEntries[0]?.workflow || 'No workflow activity'}
+                                        </Text>
                                     </Card>
                                 </Col>
                             </Row>
 
-                            {/* User Cards */}
-                            {data.length > 0 ? (
-                                data.map((user) => (
-                                    <Card
-                                        key={user.id}
-                                        className="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border-0"
-                                    >
-                                        <div className="flex items-center mb-4">
-                                            <div className="bg-blue-100 p-3 rounded-full mr-4">
-                                                <UserOutlined className="text-blue-600 text-lg" />
+                            {selectedUser ? (
+                                <Card
+                                    className="rounded-md border border-gray-200 shadow-sm"
+                                    styles={{ body: { padding: 0 } }}
+                                >
+                                    <div className="border-b border-gray-200 bg-white px-5 py-4">
+                                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                            <div className="flex items-center">
+                                                <div className="mr-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+                                                    <UserOutlined className="text-xl text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <Title level={4} className="!mb-0">
+                                                        {selectedUser.username}
+                                                    </Title>
+                                                    <Text className="text-sm text-gray-500">
+                                                        {[selectedUser.firstname, selectedUser.lastname].filter(Boolean).join(' ') || 'No full name'}
+                                                    </Text>
+                                                </div>
                                             </div>
+                                            <Space wrap>
+                                                <Tag color="processing" className="rounded-full px-3 py-1">
+                                                    {selectedUser.activities_count.toLocaleString()} activities
+                                                </Tag>
+                                                <Tag className="rounded-full px-3 py-1">
+                                                    {workflowEntries.length} workflows
+                                                </Tag>
+                                            </Space>
+                                        </div>
+                                    </div>
+
+                                    <div className="px-5 py-4">
+                                        <div className="mb-4 flex items-center justify-between">
                                             <div>
-                                                <h3 className="font-medium text-gray-900">{user.username}</h3>
-                                                <p className="text-gray-500 text-sm">
-                                                    {user.firstname} {user.lastname}
-                                                </p>
-                                                <p className="text-xs text-gray-400">
-                                                    {user.activities_count} activities
-                                                </p>
+                                                <Title level={5} className="!mb-0">
+                                                    Workflow Breakdown
+                                                </Title>
+                                                <Text className="text-sm text-gray-500">
+                                                    Task distribution by assigned workflow type.
+                                                </Text>
                                             </div>
                                         </div>
 
                                         <div className="space-y-3">
-                                            <h4 className="font-medium border-b pb-2 text-gray-700">
-                                                Workflow Breakdown
-                                            </h4>
+                                            {workflowEntries.map(({ workflow, count }) => {
+                                                const percent = topWorkflowCount > 0 ? Math.round((count / topWorkflowCount) * 100) : 0;
 
-                                            {Object.entries(user.workflows_breakdown).map(([workflow, count]) => (
-                                                <div key={workflow} className="flex justify-between items-center">
-                                                    <span className="text-sm text-gray-600">{workflow}</span>
-                                                    <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">
-                                                        {count} tasks
-                                                    </span>
-                                                </div>
-                                            ))}
+                                                return (
+                                                    <div
+                                                        key={workflow}
+                                                        className="rounded-md border border-gray-200 bg-white p-4 transition-shadow hover:shadow-sm"
+                                                    >
+                                                        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                                            <Text className="font-semibold text-slate-900">
+                                                                {workflow}
+                                                            </Text>
+                                                            <span className="rounded-md bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+                                                                {count.toLocaleString()} tasks
+                                                            </span>
+                                                        </div>
+                                                        <Progress
+                                                            percent={percent}
+                                                            showInfo={false}
+                                                            strokeColor="#2563eb"
+                                                            trailColor="#eef2f7"
+                                                            size="small"
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
-                                    </Card>
-                                ))
+                                    </div>
+                                </Card>
                             ) : (
-                                <div className="col-span-full py-12 flex flex-col items-center">
-                                    <FileSearchOutlined className="text-3xl mb-3 text-gray-400" />
-                                    <p className="text-gray-500 mb-2 text-base">No assigned workflows found</p>
-                                    <p className="text-gray-400 text-sm mb-4">
-                                        Create new assignments or check your filters
-                                    </p>
-                                </div>
+                                <Card className="rounded-md border border-gray-200 shadow-sm">
+                                    <div className="flex flex-col items-center py-12">
+                                        <FileSearchOutlined className="mb-3 text-3xl text-gray-400" />
+                                        <p className="mb-2 text-base text-gray-500">No assigned workflows found</p>
+                                        <p className="mb-4 text-sm text-gray-400">
+                                            Create new assignments or check your filters
+                                        </p>
+                                    </div>
+                                </Card>
                             )}
-
                         </div>
                     )}
                 </div>
@@ -509,7 +508,7 @@ export default function Assigned() {
                             </Select>
                         </div>
                     }
-                    className="shadow-sm border-0"
+                    className="rounded-md border border-gray-200 shadow-sm"
                     extra={
                         <div className="flex items-center gap-4">
                             <div className="text-sm text-gray-600">
@@ -525,33 +524,33 @@ export default function Assigned() {
                     ) : (
                         <div className="space-y-6">
                             {/* Quick Stats */}
-                            <Row gutter={16} className="mb-6">
-                                <Col span={6}>
-                                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                            <Row gutter={[16, 16]} className="mb-6">
+                                <Col xs={12} md={6}>
+                                    <div className="rounded-md bg-green-50 p-3 text-center">
                                         <div className="text-2xl font-bold text-green-600">
                                             {filteredHistory.filter(log => log.status === 'completed').length}
                                         </div>
                                         <div className="text-sm text-green-700">Completed</div>
                                     </div>
                                 </Col>
-                                <Col span={6}>
-                                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                <Col xs={12} md={6}>
+                                    <div className="rounded-md bg-blue-50 p-3 text-center">
                                         <div className="text-2xl font-bold text-blue-600">
                                             {filteredHistory.filter(log => log.status === 'in_progress').length}
                                         </div>
                                         <div className="text-sm text-blue-700">In Progress</div>
                                     </div>
                                 </Col>
-                                <Col span={6}>
-                                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                                <Col xs={12} md={6}>
+                                    <div className="rounded-md bg-orange-50 p-3 text-center">
                                         <div className="text-2xl font-bold text-orange-600">
                                             {filteredHistory.filter(log => log.status === 'pending').length}
                                         </div>
                                         <div className="text-sm text-orange-700">Pending</div>
                                     </div>
                                 </Col>
-                                <Col span={6}>
-                                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                                <Col xs={12} md={6}>
+                                    <div className="rounded-md bg-red-50 p-3 text-center">
                                         <div className="text-2xl font-bold text-red-600">
                                             {filteredHistory.filter(log => log.status === 'cancelled').length}
                                         </div>
@@ -572,8 +571,8 @@ export default function Assigned() {
                                                     <div className="w-3 h-3 rounded-full bg-current" />
                                                 }
                                             >
-                                                <div className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors">
-                                                    <div className="flex justify-between items-start mb-2">
+                                                <div className="rounded-md bg-gray-50 p-4 transition-colors hover:bg-gray-100">
+                                                    <div className="mb-2 flex items-start justify-between">
                                                         <div className="flex items-center gap-3">
                                                             <Tag color={getActionColor(log.action)} className="text-xs font-medium">
                                                                 {log.action}
@@ -582,13 +581,13 @@ export default function Assigned() {
                                                                 {log.workflow}
                                                             </span>
                                                         </div>
-                                                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                                                        <span className="whitespace-nowrap text-xs text-gray-500">
                                                             {dayjs(log.timestamp).format('MMM DD, YYYY HH:mm')}
                                                         </span>
                                                     </div>
-                                                    <div className="flex justify-between items-center">
+                                                    <div className="flex items-center justify-between">
                                                         <div>
-                                                            <p className="text-sm text-gray-600 mb-1">
+                                                            <p className="mb-1 text-sm text-gray-600">
                                                                 by <span className="font-medium">{log.user}</span>
                                                             </p>
                                                             <p className="text-sm text-gray-500">
@@ -606,10 +605,10 @@ export default function Assigned() {
                                             </Timeline.Item>
                                         ))
                                     ) : (
-                                        <div className="text-center py-12 text-gray-500">
-                                            <FileSearchOutlined className="text-3xl mb-3" />
+                                        <div className="py-12 text-center text-gray-500">
+                                            <FileSearchOutlined className="mb-3 text-3xl" />
                                             <p className="text-lg">No activity found for selected period</p>
-                                            <p className="text-sm mt-1">Try selecting a different time filter</p>
+                                            <p className="mt-1 text-sm">Try selecting a different time filter</p>
                                         </div>
                                     )}
                                 </Timeline>

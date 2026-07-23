@@ -404,6 +404,64 @@ body.dark-mode .admin-sidebar-corporate .admin-sidebar-menu.custom-menu .ant-men
   margin: 16px !important;
 }
 
+.workflow-workflows-page .ant-card-body {
+  background: #ffffff;
+}
+
+.workflow-workflows-table .ant-table {
+  border-radius: 8px;
+}
+
+.workflow-workflows-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.workflow-workflows-table .ant-table-tbody > tr > td {
+  border-bottom-color: #eef2f7 !important;
+}
+
+.workflow-workflows-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbff !important;
+}
+
+.workflow-workflows-table .ant-pagination {
+  margin: 16px !important;
+}
+
+.workflow-tracker-page .ant-card-body {
+  background: #ffffff;
+}
+
+.workflow-tracker-table .ant-table {
+  border-radius: 8px;
+}
+
+.workflow-tracker-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.workflow-tracker-table .ant-table-tbody > tr > td {
+  border-bottom-color: #eef2f7 !important;
+}
+
+.workflow-tracker-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbff !important;
+}
+
+.workflow-tracker-table .ant-pagination {
+  margin: 16px !important;
+}
+
 /* Pulse animation for online indicator */
 @keyframes pulse-ring {
   0% { transform: scale(0.8); opacity: 0.8; }

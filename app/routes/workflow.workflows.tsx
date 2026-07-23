@@ -1,4 +1,13 @@
-import { HomeOutlined, LoadingOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  BarChartOutlined,
+  EyeOutlined,
+  HomeOutlined,
+  LoadingOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -11,17 +20,18 @@ import {
   Input,
   MenuProps,
   Popconfirm,
+  Col,
+  Row,
   Space,
   Spin,
+  Statistic,
   Table,
   TableColumnsType,
   Tag,
+  Typography,
 } from "antd";
 import axios from "axios";
 import { Key, useEffect, useMemo, useState } from "react";
-import { AiFillProfile } from "react-icons/ai";
-import { FcRefresh } from "react-icons/fc";
-import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CrownFilled } from '@ant-design/icons';
 
@@ -38,17 +48,13 @@ interface DataType {
 
 const CACHE_KEY = 'userActivitiesData';
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes cache
+const { Text, Title } = Typography;
 
 export default function Workflows() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isUserID, setUserID] = useState<any>();
-  const [isDepartmentID, setDepartmentID] = useState<any>();
-
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { user, token } = useAuth();
   const [topThreeUserIds, setTopThreeUserIds] = useState<number[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
@@ -56,6 +62,7 @@ export default function Workflows() {
   const navigate = useNavigate();
 
   const handleRefetch = async () => {
+    localStorage.removeItem(CACHE_KEY);
     setLoading(true);
     await fetchData();
     setLoading(false);
@@ -123,21 +130,29 @@ export default function Workflows() {
     }
   };
 
-  useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
-    setDepartmentID(localStorage.getItem('userDept'));
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    if (searchText.trim() === '') {
-      fetchData();
-    } else {
-      const filtered = data.filter(data =>
-        data.username?.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setFilteredData(filtered);
+  const displayedData = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+
+    if (!normalizedSearch) {
+      return data;
     }
-  }, [searchText]); // Empty dependency array means this runs once on mount
+
+    return data.filter((item) =>
+      [
+        item.username,
+        item.firstname,
+        item.lastname,
+      ].some((value) => value?.toLowerCase().includes(normalizedSearch))
+    );
+  }, [data, searchText]);
+
+  const totalActivities = data.reduce((sum, item) => sum + item.activities_count, 0);
+  const usersWithWorkflows = data.filter((item) => item.activities_count > 0).length;
+  const topUser = data[0];
 
   const handleShowWorkflows = (value: DataType) => {
     // console.log("value", value)
@@ -164,7 +179,7 @@ export default function Workflows() {
     {
       title: "Name",
       dataIndex: "username",
-      width: 120,
+      width: 320,
       render: (text, record) => {
         const rank = topThreeUserIds.indexOf(record.id) + 1;
         const crownColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
@@ -173,24 +188,30 @@ export default function Workflows() {
           <div className="flex items-center">
             <Avatar
               src="/img/supplier-icon.png"
-              size="small"
-              className="mr-2 bg-blue-100 text-blue-600"
+              size={34}
+              className="mr-3 bg-blue-100 text-blue-600"
               icon={<UserOutlined />}
             />
-            <span className="font-medium flex items-center">
-              {text}
-              {rank > 0 && rank <= 3 && (
-                <CrownFilled
-                  style={{
-                    color: crownColors[rank - 1],
-                    fontSize: '16px',
-                    marginLeft: '6px',
-                    filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.2))'
-                  }}
-                  title={`Top ${rank}`}
-                />
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="truncate font-semibold text-gray-900">{text}</span>
+                {rank > 0 && rank <= 3 && (
+                  <CrownFilled
+                    style={{
+                      color: crownColors[rank - 1],
+                      fontSize: '16px',
+                      filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.2))'
+                    }}
+                    title={`Top ${rank}`}
+                  />
+                )}
+              </div>
+              {(record.firstname || record.lastname) && (
+                <Text className="text-xs text-gray-500">
+                  {[record.firstname, record.lastname].filter(Boolean).join(' ')}
+                </Text>
               )}
-            </span>
+            </div>
           </div>
         );
       }
@@ -198,7 +219,23 @@ export default function Workflows() {
     {
       title: "Activities Count",
       dataIndex: "activities_count",
-      width: 120,
+      width: 180,
+      render: (count: number, record) => {
+        const rank = topThreeUserIds.indexOf(record.id) + 1;
+
+        return (
+          <div className="flex items-center gap-3">
+            <span className="rounded-md bg-blue-50 px-2 py-1 text-lg font-bold text-blue-700">
+              {count.toLocaleString()}
+            </span>
+            {rank > 0 && rank <= 3 && (
+              <Tag color={rank === 1 ? 'gold' : rank === 2 ? 'default' : 'cyan'} className="rounded-full">
+                Rank {rank}
+              </Tag>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Actions",
@@ -206,7 +243,7 @@ export default function Workflows() {
       width: 160,
       fixed: "right",
       render: (_, value) => (
-        <div className="flex">
+        <div className="flex items-center">
           <Popconfirm
             title="Do you want to view?"
             description="Are you sure to view this workflows?"
@@ -214,14 +251,13 @@ export default function Workflows() {
             cancelText="No"
             onConfirm={() => handleShowWorkflows(value)}
           >
-            <Tag
-              className="cursor-pointer"
-              icon={<AiFillProfile className="float-left mt-1 mr-1" />}
-              color="#1677ff"
-              variant="solid"
+            <Button
+              type="primary"
+              size="small"
+              icon={<EyeOutlined />}
             >
               Show Workflows
-            </Tag>
+            </Button>
           </Popconfirm>
         </div>
       ),
@@ -255,56 +291,106 @@ export default function Workflows() {
   );
 
   return (
-    <Card className="w-full rounded-lg shadow-sm">
+    <Card className="workflow-workflows-page w-full rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <div>
-          <Breadcrumb
-            items={[
-              {
-                href: "/workflow",
-                title: <HomeOutlined className="text-gray-400" />,
-              },
-              {
-                title: (
-                  <span className="text-blue-600 font-medium">
-                    Workflow Management
-                  </span>
-                ),
-              },
-            ]}
-            className="text-sm"
-          />
+      <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <Breadcrumb
+              items={[
+                {
+                  href: "/workflow",
+                  title: <HomeOutlined className="text-gray-400" />,
+                },
+                {
+                  title: (
+                    <span className="text-blue-600 font-medium">
+                      Workflow Management
+                    </span>
+                  ),
+                },
+              ]}
+              className="text-sm"
+            />
+            <Title level={3} className="!mb-1 !mt-3">
+              Workflow Assignments
+            </Title>
+            <Text className="text-sm text-gray-500">
+              Review users with assigned workflows and open their workflow breakdowns.
+            </Text>
+          </div>
+
+          <Space wrap>
+            <Tag className="rounded-full px-3 py-1">Users {data.length}</Tag>
+            <Tag color="processing" className="rounded-full px-3 py-1">Assigned {usersWithWorkflows}</Tag>
+            <Tag color={selectedRows.length > 0 ? "blue" : "default"} className="rounded-full px-3 py-1">
+              Selected {selectedRows.length}
+            </Tag>
+          </Space>
         </div>
       </div>
 
+      <Row gutter={[16, 16]} className="mb-5">
+        <Col xs={24} sm={12} lg={8}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Total Activities"
+              value={totalActivities}
+              prefix={<BarChartOutlined className="text-blue-600" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">Combined assigned workflow activity</Text>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Users With Workflows"
+              value={usersWithWorkflows}
+              prefix={<TeamOutlined className="text-emerald-600" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">Users with at least one activity</Text>
+          </Card>
+        </Col>
+        <Col xs={24} lg={8}>
+          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
+            <Statistic
+              title="Top User Activities"
+              value={topUser?.activities_count ?? 0}
+              prefix={<CrownFilled className="text-amber-500" />}
+              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
+            />
+            <Text className="text-xs text-gray-500">
+              {topUser?.username ? `${topUser.username} currently leads` : 'No activity yet'}
+            </Text>
+          </Card>
+        </Col>
+      </Row>
+
       {/* Toolbar Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
+      <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
         <Alert
           message="Below is a list of all users with assigned workflows. Please review the information carefully."
           type="info"
           showIcon
-          className="w-full lg:w-auto"
+          className="mb-4"
         />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <Input.Search
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search by user name or details"
-            className="w-full sm:w-64"
-            size="middle"
+            className="w-full xl:max-w-md"
+            size="large"
           />
 
-          <Space>
-            <Tag color={selectedRows.length > 0 ? "blue" : "default"} className="m-0">
-              Checked: {selectedRows.length}
-            </Tag>
-
+          <Space wrap>
             <Button
               onClick={handleRefetch}
-              icon={<FcRefresh className="text-blue-500" />}
-              className="flex items-center gap-2 hover:border-blue-500"
+              icon={<ReloadOutlined />}
+              className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
             >
               Refresh Data
             </Button>
@@ -319,7 +405,7 @@ export default function Workflows() {
             >
               <Button
                 icon={<SettingOutlined />}
-                className="flex items-center gap-2 hover:border-blue-500"
+                className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
               >
                 Manage Columns
               </Button>
@@ -329,7 +415,7 @@ export default function Workflows() {
               stateData={selectedRows}
               exportVariant="workflow_assigned_like"
               buttonProps={{
-                className: "flex items-center gap-2 hover:border-blue-500",
+                className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
                 disabled: selectedRows.length === 0,
               }}
             />
@@ -350,10 +436,9 @@ export default function Workflows() {
         <Table<DataType>
           size="middle"
           columns={filteredColumns}
-          dataSource={searchText ? filteredData : data}
+          dataSource={displayedData}
           rowSelection={rowSelection}
-          className="shadow-sm rounded-lg overflow-hidden"
-          bordered
+          className="workflow-workflows-table overflow-hidden rounded-md border border-gray-200"
           scroll={{ x: "max-content" }}
           rowKey="id"
           pagination={{
