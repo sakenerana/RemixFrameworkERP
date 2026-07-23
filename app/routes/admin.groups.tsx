@@ -307,10 +307,10 @@ export default function GroupsRoutes() {
   const inactiveCount = data.filter((group) => group.status_labels?.name === 'Inactive').length;
 
   return (
-    <Card className="admin-groups-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+    <Card className="admin-groups-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
       {/* Header Section */}
-      <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="min-w-0">
             <Breadcrumb
               items={[
@@ -327,7 +327,7 @@ export default function GroupsRoutes() {
               ]}
               className="text-sm"
             />
-            <Title level={3} className="!mb-1 !mt-3">
+            <Title level={3} className="!mb-1 !mt-2">
               Groups
             </Title>
             <Text className="text-sm text-gray-500">
@@ -336,15 +336,20 @@ export default function GroupsRoutes() {
           </div>
 
           <Space wrap className="mt-2 sm:mt-0">
-            <Tag className="rounded-full px-3 py-1">Total {data.length}</Tag>
-            <Tag color="success" className="rounded-full px-3 py-1">Active {activeCount}</Tag>
-            <Tag color="error" className="rounded-full px-3 py-1">Inactive {inactiveCount}</Tag>
+            <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
+              Total {data.length}
+            </Tag>
+            <Tag className="m-0 rounded-full border-0 bg-emerald-50 px-4 py-1.5 text-sm text-emerald-600">
+              Active {activeCount}
+            </Tag>
+            <Tag className="m-0 rounded-full border-0 bg-red-50 px-4 py-1.5 text-sm text-red-500">
+              Inactive {inactiveCount}
+            </Tag>
             <Button
               onClick={() => handleTrack()}
               icon={<AiOutlinePlus />}
               type="primary"
-              size="large"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+              className="flex h-10 items-center gap-2 bg-blue-600 px-4 font-semibold hover:bg-blue-700"
             >
               New Group
             </Button>
@@ -440,12 +445,12 @@ export default function GroupsRoutes() {
       </Modal>
 
       {/* Toolbar Section */}
-      <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
+      <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
         <Alert
           message="Group Structure: Organize users into functional groups for better permission management."
           type="info"
           showIcon
-          className="mb-4"
+          className="admin-groups-compact-alert mb-3"
         />
 
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -453,8 +458,8 @@ export default function GroupsRoutes() {
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search groups..."
-            className="w-full xl:max-w-md"
-            size="large"
+            className="w-full xl:max-w-lg"
+            size="middle"
           />
 
           <Space wrap>
@@ -511,7 +516,7 @@ export default function GroupsRoutes() {
         </div>
       ) : (
         <Table<Groups>
-          size="middle"
+          size="small"
           columns={filteredColumns}
           dataSource={displayedData}
           className="admin-groups-table overflow-hidden rounded-md border border-gray-200"

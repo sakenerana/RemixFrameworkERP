@@ -37,6 +37,17 @@ export const BudgetService = {
         return data
     },
 
+    async getPostDetailsById(id: number) {
+        const { data, error } = await supabase
+            .from('budget')
+            .select('*, status_labels(*), departments(*)')
+            .eq('id', id)
+            .single()
+
+        if (error) throw error
+        return data
+    },
+
     async getByData() {
         const currentYear = new Date().getFullYear();
 

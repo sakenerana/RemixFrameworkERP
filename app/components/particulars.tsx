@@ -1,7 +1,84 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import { BudgetCodeService } from "~/services/budget_code.service";
 import { BudgetService } from "~/services/budget.service";
 import Liquidation from "./liquidation";
+
+const getBudgetCodeIds = (budgetCodes: unknown): number[] => {
+    if (Array.isArray(budgetCodes)) {
+        return budgetCodes
+            .map((code) => {
+                if (typeof code === "object" && code !== null) {
+                    const budgetCode = code as Record<string, unknown>;
+                    return Number(budgetCode.id ?? budgetCode.value ?? budgetCode.budget_code_id);
+                }
+
+                return Number(code);
+            })
+            .filter((code) => Number.isFinite(code));
+    }
+
+    if (typeof budgetCodes === "string") {
+        const normalized = budgetCodes
+            .replace(/[{}[\]"]/g, "")
+            .split(",")
+            .map((code) => Number(code.trim()))
+            .filter((code) => Number.isFinite(code));
+
+        return normalized;
+    }
+
+    return [];
+};
+
+const getBudgetCodeNames = (budgetCodes: unknown): string[] => {
+    if (Array.isArray(budgetCodes)) {
+        return budgetCodes
+            .map((code) => {
+                if (typeof code === "object" && code !== null) {
+                    const budgetCode = code as Record<string, unknown>;
+                    return String(budgetCode.particulars ?? budgetCode.label ?? budgetCode.name ?? "").trim();
+                }
+
+                return Number.isNaN(Number(code)) ? String(code).trim() : "";
+            })
+            .filter(Boolean);
+    }
+
+    if (typeof budgetCodes === "string") {
+        return budgetCodes
+            .replace(/[{}[\]"]/g, "")
+            .split(",")
+            .map((code) => code.trim())
+            .filter((code) => code && Number.isNaN(Number(code)));
+    }
+
+    return [];
+};
+
+const matchesDepartment = (record: any, department: string) => {
+    if (!department) return true;
+
+    if (
+        record.department === "N/A" ||
+        record.department === "n/a" ||
+        record.department === "NA" ||
+        record.department === null
+    ) {
+        return (
+            record.branch === department ||
+            record.branchName === department ||
+            record.branchCode === department ||
+            record.officeLocation === department
+        );
+    }
+
+    return (
+        record.department === department ||
+        record.departmentName === department ||
+        record.deptCode === department
+    );
+};
 
 export default function Particulars({ item }: { item: any }) {
     const [particulars, setParticulars] = useState<any[]>([]);
@@ -21,11 +98,20 @@ export default function Particulars({ item }: { item: any }) {
                 setError(null);
 
                 const budgetCodes = item.departments?.budget_code;
+                const budgetCodeIds = getBudgetCodeIds(budgetCodes);
+                const budgetCodeNames = getBudgetCodeNames(budgetCodes);
 
-                if (budgetCodes?.length) {
-                    const idArray = budgetCodes.map((code: any) => parseInt(code, 10));
-                    const data = await BudgetService.getAllParticularsByDepartment(idArray);
-                    setParticulars(data);
+                if (budgetCodeIds.length) {
+                    const data = await BudgetService.getAllParticularsByDepartment(budgetCodeIds);
+                    setParticulars(data || []);
+                } else if (budgetCodeNames.length) {
+                    const data = await BudgetCodeService.getAllParticulars();
+                    const normalizedNames = new Set(budgetCodeNames.map((name) => name.toLowerCase()));
+                    setParticulars(
+                        (data || []).filter((particular: any) =>
+                            normalizedNames.has(String(particular.particulars || "").toLowerCase())
+                        )
+                    );
                 } else {
                     setParticulars([]);
                 }
@@ -76,6 +162,37 @@ export default function Particulars({ item }: { item: any }) {
             currency: "PHP"
         }).format(amount);
 
+    const fallbackParticulars = useMemo(() => {
+        if (particulars.length || !requisitions.length) return [];
+
+        const uniqueParticulars = new Map<string, any>();
+
+        requisitions.forEach((record) => {
+            const isCurrentYear = record.startDate
+                ? new Date(record.startDate).getFullYear() === currentYear
+                : true;
+
+            if (
+                record.workflowType === "Requisition" &&
+                record.status === "Completed" &&
+                record.particular &&
+                isCurrentYear &&
+                matchesDepartment(record, item.departments.department)
+            ) {
+                uniqueParticulars.set(record.particular, {
+                    id: record.particular,
+                    particulars: record.particular,
+                    description: record.processTitle || "From completed requisition",
+                    allocatedAmount: Number(record.totalAmount || 0),
+                });
+            }
+        });
+
+        return Array.from(uniqueParticulars.values());
+    }, [particulars.length, requisitions, item.departments.department, currentYear]);
+
+    const displayParticulars = particulars.length ? particulars : fallbackParticulars;
+
     /* ===========================
        EXACT MATCHING LOGIC (CACHED)
     ============================ */
@@ -84,12 +201,11 @@ export default function Particulars({ item }: { item: any }) {
 
         const cache: Record<string, number> = {};
 
-        particulars.forEach(particular => {
+        displayParticulars.forEach(particular => {
             const key = `${particular.particulars}__${item.departments.department}`;
 
             const filtered = requisitions.filter(item2 => {
                 let matchesParticular = true;
-                let matchesDepartment = true;
                 let matchesWorkflowType = true;
                 let matchesStatus = true;
                 let matchesYear = true;
@@ -100,24 +216,7 @@ export default function Particulars({ item }: { item: any }) {
                 }
 
                 /* === DEPARTMENT MATCH (EXACT) === */
-                if (item.departments.department) {
-                    if (
-                        item2.department === "N/A" ||
-                        item2.department === "n/a" ||
-                        item2.department === "NA"
-                    ) {
-                        matchesDepartment =
-                            item2.branch === item.departments.department ||
-                            item2.branchName === item.departments.department ||
-                            item2.branchCode === item.departments.department ||
-                            item2.officeLocation === item.departments.department;
-                    } else {
-                        matchesDepartment =
-                            item2.department === item.departments.department ||
-                            item2.departmentName === item.departments.department ||
-                            item2.deptCode === item.departments.department;
-                    }
-                }
+                const hasMatchingDepartment = matchesDepartment(item2, item.departments.department);
 
                 /* === WORKFLOW === */
                 matchesWorkflowType = item2.workflowType === "Requisition";
@@ -130,7 +229,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 return (
                     matchesParticular &&
-                    matchesDepartment &&
+                    hasMatchingDepartment &&
                     matchesWorkflowType &&
                     matchesStatus &&
                     matchesYear
@@ -144,7 +243,7 @@ export default function Particulars({ item }: { item: any }) {
         });
 
         return cache;
-    }, [requisitions, particulars, item.departments.department]);
+    }, [requisitions, displayParticulars, item.departments.department]);
 
     const { liquidationData, liquidationTotal } = useMemo(() => {
         if (!requisitions.length) return { liquidationData: [], liquidationTotal: 0 };
@@ -204,12 +303,11 @@ export default function Particulars({ item }: { item: any }) {
     const requisitionTotal = useMemo(() => {
         if (!requisitions.length) return 0;
         let total = 0;
-        particulars.forEach(particular => {
+        displayParticulars.forEach(particular => {
             const key = `${particular.particulars}__${item.departments.department}`;
 
             const filtered = requisitions.filter(item2 => {
                 let matchesParticular = true;
-                let matchesDepartment = true;
                 let matchesWorkflowType = true;
                 let matchesStatus = true;
                 let matchesYear = true;
@@ -220,24 +318,7 @@ export default function Particulars({ item }: { item: any }) {
                 }
 
                 /* === DEPARTMENT MATCH (EXACT) === */
-                if (item.departments.department) {
-                    if (
-                        item2.department === "N/A" ||
-                        item2.department === "n/a" ||
-                        item2.department === "NA"
-                    ) {
-                        matchesDepartment =
-                            item2.branch === item.departments.department ||
-                            item2.branchName === item.departments.department ||
-                            item2.branchCode === item.departments.department ||
-                            item2.officeLocation === item.departments.department;
-                    } else {
-                        matchesDepartment =
-                            item2.department === item.departments.department ||
-                            item2.departmentName === item.departments.department ||
-                            item2.deptCode === item.departments.department;
-                    }
-                }
+                const hasMatchingDepartment = matchesDepartment(item2, item.departments.department);
 
                 /* === WORKFLOW === */
                 matchesWorkflowType = item2.workflowType === "Requisition";
@@ -250,7 +331,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 return (
                     matchesParticular &&
-                    matchesDepartment &&
+                    hasMatchingDepartment &&
                     matchesWorkflowType &&
                     matchesStatus &&
                     matchesYear
@@ -264,7 +345,7 @@ export default function Particulars({ item }: { item: any }) {
             total += totalForParticular;
         });
         return total;
-    }, [requisitions, item.departments.department]);
+    }, [requisitions, displayParticulars, item.departments.department]);
 
     const liquidationCount = useMemo(() => {
         if (!requisitions.length) return 0;
@@ -319,8 +400,9 @@ export default function Particulars({ item }: { item: any }) {
     /* ===========================
        LOADING / ERROR
     ============================ */
-    if (loading) return <div>Loading particulars...</div>;
     if (error) return <div>Error: {error}</div>;
+
+    const isTableLoading = loading || (loadingAmountSpent && !displayParticulars.length);
 
     return (
         <div className="space-y-6">
@@ -343,7 +425,43 @@ export default function Particulars({ item }: { item: any }) {
                     </thead>
 
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {particulars.map((p, index) => {
+                        {isTableLoading && (
+                            <tr>
+                                <td colSpan={3} className="px-4 py-10 text-center">
+                                    <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-500">
+                                        <svg
+                                            className="h-4 w-4 animate-spin text-blue-600"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            />
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            />
+                                        </svg>
+                                        Loading particulars
+                                    </span>
+                                </td>
+                            </tr>
+                        )}
+
+                        {!isTableLoading && !displayParticulars.length && (
+                            <tr>
+                                <td colSpan={3} className="px-4 py-10 text-center text-sm text-gray-500">
+                                    No particulars found
+                                </td>
+                            </tr>
+                        )}
+
+                        {!isTableLoading && displayParticulars.map((p, index) => {
                             const key = `${p.particulars}__${item.departments.department}`;
                             const spent = spentCache[key] || 0;
                             const remaining = p.allocatedAmount - spent;

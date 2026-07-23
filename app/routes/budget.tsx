@@ -31,13 +31,7 @@ import {
 } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
-  FcDiploma1,
-  FcDocument,
-  FcGlobe,
-  FcSalesPerformance,
   FcSettings,
-  FcTemplate,
-  FcTreeStructure,
 } from "react-icons/fc";
 import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
@@ -183,26 +177,33 @@ export default function BudgetLayoutIndex() {
   const menuItems: MenuProps['items'] = [
     {
       key: "1",
-      icon: <FcGlobe size={15} />,
+      icon: <LuLayoutDashboard size={15} />,
       label: <Link to="/budget/dashboard">Dashboard</Link>,
     },
     {
       key: "2",
-      icon: <FcTemplate size={15} />,        // Perfect for transactions
+      icon: <LuCreditCard size={15} />,
       label: <Link to="/budget/transactions">Transactions</Link>,
     },
     {
       key: "3",
-      icon: <FcTreeStructure size={15} />,          // Shows budget allocation
-      // Alternative: <Wallet /> or <DollarSign />
+      icon: <LuChartBarStacked size={15} />,
       label: <Link to="/budget/budgets">Budgets</Link>,
     },
     {
       key: "4",
-      icon: <FcDocument size={15} />,        // Financial reporting/trends
+      icon: <LuTrendingUp size={15} />,
       label: <Link to="/budget/report">Report</Link>,
     },
   ];
+
+  const selectedMenuKey = currentPath.startsWith('/budget/transactions')
+    ? '2'
+    : currentPath.startsWith('/budget/budgets') || currentPath.startsWith('/budget/budget-details')
+      ? '3'
+      : currentPath.startsWith('/budget/report')
+        ? '4'
+        : '1';
 
   const mobileMenuItems = [
     {
@@ -321,83 +322,89 @@ export default function BudgetLayoutIndex() {
                   height: '100vh',
                   zIndex: 200,
                   background: isDarkMode ? '#141414' : '#ffffff',
-                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #e8e8e8',
-                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '2px 0 8px rgba(0, 0, 0, 0.05)',
+                  borderRight: isDarkMode ? '1px solid #303030' : '1px solid #dbe3ef',
+                  boxShadow: isDarkMode ? '2px 0 8px rgba(0, 0, 0, 0.45)' : '6px 0 20px rgba(15, 23, 42, 0.08)',
                   overflow: 'hidden',
                 }}
-                className="sidebar-gradient"
+                className={isDarkMode ? "admin-sidebar" : "admin-sidebar admin-sidebar-corporate"}
               >
-                {/* User Profile Section - Enhanced */}
+                {/* User Profile Section */}
                 <div
-                  className="h-20 flex items-center justify-center relative overflow-hidden"
+                  className="relative flex h-32 items-center justify-center overflow-hidden px-4"
                   style={{
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: isDarkMode
+                      ? 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)'
+                      : 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)',
+                    borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e5edf7',
                   }}
                 >
-                  {/* Decorative accent */}
-                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-cyan-400" />
+                  <div className="absolute left-0 top-0 h-full w-1 bg-blue-600" />
+                  <div className="absolute bottom-0 left-5 right-5 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
                   {collapsed ? (
                     <div className="p-3 relative group">
                       <Avatar
                         src="/img/user.png"
                         size={48}
-                        className="cursor-pointer transition-all duration-300 hover:scale-110 hover:ring-4 hover:ring-blue-300/50"
+                        className="cursor-pointer transition-all duration-300 hover:ring-4 hover:ring-blue-100"
                         style={{
-                          border: '3px solid rgba(255, 255, 255, 0.2)',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                          border: isDarkMode ? '3px solid rgba(255,255,255,0.16)' : '3px solid #ffffff',
+                          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.28)' : '0 8px 18px rgba(15, 23, 42, 0.14)'
                         }}
                       />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
                     </div>
                   ) : (
-                    <div className="flex items-center w-full px-5 py-4">
+                    <div
+                      className="relative flex w-full items-center rounded-md border px-4 py-3 shadow-sm"
+                      style={{
+                        background: isDarkMode ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                        borderColor: isDarkMode ? 'rgba(255,255,255,0.12)' : '#e2e8f0',
+                      }}
+                    >
                       <div className="relative">
                         <Avatar
                           src="/img/user.png"
-                          size={52}
-                          className="cursor-pointer transition-opacity duration-200 hover:opacity-90"
+                          size={56}
+                          className="cursor-pointer transition-all duration-300 hover:ring-4 hover:ring-blue-100"
                           style={{
-                            border: "1px solid rgba(255, 255, 255, 0.18)",
-                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.18)",
+                            border: isDarkMode ? '3px solid rgba(255,255,255,0.16)' : '3px solid #f8fafc',
+                            boxShadow: isDarkMode ? '0 6px 16px rgba(0,0,0,0.3)' : '0 8px 18px rgba(15, 23, 42, 0.12)'
                           }}
                         />
-                        {/* Online status (no pulse, more subtle) */}
                         <span
-                          className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full"
+                          className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full"
                           style={{
                             background: "#22c55e",
-                            border: "2px solid rgba(15, 23, 42, 1)", // blends nicely in dark sidebar
+                            border: "2px solid #ffffff",
                           }}
                         />
                       </div>
 
                       <div className="ml-4 min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="font-semibold text-[15px] leading-5 text-white truncate">
+                          <div className={`truncate text-base font-semibold leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                             {isFname} {isLname}
                           </div>
 
-                          {/* Role badge: clean, modern, non-flashy */}
                           <Tag
                             style={{
                               marginInlineEnd: 0,
-                              fontSize: 11,
-                              fontWeight: 600,
-                              padding: "0 8px",
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: "0 9px",
                               lineHeight: "20px",
                               borderRadius: 999,
-                              border: "1px solid rgba(59, 130, 246, 0.35)",
-                              background: "rgba(59, 130, 246, 0.12)",
-                              color: "rgba(255, 255, 255, 0.85)",
+                              border: isDarkMode ? "1px solid rgba(96, 165, 250, 0.35)" : "1px solid #bfdbfe",
+                              background: isDarkMode ? "rgba(59, 130, 246, 0.14)" : "#eff6ff",
+                              color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "#1d4ed8",
                             }}
                           >
                             ADMIN
                           </Tag>
                         </div>
 
-                        <div className="text-xs text-white/60 truncate mt-1">
+                        <div className={`mt-1 truncate text-xs ${isDarkMode ? 'text-blue-100/80' : 'text-slate-500'}`}>
                           CFI Cooperative
                         </div>
                       </div>
@@ -409,16 +416,16 @@ export default function BudgetLayoutIndex() {
                 <Menu
                   theme={isDarkMode ? 'dark' : 'light'}
                   mode="inline"
-                  defaultSelectedKeys={['1']}
+                  selectedKeys={[selectedMenuKey]}
                   items={menuItems}
                   style={{
                     backgroundColor: isDarkMode ? '#141414' : 'transparent',
-                    color: isDarkMode ? '#141414' : '#f1f1f1',
-                    height: 'calc(100vh - 80px)',
+                    color: isDarkMode ? '#f1f5f9' : '#334155',
+                    height: collapsed ? 'calc(100vh - 202px)' : 'calc(100vh - 260px)',
                     overflowY: 'auto',
-                    padding: '8px 0',
+                    padding: collapsed ? '12px 8px' : '16px 12px',
                   }}
-                  className="custom-menu glass-effect"
+                  className="admin-sidebar-menu custom-menu glass-effect"
                 />
 
                 {/* Sidebar Footer / Sign Out */}
@@ -429,33 +436,32 @@ export default function BudgetLayoutIndex() {
                     bottom: 0,
                     left: 0,
                     width: "100%",
-                    padding: collapsed ? "16px 8px" : "20px 16px",
-                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                    backgroundColor: isDarkMode ? '#141414' : '#2e3c9c',
+                    padding: collapsed ? "14px 10px" : "18px 20px 20px",
+                    borderTop: isDarkMode ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid #e5edf7",
+                    background: isDarkMode ? "rgba(255,255,255,0.04)" : "#f8fafc",
                   }}
                 >
                   {collapsed ? (
                     <Tooltip title="Sign Out" placement="right">
                       <Button
                         type="text"
-                        icon={<LogoutOutlined className="text-white/80 hover:text-red-400" />}
+                        icon={<LogoutOutlined className={isDarkMode ? "text-white/80 hover:text-red-400" : "text-slate-500 hover:text-red-600"} />}
                         onClick={handleSignout}
-                        className="flex items-center justify-center w-full h-12 hover:bg-red-500/20 rounded-lg transition-all duration-300"
+                        className="flex items-center justify-center w-full h-12 rounded-md transition-all duration-300"
                         style={{
-                          color: "rgba(255, 255, 255, 0.8)",
+                          color: isDarkMode ? "rgba(255, 255, 255, 0.8)" : "#475569",
                         }}
                       />
                     </Tooltip>
                   ) : (
                     <Button
-                      color="danger" variant="solid"
-
+                      danger
+                      type="default"
                       icon={<LogoutOutlined />}
                       onClick={handleSignout}
-                      className="w-full h-10 rounded-md border-red-500/30 hover:border-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group"
-
+                      className="group flex h-11 w-full items-center justify-center rounded-md border-red-200 bg-white font-semibold text-red-600 shadow-sm transition-all duration-300 hover:!border-red-400 hover:!text-red-700"
                     >
-                      <span className="ml-2 font-semibold text-white/90 group-hover: transition-colors">
+                      <span className="ml-2">
                         SIGN OUT
                       </span>
                       <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -469,11 +475,17 @@ export default function BudgetLayoutIndex() {
                   {/* Version Info (only visible when expanded) */}
                   {!collapsed && (
                     <div className="mt-4 text-center">
-                      <div className="text-xs text-white/50 font-medium tracking-wide">
+                      <div
+                        className={`inline-flex rounded border px-2 py-0.5 text-xs font-semibold tracking-wide ${
+                          isDarkMode
+                            ? 'border-white/10 bg-white/5 text-white/70'
+                            : 'border-slate-200 bg-white text-slate-700'
+                        }`}
+                      >
                         v0.0.1
                       </div>
-                      <div className="text-[10px] text-white/30 mt-1">
-                        © {new Date().getFullYear()} CFI Admin
+                      <div className={`mt-1 text-[10px] font-medium ${isDarkMode ? 'text-white/45' : 'text-slate-500'}`}>
+                        &copy; {new Date().getFullYear()} CFI Admin
                       </div>
                     </div>
                   )}
@@ -647,7 +659,7 @@ export default function BudgetLayoutIndex() {
                 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
               `}>
                 <div className="text-sm mb-2 md:mb-0">
-                  Ant Design using Remix <b>©{new Date().getFullYear()}</b>
+                  Ant Design using Remix <b>&copy;{new Date().getFullYear()}</b>
                 </div>
                 <div className="text-sm">
                   <b>Developed by:</b> CFI IT Department

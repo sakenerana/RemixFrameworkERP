@@ -480,27 +480,27 @@ export default function UsersRoutes() {
     const inactiveCount = data.filter((user) => user.status_labels?.name === 'Inactive').length;
 
     return (
-        <Card className="admin-users-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+        <Card className="admin-users-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
             {/* Header Section */}
-            <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                     <div className="min-w-0">
-                    <Breadcrumb
-                        items={[
-                            {
-                                href: "/admin/dashboard",
-                                title: <HomeOutlined className="text-gray-400" />,
-                            },
-                            {
-                                title: <span className="text-gray-500">Admin</span>,
-                            },
-                            {
-                                title: <span className="text-blue-600 font-medium">User Management</span>,
-                            },
-                        ]}
-                        className="text-sm"
-                    />
-                        <Title level={3} className="!mb-1 !mt-3">
+                        <Breadcrumb
+                            items={[
+                                {
+                                    href: "/admin/dashboard",
+                                    title: <HomeOutlined className="text-gray-400" />,
+                                },
+                                {
+                                    title: <span className="text-gray-500">Admin</span>,
+                                },
+                                {
+                                    title: <span className="text-blue-600 font-medium">User Management</span>,
+                                },
+                            ]}
+                            className="text-sm"
+                        />
+                        <Title level={3} className="!mb-1 !mt-2">
                             User Management
                         </Title>
                         <Text className="text-sm text-gray-500">
@@ -508,20 +508,25 @@ export default function UsersRoutes() {
                         </Text>
                     </div>
 
-                    <Space wrap className="mt-2 sm:mt-0">
-                        <Tag className="rounded-full px-3 py-1">Total {data.length}</Tag>
-                        <Tag color="success" className="rounded-full px-3 py-1">Active {activeCount}</Tag>
-                        <Tag color="error" className="rounded-full px-3 py-1">Inactive {inactiveCount}</Tag>
-                    <Button
-                        onClick={() => handleTrack()}
-                        icon={<AiOutlinePlus />}
-                        type="primary"
-                            size="large"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-                    >
-                        Add User
-                    </Button>
-                </Space>
+                    <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+                        <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
+                            Total {data.length}
+                        </Tag>
+                        <Tag className="m-0 rounded-full border-0 bg-emerald-50 px-4 py-1.5 text-sm text-emerald-600">
+                            Active {activeCount}
+                        </Tag>
+                        <Tag className="m-0 rounded-full border-0 bg-red-50 px-4 py-1.5 text-sm text-red-500">
+                            Inactive {inactiveCount}
+                        </Tag>
+                        <Button
+                            onClick={() => handleTrack()}
+                            icon={<AiOutlinePlus />}
+                            type="primary"
+                            className="flex h-10 items-center gap-2 bg-blue-600 px-4 font-semibold hover:bg-blue-700"
+                        >
+                            Add User
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -833,12 +838,12 @@ export default function UsersRoutes() {
             </Modal>
 
             {/* Toolbar Section */}
-            <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
+            <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
                 <Alert
                     message="User Management: View and manage all user accounts and permissions."
                     type="info"
                     showIcon
-                    className="mb-4"
+                    className="admin-users-compact-alert mb-3"
                 />
 
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -846,8 +851,8 @@ export default function UsersRoutes() {
                         allowClear
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Search users..."
-                        className="w-full xl:max-w-md"
-                        size="large"
+                        className="w-full xl:max-w-lg"
+                        size="middle"
                     />
 
                     <Space wrap>
@@ -904,7 +909,7 @@ export default function UsersRoutes() {
                 </div>
             ) : (
                 <Table<User>
-                    size="middle"
+                    size="small"
                     columns={filteredColumns}
                     dataSource={displayedData}
                     className="admin-users-table overflow-hidden rounded-md border border-gray-200"

@@ -4,8 +4,6 @@ import {
   Breadcrumb,
   Button,
   Card,
-  Collapse,
-  CollapseProps,
   DatePicker,
   Descriptions,
   Form,
@@ -25,14 +23,13 @@ import {
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineBuild, AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineDown, AiOutlineEye, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineBuild, AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineEye, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSearch } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
-import Particulars from "~/components/particulars";
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
@@ -354,77 +351,96 @@ export default function Budgets() {
     },
   ];
 
-  const departments: CollapseProps['items'] = dataBudgetDepartment.map((item: any) => ({
-    key: item.id,
-    label: (
-      <div className="flex items-center justify-between w-full pr-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">
-              {item.departments?.department?.charAt(0) || 'D'}
-            </span>
+  const overallBudget = dataTotalBudgeted + dataTotalUnBudgeted;
+  const remainingBalance = overallBudget - dataCombinedTotal;
+  const utilizationRate = overallBudget > 0 ? Math.round((dataCombinedTotal / overallBudget) * 100) : 0;
+  const cappedUtilizationRate = Math.min(100, utilizationRate);
+  const budgetHealth = utilizationRate < 50 ? "Healthy" : utilizationRate < 80 ? "Moderate" : "Critical";
+  const budgetHealthColor = utilizationRate < 50 ? "success" : utilizationRate < 80 ? "warning" : "error";
+
+  const departmentCards = dataBudgetDepartment.map((item: any) => {
+    const utilization = item.budget > 0 ? Math.min(100, (dataCombinedTotal / item.budget) * 100) : 0;
+
+    return (
+      <div
+        key={item.id}
+        className="border-b border-gray-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-slate-50"
+      >
+        <div className="grid gap-4 xl:grid-cols-[minmax(260px,1fr)_180px_180px_220px] xl:items-center">
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-900">
+              <span className="text-sm font-semibold text-white">
+                {item.departments?.department?.charAt(0) || "D"}
+              </span>
+            </div>
+
+            <div className="min-w-0">
+              <div className="font-semibold text-slate-900">
+                {item.departments?.department || "Unknown Department"}
+              </div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                <span>
+                  Budget Period: {dayjs(item.start_date).format("MMM D")} - {dayjs(item.end_date).format("MMM D, YYYY")}
+                </span>
+                <span className="h-1 w-1 rounded-full bg-slate-300" />
+                <Tag color="green" className="m-0">Active</Tag>
+              </div>
+            </div>
           </div>
+
           <div>
-            <div className="font-semibold text-gray-800">{item.departments?.department || 'Unknown Department'}</div>
-            <div className="text-xs text-gray-500 flex items-center gap-2">
-              <span>Budget Period: {dayjs(item.start_date).format('MMM D')} - {dayjs(item.end_date).format('MMM D, YYYY')}</span>
-              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-              <span>Status: <Tag color="green">Active</Tag></span>
+            <div className="text-xs uppercase tracking-wide text-slate-400">Allocated Budget</div>
+            <div className="mt-1 text-base font-semibold text-slate-900">
+              {formatCurrency(Number(item.budget || 0))}
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="font-bold text-lg text-blue-800">
-              {new Intl.NumberFormat('en-PH', {
-                style: 'currency',
-                currency: 'PHP',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-              }).format(item.budget)}
+
+          <div>
+            <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
+              <span>Utilization</span>
+              <span>{Math.round(utilization)}%</span>
             </div>
-            <div className="text-xs text-gray-500">Allocated Budget</div>
-          </div>
-          <div className="w-32">
             <Progress
-              percent={Math.min(100, (dataCombinedTotal / item.budget) * 100)}
+              percent={utilization}
               size="small"
+              showInfo={false}
               strokeColor={
-                (dataCombinedTotal / item.budget) > 0.8 ? '#ef4444' :
-                  (dataCombinedTotal / item.budget) > 0.6 ? '#f59e0b' : '#10b981'
+                utilization > 80 ? "#ef4444" :
+                  utilization > 60 ? "#f59e0b" : "#2563eb"
               }
             />
           </div>
+
+          <div className="flex flex-wrap justify-start gap-2 xl:justify-end">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined className="text-sm" />}
+              onClick={() => {
+                setIsModalOpenEditAllocateBudget(true);
+                setDataBudgetPerDepartment(item);
+                formEditAllocateBudget.setFieldsValue({ budget: item.budget });
+              }}
+              disabled={isDisabled}
+              className="flex items-center rounded-md border border-slate-200 px-3 py-1.5 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            >
+              Edit Budget
+            </Button>
+
+            <Button
+              type="primary"
+              size="small"
+              icon={<AiOutlineEye />}
+              href={`/budget/budget-details?id=${item.id}`}
+              className="flex items-center rounded-md bg-blue-600 px-3 py-1.5"
+            >
+              View Details
+            </Button>
+          </div>
         </div>
       </div>
-    ),
-    children: <Particulars item={item} />,
-    extra: (
-      <div className="flex items-center gap-3">
-        <Button
-          type="text"
-          size="small"
-          icon={<EditOutlined className="text-sm" />}
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsModalOpenEditAllocateBudget(true);
-            setDataBudgetPerDepartment(item);
-            formEditAllocateBudget.setFieldsValue({ budget: item.budget });
-          }}
-          disabled={isDisabled}
-          className="flex items-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-all"
-        >
-          Edit Budget
-        </Button>
-      </div>
-    ),
-    style: {
-      marginBottom: 8,
-      background: 'white',
-      borderRadius: 8,
-      border: '1px solid #e5e7eb',
-    }
-  }));
+    );
+  });
 
   const onFinish = async () => {
     try {
@@ -528,7 +544,7 @@ export default function Budgets() {
   };
 
   return (
-    <div>
+    <div className="budget-management-page">
       <div className="flex justify-between">
         <Breadcrumb
           items={[
@@ -1000,465 +1016,203 @@ export default function Budgets() {
         </Modal>
 
       </div>
-      <Alert
-        message="You can see here all the status of overall budget status. Please check closely."
-        type="info"
-        showIcon
-      />
-
-      {/* THIS IS THE FIRST ROW OF DASHBOARD */}
-
-      <Row gutter={16} className="pt-5">
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-          {budget.map((data: any, index: number) => (
-            <Card
-              key={data.title}
-              loading={false}
-              className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
-              bodyStyle={{
-                padding: '24px',
-                background: data.gradient,
-                borderRadius: '8px',
-                color: 'white',
-                minHeight: '180px',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex justify-between items-start mb-4">
-                  <span className="flex flex-wrap text-sm font-semibold text-white">
-                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" />
-                    {data.title}
-                  </span>
-                  <Tag
-                    color="gray"
-                    className="flex gap-1 text-xs bg-white/20 backdrop-blur-sm border-white/30 text-gray-800"
-                  >
-                    <AiOutlineRise className="text-gray-500" /> TBD
-                  </Tag>
-                </div>
-                <div className="mt-auto">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-white">
-                      {loadingBudget ? (
-                        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-                      ) : (
-                        formatCurrency(data.value ?? 0)
-                      )}
-                    </span>
-                    <span className="text-sm text-white/80">
-                      of {formatCurrency(data.totalBudget ?? 0)}
-                    </span>
-                  </div>
-                  {loading ? (
-                    <Skeleton active paragraph={false} className="mt-3 bg-white/20" />
-                  ) : (
-                    <div className="mt-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-full bg-white/20 rounded-full h-2">
-                          <div
-                            className="bg-white/90 h-2 rounded-full"
-                            style={{
-                              width: `${Math.min(100, (data.value / data.totalBudget) * 100)}%`
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs font-medium text-white min-w-[40px]">
-                          {Math.round(Math.min(100, (data.value / data.totalBudget) * 100))}%
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-xs text-white/80 mt-1">
-                        <span>0%</span>
-                        <span>Utilization</span>
-                        <span>100%</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+      <section className="mt-5 space-y-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-600">
+                <AiOutlineDollarCircle />
+                Budget Control Center
               </div>
-            </Card>
-          ))}
-        </div>
-      </Row>
-
-      {/* 2nd Row of Budget Cards */}
-      <Row gutter={16} className="pt-5">
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 gap-6 w-full">
-          {/* Overall Budget Card - Enhanced Design */}
-          <Card
-            loading={loading}
-            className="rounded-xl shadow-lg border-0 overflow-hidden"
-            bodyStyle={{ padding: 0 }}
-          >
-            <div className="relative">
-              {/* Header with gradient background */}
-              <div className=" px-6 pt-6 rounded-md">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <h2 className="text-xl font-bold">Overall Budget Status</h2>
-                    </div>
-                    <p className="text-gray-500 text-sm">Financial overview for current period</p>
-                  </div>
-                  <Tag className="bg-gray/20 border-gray/30 text-gray-500 text-sm px-3 py-1 rounded-full">
-                    {/* <AiOutlineCalendar /> */}
-                    {`Jan 01 ${currentYear}`} - {`Dec 31 ${currentYear}`}
-                  </Tag>
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="p-6">
-                {/* Key Metrics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-
-                  {/* Total Budgeted */}
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-green-700 text-sm font-medium">Total Budgeted</div>
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                        <AiOutlineDollarCircle className="text-green-600 text-sm" />
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-green-800">
-                      {formatCurrency(dataTotalBudgeted || 0)}
-                    </div>
-                    <div className="text-xs text-green-600 mt-1">Allocated funds</div>
-                  </div>
-
-                  {/* Total Unbudgeted */}
-                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-amber-700 text-sm font-medium">Total Unbudgeted</div>
-                      <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center">
-                        <span className="text-amber-600 text-xs font-bold">U</span>
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-amber-800">
-                      {formatCurrency(dataTotalUnBudgeted || 0)}
-                    </div>
-                    <div className="text-xs text-amber-600 mt-1">Additional expenses</div>
-                  </div>
-
-                  {/* Overall Budget */}
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-blue-700 text-sm font-medium">Overall Budget</div>
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <AiOutlineInfoCircle className="text-blue-600 text-sm" />
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-blue-800">
-                      {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
-                    </div>
-                    <div className="text-xs text-blue-600 mt-1">Overall allocation</div>
-                  </div>
-
-                  {/* Amount Spent */}
-                  <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-red-700 text-sm font-medium">Amount Spent</div>
-                      <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
-                        <AiOutlineRise className="text-red-600 text-sm" />
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-red-800">
-                      {formatCurrency(dataCombinedTotal || 0)}
-                    </div>
-                    <div className="text-xs text-red-600 mt-1">Utilized funds</div>
-                  </div>
-
-                  {/* Remaining Balance */}
-                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-emerald-700 text-sm font-medium">Remaining Balance</div>
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <AiOutlineCheck className="text-emerald-600 text-sm" />
-                      </div>
-                    </div>
-                    <div className="text-2xl font-bold text-emerald-800">
-                      {formatCurrency((dataTotalBudgeted + dataTotalUnBudgeted || 0) - dataCombinedTotal || 0)}
-                    </div>
-                    <div className="text-xs text-emerald-600 mt-1">Available funds</div>
-                  </div>
-
-                </div>
-
-                {/* Progress Section */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <h3 className="font-semibold text-gray-700">Budget Utilization</h3>
-                      <p className="text-sm text-gray-500">How much of your total budget has been used</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-700">
-                        {dataTotalBudgeted + dataTotalUnBudgeted > 0
-                          ? `${Math.round((dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)}%`
-                          : '0%'
-                        }
-                      </div>
-                      <div className="text-xs text-gray-500">Utilization Rate</div>
-                    </div>
-                  </div>
-
-                  {/* Custom Progress Bar */}
-                  <div className="relative pt-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>0%</span>
-                      <span className="font-medium">Budget Utilization</span>
-                      <span>100%</span>
-                    </div>
-
-                    <div className="h-4 bg-gray-200 rounded-full overflow-hidden relative">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${dataTotalBudgeted + dataTotalUnBudgeted > 0
-                            ? Math.min(100, (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)
-                            : 0}%`
-                        }}
-                      >
-                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-white border-2 border-blue-500 rounded-full shadow-sm"></div>
-                      </div>
-                    </div>
-
-                    {/* Milestone markers */}
-                    <div className="flex justify-between mt-1 relative">
-                      {[0, 25, 50, 75, 100].map((marker) => (
-                        <div key={marker} className="flex flex-col items-center">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                          <span className="text-xs text-gray-500 mt-1">{marker}%</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Budget breakdown indicators */}
-                    <div className="flex justify-between mt-6">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                        <span className="text-sm text-gray-600">Budget Used</span>
-                        <span className="text-sm font-semibold">{formatCurrency(dataCombinedTotal)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-gray-300 rounded"></div>
-                        <span className="text-sm text-gray-600">Budget Available</span>
-                        <span className="text-sm font-semibold">
-                          {formatCurrency((dataTotalBudgeted + dataTotalUnBudgeted) - dataCombinedTotal)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="text-sm text-gray-500 mb-1">Daily Average Spend</div>
-                    <div className="text-lg font-semibold text-gray-800">
-                      {formatCurrency(dataCombinedTotal / 365)}
-                    </div>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="text-sm text-gray-500 mb-1">Monthly Average</div>
-                    <div className="text-lg font-semibold text-gray-800">
-                      {formatCurrency(dataCombinedTotal / 12)}
-                    </div>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="text-sm text-gray-500 mb-1">Budget Health</div>
-                    <div className="flex items-center">
-                      <div className={`text-lg font-semibold mr-2 ${(dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
-                        ? 'text-green-600'
-                        : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
-                          ? 'text-amber-600'
-                          : 'text-red-600'
-                        }`}>
-                        {dataTotalBudgeted + dataTotalUnBudgeted > 0
-                          ? Math.round((dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) * 100)
-                          : 0
-                        }%
-                      </div>
-                      <Tag color={
-                        (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
-                          ? 'success'
-                          : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
-                            ? 'warning'
-                            : 'error'
-                      }>
-                        {(dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.5
-                          ? 'Healthy'
-                          : (dataCombinedTotal / (dataTotalBudgeted + dataTotalUnBudgeted)) < 0.8
-                            ? 'Moderate'
-                            : 'Critical'
-                        }
-                      </Tag>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </Row>
-
-      {/* LIST OF DEPARTMENT AND INFORMATION CARD */}
-      <Row gutter={16} className="mt-6">
-        <div className="w-full">
-          <Card
-            className="rounded-xl shadow-md border-0 overflow-hidden"
-            bodyStyle={{ padding: 0 }}
-          >
-            {/* Header with Stats */}
-            <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 p-6">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <h2 className="text-xl font-bold text-gray-800">Departments Overview</h2>
-                  </div>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">
-                        Total Departments: <span className="font-semibold">{dataDepartment.length}</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">
-                        Total Budget: <span className="font-semibold">{formatCurrency(dataTotalBudgeted || 0)}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<AiOutlineInfoCircle />}
-                    onClick={() => {/* Add department summary modal */ }}
-                    className="text-gray-500 hover:text-blue-600"
-                  >
-                    View Summary
-                  </Button>
-                  <Tag color="blue" className="px-3 py-1 rounded-full">
-                    <span className="flex items-center gap-1">
-                      <RiCircleFill className="text-[6px]" />
-                      Active
-                    </span>
-                  </Tag>
-                </div>
-              </div>
-            </div>
-
-            {/* Departments List - Enhanced Collapse */}
-            <div className="p-2">
-              <Collapse
-                items={departments}
-                expandIconPosition="end"
-                ghost
-                size="large"
-                className="department-collapse"
-                expandIcon={({ isActive }) => (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">
-                      {isActive ? 'Hide Details' : 'View Details'}
-                    </span>
-                    <div className={`transition-transform ${isActive ? 'rotate-180' : ''}`}>
-                      <AiOutlineDown className="text-gray-400" />
-                    </div>
-                  </div>
-                )}
-              />
-            </div>
-
-            {/* Empty State */}
-            {dataDepartment.length === 0 && (
-              <div className="py-16 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <AiOutlineBuild className="text-gray-400 text-2xl" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Departments Found</h3>
-                <p className="text-gray-500 mb-6">Add departments to start managing budgets</p>
-                <Button type="primary" icon={<AiOutlinePlus />}>
-                  Add First Department
-                </Button>
-              </div>
-            )}
-
-            {/* Footer with Summary */}
-            <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
-              <div className="flex flex-wrap justify-between items-center gap-4">
-                <div className="text-sm text-gray-600">
-                  Showing <span className="font-semibold">{dataDepartment.length}</span> departments
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-sm">
-                    <span className="text-gray-500">Total Allocated: </span>
-                    <span className="font-semibold text-green-600">
-                      {formatCurrency(dataTotalBudgeted || 0)}
-                    </span>
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-gray-500">Total Used: </span>
-                    <span className="font-semibold text-blue-600">
-                      {formatCurrency(dataCombinedTotal || 0)}
-                    </span>
-                  </div>
-                  <Tooltip title="Budget Utilization Rate">
-                    <div className="text-sm">
-                      <span className="text-gray-500">Utilization: </span>
-                      <span className={`font-semibold ${(dataCombinedTotal / dataTotalBudgeted) > 0.8 ? 'text-red-600' :
-                          (dataCombinedTotal / dataTotalBudgeted) > 0.6 ? 'text-amber-600' : 'text-green-600'
-                        }`}>
-                        {dataTotalBudgeted > 0 ? `${Math.round((dataCombinedTotal / dataTotalBudgeted) * 100)}%` : '0%'}
-                      </span>
-                    </div>
-                  </Tooltip>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </Row>
-
-      {/* THIS IS THE BUDGET DASHBOARD */}
-
-      <Row gutter={16}>
-        <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow mt-4">
-          <div className="flex items-start gap-4">
-            <AiOutlineInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-semibold text-blue-900">
-                  Budgeting Tip of the Month
-                </h3>
-                <Tag color="blue" className="text-xs">NEW</Tag>
-              </div>
-              <p className="text-sm text-blue-800 leading-relaxed">
-                Track expenses weekly to avoid surprises.
-                <span className="font-medium text-blue-900"> Save 10% as emergency buffer.</span>
+              <h1 className="mt-2 text-2xl font-semibold text-slate-950">Budget Management</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Monitor allocations, spending, liquidation, and department budget usage for {currentYear}.
               </p>
-              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
-                <p className="text-xs text-blue-700 italic">
-                  "A budget is telling your money where to go instead of wondering where it went."
-                  <span className="block font-medium text-blue-800 mt-1 not-italic">— IT Department</span>
-                </p>
-              </blockquote>
-              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
-                <p className="text-xs text-blue-700 italic">
-                  "Don't save what is left after spending; spend what is left after saving."
-                  <span className="block font-medium text-blue-800 mt-1 not-italic">— Finance Department</span>
-                </p>
-              </blockquote>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[620px]">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="text-xs text-slate-500">Departments</div>
+                <div className="mt-1 text-xl font-semibold text-slate-900">{dataDepartment.length}</div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="text-xs text-slate-500">Budget Health</div>
+                <div className="mt-1"><Tag color={budgetHealthColor}>{budgetHealth}</Tag></div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="text-xs text-slate-500">Period</div>
+                <div className="mt-1 text-sm font-semibold text-slate-900">Jan - Dec {currentYear}</div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="text-xs text-slate-500">Utilization</div>
+                <div className="mt-1 text-xl font-semibold text-slate-900">{utilizationRate}%</div>
+              </div>
             </div>
           </div>
         </div>
 
-      </Row>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Total Budget</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(overallBudget || 0)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Approved allocation for the year</p>
+              </div>
+              <div className="rounded-lg bg-blue-50 p-2 text-blue-600"><AiOutlineDollarCircle /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Amount Spent</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(dataCombinedTotal || 0)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Requisition and liquidation combined</p>
+              </div>
+              <div className="rounded-lg bg-rose-50 p-2 text-rose-600"><AiOutlineRise /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Liquidation</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(dataTotalLiquidation || 0)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Completed liquidation amount</p>
+              </div>
+              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600"><AiOutlineCheck /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Remaining Balance</p>
+                <div className={`mt-3 text-2xl font-semibold ${remainingBalance < 0 ? "text-rose-600" : "text-emerald-700"}`}>
+                  {formatCurrency(remainingBalance || 0)}
+                </div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Available budget after spending</p>
+              </div>
+              <div className="rounded-lg bg-slate-100 p-2 text-slate-600"><AiOutlineInfoCircle /></div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 24 }} loading={loading}>
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <h2 className="m-0 text-lg font-semibold text-slate-950">Budget Utilization</h2>
+                <p className="m-0 mt-1 text-sm text-slate-500">Current spend against approved budget.</p>
+              </div>
+              <div className="text-left lg:text-right">
+                <div className="text-3xl font-semibold text-blue-700">{utilizationRate}%</div>
+                <Tag color={budgetHealthColor}>{budgetHealth}</Tag>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Progress
+                percent={cappedUtilizationRate}
+                showInfo={false}
+                strokeColor={utilizationRate > 100 ? "#dc2626" : utilizationRate > 80 ? "#ef4444" : utilizationRate > 60 ? "#f59e0b" : "#2563eb"}
+                trailColor="#e2e8f0"
+              />
+              <div className="mt-2 flex justify-between text-xs text-slate-500">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="text-xs text-slate-500">Requisition</div>
+                <div className="mt-1 text-lg font-semibold text-slate-900">{formatCurrency(dataTotalRequisition || 0)}</div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="text-xs text-slate-500">Daily Average Spend</div>
+                <div className="mt-1 text-lg font-semibold text-slate-900">{formatCurrency(dataCombinedTotal / 365)}</div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="text-xs text-slate-500">Monthly Average</div>
+                <div className="mt-1 text-lg font-semibold text-slate-900">{formatCurrency(dataCombinedTotal / 12)}</div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 24 }} loading={loading}>
+            <h2 className="m-0 text-lg font-semibold text-slate-950">Funding Summary</h2>
+            <p className="m-0 mt-1 text-sm text-slate-500">Allocation composition for {currentYear}.</p>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="text-slate-500">Budgeted</span>
+                  <span className="font-semibold text-slate-900">{formatCurrency(dataTotalBudgeted || 0)}</span>
+                </div>
+                <Progress percent={overallBudget > 0 ? Math.round((dataTotalBudgeted / overallBudget) * 100) : 0} showInfo={false} strokeColor="#16a34a" />
+              </div>
+              <div>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="text-slate-500">Unbudgeted</span>
+                  <span className="font-semibold text-slate-900">{formatCurrency(dataTotalUnBudgeted || 0)}</span>
+                </div>
+                <Progress percent={overallBudget > 0 ? Math.round((dataTotalUnBudgeted / overallBudget) * 100) : 0} showInfo={false} strokeColor="#f59e0b" />
+              </div>
+              <div className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+                Overspending is shown as a negative remaining balance so finance can review allocations quickly.
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 0 }}>
+          <div className="border-b border-slate-200 px-5 py-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="m-0 text-lg font-semibold text-slate-950">Department Budgets</h2>
+                <p className="m-0 mt-1 text-sm text-slate-500">
+                  Showing {dataBudgetDepartment.length || dataDepartment.length} active department allocations.
+                </p>
+              </div>
+              <Tag color="blue" className="m-0 px-3 py-1">{formatCurrency(dataTotalBudgeted || 0)} allocated</Tag>
+            </div>
+          </div>
+
+          <div className="hidden border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 xl:grid xl:grid-cols-[minmax(260px,1fr)_180px_180px_220px]">
+            <span>Department</span>
+            <span>Budget</span>
+            <span>Usage</span>
+            <span className="text-right">Actions</span>
+          </div>
+
+          <div>{departmentCards}</div>
+
+          {dataDepartment.length === 0 && (
+            <div className="py-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                <AiOutlineBuild className="text-2xl text-slate-400" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-slate-700">No Departments Found</h3>
+              <p className="mb-6 text-slate-500">Add departments to start managing budgets</p>
+              <Button type="primary" icon={<AiOutlinePlus />}>Add First Department</Button>
+            </div>
+          )}
+
+          <div className="border-t border-slate-200 bg-slate-50 px-5 py-3">
+            <div className="flex flex-wrap justify-between gap-3 text-sm text-slate-600">
+              <span>Showing <span className="font-semibold">{dataBudgetDepartment.length || dataDepartment.length}</span> departments</span>
+              <span>
+                Total Used: <span className="font-semibold text-blue-700">{formatCurrency(dataCombinedTotal || 0)}</span>
+                <span className="mx-2 text-slate-300">/</span>
+                Utilization: <span className="font-semibold text-slate-900">{utilizationRate}%</span>
+              </span>
+            </div>
+          </div>
+        </Card>
+      </section>
     </div>
   );
 }

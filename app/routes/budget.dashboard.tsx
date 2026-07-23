@@ -1,8 +1,8 @@
 import { GlobalOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
-  Alert,
   Button,
   Card,
+  Progress,
   Row,
   Tag,
   message,
@@ -12,9 +12,7 @@ import {
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineDollar, AiOutlineFileText, AiOutlineInfoCircle, AiOutlineShoppingCart, AiOutlineStock, AiOutlineWallet } from "react-icons/ai";
-import { RiCircleFill } from "react-icons/ri";
 import AreaChart from "~/components/area_chart";
-import PieChart from "~/components/pie_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
@@ -38,24 +36,6 @@ const translations = {
     switchToEnglish: "Palitan sa Ingles",
   }
 };
-
-const dataAreaChart = [
-  { date: '2025-01-01', value: 3000, category: 'Requisition' },
-  { date: '2025-01-02', value: 4000, category: 'Requisition' },
-  { date: '2025-01-03', value: 3500, category: 'Requisition' },
-  { date: '2025-01-04', value: 5000, category: 'Requisition' },
-  { date: '2025-01-05', value: 4500, category: 'Requisition' },
-  { date: '2025-01-01', value: 2000, category: 'Liquidation' },
-  { date: '2025-01-02', value: 3000, category: 'Liquidation' },
-  { date: '2025-01-03', value: 4500, category: 'Liquidation' },
-  { date: '2025-01-04', value: 3500, category: 'Liquidation' },
-  { date: '2025-01-05', value: 4000, category: 'Liquidation' },
-  { date: '2025-01-01', value: 1500, category: 'Amount Spent' },
-  { date: '2025-01-02', value: 2500, category: 'Amount Spent' },
-  { date: '2025-01-03', value: 3000, category: 'Amount Spent' },
-  { date: '2025-01-04', value: 4000, category: 'Amount Spent' },
-  { date: '2025-01-05', value: 3500, category: 'Amount Spent' },
-];
 
 export default function BudgetRoutes() {
   const [data, setData] = useState<Budget>();
@@ -303,391 +283,244 @@ export default function BudgetRoutes() {
     setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
+  const currentYear = new Date().getFullYear();
+  const overallBudget = (Number(dataTotalBudgeted) || 0) + (Number(dataTotalUnBudgeted) || 0);
+  const amountSpent = Number(dataCombinedTotal) || 0;
+  const remainingBalance = overallBudget - amountSpent;
+  const utilizationRate = overallBudget > 0 ? Math.round((amountSpent / overallBudget) * 100) : 0;
+  const cappedUtilizationRate = Math.min(100, utilizationRate);
+  const budgetHealth = utilizationRate < 50 ? "Healthy" : utilizationRate < 80 ? "Moderate" : "Critical";
+  const budgetHealthColor = utilizationRate < 50 ? "success" : utilizationRate < 80 ? "warning" : "error";
+  const monthlySeries = Array.from({ length: 12 }).map((_, index) => {
+    const monthNumber = (index + 1).toString().padStart(2, "0");
+    const monthKey = `${currentYear}-${monthNumber}`;
+    const monthName = new Date(currentYear, index).toLocaleString("default", { month: "short" });
+    const total = dataMonthly?.find((item: any) => item.month === monthKey)?.total || 0;
+
+    return {
+      monthKey,
+      monthName,
+      total,
+      date: `${monthKey}-01`,
+      value: total,
+      category: "Amount Spent",
+      isCurrentMonth: index === new Date().getMonth(),
+    };
+  });
+  const chartData = monthlySeries.map(({ date, value, category }) => ({ date, value, category }));
+  const highestMonth = monthlySeries.reduce(
+    (highest, current) => current.total > highest.total ? current : highest,
+    monthlySeries[0]
+  );
+
   return (
     <ProtectedRoute>
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="font-bold">{t.dashboardTitle}</h1>
-          <Button type="default" onClick={toggleLanguage}>
-            <GlobalOutlined />
-            {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
-          </Button>
-        </div>
-
-        <Alert
-          message={t.alertMessage}
-          type="info"
-          showIcon
-        />
-
-        {/* First Row - Summary Cards */}
-        <Row gutter={16} className="pt-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 w-full">
-            {/* 1. Total Budget for this year */}
-            {loading ? (
-              <Card>
-                <Skeleton active paragraph={{ rows: 3 }} />
-              </Card>
-            ) : (
-              <Card
-                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
-                bodyStyle={{
-                  padding: '20px',
-                  background: statGradients.totalBudget,
-                  color: 'white'
-                }}
-              >
-                <div className="relative">
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
-                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Budget
-                  </h2>
-                  <p className="flex flex-wrap text-white text-2xl font-bold">
-                    <AiOutlineDollar className="mt-1 mr-2 text-white/90" /> {formatCurrency(dataTotalBudgeted + dataTotalUnBudgeted || 0)}
-                  </p>
-                  <p className="text-xs mt-4 text-white/80">Annual allocation for {new Date().getFullYear()}</p>
-                </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
-                  Annual
-                </div>
-              </Card>
-            )}
-
-            {/* 2. Total Requisition for this year */}
-            {loading ? (
-              <Card>
-                <Skeleton active paragraph={{ rows: 3 }} />
-              </Card>
-            ) : (
-              <Card
-                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
-                bodyStyle={{
-                  padding: '20px',
-                  background: statGradients.totalRequisition,
-                  color: 'white'
-                }}
-              >
-                <div className="relative">
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
-                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Requisition
-                  </h2>
-                  <p className="flex flex-wrap text-white text-2xl font-bold">
-                    <AiOutlineShoppingCart className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataTotalRequisition) || 0)}
-                  </p>
-                  <p className="text-xs mt-4 text-white/80">Approved requests this year</p>
-                </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
-                  YTD
-                </div>
-              </Card>
-            )}
-
-            {/* 3. Total Liquidation for this year */}
-            {loading ? (
-              <Card>
-                <Skeleton active paragraph={{ rows: 3 }} />
-              </Card>
-            ) : (
-              <Card
-                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
-                bodyStyle={{
-                  padding: '20px',
-                  background: statGradients.totalLiquidation,
-                  color: 'white'
-                }}
-              >
-                <div className="relative">
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
-                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Total Liquidation
-                  </h2>
-                  <p className="flex flex-wrap text-white text-2xl font-bold">
-                    <AiOutlineFileText className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataTotalLiquidation) || 0)}
-                  </p>
-                  <p className="text-xs mt-4 text-white/80">Settled expenses this year</p>
-                </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
-                  YTD
-                </div>
-              </Card>
-            )}
-
-            {/* 4. Amount Spent */}
-            {loading ? (
-              <Card>
-                <Skeleton active paragraph={{ rows: 3 }} />
-              </Card>
-            ) : (
-              <Card
-                className="rounded-md shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.02] border-none"
-                bodyStyle={{
-                  padding: '20px',
-                  background: statGradients.amountSpent,
-                  color: 'white'
-                }}
-              >
-                <div className="relative">
-                  <h2 className="flex flex-wrap text-sm font-semibold mb-2 text-white">
-                    <RiCircleFill className="text-[5px] text-white/90 mt-2 mr-2" /> Amount Spent
-                  </h2>
-                  <p className="flex flex-wrap text-white text-2xl font-bold">
-                    <AiOutlineWallet className="mt-1 mr-2 text-white/90" /> {formatCurrency(Number(dataCombinedTotal) || 0)}
-                  </p>
-                  <p className="text-xs mt-4 text-white/80">Annual spent this year</p>
-                  {/* Budget utilization indicator */}
-                  {/* <div className="mt-2">
-                    <div className="flex items-center gap-2 mt-3">
-                      <div className="w-full bg-white/20 rounded-full h-2">
-                        <div
-                          className="bg-white/90 h-2 rounded-full"
-                          style={{
-                            width: `${Math.min(100, ((Number(dataCombinedTotal) || 0) / (dataTotalBudgeted + dataTotalUnBudgeted || 1) * 100))}%`
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-white">
-                        {Math.round(((Number(dataCombinedTotal) || 0) / (dataTotalBudgeted + dataTotalUnBudgeted || 1) * 100))}%
-                      </span>
-                    </div>
-                    <p className="text-xs mt-1 text-white/80">
-                      Budget utilization
-                    </p>
-                  </div> */}
-                </div>
-                <div className="absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg bg-white/20 backdrop-blur-sm text-white">
-                  Balance
-                </div>
-              </Card>
-            )}
-
-          </div>
-        </Row>
-
-        {/* Second Row - Charts */}
-        <Row gutter={16} className="pt-5">
-          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-6 w-full">
-            <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" /> Budget
-                </h2>
-                <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
-                {loading && <Spin></Spin>}
-                {!loading &&
-                  <AreaChart data={dataAreaChart} />
-                  // <PieChart
-                  //   data={[
-                  //     { type: t.users, value: dataUser },
-                  //     { type: t.departments, value: dataDepartment },
-                  //     { type: t.groups, value: dataGroup },
-                  //     { type: t.inactiveUsersLabel, value: dataInactiveUsers },
-                  //   ]}
-                  //   title=""
-                  // />}
-                }
+      <div className="budget-dashboard-page space-y-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-600">
+                <AiOutlineStock />
+                Budget Dashboard
               </div>
-            </Card>
-            {/* <Card className="rounded-md shadow-sm overflow-hidden transition-transform duration-300">
-              <div>
-                <h2 className="flex flex-wrap text-sm font-semibold mb-2">
-                  <RiCircleFill className="text-[5px] text-green-500 mt-2 mr-2" />
-                  {t.spendingByCategory}
-                </h2>
-                <p className="flex flex-wrap text-xs">{t.currentMonthBreakdown}</p>
-
-                {loading ? (
-                  <div className="h-64 flex items-center justify-center">
-                    <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
-                  </div>
-                ) : dataMonthly && dataMonthly.length > 0 ? (
-                  <PieChart
-                    data={dataMonthly.map((item: any) => ({
-                      type: item.month,
-                      value: item.total
-                    }))}
-                    title=""
-                  />
-                ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
-                    No Data Available
-                  </div>
-                )}
-
-                {dataMonthly && dataMonthly.length > 0 ? (
-                  <PieChart
-                    data={dataMonthly.map((item: any) => ({
-                      type: item.month,
-                      value: item.total
-                    }))}
-                    title=""
-                  />
-                ) : (
-                  <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
-                    No Data Available
-                  </div>
-                )}
-              </div>
-
-              {dataMonthly && dataMonthly.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                  {dataMonthly.map((item: any, index: number) => (
-                    <div key={index} className="flex items-center">
-                      <span
-                        className="w-2 h-2 rounded-full mr-2"
-                        style={{
-                          backgroundColor: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][index % 4]
-                        }}
-                      />
-                      <span className="truncate">{item.month}</span>
-                      <span className="ml-auto font-medium">
-                        {formatCurrency(item.total)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card> */}
-
-            <Card className="rounded-lg p-2 shadow-sm">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <RiCircleFill className="text-green-500 text-[5px] mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-sm font-semibold">Monthly Spending - {new Date().getFullYear()}</h3>
-                  <p className="text-xs">Full year overview</p>
-                </div>
-              </div>
-
-              {/* Monthly Data Grid */}
-              {loading ? (
-                <div className="grid grid-cols-3 gap-3 mt-4">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={`month-skel-${i}`} className="p-2 rounded-md border border-gray-100">
-                      <Skeleton.Input active size="small" block className="mb-1" />
-                      <Skeleton.Input active size="small" block />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                // Your existing monthly grid
-                <>
-                  <div className="grid grid-cols-3 gap-3 mt-4">
-                    {Array.from({ length: 12 }).map((_, index) => {
-                      const monthNumber = (index + 1).toString().padStart(2, '0');
-                      // const currentYear = 2024;
-                      const currentYear = new Date().getFullYear();
-                      const monthKey = `${currentYear}-${monthNumber}`;
-                      const monthData = dataMonthly?.find((item: any) => item.month === monthKey);
-                      const total = monthData?.total || 0;
-                      const monthName = new Date(currentYear, index).toLocaleString('default', { month: 'long' });
-                      const isCurrentMonth = index === new Date().getMonth();
-
-                      return (
-                        <div
-                          key={index}
-                          className={`p-2 rounded-md border ${isCurrentMonth
-                            ? 'border-green-300 bg-green-50/50'
-                            : 'border-gray-100'
-                            }`}
-                        >
-                          <div className="text-xs font-medium">
-                            {monthName.slice(0, 3)}
-                          </div>
-                          <div className={`text-sm ${total > 0
-                            ? 'font-semibold text-green-800'
-                            : 'text-green-400'
-                            }`}>
-                            {total > 0 ? `${formatCurrency(total)}` : '—'}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Yearly Summary */}
-                  <div className="mt-4 pt-3 border-t border-gray-100">
-                    <div className="flex justify-between text-sm">
-                      <span>Total annual spending:</span>
-                      <span className="font-semibold">
-                        {formatCurrency(dataCombinedTotal ?? 0)}
-                      </span>
-                    </div>
-
-
-                    {dataMonthly && dataMonthly.length > 0 && (
-                      <div className="flex justify-between text-sm mt-1">
-                        <span>Highest month:</span>
-                        <span className="font-medium">
-                          {(() => {
-                            // Find the month with highest spending
-                            const highestMonth = dataMonthly.reduce((prev: any, current: any) =>
-                              (prev.total > current.total) ? prev : current
-                            );
-                            const monthName = new Date(highestMonth.month).toLocaleString('default', { month: 'long' });
-                            return (
-                              <>
-                                {monthName}
-                                <span className="text-green-600 ml-1">
-                                  ({formatCurrency(highestMonth.total)})
-                                </span>
-                              </>
-                            );
-                          })()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </Card>
-          </div>
-        </Row>
-
-        <div className="w-full mt-4 bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-lg border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-start gap-4">
-            <AiOutlineInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-semibold text-blue-900">
-                  Budgeting Tip of the Month
-                </h3>
-                <Tag color="blue" className="text-xs">NEW</Tag>
-              </div>
-              <p className="text-sm text-blue-800 leading-relaxed">
-                Track expenses weekly to avoid surprises.
-                <span className="font-medium text-blue-900"> Save 10% as emergency buffer.</span>
+              <h1 className="mt-2 text-2xl font-semibold text-slate-950">Financial Overview</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Track annual allocations, completed requisitions, liquidation, and monthly spending for {currentYear}.
               </p>
-              {/* <div className="mt-2 flex items-center gap-2">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<AiOutlinePlusCircle />}
-                  className="text-blue-600 text-xs"
-                >
-                  Create Reminder
-                </Button>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<AiOutlineShareAlt />}
-                  className="text-blue-600 text-xs"
-                >
-                  Share Tip
-                </Button>
-              </div> */}
-              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
-                <p className="text-xs text-blue-700 italic">
-                  "A budget is telling your money where to go instead of wondering where it went."
-                  <span className="block font-medium text-blue-800 mt-1 not-italic">— IT Department</span>
-                </p>
-              </blockquote>
-              <blockquote className="mt-3 px-3 py-2 bg-blue-50/50 border-l-4 border-blue-300 rounded-r">
-                <p className="text-xs text-blue-700 italic">
-                  "Don't save what is left after spending; spend what is left after saving."
-                  <span className="block font-medium text-blue-800 mt-1 not-italic">— Finance Department</span>
-                </p>
-              </blockquote>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Tag color={budgetHealthColor} className="m-0 px-3 py-1">{budgetHealth}</Tag>
+              <Button type="default" onClick={toggleLanguage}>
+                <GlobalOutlined />
+                {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
+              </Button>
             </div>
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Total Budget</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(overallBudget)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Annual allocation for {currentYear}</p>
+              </div>
+              <div className="rounded-lg bg-blue-50 p-2 text-blue-600"><AiOutlineDollar /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Total Requisition</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(Number(dataTotalRequisition) || 0)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Approved requests this year</p>
+              </div>
+              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600"><AiOutlineShoppingCart /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Total Liquidation</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(Number(dataTotalLiquidation) || 0)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Settled expenses this year</p>
+              </div>
+              <div className="rounded-lg bg-amber-50 p-2 text-amber-600"><AiOutlineFileText /></div>
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="m-0 text-sm font-medium text-slate-500">Amount Spent</p>
+                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(amountSpent)}</div>
+                <p className="m-0 mt-2 text-xs text-slate-500">Requisition and liquidation total</p>
+              </div>
+              <div className="rounded-lg bg-rose-50 p-2 text-rose-600"><AiOutlineWallet /></div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.6fr)]">
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 24 }}>
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h2 className="m-0 text-lg font-semibold text-slate-950">Monthly Spending Trend</h2>
+                <p className="m-0 mt-1 text-sm text-slate-500">Functional chart based on completed requisition and liquidation records.</p>
+              </div>
+              <div className="text-left md:text-right">
+                <div className="text-sm text-slate-500">Total annual spending</div>
+                <div className="text-xl font-semibold text-slate-950">{formatCurrency(amountSpent)}</div>
+              </div>
+            </div>
+
+            <div className="mt-6 h-[340px]">
+              {loading ? (
+                <div className="flex h-full items-center justify-center">
+                  <Spin indicator={<LoadingOutlined style={{ fontSize: 28 }} spin />} />
+                </div>
+              ) : chartData.some((item) => item.value > 0) ? (
+                <AreaChart
+                  data={chartData}
+                  config={{
+                    color: ['#2563eb'],
+                    xAxis: {
+                      type: 'time',
+                      mask: 'MMM',
+                      tickCount: 12,
+                    },
+                    yAxis: {
+                      label: {
+                        formatter: (value: string) => formatCurrency(Number(value)).replace('.00', ''),
+                      },
+                    },
+                    tooltip: {
+                      formatter: (datum: any) => ({
+                        name: datum.category,
+                        value: formatCurrency(Number(datum.value) || 0),
+                      }),
+                    },
+                  }}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
+                  No spending data available for {currentYear}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 24 }} loading={loading}>
+            <h2 className="m-0 text-lg font-semibold text-slate-950">Budget Utilization</h2>
+            <p className="m-0 mt-1 text-sm text-slate-500">Spending compared with available annual budget.</p>
+
+            <div className="mt-6 flex items-end justify-between gap-4">
+              <div>
+                <div className="text-4xl font-semibold text-blue-700">{utilizationRate}%</div>
+                <Tag color={budgetHealthColor}>{budgetHealth}</Tag>
+              </div>
+              <div className={`text-right text-lg font-semibold ${remainingBalance < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+                {formatCurrency(remainingBalance)}
+                <div className="text-xs font-normal text-slate-500">Remaining balance</div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Progress
+                percent={cappedUtilizationRate}
+                showInfo={false}
+                strokeColor={utilizationRate > 100 ? '#dc2626' : utilizationRate > 80 ? '#ef4444' : utilizationRate > 60 ? '#f59e0b' : '#2563eb'}
+                trailColor="#e2e8f0"
+              />
+              <div className="mt-2 flex justify-between text-xs text-slate-500">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-3 rounded-lg bg-slate-50 p-4 text-sm">
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Budgeted</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(Number(dataTotalBudgeted) || 0)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Unbudgeted</span>
+                <span className="font-semibold text-slate-900">{formatCurrency(Number(dataTotalUnBudgeted) || 0)}</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 24 }}>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="m-0 text-lg font-semibold text-slate-950">Monthly Spending - {currentYear}</h2>
+              <p className="m-0 mt-1 text-sm text-slate-500">Full-year month-by-month overview.</p>
+            </div>
+            {highestMonth && highestMonth.total > 0 && (
+              <div className="text-sm text-slate-500">
+                Highest month: <span className="font-semibold text-slate-900">{highestMonth.monthName}</span>
+                <span className="ml-1 text-emerald-700">({formatCurrency(highestMonth.total)})</span>
+              </div>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div key={`month-skel-${index}`} className="rounded-lg border border-slate-100 p-3">
+                  <Skeleton.Input active size="small" block className="mb-2" />
+                  <Skeleton.Input active size="small" block />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+              {monthlySeries.map((item) => (
+                <div
+                  key={item.monthKey}
+                  className={`rounded-lg border p-3 ${item.isCurrentMonth ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                >
+                  <div className="text-xs font-medium text-slate-500">{item.monthName}</div>
+                  <div className={`mt-2 text-base font-semibold ${item.total > 0 ? 'text-slate-950' : 'text-slate-400'}`}>
+                    {item.total > 0 ? formatCurrency(item.total) : '--'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
     </ProtectedRoute>
   );

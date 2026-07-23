@@ -7,7 +7,6 @@ import {
   LoadingOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
 import {
   Alert,
   Breadcrumb,
@@ -19,13 +18,12 @@ import {
   MenuProps,
   message,
   Space,
-  Spin,
   Table,
   TableColumnsType,
   Tag,
 } from "antd";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs from 'dayjs';
@@ -34,14 +32,9 @@ import { BudgetService } from "~/services/budget.service";
 
 export default function BudgetTransactions() {
   const [data, setData] = useState<any[]>([]);
-  const [dataBudget, setDataBudget] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
-  const [isOfficeID, setOfficeID] = useState<any>();
-
-  const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -170,13 +163,13 @@ export default function BudgetTransactions() {
     }
   };
 
-  useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
+  useEffect(() => {
     setDepartmentID(localStorage.getItem('userDept'));
-    setOfficeID(localStorage.getItem('userOfficeID'));
   }, []);
 
   useEffect(() => {
+    if (!isDepartmentID) return;
+
     if (searchText.trim() === '') {
       // fetchDataBudget();
       fetchData();
@@ -187,7 +180,7 @@ export default function BudgetTransactions() {
       );
       setFilteredData(filtered);
     }
-  }, [searchText]); // Empty dependency array means this runs once on mount
+  }, [searchText, isDepartmentID]);
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
@@ -364,101 +357,188 @@ export default function BudgetTransactions() {
     column.title ? columnVisibility[column.title.toString()] : true
   );
 
+  const tableData = searchText ? filteredData : data;
+  const totalAmount = tableData.reduce(
+    (sum, item) => sum + (Number(item.totalAmount) || 0),
+    0
+  );
+  const completedCount = data.filter(item => item.status === "Completed").length;
+  const requisitionCount = data.filter(item => item.workflowType === "Requisition").length;
+  const liquidationCount = data.filter(item => item.workflowType === "Liquidation").length;
+  const currentYear = new Date().getFullYear();
+
   return (
-    <Card>
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <Breadcrumb
-            items={[
-              {
-                href: "/budget",
-                title: <HomeOutlined className="text-gray-400" />,
-              },
-              {
-                title: <span>Budget</span>,
-              },
-              {
-                title: <span className="text-blue-600 font-medium">Transactions</span>,
-              },
-            ]}
-            className="text-sm"
-          />
-        </div>
-
-      </div>
-
-      {/* Toolbar Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 rounded-lg">
-        <Alert
-          message="This is the list of all transactions. Please review carefully."
-          type="info"
-          showIcon
-          className="w-full lg:w-auto"
-        />
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
-          <Input.Search
-            allowClear
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search transactions..."
-            className="w-full sm:w-64"
-            size="middle"
-          />
-
-          <Space>
-            <Button
-              onClick={handleRefetch}
-              icon={<FcRefresh className="text-blue-500" />}
-              className="flex items-center gap-2 hover:border-blue-500"
-            >
-              Refresh
-            </Button>
-
-            <Dropdown
-              menu={{
-                items: columnMenuItems,
-                className: "shadow-lg rounded-md min-w-[200px]"
-              }}
-              placement="bottomRight"
-              trigger={['click']}
-            >
-              <Button
-                icon={<SettingOutlined />}
-                className="flex items-center gap-2 hover:border-blue-500"
-              >
-                Columns
-              </Button>
-            </Dropdown>
-
-            <PrintDropdownComponent
-              stateData={data}
-              buttonProps={{
-                className: "flex items-center gap-2 hover:border-blue-500",
-              }}
+    <div className="budget-transactions-page space-y-5">
+      <Card
+        className="border border-slate-200 shadow-sm"
+        bodyStyle={{ padding: "12px 16px" }}
+      >
+        <div className="grid gap-4 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-center">
+          <div className="space-y-1">
+            <Breadcrumb
+              items={[
+                {
+                  href: "/budget",
+                  title: <HomeOutlined className="text-gray-400" />,
+                },
+                {
+                  title: <span>Budget</span>,
+                },
+                {
+                  title: <span className="text-blue-600 font-medium">Transactions</span>,
+                },
+              ]}
+              className="text-xs"
             />
-          </Space>
+            <div>
+              <h1 className="m-0 text-xl font-semibold leading-6 text-slate-900">
+                Budget Transactions
+              </h1>
+              <p className="m-0 text-xs text-slate-500">
+                Review requisitions and liquidations recorded for the current budget period.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center xl:w-auto xl:justify-end">
+            <Input.Search
+              allowClear
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search transactions..."
+              className="w-full sm:w-[320px]"
+              size="middle"
+            />
+
+            <Space.Compact className="w-full sm:w-auto">
+              <Button
+                onClick={handleRefetch}
+                icon={<FcRefresh className="text-blue-500" />}
+                className="min-w-[112px]"
+              >
+                Refresh
+              </Button>
+
+              <Dropdown
+                menu={{
+                  items: columnMenuItems,
+                  className: "shadow-lg rounded-md min-w-[200px]"
+                }}
+                placement="bottomRight"
+                trigger={['click']}
+              >
+                <Button
+                  icon={<SettingOutlined />}
+                  className="min-w-[112px]"
+                >
+                  Columns
+                </Button>
+              </Dropdown>
+            </Space.Compact>
+
+            <div className="w-full sm:w-auto">
+              <PrintDropdownComponent
+                stateData={tableData}
+                buttonProps={{
+                  className: "w-full sm:w-[112px]",
+                }}
+              />
+            </div>
+          </div>
         </div>
+      </Card>
+
+      {error && (
+        <Alert
+          message="Unable to load the latest transactions."
+          description={error}
+          type="error"
+          showIcon
+        />
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="border border-blue-100 bg-blue-50 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="m-0 text-sm font-medium text-blue-700">Total Records</p>
+              <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
+                {tableData.length.toLocaleString()}
+              </p>
+              <p className="m-0 mt-2 text-xs text-slate-500">Filtered transaction count</p>
+            </div>
+            <InboxOutlined className="rounded-lg bg-white p-3 text-xl text-blue-600 shadow-sm" />
+          </div>
+        </Card>
+
+        <Card className="border border-emerald-100 bg-emerald-50 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="m-0 text-sm font-medium text-emerald-700">Completed</p>
+              <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
+                {completedCount.toLocaleString()}
+              </p>
+              <p className="m-0 mt-2 text-xs text-slate-500">Approved and closed items</p>
+            </div>
+            <CheckCircleOutlined className="rounded-lg bg-white p-3 text-xl text-emerald-600 shadow-sm" />
+          </div>
+        </Card>
+
+        <Card className="border border-violet-100 bg-violet-50 shadow-sm">
+          <div>
+            <p className="m-0 text-sm font-medium text-violet-700">Workflow Mix</p>
+            <div className="mt-3 flex items-end gap-4">
+              <p className="m-0 text-3xl font-semibold text-slate-900">
+                {requisitionCount.toLocaleString()}
+              </p>
+              <p className="m-0 pb-1 text-sm text-slate-500">requisitions</p>
+            </div>
+            <p className="m-0 mt-2 text-xs text-slate-500">
+              {liquidationCount.toLocaleString()} liquidations in view
+            </p>
+          </div>
+        </Card>
+
+        <Card className="border border-amber-100 bg-amber-50 shadow-sm">
+          <div>
+            <p className="m-0 text-sm font-medium text-amber-700">Amount Tracked</p>
+            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
+              {formatCurrency(totalAmount)}
+            </p>
+            <p className="m-0 mt-2 text-xs text-slate-500">Visible total for {currentYear}</p>
+          </div>
+        </Card>
       </div>
 
-      {/* Table Section */}
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Spin
-            size="large"
-            tip="Loading transactions..."
-            indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
-          />
+      <Card
+        className="border border-slate-200 shadow-sm"
+        bodyStyle={{ padding: 0 }}
+      >
+        <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="m-0 text-lg font-semibold text-slate-900">Transaction Register</h2>
+            <p className="m-0 mt-1 text-sm text-slate-500">
+              Showing {tableData.length.toLocaleString()} transaction{tableData.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          {loading && (
+            <span className="inline-flex items-center gap-2 text-sm text-blue-600">
+              <LoadingOutlined spin />
+              Loading transactions
+            </span>
+          )}
         </div>
-      ) : (
+
         <Table<any>
           size="middle"
           columns={filteredColumns}
-          dataSource={searchText ? filteredData : data}
-          className="shadow-sm rounded-lg overflow-hidden"
-          bordered
+          dataSource={tableData}
+          className="overflow-hidden"
+          loading={{
+            spinning: loading,
+            indicator: <LoadingOutlined style={{ fontSize: 28 }} spin />,
+          }}
           scroll={{ x: "max-content" }}
-          rowKey="id"
+          rowKey={(record) => record.id || record.referenceNo || record.processId}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
@@ -484,7 +564,7 @@ export default function BudgetTransactions() {
             )
           }}
         />
-      )}
-    </Card>
+      </Card>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
-import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, FilterOutlined, EyeOutlined, DollarOutlined, PieChartOutlined, BarChartOutlined, SearchOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
+import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, EyeOutlined, DollarOutlined, PieChartOutlined, BarChartOutlined } from "@ant-design/icons";
 import {
     Alert,
     Breadcrumb,
@@ -9,7 +8,6 @@ import {
     MenuProps,
     Modal,
     Space,
-    Spin,
     Table,
     TableColumnsType,
     Tag,
@@ -17,13 +15,12 @@ import {
     Tooltip,
     DatePicker,
     Card,
-    Statistic,
     Row,
     Col,
     message,
 } from "antd";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs from 'dayjs';
 import { BudgetService } from "~/services/budget.service";
@@ -45,11 +42,9 @@ interface BudgetHistoryDataType {
 }
 
 export default function BudgetHistoryReports() {
-    const [data, setData] = useState<BudgetHistoryDataType[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingpendingApproved, setLoadingPendingApproved] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<BudgetHistoryDataType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<BudgetHistoryDataType | null>(null);
@@ -58,33 +53,8 @@ export default function BudgetHistoryReports() {
     const [dataPendingApprovals, setDataPendingApprovals] = useState<any>();
     const [dataApprovedBudget, setDataApprovedBudget] = useState<any>();
 
-    const [isUserID, setUserID] = useState<any>();
     const [isDepartmentID, setDepartmentID] = useState<any>();
     const [isOfficeID, setOfficeID] = useState<any>();
-
-    // Gradient backgrounds for statistics cards
-    const statGradients = {
-        totalAllocated: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',        // Purple gradient
-        pendingApprovals: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',      // Orange gradient
-        approvedBudgets: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',      // Green gradient
-    };
-
-    // Alternative gradient options:
-    // Option 2 (Corporate theme):
-    // const statGradients = {
-    //     totalAllocated: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',      // Navy blue
-    //     pendingApprovals: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)',    // Red gradient
-    //     approvedBudgets: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',    // Teal green
-    // };
-
-    // Option 3 (Pastel theme):
-    // const statGradients = {
-    //     totalAllocated: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',      // Purple/blue
-    //     pendingApprovals: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',    // Pink/pastel
-    //     approvedBudgets: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',    // Soft blue/pink
-    // };
-
-    const navigate = useNavigate();
 
     // const handleRefetch = async () => {
     //     setLoading(true);
@@ -215,39 +185,16 @@ export default function BudgetHistoryReports() {
         }
     };
 
-    useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
+    useEffect(() => {
         setDepartmentID(localStorage.getItem('userDept'));
         setOfficeID(localStorage.getItem('userOfficeID'));
     }, []);
 
     useEffect(() => {
+        if (!isDepartmentID || !isOfficeID) return;
+
         fetchDataBudgetAllocated();
-    }, []);
-
-    // Apply filters
-    // useEffect(() => {
-    //     let filtered = filteredData;
-
-    //     // Search filter
-    //     if (searchText.trim() !== '') {
-    //         filtered = filtered.filter(item =>
-    //             item.processTitle?.toLowerCase().includes(searchText.toLowerCase()) ||
-    //             item.referenceNo?.toLowerCase().includes(searchText.toLowerCase())
-    //         );
-    //     }
-
-    //     // Date range filter
-    //     // if (dateRange && dateRange.length === 2) {
-    //     //     const [start, end] = dateRange;
-    //     //     filtered = filtered.filter(item => {
-    //     //         const createdDate = dayjs(item.created_at);
-    //     //         return createdDate.isAfter(start) && createdDate.isBefore(end);
-    //     //     });
-    //     // }
-
-    //     setFilteredData(filtered);
-    // }, [searchText, data]);
+    }, [isDepartmentID, isOfficeID]);
 
     const handleViewDetails = (record: BudgetHistoryDataType) => {
         setSelectedRecord(record);
@@ -260,10 +207,12 @@ export default function BudgetHistoryReports() {
     };
 
     const formatCurrency = (amount: number) => {
-        return `₱${amount.toLocaleString('en-PH', {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-        })}`;
+        }).format(Number(amount) || 0);
     };
 
     // State for column visibility
@@ -407,242 +356,178 @@ export default function BudgetHistoryReports() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
+    const totalAllocated = Number(dataBudget?.budget) || 0;
+    const pendingApprovals = Number(dataPendingApprovals) || 0;
+    const approvedBudgets = Number(dataApprovedBudget) || 0;
+    const historyTotalAmount = filteredData.reduce(
+        (sum, item) => sum + (Number(item.totalAmount) || 0),
+        0
+    );
+
     return (
-        <Card className="w-full rounded-lg shadow-sm">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <Breadcrumb
-                        items={[
-                            {
-                                href: "/budget",
-                                title: <HomeOutlined className="text-gray-400" />,
-                            },
-                            {
-                                title: <span className="text-blue-600 font-medium">Budget History & Reports</span>,
-                            },
-                        ]}
-                        className="text-sm"
-                    />
-                    <h1 className="font-bold mt-2">Budget Tracking History</h1>
-                </div>
-            </div>
-
-            {/* Statistics Cards with Gradient Backgrounds */}
-            <Row gutter={16} className="mb-6">
-                <Col span={8}>
-                    <Card
-                        className="border-none shadow-md"
-                        bodyStyle={{
-                            padding: '24px',
-                            background: statGradients.totalAllocated,
-                            borderRadius: '8px',
-                            color: 'white',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <Statistic
-                            title={<span style={{ color: 'white' }}>Total Allocated</span>}
-                            value={dataBudget?.budget}
-                            valueStyle={{ color: 'white', fontSize: '24px' }}
-                            prefix={<DollarOutlined style={{ color: 'rgba(255, 255, 255, 0.9)' }} />}
-                            formatter={value => formatCurrency(Number(value))}
+        <div className="budget-report-page space-y-5">
+            <Card
+                className="border border-slate-200 shadow-sm"
+                bodyStyle={{ padding: "12px 16px" }}
+            >
+                <div className="grid gap-4 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-center">
+                    <div className="space-y-1">
+                        <Breadcrumb
+                            items={[
+                                {
+                                    href: "/budget",
+                                    title: <HomeOutlined className="text-gray-400" />,
+                                },
+                                {
+                                    title: <span className="text-blue-600 font-medium">Budget History & Reports</span>,
+                                },
+                            ]}
+                            className="text-xs"
                         />
-                        <div style={{
-                            marginTop: '12px',
-                            fontSize: '12px',
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                        }}>
-                            <div style={{
-                                width: '6px',
-                                height: '6px',
-                                borderRadius: '50%',
-                                background: 'rgba(255, 255, 255, 0.9)'
-                            }} />
-                            Total budget allocation
+                        <div>
+                            <h1 className="m-0 text-xl font-semibold leading-6 text-slate-900">
+                                Budget Tracking History
+                            </h1>
+                            <p className="m-0 text-xs text-slate-500">
+                                Track approved budget activity and review financial records by date range.
+                            </p>
                         </div>
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card
-                        className="border-none shadow-md"
-                        bodyStyle={{
-                            padding: '24px',
-                            background: statGradients.pendingApprovals,
-                            borderRadius: '8px',
-                            color: 'white',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        {loadingpendingApproved ? (
-                            <div className="flex justify-center items-center h-16">
-                                <Spin
-                                    indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white' }} spin />}
-                                />
-                            </div>
-                        ) : (
-                            <>
-                                <Statistic
-                                    title={<span style={{ color: 'white' }}>Pending Approvals</span>}
-                                    value={dataPendingApprovals}
-                                    valueStyle={{ color: 'white', fontSize: '24px' }}
-                                />
-                                <div style={{
-                                    marginTop: '12px',
-                                    fontSize: '12px',
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}>
-                                    <div style={{
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '50%',
-                                        background: 'rgba(255, 255, 255, 0.9)'
-                                    }} />
-                                    Awaiting approval
-                                </div>
-                            </>
-                        )}
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card
-                        className="border-none shadow-md"
-                        bodyStyle={{
-                            padding: '24px',
-                            background: statGradients.approvedBudgets,
-                            borderRadius: '8px',
-                            color: 'white',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        {loadingpendingApproved ? (
-                            <div className="flex justify-center items-center h-16">
-                                <Spin
-                                    indicator={<LoadingOutlined style={{ fontSize: 24, color: 'white' }} spin />}
-                                />
-                            </div>
-                        ) : (
-                            <>
-                                <Statistic
-                                    title={<span style={{ color: 'white' }}>Approved Budgets</span>}
-                                    value={dataApprovedBudget}
-                                    valueStyle={{ color: 'white', fontSize: '24px' }}
-                                />
-                                <div style={{
-                                    marginTop: '12px',
-                                    fontSize: '12px',
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}>
-                                    <div style={{
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '50%',
-                                        background: 'rgba(255, 255, 255, 0.9)'
-                                    }} />
-                                    Approved requests
-                                </div>
-                            </>
-                        )}
-                    </Card>
-                </Col>
-            </Row>
+                    </div>
 
-            {/* Toolbar Section */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-                <Alert
-                    message="Comprehensive history of all budget allocations and expenditures. Monitor approvals, and analyze financial performance."
-                    type="info"
-                    showIcon
-                    className="w-full lg:w-auto rounded-lg"
-                />
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
-                    {/* <Input.Search
-                        allowClear
-                        onChange={(e) => setSearchText(e.target.value)}
-                        placeholder="Search budgets..."
-                        className="w-full sm:w-64"
-                        size="middle"
-                    /> */}
-
-                    <Space>
-
-                        <Dropdown
-                            menu={{
-                                items: columnMenuItems,
-                                className: "shadow-lg rounded-md min-w-[200px] py-2"
+                    <div className="flex w-full flex-col gap-2 md:flex-row md:items-center xl:w-auto xl:justify-end">
+                        <RangePicker
+                            onChange={(value, dateString) => {
+                                if (!dateString[0] || !dateString[1]) return;
+                                fetchBudgetHistoryData(dateString[0], dateString[1]);
                             }}
-                            placement="bottomRight"
-                            trigger={['click']}
-                        >
-                            <Button
-                                icon={<SettingOutlined />}
-                                className="flex items-center gap-2 hover:border-blue-500"
-                            >
-                                Columns
-                            </Button>
-                        </Dropdown>
-
-                        <PrintDropdownComponent
-                            stateData={data}
-                            buttonProps={{
-                                className: "flex items-center gap-2 hover:border-blue-500",
-                            }}
+                            className="w-full md:w-[300px]"
+                            placeholder={['Start Date', 'End Date']}
+                            size="middle"
                         />
-                    </Space>
-                </div>
-            </div>
 
-            {/* Filters Section */}
-            <Card className="mb-6 shadow-sm">
-                <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-                    <span className="text-sm font-medium text-gray-700">Filters:</span>
+                        <Space.Compact className="w-full md:w-auto">
+                            <Dropdown
+                                menu={{
+                                    items: columnMenuItems,
+                                    className: "shadow-lg rounded-md min-w-[200px] py-2"
+                                }}
+                                placement="bottomRight"
+                                trigger={['click']}
+                            >
+                                <Button
+                                    icon={<SettingOutlined />}
+                                    className="min-w-[112px]"
+                                >
+                                    Columns
+                                </Button>
+                            </Dropdown>
+                        </Space.Compact>
 
-                    <RangePicker
-                        onChange={(value, dateString) => {
-                            // console.log("set date range:", value);        
-                            // console.log("formatted:", dateString[0]); 
-                            fetchBudgetHistoryData(dateString[0], dateString[1]);
-                        }}
-                        className="w-full lg:w-auto"
-                        placeholder={['Start Date', 'End Date']}
-                    />
+                        <div className="w-full md:w-auto">
+                            <PrintDropdownComponent
+                                stateData={filteredData}
+                                buttonProps={{
+                                    className: "w-full md:w-[112px]",
+                                }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </Card>
 
-            {/* Table Section */}
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <Spin
-                        size="large"
-                        tip="Loading budget history..."
-                        indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />}
-                    />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <Card className="border border-blue-100 bg-blue-50 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="m-0 text-sm font-medium text-blue-700">Total Allocated</p>
+                            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
+                                {formatCurrency(totalAllocated)}
+                            </p>
+                            <p className="m-0 mt-2 text-xs text-slate-500">Current budget allocation</p>
+                        </div>
+                        <DollarOutlined className="rounded-lg bg-white p-3 text-xl text-blue-600 shadow-sm" />
+                    </div>
+                </Card>
+
+                <Card className="border border-amber-100 bg-amber-50 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="m-0 text-sm font-medium text-amber-700">Pending Approvals</p>
+                            <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
+                                {loadingpendingApproved ? <LoadingOutlined spin /> : pendingApprovals.toLocaleString()}
+                            </p>
+                            <p className="m-0 mt-2 text-xs text-slate-500">Items still in progress</p>
+                        </div>
+                        <PieChartOutlined className="rounded-lg bg-white p-3 text-xl text-amber-600 shadow-sm" />
+                    </div>
+                </Card>
+
+                <Card className="border border-emerald-100 bg-emerald-50 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="m-0 text-sm font-medium text-emerald-700">Approved Budgets</p>
+                            <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
+                                {loadingpendingApproved ? <LoadingOutlined spin /> : approvedBudgets.toLocaleString()}
+                            </p>
+                            <p className="m-0 mt-2 text-xs text-slate-500">Completed approvals</p>
+                        </div>
+                        <BarChartOutlined className="rounded-lg bg-white p-3 text-xl text-emerald-600 shadow-sm" />
+                    </div>
+                </Card>
+
+                <Card className="border border-violet-100 bg-violet-50 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="m-0 text-sm font-medium text-violet-700">History Amount</p>
+                            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
+                                {formatCurrency(historyTotalAmount)}
+                            </p>
+                            <p className="m-0 mt-2 text-xs text-slate-500">Loaded report total</p>
+                        </div>
+                        <FileSearchOutlined className="rounded-lg bg-white p-3 text-xl text-violet-600 shadow-sm" />
+                    </div>
+                </Card>
+            </div>
+
+            {error && (
+                <Alert
+                    message="Unable to load the budget report."
+                    description={error}
+                    type="error"
+                    showIcon
+                />
+            )}
+
+            <Card
+                className="border border-slate-200 shadow-sm"
+                bodyStyle={{ padding: 0 }}
+            >
+                <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="m-0 text-lg font-semibold text-slate-900">Report Records</h2>
+                        <p className="m-0 mt-1 text-sm text-slate-500">
+                            Showing {filteredData.length.toLocaleString()} budget record{filteredData.length === 1 ? "" : "s"}
+                        </p>
+                    </div>
+                    {loading && (
+                        <span className="inline-flex items-center gap-2 text-sm text-blue-600">
+                            <LoadingOutlined spin />
+                            Loading history
+                        </span>
+                    )}
                 </div>
-            ) : (
+
                 <Table<BudgetHistoryDataType>
                     size="middle"
                     columns={filteredColumns}
                     dataSource={filteredData}
-                    className="shadow-sm rounded-lg overflow-hidden"
-                    bordered
+                    className="overflow-hidden"
+                    loading={{
+                        spinning: loading,
+                        indicator: <LoadingOutlined style={{ fontSize: 28 }} spin />,
+                    }}
                     scroll={{ x: 'max-content', y: 600 }}
-                    rowKey="id"
+                    rowKey={(record) => record.id || record.referenceNo}
                     pagination={{
                         showSizeChanger: true,
                         showQuickJumper: true,
@@ -657,15 +542,15 @@ export default function BudgetHistoryReports() {
                     }}
                     locale={{
                         emptyText: (
-                            <div className="py-12 flex flex-col items-center">
+                            <div className="py-10 flex flex-col items-center">
                                 <FileSearchOutlined className="text-3xl text-gray-400 mb-3" />
                                 <p className="text-gray-500 mb-2 text-base">No budget history found</p>
-                                <p className="text-gray-400 text-sm mb-4">Adjust your filters or create new budget requests</p>
+                                <p className="text-gray-400 text-sm">Select a date range to load report records</p>
                             </div>
                         )
                     }}
                 />
-            )}
+            </Card>
 
             {/* Budget Details Modal */}
             <Modal
@@ -787,6 +672,7 @@ export default function BudgetHistoryReports() {
                     </div>
                 )}
             </Modal>
-        </Card>
+        </div>
     );
 }
+
