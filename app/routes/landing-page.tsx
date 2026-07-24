@@ -70,6 +70,7 @@ const LOCAL_STORAGE_KEYS = [
     'userDept',
     'userOffice',
     'userOfficeID',
+    'access',
     'workflowDashboardData',
     'userActivitiesData',
 ];
@@ -177,6 +178,7 @@ const persistUserSession = (userData: LandingUser) => {
     localStorage.setItem('lname', userData.last_name ?? '');
     localStorage.setItem('ab_id', String(userData.ab_user_id ?? ''));
     localStorage.setItem('username', userData.username ?? '');
+    localStorage.setItem('access', userData.access ?? '[]');
 };
 
 const clearSessionStorage = () => {

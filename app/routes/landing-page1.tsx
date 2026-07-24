@@ -45,6 +45,7 @@ export default function LandingPage() {
       localStorage.setItem('lname', dataFetch.last_name);
       localStorage.setItem('ab_id', dataFetch.ab_user_id);
       localStorage.setItem('username', dataFetch.username);
+      localStorage.setItem('access', dataFetch?.access || '[]');
 
       // Update all states at once
       setData(dataFetch);

@@ -156,6 +156,7 @@ export default function BudgetLayoutIndex() {
     localStorage.removeItem("userDept");
     localStorage.removeItem("userOffice");
     localStorage.removeItem("userOfficeID");
+    localStorage.removeItem("access");
 
     localStorage.removeItem("workflowDashboardData");
     localStorage.removeItem("userActivitiesData");
@@ -199,7 +200,7 @@ export default function BudgetLayoutIndex() {
 
   const selectedMenuKey = currentPath.startsWith('/budget/transactions')
     ? '2'
-    : currentPath.startsWith('/budget/budgets') || currentPath.startsWith('/budget/budget-details')
+    : currentPath.startsWith('/budget/budgets') || currentPath.startsWith('/budget/budget-details') || currentPath.startsWith('/budget/budget-code')
       ? '3'
       : currentPath.startsWith('/budget/report')
         ? '4'

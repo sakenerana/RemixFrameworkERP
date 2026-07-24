@@ -22,6 +22,7 @@ import {
 } from "antd";
 import axios from "axios";
 import moment from "moment";
+import { Link } from "@remix-run/react";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineBuild, AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineEye, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSearch } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
@@ -29,7 +30,9 @@ import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
 import { DepartmentService } from "~/services/department.service";
+import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
+import { canManageBudgetParticulars } from "~/utils/budgetAccess";
 
 export default function Budgets() {
   const [data, setData] = useState<Budget>();
@@ -50,6 +53,7 @@ export default function Budgets() {
   const [isUserID, setUserID] = useState<any>();
   const [isDepartmentID, setDepartmentID] = useState<any>();
   const [isOfficeID, setOfficeID] = useState<any>();
+  const [canManageParticulars, setCanManageParticulars] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenEditAllocateBudget, setIsModalOpenEditAllocateBudget] = useState(false);
@@ -300,7 +304,7 @@ export default function Budgets() {
   };
 
   const disableCreateBudgetButton = async () => {
-    if (isDepartmentID == 2) {
+    if (isDepartmentID == 2 || isDepartmentID == 1) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -333,6 +337,36 @@ export default function Budgets() {
     setUserID(localStorage.getItem('userAuthID'));
     setDepartmentID(localStorage.getItem('userDept'));
     setOfficeID(localStorage.getItem('userOfficeID'));
+
+    const resolveParticularAccess = async () => {
+      const localAccess = localStorage.getItem('access');
+      const localDepartment = localStorage.getItem('dept');
+
+      if (canManageBudgetParticulars({ department: localDepartment })) {
+        setCanManageParticulars(true);
+        return;
+      }
+
+      const userAuthId = localStorage.getItem('userAuthID');
+      if (!userAuthId) {
+        setCanManageParticulars(false);
+        return;
+      }
+
+      try {
+        const user = await UserService.getPostById(userAuthId);
+        localStorage.setItem('access', user?.access || '[]');
+        setCanManageParticulars(
+          canManageBudgetParticulars({
+            department: localDepartment,
+          })
+        );
+      } catch {
+        setCanManageParticulars(false);
+      }
+    };
+
+    resolveParticularAccess();
   }, []);
 
   const currentYear = new Date().getFullYear();
@@ -561,28 +595,45 @@ export default function Budgets() {
           ]}
         />
         <Space direction="horizontal">
-          <Space wrap>
-            <Button
-              onClick={() => handleUnbudgetedRequisition()}
-              icon={<AiOutlinePlus />}
-              type="default"
-              disabled={isDisabled}
-              className="mb-2"
-            >
-              Create Unbudgeted
-            </Button>
-          </Space>
-          <Space wrap>
-            <Button
-              onClick={() => handleTrack()}
-              icon={<AiOutlinePlus />}
-              type="primary"
-              disabled={isDisabled}
-              className="mb-2"
-            >
-              Create Budget
-            </Button>
-          </Space>
+          {canManageParticulars && (
+            <Space wrap>
+              <Link to="/budget/budget-code">
+                <Button
+                  icon={<AiOutlinePlus />}
+                  type="default"
+                  className="mb-2"
+                >
+                  Particulars
+                </Button>
+              </Link>
+            </Space>
+          )}
+          {canManageParticulars && (
+            <>
+              <Space wrap>
+                <Button
+                  onClick={() => handleUnbudgetedRequisition()}
+                  icon={<AiOutlinePlus />}
+                  type="default"
+                  disabled={isDisabled}
+                  className="mb-2"
+                >
+                  Create Unbudgeted
+                </Button>
+              </Space>
+              <Space wrap>
+                <Button
+                  onClick={() => handleTrack()}
+                  icon={<AiOutlinePlus />}
+                  type="primary"
+                  disabled={isDisabled}
+                  className="mb-2"
+                >
+                  Create Budget
+                </Button>
+              </Space>
+            </>
+          )}
         </Space>
         <Modal
           width={460}
