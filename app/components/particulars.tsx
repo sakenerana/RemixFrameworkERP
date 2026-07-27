@@ -80,6 +80,23 @@ const matchesDepartment = (record: any, department: string) => {
     );
 };
 
+const normalizeText = (value: unknown) => String(value ?? "").trim();
+
+const isBlankParticular = (value: unknown) => !normalizeText(value);
+
+const isNaParticular = (value: unknown) => {
+    const normalized = normalizeText(value).toLowerCase();
+    return normalized === "n/a" || normalized === "na";
+};
+
+const matchesParticularValue = (recordParticular: unknown, budgetParticular: unknown) => {
+    if (isNaParticular(budgetParticular)) {
+        return isBlankParticular(recordParticular) || isNaParticular(recordParticular);
+    }
+
+    return normalizeText(recordParticular) === normalizeText(budgetParticular);
+};
+
 export default function Particulars({ item }: { item: any }) {
     const [particulars, setParticulars] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -212,7 +229,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 /* === PARTICULAR MATCH (EXACT) === */
                 if (particular.particulars) {
-                    matchesParticular = item2.particular === particular.particulars;
+                    matchesParticular = matchesParticularValue(item2.particular, particular.particulars);
                 }
 
                 /* === DEPARTMENT MATCH (EXACT) === */
@@ -314,7 +331,7 @@ export default function Particulars({ item }: { item: any }) {
 
                 /* === PARTICULAR MATCH (EXACT) === */
                 if (particular.particulars) {
-                    matchesParticular = item2.particular === particular.particulars;
+                    matchesParticular = matchesParticularValue(item2.particular, particular.particulars);
                 }
 
                 /* === DEPARTMENT MATCH (EXACT) === */
