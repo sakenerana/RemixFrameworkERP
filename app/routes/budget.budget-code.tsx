@@ -1,4 +1,5 @@
 import {
+  ApartmentOutlined,
   DeleteOutlined,
   EditOutlined,
   HomeOutlined,
@@ -17,6 +18,7 @@ import {
   message,
   Modal,
   Popconfirm,
+  Select,
   Space,
   Table,
   TableColumnsType,
@@ -26,6 +28,7 @@ import {
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { BudgetCodePayload, BudgetCodeService } from "~/services/budget_code.service";
+import { DepartmentService } from "~/services/department.service";
 import { UserService } from "~/services/user.service";
 import { canManageBudgetParticulars } from "~/utils/budgetAccess";
 
@@ -37,16 +40,52 @@ interface BudgetCode {
   particulars: string;
 }
 
+interface DepartmentRecord {
+  id: number;
+  department: string;
+  budget_code?: unknown;
+}
+
+interface AssignParticularsForm {
+  department_id: number;
+  budget_code: string[];
+}
+
+const normalizeBudgetCodeIds = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(String);
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
+    } catch {
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+
+  return [];
+};
+
 export default function BudgetCodePage() {
   const [data, setData] = useState<BudgetCode[]>([]);
+  const [departments, setDepartments] = useState<DepartmentRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [departmentsLoading, setDepartmentsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [assignSaving, setAssignSaving] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<BudgetCode | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [checkedAccess, setCheckedAccess] = useState(false);
   const [form] = Form.useForm<BudgetCodePayload>();
+  const [assignForm] = Form.useForm<AssignParticularsForm>();
 
   const fetchData = async () => {
     try {
@@ -57,6 +96,18 @@ export default function BudgetCodePage() {
       message.error(error instanceof Error ? error.message : "Failed to load budget codes");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      setDepartmentsLoading(true);
+      const rows = await DepartmentService.getAllPosts();
+      setDepartments((rows || []) as DepartmentRecord[]);
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : "Failed to load departments");
+    } finally {
+      setDepartmentsLoading(false);
     }
   };
 
@@ -86,6 +137,7 @@ export default function BudgetCodePage() {
 
       if (allowed) {
         fetchData();
+        fetchDepartments();
       }
     };
 
@@ -107,6 +159,15 @@ export default function BudgetCodePage() {
     setIsModalOpen(true);
   };
 
+  const openAssignModal = () => {
+    assignForm.resetFields();
+    setIsAssignModalOpen(true);
+
+    if (!departments.length) {
+      fetchDepartments();
+    }
+  };
+
   const openEditModal = (record: BudgetCode) => {
     setEditingRecord(record);
     form.setFieldsValue({ particulars: record.particulars });
@@ -117,6 +178,19 @@ export default function BudgetCodePage() {
     setIsModalOpen(false);
     setEditingRecord(null);
     form.resetFields();
+  };
+
+  const closeAssignModal = () => {
+    setIsAssignModalOpen(false);
+    assignForm.resetFields();
+  };
+
+  const handleDepartmentChange = (departmentId: number) => {
+    const selectedDepartment = departments.find((department) => department.id === departmentId);
+    assignForm.setFieldValue(
+      "budget_code",
+      normalizeBudgetCodeIds(selectedDepartment?.budget_code)
+    );
   };
 
   const handleSubmit = async () => {
@@ -140,6 +214,27 @@ export default function BudgetCodePage() {
       }
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAssignSubmit = async () => {
+    try {
+      const values = await assignForm.validateFields();
+      setAssignSaving(true);
+
+      await DepartmentService.updatePost(values.department_id, {
+        budget_code: values.budget_code,
+      } as any);
+
+      message.success("Department particulars updated successfully");
+      closeAssignModal();
+      fetchDepartments();
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message);
+      }
+    } finally {
+      setAssignSaving(false);
     }
   };
 
@@ -225,7 +320,7 @@ export default function BudgetCodePage() {
       <Card className="rounded-xl border border-slate-200 shadow-sm">
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="Only Admin and Finance users can manage budget particulars."
+          description="Only Finance and IT users can manage budget particulars."
         >
           <Link to="/budget/budgets">
             <Button type="primary">Back to Budgets</Button>
@@ -269,6 +364,13 @@ export default function BudgetCodePage() {
             </Tag>
             <Button>
               <Link to="/budget/budgets">Back to Budgets</Link>
+            </Button>
+            <Button
+              icon={<ApartmentOutlined />}
+              onClick={openAssignModal}
+              loading={departmentsLoading}
+            >
+              Assign to Department
             </Button>
             <Button
               type="primary"
@@ -348,6 +450,56 @@ export default function BudgetCodePage() {
               autoSize={{ minRows: 3, maxRows: 5 }}
               placeholder="Example: Vehicle Maintenance"
               allowClear
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Assign Department Particulars"
+        open={isAssignModalOpen}
+        onCancel={closeAssignModal}
+        onOk={handleAssignSubmit}
+        okText="Save Assignment"
+        confirmLoading={assignSaving}
+        destroyOnClose
+      >
+        <Form form={assignForm} layout="vertical" className="pt-3">
+          <Form.Item
+            label="Department"
+            name="department_id"
+            rules={[{ required: true, message: "Please choose a department" }]}
+          >
+            <Select
+              showSearch
+              loading={departmentsLoading}
+              placeholder="Choose department"
+              optionFilterProp="label"
+              onChange={handleDepartmentChange}
+              options={departments.map((department) => ({
+                label: department.department,
+                value: department.id,
+              }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Budget Particulars"
+            name="budget_code"
+            rules={[{ required: true, message: "Please choose at least one particular" }]}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              showSearch
+              loading={loading}
+              maxTagCount="responsive"
+              placeholder="Choose budget particulars"
+              optionFilterProp="label"
+              options={data.map((item) => ({
+                label: item.particulars || "N/A",
+                value: String(item.id),
+              }))}
             />
           </Form.Item>
         </Form>
