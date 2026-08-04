@@ -30,7 +30,6 @@ import {
     Table,
     TableColumnsType,
     Tag,
-    Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -54,6 +53,7 @@ import {
 import { FcRefresh } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { OfficeService } from "~/services/office.service";
@@ -62,9 +62,6 @@ import { Department } from "~/types/department.type";
 import { Groups } from "~/types/groups.type";
 import { Office } from "~/types/office.type";
 import { User } from "~/types/user.type";
-import supabase from "~/utils/supabase.client";
-
-const { Text, Title } = Typography;
 
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
@@ -482,33 +479,29 @@ export default function UsersRoutes() {
     return (
         <Card className="admin-users-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
             {/* Header Section */}
-            <div className="mb-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                    <div className="min-w-0">
-                        <Breadcrumb
-                            items={[
-                                {
-                                    href: "/admin/dashboard",
-                                    title: <HomeOutlined className="text-gray-400" />,
-                                },
-                                {
-                                    title: <span className="text-gray-500">Admin</span>,
-                                },
-                                {
-                                    title: <span className="text-blue-600 font-medium">User Management</span>,
-                                },
-                            ]}
-                            className="text-sm"
-                        />
-                        <Title level={3} className="!mb-1 !mt-2">
-                            User Management
-                        </Title>
-                        <Text className="text-sm text-gray-500">
-                            Manage account access, office assignments, departments, and module permissions.
-                        </Text>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+            <AppPageHeader
+                className="mb-3"
+                breadcrumb={
+                    <Breadcrumb
+                        items={[
+                            {
+                                href: "/admin/dashboard",
+                                title: <HomeOutlined className="text-gray-400" />,
+                            },
+                            {
+                                title: <span className="text-gray-500">Admin</span>,
+                            },
+                            {
+                                title: <span className="text-blue-600 font-medium">User Management</span>,
+                            },
+                        ]}
+                        className="text-sm"
+                    />
+                }
+                title="User Management"
+                subtitle="Manage account access, office assignments, departments, and module permissions."
+                actions={
+                    <>
                         <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
                             Total {data.length}
                         </Tag>
@@ -526,9 +519,9 @@ export default function UsersRoutes() {
                         >
                             Add User
                         </Button>
-                    </div>
-                </div>
-            </div>
+                    </>
+                }
+            />
 
             {/* User Creation/Edit Modal */}
             <Modal

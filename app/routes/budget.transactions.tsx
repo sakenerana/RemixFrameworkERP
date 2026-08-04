@@ -25,7 +25,9 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FcRefresh } from "react-icons/fc";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import dayjs from 'dayjs';
 import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
@@ -369,37 +371,27 @@ export default function BudgetTransactions() {
 
   return (
     <div className="budget-transactions-page space-y-5">
-      <Card
-        className="border border-slate-200 shadow-sm"
-        bodyStyle={{ padding: "12px 16px" }}
-      >
-        <div className="grid gap-4 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-center">
-          <div className="space-y-1">
-            <Breadcrumb
-              items={[
-                {
-                  href: "/budget",
-                  title: <HomeOutlined className="text-gray-400" />,
-                },
-                {
-                  title: <span>Budget</span>,
-                },
-                {
-                  title: <span className="text-blue-600 font-medium">Transactions</span>,
-                },
-              ]}
-              className="text-xs"
-            />
-            <div>
-              <h1 className="m-0 text-xl font-semibold leading-6 text-slate-900">
-                Budget Transactions
-              </h1>
-              <p className="m-0 text-xs text-slate-500">
-                Review requisitions and liquidations recorded for the current budget period.
-              </p>
-            </div>
-          </div>
-
+      <AppPageHeader
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/budget",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span>Budget</span>,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Transactions</span>,
+              },
+            ]}
+            className="text-xs"
+          />
+        }
+        title="Budget Transactions"
+        subtitle="Review requisitions and liquidations recorded for the current budget period."
+        actions={
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center xl:w-auto xl:justify-end">
             <Input.Search
               allowClear
@@ -444,8 +436,8 @@ export default function BudgetTransactions() {
               />
             </div>
           </div>
-        </div>
-      </Card>
+        }
+      />
 
       {error && (
         <Alert
@@ -457,56 +449,28 @@ export default function BudgetTransactions() {
       )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="border border-blue-100 bg-blue-50 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="m-0 text-sm font-medium text-blue-700">Total Records</p>
-              <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
-                {tableData.length.toLocaleString()}
-              </p>
-              <p className="m-0 mt-2 text-xs text-slate-500">Filtered transaction count</p>
-            </div>
-            <InboxOutlined className="rounded-lg bg-white p-3 text-xl text-blue-600 shadow-sm" />
-          </div>
-        </Card>
-
-        <Card className="border border-emerald-100 bg-emerald-50 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="m-0 text-sm font-medium text-emerald-700">Completed</p>
-              <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
-                {completedCount.toLocaleString()}
-              </p>
-              <p className="m-0 mt-2 text-xs text-slate-500">Approved and closed items</p>
-            </div>
-            <CheckCircleOutlined className="rounded-lg bg-white p-3 text-xl text-emerald-600 shadow-sm" />
-          </div>
-        </Card>
-
-        <Card className="border border-violet-100 bg-violet-50 shadow-sm">
-          <div>
-            <p className="m-0 text-sm font-medium text-violet-700">Workflow Mix</p>
-            <div className="mt-3 flex items-end gap-4">
-              <p className="m-0 text-3xl font-semibold text-slate-900">
-                {requisitionCount.toLocaleString()}
-              </p>
-              <p className="m-0 pb-1 text-sm text-slate-500">requisitions</p>
-            </div>
-            <p className="m-0 mt-2 text-xs text-slate-500">
-              {liquidationCount.toLocaleString()} liquidations in view
-            </p>
-          </div>
-        </Card>
-
-        <Card className="border border-amber-100 bg-amber-50 shadow-sm">
-          <div>
-            <p className="m-0 text-sm font-medium text-amber-700">Amount Tracked</p>
-            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
-              {formatCurrency(totalAmount)}
-            </p>
-            <p className="m-0 mt-2 text-xs text-slate-500">Visible total for {currentYear}</p>
-          </div>
-        </Card>
+        <SummaryMetricCard
+          title="Total Records"
+          value={tableData.length.toLocaleString()}
+          icon={<InboxOutlined className="text-blue-600" />}
+          description="Filtered transaction count"
+        />
+        <SummaryMetricCard
+          title="Completed"
+          value={completedCount.toLocaleString()}
+          icon={<CheckCircleOutlined className="text-emerald-600" />}
+          description="Approved and closed items"
+        />
+        <SummaryMetricCard
+          title="Workflow Mix"
+          value={requisitionCount.toLocaleString()}
+          description={`${liquidationCount.toLocaleString()} liquidations in view`}
+        />
+        <SummaryMetricCard
+          title="Amount Tracked"
+          value={formatCurrency(totalAmount)}
+          description={`Visible total for ${currentYear}`}
+        />
       </div>
 
       <Card

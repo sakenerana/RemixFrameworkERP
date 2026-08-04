@@ -11,9 +11,11 @@ import {
 } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { AiOutlineDollar, AiOutlineFileText, AiOutlineInfoCircle, AiOutlineShoppingCart, AiOutlineStock, AiOutlineWallet } from "react-icons/ai";
+import { AiOutlineDollar, AiOutlineFileText, AiOutlineShoppingCart, AiOutlineWallet } from "react-icons/ai";
 import AreaChart from "~/components/area_chart";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 
@@ -316,28 +318,20 @@ export default function BudgetRoutes() {
   return (
     <ProtectedRoute>
       <div className="budget-dashboard-page space-y-5">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-600">
-                <AiOutlineStock />
-                Budget Dashboard
-              </div>
-              <h1 className="mt-2 text-2xl font-semibold text-slate-950">Financial Overview</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Track annual allocations, completed requisitions, liquidation, and monthly spending for {currentYear}.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
+        <AppPageHeader
+          eyebrow="Budget Dashboard"
+          title="Financial Overview"
+          subtitle={`Track annual allocations, completed requisitions, liquidation, and monthly spending for ${currentYear}.`}
+          actions={
+            <>
               <Tag color={budgetHealthColor} className="m-0 px-3 py-1">{budgetHealth}</Tag>
               <Button type="default" onClick={toggleLanguage}>
                 <GlobalOutlined />
                 {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
               </Button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        />
 
         {error && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -346,49 +340,34 @@ export default function BudgetRoutes() {
         )}
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Total Budget</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(overallBudget)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Annual allocation for {currentYear}</p>
-              </div>
-              <div className="rounded-lg bg-blue-50 p-2 text-blue-600"><AiOutlineDollar /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Total Requisition</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(Number(dataTotalRequisition) || 0)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Approved requests this year</p>
-              </div>
-              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600"><AiOutlineShoppingCart /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Total Liquidation</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(Number(dataTotalLiquidation) || 0)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Settled expenses this year</p>
-              </div>
-              <div className="rounded-lg bg-amber-50 p-2 text-amber-600"><AiOutlineFileText /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Amount Spent</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(amountSpent)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Requisition and liquidation total</p>
-              </div>
-              <div className="rounded-lg bg-rose-50 p-2 text-rose-600"><AiOutlineWallet /></div>
-            </div>
-          </Card>
+          <SummaryMetricCard
+            title="Total Budget"
+            value={formatCurrency(overallBudget)}
+            icon={<AiOutlineDollar className="text-blue-600" />}
+            description={`Annual allocation for ${currentYear}`}
+            loading={loading}
+          />
+          <SummaryMetricCard
+            title="Total Requisition"
+            value={formatCurrency(Number(dataTotalRequisition) || 0)}
+            icon={<AiOutlineShoppingCart className="text-emerald-600" />}
+            description="Approved requests this year"
+            loading={loading}
+          />
+          <SummaryMetricCard
+            title="Total Liquidation"
+            value={formatCurrency(Number(dataTotalLiquidation) || 0)}
+            icon={<AiOutlineFileText className="text-amber-600" />}
+            description="Settled expenses this year"
+            loading={loading}
+          />
+          <SummaryMetricCard
+            title="Amount Spent"
+            value={formatCurrency(amountSpent)}
+            icon={<AiOutlineWallet className="text-rose-600" />}
+            description="Requisition and liquidation total"
+            loading={loading}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.6fr)]">

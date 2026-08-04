@@ -26,7 +26,6 @@ import {
   Table,
   TableColumnsType,
   Tag,
-  Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -40,10 +39,9 @@ import {
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { GroupService } from "~/services/groups.service";
 import { Groups } from "~/types/groups.type";
-
-const { Text, Title } = Typography;
 
 export default function GroupsRoutes() {
   const [data, setData] = useState<Groups[]>([]);
@@ -309,33 +307,29 @@ export default function GroupsRoutes() {
   return (
     <Card className="admin-groups-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
       {/* Header Section */}
-      <div className="mb-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="min-w-0">
-            <Breadcrumb
-              items={[
-                {
-                  href: "/admin/dashboard",
-                  title: <HomeOutlined className="text-gray-400" />,
-                },
-                {
-                  title: <span className="text-gray-500">Settings</span>,
-                },
-                {
-                  title: <span className="text-blue-600 font-medium">Groups</span>,
-                },
-              ]}
-              className="text-sm"
-            />
-            <Title level={3} className="!mb-1 !mt-2">
-              Groups
-            </Title>
-            <Text className="text-sm text-gray-500">
-              Manage permission groups used to organize users by system access level.
-            </Text>
-          </div>
-
-          <Space wrap className="mt-2 sm:mt-0">
+      <AppPageHeader
+        className="mb-3"
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/admin/dashboard",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-gray-500">Settings</span>,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Groups</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        }
+        title="Groups"
+        subtitle="Manage permission groups used to organize users by system access level."
+        actions={
+          <>
             <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
               Total {data.length}
             </Tag>
@@ -353,9 +347,9 @@ export default function GroupsRoutes() {
             >
               New Group
             </Button>
-          </Space>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Group Creation/Edit Modal */}
       <Modal

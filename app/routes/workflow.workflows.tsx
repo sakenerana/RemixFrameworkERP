@@ -24,7 +24,6 @@ import {
   Row,
   Space,
   Spin,
-  Statistic,
   Table,
   TableColumnsType,
   Tag,
@@ -34,6 +33,8 @@ import axios from "axios";
 import { Key, useEffect, useMemo, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CrownFilled } from '@ant-design/icons';
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 interface DataType {
   id: number;
@@ -292,79 +293,63 @@ export default function Workflows() {
 
   return (
     <Card className="workflow-workflows-page w-full rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
-      {/* Header Section */}
-      <div className="mb-5 rounded-md border border-gray-200 bg-white px-5 py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <Breadcrumb
-              items={[
-                {
-                  href: "/workflow",
-                  title: <HomeOutlined className="text-gray-400" />,
-                },
-                {
-                  title: (
-                    <span className="text-blue-600 font-medium">
-                      Workflow Management
-                    </span>
-                  ),
-                },
-              ]}
-              className="text-sm"
-            />
-            <Title level={3} className="!mb-1 !mt-3">
-              Workflow Assignments
-            </Title>
-            <Text className="text-sm text-gray-500">
-              Review users with assigned workflows and open their workflow breakdowns.
-            </Text>
-          </div>
-
-          <Space wrap>
+      <AppPageHeader
+        className="mb-5"
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/workflow",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: (
+                  <span className="text-blue-600 font-medium">
+                    Workflow Management
+                  </span>
+                ),
+              },
+            ]}
+            className="text-sm"
+          />
+        }
+        title="Workflow Assignments"
+        subtitle="Review users with assigned workflows and open their workflow breakdowns."
+        meta={
+          <>
             <Tag className="rounded-full px-3 py-1">Users {data.length}</Tag>
             <Tag color="processing" className="rounded-full px-3 py-1">Assigned {usersWithWorkflows}</Tag>
             <Tag color={selectedRows.length > 0 ? "blue" : "default"} className="rounded-full px-3 py-1">
               Selected {selectedRows.length}
             </Tag>
-          </Space>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <Row gutter={[16, 16]} className="mb-5">
         <Col xs={24} sm={12} lg={8}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Total Activities"
-              value={totalActivities}
-              prefix={<BarChartOutlined className="text-blue-600" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">Combined assigned workflow activity</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Total Activities"
+            value={totalActivities}
+            icon={<BarChartOutlined className="text-blue-600" />}
+            description="Combined assigned workflow activity"
+          />
         </Col>
         <Col xs={24} sm={12} lg={8}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Users With Workflows"
-              value={usersWithWorkflows}
-              prefix={<TeamOutlined className="text-emerald-600" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">Users with at least one activity</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Users With Workflows"
+            value={usersWithWorkflows}
+            icon={<TeamOutlined className="text-emerald-600" />}
+            description="Users with at least one activity"
+          />
         </Col>
         <Col xs={24} lg={8}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Top User Activities"
-              value={topUser?.activities_count ?? 0}
-              prefix={<CrownFilled className="text-amber-500" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">
-              {topUser?.username ? `${topUser.username} currently leads` : 'No activity yet'}
-            </Text>
-          </Card>
+          <SummaryMetricCard
+            title="Top User Activities"
+            value={topUser?.activities_count ?? 0}
+            icon={<CrownFilled className="text-amber-500" />}
+            description={topUser?.username ? `${topUser.username} currently leads` : 'No activity yet'}
+          />
         </Col>
       </Row>
 

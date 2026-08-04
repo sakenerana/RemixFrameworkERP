@@ -23,16 +23,14 @@ import {
   Table,
   TableColumnsType,
   Tag,
-  Typography,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { BudgetCodePayload, BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
 import { UserService } from "~/services/user.service";
 import { canManageBudgetParticulars } from "~/utils/budgetAccess";
-
-const { Text, Title } = Typography;
 
 interface BudgetCode {
   id: number;
@@ -332,32 +330,27 @@ export default function BudgetCodePage() {
 
   return (
     <div className="budget-code-page space-y-3">
-      <Card className="border border-slate-200 shadow-sm" bodyStyle={{ padding: 14 }}>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <Breadcrumb
-              className="text-sm"
-              items={[
-                {
-                  href: "/budget",
-                  title: <HomeOutlined className="text-gray-400" />,
-                },
-                {
-                  title: <span className="text-gray-500">Budget</span>,
-                },
-                {
-                  title: <span className="font-medium text-blue-600">Budget Code</span>,
-                },
-              ]}
-            />
-            <Title level={3} className="!mb-1 !mt-2">
-              Budget Code Particulars
-            </Title>
-            <Text className="text-sm text-slate-500">
-              Maintain the master list of particulars used for department budget mapping.
-            </Text>
-          </div>
-
+      <AppPageHeader
+        breadcrumb={
+          <Breadcrumb
+            className="text-sm"
+            items={[
+              {
+                href: "/budget",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-gray-500">Budget</span>,
+              },
+              {
+                title: <span className="font-medium text-blue-600">Budget Code</span>,
+              },
+            ]}
+          />
+        }
+        title="Budget Code Particulars"
+        subtitle="Maintain the master list of particulars used for department budget mapping."
+        actions={
           <Space wrap>
             <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
               Total {data.length}
@@ -381,8 +374,8 @@ export default function BudgetCodePage() {
               Add Particular
             </Button>
           </Space>
-        </div>
-      </Card>
+        }
+      />
 
       <Card className="border border-slate-200 shadow-sm" bodyStyle={{ padding: 14 }}>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

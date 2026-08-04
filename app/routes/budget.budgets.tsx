@@ -26,6 +26,8 @@ import { Link } from "@remix-run/react";
 import { useEffect, useMemo, useState } from "react";
 import { AiOutlineBuild, AiOutlineCalendar, AiOutlineCheck, AiOutlineClear, AiOutlineDollarCircle, AiOutlineEye, AiOutlineInfoCircle, AiOutlinePlus, AiOutlineRise, AiOutlineSearch } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
 import dayjs from 'dayjs';
@@ -1068,86 +1070,50 @@ export default function Budgets() {
 
       </div>
       <section className="mt-5 space-y-5">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-600">
-                <AiOutlineDollarCircle />
-                Budget Control Center
-              </div>
-              <h1 className="mt-2 text-2xl font-semibold text-slate-950">Budget Management</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Monitor allocations, spending, liquidation, and department budget usage for {currentYear}.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[620px]">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="text-xs text-slate-500">Departments</div>
-                <div className="mt-1 text-xl font-semibold text-slate-900">{dataDepartment.length}</div>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="text-xs text-slate-500">Budget Health</div>
-                <div className="mt-1"><Tag color={budgetHealthColor}>{budgetHealth}</Tag></div>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="text-xs text-slate-500">Period</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">Jan - Dec {currentYear}</div>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="text-xs text-slate-500">Utilization</div>
-                <div className="mt-1 text-xl font-semibold text-slate-900">{utilizationRate}%</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AppPageHeader
+          eyebrow="Budget Control Center"
+          title="Budget Management"
+          subtitle={`Monitor allocations, spending, liquidation, and department budget usage for ${currentYear}.`}
+          meta={
+            <>
+              <Tag className="rounded-full px-3 py-1">Departments {dataDepartment.length}</Tag>
+              <Tag color={budgetHealthColor} className="rounded-full px-3 py-1">{budgetHealth}</Tag>
+              <Tag className="rounded-full px-3 py-1">Jan - Dec {currentYear}</Tag>
+              <Tag color="processing" className="rounded-full px-3 py-1">{utilizationRate}% utilization</Tag>
+            </>
+          }
+        />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loading}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Total Budget</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(overallBudget || 0)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Approved allocation for the year</p>
-              </div>
-              <div className="rounded-lg bg-blue-50 p-2 text-blue-600"><AiOutlineDollarCircle /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Amount Spent</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(dataCombinedTotal || 0)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Requisition and liquidation combined</p>
-              </div>
-              <div className="rounded-lg bg-rose-50 p-2 text-rose-600"><AiOutlineRise /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Liquidation</p>
-                <div className="mt-3 text-2xl font-semibold text-slate-950">{formatCurrency(dataTotalLiquidation || 0)}</div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Completed liquidation amount</p>
-              </div>
-              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600"><AiOutlineCheck /></div>
-            </div>
-          </Card>
-
-          <Card className="rounded-xl border border-slate-200 shadow-sm" bodyStyle={{ padding: 20 }} loading={loadingBudget}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="m-0 text-sm font-medium text-slate-500">Remaining Balance</p>
-                <div className={`mt-3 text-2xl font-semibold ${remainingBalance < 0 ? "text-rose-600" : "text-emerald-700"}`}>
-                  {formatCurrency(remainingBalance || 0)}
-                </div>
-                <p className="m-0 mt-2 text-xs text-slate-500">Available budget after spending</p>
-              </div>
-              <div className="rounded-lg bg-slate-100 p-2 text-slate-600"><AiOutlineInfoCircle /></div>
-            </div>
-          </Card>
+          <SummaryMetricCard
+            title="Total Budget"
+            value={formatCurrency(overallBudget || 0)}
+            icon={<AiOutlineDollarCircle className="text-blue-600" />}
+            description="Approved allocation for the year"
+            loading={loading}
+          />
+          <SummaryMetricCard
+            title="Amount Spent"
+            value={formatCurrency(dataCombinedTotal || 0)}
+            icon={<AiOutlineRise className="text-rose-600" />}
+            description="Requisition and liquidation combined"
+            loading={loadingBudget}
+          />
+          <SummaryMetricCard
+            title="Liquidation"
+            value={formatCurrency(dataTotalLiquidation || 0)}
+            icon={<AiOutlineCheck className="text-emerald-600" />}
+            description="Completed liquidation amount"
+            loading={loadingBudget}
+          />
+          <SummaryMetricCard
+            title="Remaining Balance"
+            value={formatCurrency(remainingBalance || 0)}
+            icon={<AiOutlineInfoCircle className="text-slate-600" />}
+            description="Available budget after spending"
+            valueColor={remainingBalance < 0 ? "#dc2626" : "#047857"}
+            loading={loadingBudget}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">

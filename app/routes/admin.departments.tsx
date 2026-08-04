@@ -26,7 +26,6 @@ import {
   Table,
   TableColumnsType,
   Tag,
-  Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -41,11 +40,10 @@ import {
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
-
-const { Text, Title } = Typography;
 
 export default function DepartmentsRoutes() {
   const [data, setData] = useState<Department[]>([]);
@@ -88,10 +86,6 @@ export default function DepartmentsRoutes() {
     setEditingId(record.id);
     setIsModalOpen(true);
     setIsTitle('Update Department')
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -334,33 +328,29 @@ export default function DepartmentsRoutes() {
   return (
     <Card className="admin-departments-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
       {/* Header Section */}
-      <div className="mb-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="min-w-0">
-            <Breadcrumb
-              items={[
-                {
-                  href: "/admin/dashboard",
-                  title: <HomeOutlined className="text-gray-400" />,
-                },
-                {
-                  title: <span className="text-gray-500">Settings</span>,
-                },
-                {
-                  title: <span className="text-blue-600 font-medium">Departments</span>,
-                },
-              ]}
-              className="text-sm"
-            />
-            <Title level={3} className="!mb-1 !mt-2">
-              Departments
-            </Title>
-            <Text className="text-sm text-gray-500">
-              Maintain department records and connect each department to budget particulars.
-            </Text>
-          </div>
-
-          <Space wrap className="mt-2 sm:mt-0">
+      <AppPageHeader
+        className="mb-3"
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/admin/dashboard",
+                title: <HomeOutlined className="text-gray-400" />,
+              },
+              {
+                title: <span className="text-gray-500">Settings</span>,
+              },
+              {
+                title: <span className="text-blue-600 font-medium">Departments</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        }
+        title="Departments"
+        subtitle="Maintain department records and connect each department to budget particulars."
+        actions={
+          <>
             <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
               Total {data.length}
             </Tag>
@@ -378,9 +368,9 @@ export default function DepartmentsRoutes() {
             >
               New Department
             </Button>
-          </Space>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Department Creation/Edit Modal */}
       <Modal

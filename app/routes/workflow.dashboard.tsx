@@ -6,10 +6,12 @@ import {
   ReloadOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
-import { Alert, Button, Card, Col, Progress, Row, Spin, Statistic, Tag, Typography } from "antd";
+import { Alert, Button, Card, Col, Progress, Row, Spin, Tag, Typography } from "antd";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { CrownFilled } from '@ant-design/icons';
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 interface Activity {
   id: number;
@@ -165,21 +167,13 @@ export default function WorkflowDashboard() {
 
   return (
     <div className="workflow-dashboard-page">
-      <Card className="mb-5 rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 20 } }}>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <Tag color="blue" className="mb-3 rounded-full px-3 py-1">
-              Workflow Operations
-            </Tag>
-            <Title level={2} className="!mb-1 !text-slate-900">
-              {t.dashboardTitle}
-            </Title>
-            <Text className="text-sm text-gray-500">
-              Track demand across active workflow services and identify high-volume requests.
-            </Text>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
+      <AppPageHeader
+        className="mb-5"
+        eyebrow="Workflow Operations"
+        title={t.dashboardTitle}
+        subtitle="Track demand across active workflow services and identify high-volume requests."
+        actions={
+          <>
             <Button
               onClick={handleRefresh}
               icon={<ReloadOutlined />}
@@ -195,9 +189,9 @@ export default function WorkflowDashboard() {
             >
               {language === 'en' ? t.switchToFilipino : t.switchToEnglish}
             </Button>
-          </div>
-        </div>
-      </Card>
+          </>
+        }
+      />
 
       {error && (
         <Alert message={`Error: ${error}`} type="error" className="mb-4 rounded-md" />
@@ -212,47 +206,35 @@ export default function WorkflowDashboard() {
 
       <Row gutter={[16, 16]} className="mb-5">
         <Col xs={24} sm={12} lg={6}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Total Uses"
-              value={totalUses}
-              prefix={<BarChartOutlined className="text-blue-600" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">All workflow requests recorded</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Total Uses"
+            value={totalUses}
+            icon={<BarChartOutlined className="text-blue-600" />}
+            description="All workflow requests recorded"
+          />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Workflow Types"
-              value={data.data.length}
-              prefix={<AppstoreOutlined className="text-emerald-600" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">{activeWorkflowCount} with activity</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Workflow Types"
+            value={data.data.length}
+            icon={<AppstoreOutlined className="text-emerald-600" />}
+            description={`${activeWorkflowCount} with activity`}
+          />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Average Uses"
-              value={averageUses}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">Average per workflow type</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Average Uses"
+            value={averageUses}
+            description="Average per workflow type"
+          />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-            <Statistic
-              title="Top Workflow Uses"
-              value={leaderCount}
-              prefix={<TrophyOutlined className="text-amber-600" />}
-              valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-            />
-            <Text className="text-xs text-gray-500">Current leading request type</Text>
-          </Card>
+          <SummaryMetricCard
+            title="Top Workflow Uses"
+            value={leaderCount}
+            icon={<TrophyOutlined className="text-amber-600" />}
+            description="Current leading request type"
+          />
         </Col>
       </Row>
 
@@ -284,7 +266,7 @@ export default function WorkflowDashboard() {
                 return (
                   <Col key={workflow.id} xs={24} md={8}>
                     <Card
-                      className="h-full rounded-md border shadow-sm transition-shadow hover:shadow-md"
+                      className={`workflow-rank-card workflow-rank-card-${index + 1} h-full rounded-md border shadow-sm transition-shadow hover:shadow-md`}
                       styles={{
                         body: {
                           padding: 20,
@@ -339,7 +321,7 @@ export default function WorkflowDashboard() {
                 return (
                   <Col key={item.id} xs={24} sm={12} lg={8} xl={6}>
                     <Card
-                      className="h-full rounded-md border border-gray-200 transition-shadow hover:shadow-md"
+                      className="workflow-volume-card h-full rounded-md border border-gray-200 transition-shadow hover:shadow-md"
                       styles={{ body: { padding: 14 } }}
                     >
                       <div className="mb-3 flex items-start justify-between gap-3">

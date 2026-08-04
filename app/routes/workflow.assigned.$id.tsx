@@ -28,6 +28,8 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 const { Option } = Select;
 const { Text, Title } = Typography;
@@ -301,37 +303,33 @@ export default function Assigned() {
 
     return (
         <div className="workflow-assigned-page w-full">
-            {/* Header Section */}
-            <Card className="mb-5 rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 20 } }}>
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="min-w-0">
-                        <Breadcrumb
-                            items={[
-                                {
-                                    href: "/workflow",
-                                    title: <HomeOutlined className="text-gray-400" />,
-                                },
-                                {
-                                    title: <span className="text-gray-500">Workflow</span>,
-                                },
-                                {
-                                    title: <span className="text-blue-600 font-medium">Assigned</span>,
-                                },
-                            ]}
-                            className="text-sm"
-                        />
-                        <Title level={3} className="!mb-1 !mt-3">
-                            Assigned Workflows
-                        </Title>
-                        <Text className="text-sm text-gray-500">
-                            Review the selected user's workflow activity and task distribution.
-                        </Text>
-                    </div>
+            <AppPageHeader
+                className="mb-5"
+                breadcrumb={
+                    <Breadcrumb
+                        items={[
+                            {
+                                href: "/workflow",
+                                title: <HomeOutlined className="text-gray-400" />,
+                            },
+                            {
+                                title: <span className="text-gray-500">Workflow</span>,
+                            },
+                            {
+                                title: <span className="text-blue-600 font-medium">Assigned</span>,
+                            },
+                        ]}
+                        className="text-sm"
+                    />
+                }
+                title="Assigned Workflows"
+                subtitle="Review the selected user's workflow activity and task distribution."
+                actions={
                     <Button type="primary" icon={<FileExcelOutlined />} onClick={exportToExcel}>
                         Export to Excel
                     </Button>
-                </div>
-            </Card>
+                }
+            />
 
             {error && (
                 <Alert message={`Error: ${error}`} type="error" className="mb-4 rounded-md" />
@@ -364,38 +362,27 @@ export default function Assigned() {
                         <div className="space-y-5">
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} md={8}>
-                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-                                        <Statistic
-                                            title="Total Activities"
-                                            value={totalActivities}
-                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-                                            prefix={<FileSearchOutlined className="text-blue-600" />}
-                                        />
-                                        <Text className="text-xs text-gray-500">Assigned activity volume</Text>
-                                    </Card>
+                                    <SummaryMetricCard
+                                        title="Total Activities"
+                                        value={totalActivities}
+                                        icon={<FileSearchOutlined className="text-blue-600" />}
+                                        description="Assigned activity volume"
+                                    />
                                 </Col>
                                 <Col xs={24} md={8}>
-                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-                                        <Statistic
-                                            title="Workflow Types"
-                                            value={totalWorkflows}
-                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-                                            prefix={<BarChartOutlined className="text-emerald-600" />}
-                                        />
-                                        <Text className="text-xs text-gray-500">Unique workflow categories</Text>
-                                    </Card>
+                                    <SummaryMetricCard
+                                        title="Workflow Types"
+                                        value={totalWorkflows}
+                                        icon={<BarChartOutlined className="text-emerald-600" />}
+                                        description="Unique workflow categories"
+                                    />
                                 </Col>
                                 <Col xs={24} md={8}>
-                                    <Card className="h-full rounded-md border border-gray-200 shadow-sm">
-                                        <Statistic
-                                            title="Top Workflow Tasks"
-                                            value={topWorkflowCount}
-                                            valueStyle={{ color: '#0f172a', fontWeight: 700 }}
-                                        />
-                                        <Text className="text-xs text-gray-500">
-                                            {workflowEntries[0]?.workflow || 'No workflow activity'}
-                                        </Text>
-                                    </Card>
+                                    <SummaryMetricCard
+                                        title="Top Workflow Tasks"
+                                        value={topWorkflowCount}
+                                        description={workflowEntries[0]?.workflow || 'No workflow activity'}
+                                    />
                                 </Col>
                             </Row>
 

@@ -1,8 +1,5 @@
 import {
   ApartmentOutlined,
-  ArrowDownOutlined,
-  ArrowRightOutlined,
-  ArrowUpOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   GlobalOutlined,
@@ -14,7 +11,6 @@ import {
   Button,
   Card,
   Row,
-  Space,
   Spin,
   Table,
   TableColumnsType,
@@ -27,6 +23,8 @@ import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import AreaChart from "~/components/area_chart";
 import BarChart from "~/components/bar_chart";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
 import { UserService } from "~/services/user.service";
@@ -132,9 +130,7 @@ interface DashboardMetricCard {
   title: string;
   value: number;
   icon: React.ReactNode;
-  accentColor: string;
-  iconClassName: string;
-  trend: number;
+  valueColor: string;
   loading: boolean;
   description: string;
 }
@@ -203,40 +199,32 @@ export default function AdminDashboard() {
       {
         title: t.activeUsers,
         value: metrics.users,
-        icon: <UserOutlined className="text-white" />,
-        accentColor: "#16a34a",
-        iconClassName: "bg-emerald-500",
-        trend: 12,
+        icon: <UserOutlined className="text-emerald-600" />,
+        valueColor: "#047857",
         loading,
         description: t.currentlyActive,
       },
       {
         title: t.departments,
         value: metrics.departments,
-        icon: <ApartmentOutlined className="text-white" />,
-        accentColor: "#2563eb",
-        iconClassName: "bg-blue-500",
-        trend: 0,
+        icon: <ApartmentOutlined className="text-blue-600" />,
+        valueColor: "#1d4ed8",
         loading,
         description: t.organizationalUnits,
       },
       {
         title: t.groups,
         value: metrics.groups,
-        icon: <TeamOutlined className="text-white" />,
-        accentColor: "#7c3aed",
-        iconClassName: "bg-violet-500",
-        trend: 5,
+        icon: <TeamOutlined className="text-violet-600" />,
+        valueColor: "#6d28d9",
         loading,
         description: t.permissionGroups,
       },
       {
         title: t.inactiveUsers,
         value: metrics.inactiveUsers,
-        icon: <CloseCircleOutlined className="text-white" />,
-        accentColor: "#dc2626",
-        iconClassName: "bg-red-500",
-        trend: -8,
+        icon: <CloseCircleOutlined className="text-red-600" />,
+        valueColor: "#dc2626",
         loading,
         description: t.requiringReview,
       },
@@ -247,30 +235,6 @@ export default function AdminDashboard() {
   const totalAccounts = metrics.users + metrics.inactiveUsers;
   const activeRate = totalAccounts > 0 ? Math.round((metrics.users / totalAccounts) * 100) : 0;
   const organizationUnits = metrics.departments + metrics.groups;
-
-  const renderTrendIndicator = (trend: number) => {
-    if (trend > 0) {
-      return (
-        <span className="font-medium text-emerald-700">
-          <ArrowUpOutlined /> {trend}%
-        </span>
-      );
-    }
-
-    if (trend < 0) {
-      return (
-        <span className="font-medium text-red-700">
-          <ArrowDownOutlined /> {Math.abs(trend)}%
-        </span>
-      );
-    }
-
-    return (
-      <span className="font-medium text-gray-600">
-        <ArrowRightOutlined /> Stable
-      </span>
-    );
-  };
 
   const columnsUser: TableColumnsType<User> = [
     {
@@ -318,60 +282,35 @@ export default function AdminDashboard() {
   return (
     <ProtectedRoute>
       <div className="admin-dashboard-page space-y-3">
-        <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="max-w-3xl">
-              <Text className="text-xs font-bold uppercase tracking-wide text-blue-600">
-                {t.overview}
-              </Text>
-              <Title level={3} className="!mb-1 !mt-0">
-                {t.dashboardTitle}
-              </Title>
-              <Text className="text-sm text-gray-500">{t.dashboardSubtitle}</Text>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-                <Text className="block text-xs uppercase tracking-wide text-gray-500">{t.currentSnapshot}</Text>
-                <Text className="text-base font-semibold text-gray-900">{totalAccounts.toLocaleString()} {t.users}</Text>
-              </div>
-              <Button type="default" icon={<GlobalOutlined />} onClick={toggleLanguage}>
-                {language === "en" ? t.switchToFilipino : t.switchToEnglish}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <AppPageHeader
+          eyebrow={t.overview}
+          title={t.dashboardTitle}
+          subtitle={t.dashboardSubtitle}
+          meta={
+            <Tag className="m-0 rounded-full border-0 bg-slate-50 px-4 py-1.5 text-sm text-slate-900">
+              {totalAccounts.toLocaleString()} {t.users}
+            </Tag>
+          }
+          actions={
+            <Button type="default" icon={<GlobalOutlined />} onClick={toggleLanguage}>
+              {language === "en" ? t.switchToFilipino : t.switchToEnglish}
+            </Button>
+          }
+        />
 
         <Alert message={t.alertMessage} type="info" showIcon closable />
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {dashboardMetrics.map((metric) => (
-            <Card
+            <SummaryMetricCard
               key={metric.title}
+              title={metric.title}
+              value={metric.value.toLocaleString()}
+              icon={metric.icon}
+              description={metric.description}
               loading={metric.loading}
-              className="overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-shadow hover:shadow-md"
-              styles={{ body: { padding: 0 } }}
-            >
-              <div className="h-1" style={{ backgroundColor: metric.accentColor }} />
-              <div className="flex items-center justify-between gap-3 p-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-md ${metric.iconClassName}`}>
-                    {metric.icon}
-                  </div>
-                  <div className="min-w-0">
-                    <Text className="block truncate text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {metric.title}
-                    </Text>
-                    <div className="text-2xl font-bold leading-tight text-gray-900">
-                    {metric.value.toLocaleString()}
-                    </div>
-                    <Text className="block truncate text-xs text-gray-500">{metric.description}</Text>
-                  </div>
-                </div>
-                <Tag className="m-0 shrink-0 rounded-full border-gray-200 bg-gray-50 px-2 py-0.5">
-                  {renderTrendIndicator(metric.trend)}
-                </Tag>
-              </div>
-            </Card>
+              valueColor={metric.valueColor}
+            />
           ))}
         </div>
 

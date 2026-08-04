@@ -21,7 +21,9 @@ import {
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import dayjs from 'dayjs';
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
@@ -366,34 +368,24 @@ export default function BudgetHistoryReports() {
 
     return (
         <div className="budget-report-page space-y-5">
-            <Card
-                className="border border-slate-200 shadow-sm"
-                bodyStyle={{ padding: "12px 16px" }}
-            >
-                <div className="grid gap-4 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-center">
-                    <div className="space-y-1">
-                        <Breadcrumb
-                            items={[
-                                {
-                                    href: "/budget",
-                                    title: <HomeOutlined className="text-gray-400" />,
-                                },
-                                {
-                                    title: <span className="text-blue-600 font-medium">Budget History & Reports</span>,
-                                },
-                            ]}
-                            className="text-xs"
-                        />
-                        <div>
-                            <h1 className="m-0 text-xl font-semibold leading-6 text-slate-900">
-                                Budget Tracking History
-                            </h1>
-                            <p className="m-0 text-xs text-slate-500">
-                                Track approved budget activity and review financial records by date range.
-                            </p>
-                        </div>
-                    </div>
-
+            <AppPageHeader
+                breadcrumb={
+                    <Breadcrumb
+                        items={[
+                            {
+                                href: "/budget",
+                                title: <HomeOutlined className="text-gray-400" />,
+                            },
+                            {
+                                title: <span className="text-blue-600 font-medium">Budget History & Reports</span>,
+                            },
+                        ]}
+                        className="text-xs"
+                    />
+                }
+                title="Budget Tracking History"
+                subtitle="Track approved budget activity and review financial records by date range."
+                actions={
                     <div className="flex w-full flex-col gap-2 md:flex-row md:items-center xl:w-auto xl:justify-end">
                         <RangePicker
                             onChange={(value, dateString) => {
@@ -432,61 +424,36 @@ export default function BudgetHistoryReports() {
                             />
                         </div>
                     </div>
-                </div>
-            </Card>
+                }
+            />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <Card className="border border-blue-100 bg-blue-50 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <p className="m-0 text-sm font-medium text-blue-700">Total Allocated</p>
-                            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
-                                {formatCurrency(totalAllocated)}
-                            </p>
-                            <p className="m-0 mt-2 text-xs text-slate-500">Current budget allocation</p>
-                        </div>
-                        <DollarOutlined className="rounded-lg bg-white p-3 text-xl text-blue-600 shadow-sm" />
-                    </div>
-                </Card>
-
-                <Card className="border border-amber-100 bg-amber-50 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <p className="m-0 text-sm font-medium text-amber-700">Pending Approvals</p>
-                            <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
-                                {loadingpendingApproved ? <LoadingOutlined spin /> : pendingApprovals.toLocaleString()}
-                            </p>
-                            <p className="m-0 mt-2 text-xs text-slate-500">Items still in progress</p>
-                        </div>
-                        <PieChartOutlined className="rounded-lg bg-white p-3 text-xl text-amber-600 shadow-sm" />
-                    </div>
-                </Card>
-
-                <Card className="border border-emerald-100 bg-emerald-50 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <p className="m-0 text-sm font-medium text-emerald-700">Approved Budgets</p>
-                            <p className="m-0 mt-3 text-3xl font-semibold text-slate-900">
-                                {loadingpendingApproved ? <LoadingOutlined spin /> : approvedBudgets.toLocaleString()}
-                            </p>
-                            <p className="m-0 mt-2 text-xs text-slate-500">Completed approvals</p>
-                        </div>
-                        <BarChartOutlined className="rounded-lg bg-white p-3 text-xl text-emerald-600 shadow-sm" />
-                    </div>
-                </Card>
-
-                <Card className="border border-violet-100 bg-violet-50 shadow-sm">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <p className="m-0 text-sm font-medium text-violet-700">History Amount</p>
-                            <p className="m-0 mt-3 text-2xl font-semibold text-slate-900">
-                                {formatCurrency(historyTotalAmount)}
-                            </p>
-                            <p className="m-0 mt-2 text-xs text-slate-500">Loaded report total</p>
-                        </div>
-                        <FileSearchOutlined className="rounded-lg bg-white p-3 text-xl text-violet-600 shadow-sm" />
-                    </div>
-                </Card>
+                <SummaryMetricCard
+                    title="Total Allocated"
+                    value={formatCurrency(totalAllocated)}
+                    icon={<DollarOutlined className="text-blue-600" />}
+                    description="Current budget allocation"
+                />
+                <SummaryMetricCard
+                    title="Pending Approvals"
+                    value={pendingApprovals.toLocaleString()}
+                    icon={<PieChartOutlined className="text-amber-600" />}
+                    description="Items still in progress"
+                    loading={loadingpendingApproved}
+                />
+                <SummaryMetricCard
+                    title="Approved Budgets"
+                    value={approvedBudgets.toLocaleString()}
+                    icon={<BarChartOutlined className="text-emerald-600" />}
+                    description="Completed approvals"
+                    loading={loadingpendingApproved}
+                />
+                <SummaryMetricCard
+                    title="History Amount"
+                    value={formatCurrency(historyTotalAmount)}
+                    icon={<FileSearchOutlined className="text-violet-600" />}
+                    description="Loaded report total"
+                />
             </div>
 
             {error && (

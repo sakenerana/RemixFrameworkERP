@@ -21,11 +21,9 @@ import {
   MenuProps,
   Modal,
   Popconfirm,
-  Progress,
   Row,
   Space,
   Spin,
-  Statistic,
   Table,
   TableColumnsType,
   Tag,
@@ -36,6 +34,8 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 const { Text, Title } = Typography;
 
@@ -302,82 +302,64 @@ export default function WorkflowTracker() {
 
   return (
     <div className="workflow-tracker-page space-y-4">
-      <Card className="rounded-lg shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-2">
-            <Breadcrumb
-              items={[
-                {
-                  href: "/workflow",
-                  title: <HomeOutlined className="text-slate-400" />,
-                },
-                {
-                  title: <span className="font-medium text-blue-600">Workflow Tracker</span>,
-                },
-              ]}
-              className="text-sm"
-            />
-            <div>
-              <Title level={4} className="!m-0 !text-slate-900">
-                Workflow Tracker
-              </Title>
-              <Text className="text-slate-500">
-                Monitor requested workflows, due dates, and active routing progress.
-              </Text>
-            </div>
-          </div>
-
-          <Space wrap>
+      <AppPageHeader
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/workflow",
+                title: <HomeOutlined className="text-slate-400" />,
+              },
+              {
+                title: <span className="font-medium text-blue-600">Workflow Tracker</span>,
+              },
+            ]}
+            className="text-sm"
+          />
+        }
+        title="Workflow Tracker"
+        subtitle="Monitor requested workflows, due dates, and active routing progress."
+        meta={
+          <>
             <Tag color="blue">{displayedData.length} shown</Tag>
             <Tag color={trackerStats.overdue > 0 ? "red" : "green"}>{trackerStats.overdue} overdue</Tag>
-          </Space>
-        </div>
-      </Card>
+          </>
+        }
+      />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} xl={6}>
-          <Card className="rounded-lg shadow-sm">
-            <Statistic title="Total Requests" value={trackerStats.total} prefix={<FileSearchOutlined />} />
-            <Progress percent={100} showInfo={false} strokeColor="#2563eb" className="!mt-3" />
-          </Card>
+          <SummaryMetricCard
+            title="Total Requests"
+            value={trackerStats.total}
+            icon={<FileSearchOutlined className="text-blue-600" />}
+            description="Workflow requests in view"
+          />
         </Col>
         <Col xs={24} sm={12} xl={6}>
-          <Card className="rounded-lg shadow-sm">
-            <Statistic title="Workflow Types" value={trackerStats.workflowTypes} prefix={<CheckCircleOutlined />} />
-            <Progress
-              percent={Math.min(trackerStats.workflowTypes * 12, 100)}
-              showInfo={false}
-              strokeColor="#16a34a"
-              className="!mt-3"
-            />
-          </Card>
+          <SummaryMetricCard
+            title="Workflow Types"
+            value={trackerStats.workflowTypes}
+            icon={<CheckCircleOutlined className="text-emerald-600" />}
+            description="Unique workflow categories"
+          />
         </Col>
         <Col xs={24} sm={12} xl={6}>
-          <Card className="rounded-lg shadow-sm">
-            <Statistic title="Due This Week" value={trackerStats.dueSoon} prefix={<ClockCircleOutlined />} />
-            <Progress
-              percent={trackerStats.total ? Math.round((trackerStats.dueSoon / trackerStats.total) * 100) : 0}
-              showInfo={false}
-              strokeColor="#f59e0b"
-              className="!mt-3"
-            />
-          </Card>
+          <SummaryMetricCard
+            title="Due This Week"
+            value={trackerStats.dueSoon}
+            icon={<ClockCircleOutlined className="text-amber-600" />}
+            description="Requests due in the next seven days"
+          />
         </Col>
         <Col xs={24} sm={12} xl={6}>
-          <Card className="rounded-lg shadow-sm">
-            <Statistic
-              title="Overdue"
-              value={trackerStats.overdue}
-              prefix={<CalendarOutlined />}
-              valueStyle={{ color: trackerStats.overdue ? "#dc2626" : "#16a34a" }}
-            />
-            <Progress
-              percent={trackerStats.total ? Math.round((trackerStats.overdue / trackerStats.total) * 100) : 0}
-              showInfo={false}
-              strokeColor={trackerStats.overdue ? "#dc2626" : "#16a34a"}
-              className="!mt-3"
-            />
-          </Card>
+          <SummaryMetricCard
+            title="Overdue"
+            value={trackerStats.overdue}
+            icon={<CalendarOutlined className={trackerStats.overdue ? "text-red-600" : "text-emerald-600"} />}
+            valueColor={trackerStats.overdue ? "#dc2626" : "#16a34a"}
+            description="Requests past due date"
+          />
         </Col>
       </Row>
 
