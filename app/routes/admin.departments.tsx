@@ -8,20 +8,17 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import {
-  Alert,
   Avatar,
   Breadcrumb,
   Button,
   Card,
   Checkbox,
-  Dropdown,
   Form,
   Input,
   MenuProps,
   message,
   Modal,
   Popconfirm,
-  Space,
   Spin,
   Table,
   TableColumnsType,
@@ -38,8 +35,8 @@ import {
   AiOutlineTeam,
   AiOutlineUndo,
 } from "react-icons/ai";
-import { FcRefresh } from "react-icons/fc";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
@@ -473,57 +470,24 @@ export default function DepartmentsRoutes() {
       </Modal>
 
       {/* Toolbar Section */}
-      <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-        <Alert
-          message="Department Structure: Organize your company's departments and reporting structure."
-          type="info"
-          showIcon
-          className="admin-departments-compact-alert mb-3"
-        />
-
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <Input.Search
-            allowClear
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search departments..."
-            className="w-full xl:max-w-lg"
-            size="middle"
+      <DataTableToolbar
+        alertMessage="Department Structure: Organize your company's departments and reporting structure."
+        alertClassName="admin-departments-compact-alert"
+        className="mb-3"
+        searchPlaceholder="Search departments..."
+        onSearchChange={setSearchText}
+        onRefresh={handleRefetch}
+        columnMenuItems={columnMenuItems}
+        columnsMenuClassName="shadow-lg rounded-md min-w-[220px]"
+        exportNode={
+          <PrintDropdownComponent
+            stateData={data}
+            buttonProps={{
+              className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
+            }}
           />
-
-          <Space wrap>
-            <Button
-              onClick={handleRefetch}
-              icon={<FcRefresh className="text-blue-500" />}
-              className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
-            >
-              Refresh
-            </Button>
-
-            <Dropdown
-              menu={{
-                items: columnMenuItems,
-                className: "shadow-lg rounded-md min-w-[220px]"
-              }}
-              placement="bottomRight"
-              trigger={['click']}
-            >
-              <Button
-                icon={<SettingOutlined />}
-                className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
-              >
-                Columns
-              </Button>
-            </Dropdown>
-
-            <PrintDropdownComponent
-              stateData={data}
-              buttonProps={{
-                className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
-              }}
-            />
-          </Space>
-        </div>
-      </div>
+        }
+      />
 
       {/* Table Section */}
       {loading ? (

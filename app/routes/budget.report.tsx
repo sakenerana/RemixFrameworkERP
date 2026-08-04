@@ -1,13 +1,11 @@
-import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, EyeOutlined, DollarOutlined, PieChartOutlined, BarChartOutlined } from "@ant-design/icons";
+import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, EyeOutlined, DollarOutlined, PieChartOutlined, BarChartOutlined } from "@ant-design/icons";
 import {
     Alert,
     Breadcrumb,
     Button,
     Checkbox,
-    Dropdown,
     MenuProps,
     Modal,
-    Space,
     Table,
     TableColumnsType,
     Tag,
@@ -23,6 +21,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import dayjs from 'dayjs';
 import { BudgetService } from "~/services/budget.service";
@@ -386,44 +385,31 @@ export default function BudgetHistoryReports() {
                 title="Budget Tracking History"
                 subtitle="Track approved budget activity and review financial records by date range."
                 actions={
-                    <div className="flex w-full flex-col gap-2 md:flex-row md:items-center xl:w-auto xl:justify-end">
-                        <RangePicker
-                            onChange={(value, dateString) => {
-                                if (!dateString[0] || !dateString[1]) return;
-                                fetchBudgetHistoryData(dateString[0], dateString[1]);
-                            }}
-                            className="w-full md:w-[300px]"
-                            placeholder={['Start Date', 'End Date']}
-                            size="middle"
-                        />
-
-                        <Space.Compact className="w-full md:w-auto">
-                            <Dropdown
-                                menu={{
-                                    items: columnMenuItems,
-                                    className: "shadow-lg rounded-md min-w-[200px] py-2"
+                    <DataTableToolbar
+                        framed={false}
+                        compactActions
+                        leadingControls={
+                            <RangePicker
+                                onChange={(value, dateString) => {
+                                    if (!dateString[0] || !dateString[1]) return;
+                                    fetchBudgetHistoryData(dateString[0], dateString[1]);
                                 }}
-                                placement="bottomRight"
-                                trigger={['click']}
-                            >
-                                <Button
-                                    icon={<SettingOutlined />}
-                                    className="min-w-[112px]"
-                                >
-                                    Columns
-                                </Button>
-                            </Dropdown>
-                        </Space.Compact>
-
-                        <div className="w-full md:w-auto">
+                                className="w-full md:w-[300px]"
+                                placeholder={['Start Date', 'End Date']}
+                                size="middle"
+                            />
+                        }
+                        columnMenuItems={columnMenuItems}
+                        columnsMenuClassName="shadow-lg rounded-md min-w-[200px] py-2"
+                        exportNode={
                             <PrintDropdownComponent
                                 stateData={filteredData}
                                 buttonProps={{
                                     className: "w-full md:w-[112px]",
                                 }}
                             />
-                        </div>
-                    </div>
+                        }
+                    />
                 }
             />
 

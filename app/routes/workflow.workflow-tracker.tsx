@@ -6,8 +6,6 @@ import {
   HomeOutlined,
   LinkOutlined,
   LoadingOutlined,
-  ReloadOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
@@ -16,8 +14,6 @@ import {
   Card,
   Checkbox,
   Col,
-  Dropdown,
-  Input,
   MenuProps,
   Modal,
   Popconfirm,
@@ -35,6 +31,7 @@ import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 const { Text, Title } = Typography;
@@ -364,48 +361,24 @@ export default function WorkflowTracker() {
       </Row>
 
       <Card className="rounded-lg shadow-sm">
-        <div className="mb-4 flex flex-col items-start justify-end gap-4 lg:flex-row lg:items-center">
-          <div className="flex w-full flex-col items-start gap-3 sm:flex-row sm:items-center lg:w-auto">
-            <Input.Search
-              allowClear
-              onChange={(event) => setSearchText(event.target.value)}
-              placeholder="Search workflows..."
-              className="w-full sm:w-72"
-              size="middle"
+        <DataTableToolbar
+          framed={false}
+          className="mb-4"
+          searchPlaceholder="Search workflows..."
+          searchClassName="w-full sm:w-72"
+          onSearchChange={setSearchText}
+          onRefresh={() => fetchData({ forceRefresh: true })}
+          refreshLoading={loading}
+          columnMenuItems={columnMenuItems}
+          exportNode={
+            <PrintDropdownComponent
+              stateData={displayedData}
+              buttonProps={{
+                className: "flex items-center gap-2 hover:border-blue-500",
+              }}
             />
-
-            <Space wrap>
-              <Button
-                onClick={() => fetchData({ forceRefresh: true })}
-                icon={<ReloadOutlined />}
-                loading={loading}
-                className="flex items-center gap-2 hover:border-blue-500"
-              >
-                Refresh
-              </Button>
-
-              <Dropdown
-                menu={{
-                  items: columnMenuItems,
-                  className: "min-w-[200px] rounded-md py-2 shadow-lg",
-                }}
-                placement="bottomRight"
-                trigger={["click"]}
-              >
-                <Button icon={<SettingOutlined />} className="flex items-center gap-2 hover:border-blue-500">
-                  Columns
-                </Button>
-              </Dropdown>
-
-              <PrintDropdownComponent
-                stateData={displayedData}
-                buttonProps={{
-                  className: "flex items-center gap-2 hover:border-blue-500",
-                }}
-              />
-            </Space>
-          </div>
-        </div>
+          }
+        />
 
         {error && (
           <Alert

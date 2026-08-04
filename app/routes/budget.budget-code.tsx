@@ -5,7 +5,6 @@ import {
   HomeOutlined,
   LoadingOutlined,
   PlusOutlined,
-  ReloadOutlined,
 } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
 import {
@@ -27,6 +26,7 @@ import {
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { BudgetCodePayload, BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
 import { UserService } from "~/services/user.service";
@@ -377,19 +377,12 @@ export default function BudgetCodePage() {
         }
       />
 
-      <Card className="border border-slate-200 shadow-sm" bodyStyle={{ padding: 14 }}>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <Input.Search
-            allowClear
-            placeholder="Search particulars..."
-            className="w-full lg:max-w-lg"
-            onChange={(event) => setSearchText(event.target.value)}
-          />
-          <Button icon={<ReloadOutlined />} onClick={fetchData}>
-            Refresh
-          </Button>
-        </div>
-      </Card>
+      <DataTableToolbar
+        searchPlaceholder="Search particulars..."
+        searchClassName="w-full lg:max-w-lg"
+        onSearchChange={setSearchText}
+        onRefresh={fetchData}
+      />
 
       <Card className="border border-slate-200 shadow-sm" bodyStyle={{ padding: 0 }}>
         <Table<BudgetCode>

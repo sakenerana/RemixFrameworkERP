@@ -5,7 +5,6 @@ import {
   InboxOutlined,
   LinkOutlined,
   LoadingOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
@@ -13,20 +12,17 @@ import {
   Button,
   Card,
   Checkbox,
-  Dropdown,
-  Input,
   MenuProps,
   message,
-  Space,
   Table,
   TableColumnsType,
   Tag,
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FcRefresh } from "react-icons/fc";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import dayjs from 'dayjs';
 import { RiCircleFill } from "react-icons/ri";
@@ -392,50 +388,24 @@ export default function BudgetTransactions() {
         title="Budget Transactions"
         subtitle="Review requisitions and liquidations recorded for the current budget period."
         actions={
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center xl:w-auto xl:justify-end">
-            <Input.Search
-              allowClear
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search transactions..."
-              className="w-full sm:w-[320px]"
-              size="middle"
-            />
-
-            <Space.Compact className="w-full sm:w-auto">
-              <Button
-                onClick={handleRefetch}
-                icon={<FcRefresh className="text-blue-500" />}
-                className="min-w-[112px]"
-              >
-                Refresh
-              </Button>
-
-              <Dropdown
-                menu={{
-                  items: columnMenuItems,
-                  className: "shadow-lg rounded-md min-w-[200px]"
-                }}
-                placement="bottomRight"
-                trigger={['click']}
-              >
-                <Button
-                  icon={<SettingOutlined />}
-                  className="min-w-[112px]"
-                >
-                  Columns
-                </Button>
-              </Dropdown>
-            </Space.Compact>
-
-            <div className="w-full sm:w-auto">
+          <DataTableToolbar
+            framed={false}
+            compactActions
+            searchPlaceholder="Search transactions..."
+            searchClassName="w-full sm:w-[320px]"
+            onSearchChange={setSearchText}
+            onRefresh={handleRefetch}
+            columnMenuItems={columnMenuItems}
+            columnsMenuClassName="shadow-lg rounded-md min-w-[200px]"
+            exportNode={
               <PrintDropdownComponent
                 stateData={tableData}
                 buttonProps={{
                   className: "w-full sm:w-[112px]",
                 }}
               />
-            </div>
-          </div>
+            }
+          />
         }
       />
 

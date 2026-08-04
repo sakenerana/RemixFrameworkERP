@@ -8,7 +8,6 @@ import {
     UserOutlined,
 } from "@ant-design/icons";
 import {
-    Alert,
     Avatar,
     Breadcrumb,
     Button,
@@ -16,7 +15,6 @@ import {
     Checkbox,
     CheckboxOptionType,
     Col,
-    Dropdown,
     Form,
     Input,
     MenuProps,
@@ -25,7 +23,6 @@ import {
     Popconfirm,
     Row,
     Select,
-    Space,
     Spin,
     Table,
     TableColumnsType,
@@ -50,9 +47,9 @@ import {
     AiOutlineUndo,
     AiOutlineUser,
 } from "react-icons/ai";
-import { FcRefresh } from "react-icons/fc";
 import { useAuth } from "~/auth/AuthContext";
 import PrintDropdownComponent from "~/components/print_dropdown";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { DepartmentService } from "~/services/department.service";
 import { GroupService } from "~/services/groups.service";
@@ -831,57 +828,24 @@ export default function UsersRoutes() {
             </Modal>
 
             {/* Toolbar Section */}
-            <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-                <Alert
-                    message="User Management: View and manage all user accounts and permissions."
-                    type="info"
-                    showIcon
-                    className="admin-users-compact-alert mb-3"
-                />
-
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                    <Input.Search
-                        allowClear
-                        onChange={(e) => setSearchText(e.target.value)}
-                        placeholder="Search users..."
-                        className="w-full xl:max-w-lg"
-                        size="middle"
+            <DataTableToolbar
+                alertMessage="User Management: View and manage all user accounts and permissions."
+                alertClassName="admin-users-compact-alert"
+                className="mb-3"
+                searchPlaceholder="Search users..."
+                onSearchChange={setSearchText}
+                onRefresh={handleRefetch}
+                columnMenuItems={columnMenuItems}
+                columnsMenuClassName="shadow-lg rounded-md min-w-[220px]"
+                exportNode={
+                    <PrintDropdownComponent
+                        stateData={data}
+                        buttonProps={{
+                            className: "flex items-center gap-2 hover:border-blue-500",
+                        }}
                     />
-
-                    <Space wrap>
-                        <Button
-                            onClick={handleRefetch}
-                            icon={<FcRefresh className="text-blue-500" />}
-                            className="flex items-center gap-2 hover:border-blue-500"
-                        >
-                            Refresh
-                        </Button>
-
-                        <Dropdown
-                            menu={{
-                                items: columnMenuItems,
-                                className: "shadow-lg rounded-md min-w-[220px]"
-                            }}
-                            placement="bottomRight"
-                            trigger={['click']}
-                        >
-                            <Button
-                                icon={<SettingOutlined />}
-                                className="flex items-center gap-2 hover:border-blue-500"
-                            >
-                                Columns
-                            </Button>
-                        </Dropdown>
-
-                        <PrintDropdownComponent
-                            stateData={data}
-                            buttonProps={{
-                                className: "flex items-center gap-2 hover:border-blue-500",
-                            }}
-                        />
-                    </Space>
-                </div>
-            </div>
+                }
+            />
 
             {/* Table Section */}
             {loading ? (

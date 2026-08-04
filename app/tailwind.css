@@ -823,10 +823,21 @@ body.dark-mode .workflow-dashboard-page {
 }
 
 body.dark-mode .app-page-header.ant-card,
-body.dark-mode .summary-metric-card.ant-card {
+body.dark-mode .summary-metric-card.ant-card,
+body.dark-mode .data-table-toolbar {
   background: #1f1f1f !important;
   border-color: #374151 !important;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.dark-mode .data-table-toolbar .ant-alert-info {
+  background: #0f1f38 !important;
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-mode .data-table-toolbar .ant-alert-info .ant-alert-message,
+body.dark-mode .data-table-toolbar .ant-alert-info .ant-alert-icon {
+  color: #e5e7eb !important;
 }
 
 body.dark-mode .app-page-header .text-slate-950,

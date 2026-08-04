@@ -3,26 +3,20 @@ import {
   EyeOutlined,
   HomeOutlined,
   LoadingOutlined,
-  ReloadOutlined,
-  SettingOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
-  Alert,
   Avatar,
   Breadcrumb,
   Button,
   Card,
   Checkbox,
-  Dropdown,
-  Input,
   MenuProps,
   Popconfirm,
   Col,
   Row,
-  Space,
   Spin,
   Table,
   TableColumnsType,
@@ -34,6 +28,7 @@ import { Key, useEffect, useMemo, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { CrownFilled } from '@ant-design/icons';
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 
 interface DataType {
@@ -354,59 +349,29 @@ export default function Workflows() {
       </Row>
 
       {/* Toolbar Section */}
-      <div className="mb-5 rounded-md border border-gray-200 bg-gray-50 p-4">
-        <Alert
-          message="Below is a list of all users with assigned workflows. Please review the information carefully."
-          type="info"
-          showIcon
-          className="mb-4"
-        />
-
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <Input.Search
-            allowClear
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search by user name or details"
-            className="w-full xl:max-w-md"
-            size="large"
+      <DataTableToolbar
+        alertMessage="Below is a list of all users with assigned workflows. Please review the information carefully."
+        className="mb-5"
+        searchPlaceholder="Search by user name or details"
+        searchClassName="w-full xl:max-w-md"
+        searchSize="large"
+        onSearchChange={setSearchText}
+        onRefresh={handleRefetch}
+        refreshLabel="Refresh Data"
+        columnMenuItems={columnMenuItems}
+        columnsLabel="Manage Columns"
+        columnsMenuClassName="shadow-lg rounded-md min-w-[200px]"
+        exportNode={
+          <PrintDropdownComponent
+            stateData={selectedRows}
+            exportVariant="workflow_assigned_like"
+            buttonProps={{
+              className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
+              disabled: selectedRows.length === 0,
+            }}
           />
-
-          <Space wrap>
-            <Button
-              onClick={handleRefetch}
-              icon={<ReloadOutlined />}
-              className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
-            >
-              Refresh Data
-            </Button>
-
-            <Dropdown
-              menu={{
-                items: columnMenuItems,
-                className: "shadow-lg rounded-md min-w-[200px]",
-              }}
-              placement="bottomRight"
-              trigger={["click"]}
-            >
-              <Button
-                icon={<SettingOutlined />}
-                className="flex items-center gap-2 border-gray-300 hover:border-blue-500"
-              >
-                Manage Columns
-              </Button>
-            </Dropdown>
-
-            <PrintDropdownComponent
-              stateData={selectedRows}
-              exportVariant="workflow_assigned_like"
-              buttonProps={{
-                className: "flex items-center gap-2 border-gray-300 hover:border-blue-500",
-                disabled: selectedRows.length === 0,
-              }}
-            />
-          </Space>
-        </div>
-      </div>
+        }
+      />
 
       {/* Table Section */}
       {loading ? (
