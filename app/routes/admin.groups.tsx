@@ -23,6 +23,7 @@ import {
   Table,
   TableColumnsType,
   Tag,
+  Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -350,11 +351,21 @@ export default function GroupsRoutes() {
 
       {/* Group Creation/Edit Modal */}
       <Modal
-        width={500}
+        width={560}
+        className="group-form-modal"
         title={
-          <div className="flex items-center gap-2">
-            <AiOutlineTeam className="text-blue-500 text-xl" />
-            <span className="text-lg font-semibold">{isTitle}</span>
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <AiOutlineTeam className="text-xl" />
+            </div>
+            <div>
+              <Typography.Title level={4} className="!mb-0">
+                {isTitle}
+              </Typography.Title>
+              <Typography.Text className="text-sm text-slate-500">
+                Maintain permission group names used across user access setup.
+              </Typography.Text>
+            </div>
           </div>
         }
         open={isModalOpen}
@@ -368,7 +379,7 @@ export default function GroupsRoutes() {
             padding: '16px 24px'
           },
           body: {
-            padding: '24px'
+            padding: '20px 24px'
           }
         }}
       >
@@ -376,7 +387,7 @@ export default function GroupsRoutes() {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          className="space-y-6"
+          className="space-y-4"
         >
 
           <Form.Item
@@ -410,13 +421,19 @@ export default function GroupsRoutes() {
             />
           </Form.Item>
 
+          <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+            <p className="m-0 text-sm font-semibold text-slate-900">Group naming</p>
+            <p className="m-0 text-sm text-slate-600">
+              Use clear functional names so permissions are easy to audit later.
+            </p>
+          </div>
+
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-100 pt-5">
             <Button
               onClick={onReset}
               type="default"
-              size="large"
-              className="w-full sm:w-auto h-11"
+              className="h-10 w-full sm:w-auto"
               icon={<AiOutlineUndo />}
             >
               Reset Form
@@ -424,8 +441,7 @@ export default function GroupsRoutes() {
             <Button
               type="primary"
               htmlType="submit"
-              size="large"
-              className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+              className="h-10 w-full bg-blue-600 px-5 font-semibold hover:bg-blue-700 sm:w-auto"
               loading={loading}
               icon={!loading && <AiOutlineSave />}
             >

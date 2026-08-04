@@ -19,6 +19,7 @@ import {
   Spin,
   Tag,
   Tooltip,
+  Typography,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -64,7 +65,7 @@ export default function Budgets() {
   const [formEditAllocateBudget] = Form.useForm<Budget>();
   const [formUnbudgeted] = Form.useForm<any>();
   const { RangePicker } = DatePicker;
-  const { Option } = Select;
+  const { Text, Title } = Typography;
 
   // Gradient backgrounds for statistics cards
   const statGradients = {
@@ -101,7 +102,7 @@ export default function Budgets() {
       content: "Are you sure you want to reset all form fields?",
       okText: "Reset",
       cancelText: "Cancel",
-      onOk: () => form.resetFields(),
+      onOk: () => formUnbudgeted.resetFields(),
     });
   };
 
@@ -129,6 +130,15 @@ export default function Budgets() {
       style: "currency",
       currency: "PHP",
     }).format(amount);
+  };
+
+  const formatPesoInput = (value: string | number | undefined) => {
+    if (value === undefined || value === null) return "PHP 0";
+    return `PHP ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const parsePesoInput = (value?: string) => {
+    return value ? value.replace(/[^\d]/g, "") : "";
   };
 
   const fetchData = async () => {
@@ -393,6 +403,14 @@ export default function Budgets() {
   const cappedUtilizationRate = Math.min(100, utilizationRate);
   const budgetHealth = utilizationRate < 50 ? "Healthy" : utilizationRate < 80 ? "Moderate" : "Critical";
   const budgetHealthColor = utilizationRate < 50 ? "success" : utilizationRate < 80 ? "warning" : "error";
+  const departmentOptions = useMemo(
+    () => dataDepartment.map((item: any) => ({ label: item.department, value: item.id })),
+    [dataDepartment]
+  );
+  const selectedCreateDepartmentId = Form.useWatch("department_id", form);
+  const selectedUnbudgetedDepartmentId = Form.useWatch("department_id", formUnbudgeted);
+  const selectedCreateDepartment = dataDepartment.find((item: any) => item.id === selectedCreateDepartmentId);
+  const selectedUnbudgetedDepartment = dataDepartment.find((item: any) => item.id === selectedUnbudgetedDepartmentId);
 
   const departmentCards = dataBudgetDepartment.map((item: any) => {
     const utilization = item.budget > 0 ? Math.min(100, (dataCombinedTotal / item.budget) * 100) : 0;
@@ -638,143 +656,103 @@ export default function Budgets() {
           )}
         </Space>
         <Modal
-          width={460}
-          title={
-            <div className="flex items-center gap-3">
-              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
-              <span className="text-xl font-semibold">Create Budget</span>
-            </div>
-          }
+          width={620}
+          title={null}
           open={isModalOpen}
           onCancel={handleCancel}
           footer={null}
           centered
           destroyOnClose
-          styles={{
-            header: {
-              borderBottom: '1px solid #f0f0f0',
-              padding: '20px 24px'
-            },
-            body: {
-              padding: '24px'
-            }
-          }}
           className="budget-modal"
         >
+          <div className="mb-5 flex items-start gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+              <AiOutlineDollarCircle className="text-xl" />
+            </div>
+            <div>
+              <Title level={4} className="!m-0 !text-slate-900">Create Budget</Title>
+              <Text className="text-slate-500">Allocate an annual budget to a department.</Text>
+            </div>
+          </div>
+
           <Form
             form={form}
             layout="vertical"
             onFinish={onFinish}
             className="budget-form"
           >
-            {/* Date Range Field */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Budget Period <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Budget Period"
               name="date"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please select budget period'
-                }
-              ]}
-              className="mb-6"
+              rules={[{ required: true, message: 'Please select budget period' }]}
             >
               <RangePicker
-                className="w-full h-10 rounded-lg"
-                suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                className="w-full"
+                suffixIcon={<AiOutlineCalendar className="text-slate-400" />}
                 format="MMM D, YYYY"
                 placeholder={['Start date', 'End date']}
               />
             </Form.Item>
 
-            {/* SELECT DEPARTMENT */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Select Department <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Department"
               name="department_id"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please select department'
-                }
-              ]}
-              className="mb-6"
+              rules={[{ required: true, message: 'Please select department' }]}
             >
-              <Select placeholder="Select a department" style={{ width: '100%' }}>
-                {dataDepartment.map((item: any) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.department}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            {/* Initial Balance Field */}
-            <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Initial Budget <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
-              name="budget"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please enter initial amount'
-                },
-                {
-                  type: 'number',
-                  min: 0,
-                  message: 'Amount must be positive'
-                }
-              ]}
-              className="mb-2"
-            >
-              <InputNumber
-                className="w-full h-10 rounded-lg"
-                min={0}
-                step={1000}
-                formatter={(value) => {
-                  if (value === undefined || value === null) return '₱ 0';
-                  // Format with commas and peso sign
-                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }}
-                parser={(value: any) => {
-                  // Remove all non-numeric characters
-                  return value ? value.replace(/[^\d]/g, '') : '';
-                }}
-                placeholder="Enter amount"
+              <Select
+                showSearch
+                allowClear
+                placeholder="Choose department"
+                options={departmentOptions}
+                loading={loading}
+                optionFilterProp="label"
+                notFoundContent={loading ? "Loading departments..." : "No departments found"}
               />
             </Form.Item>
 
-            <div className="text-sm mb-6">
-              <AiOutlineInfoCircle className="inline mr-2" />
-              Enter the starting balance for this budget period
+            <Form.Item
+              label="Initial Budget"
+              name="budget"
+              rules={[
+                { required: true, message: 'Please enter initial amount' },
+                { type: 'number', min: 0, message: 'Amount must be positive' }
+              ]}
+            >
+              <InputNumber
+                className="w-full"
+                min={0}
+                step={1000}
+                formatter={formatPesoInput}
+                parser={parsePesoInput}
+                placeholder="Enter allocation amount"
+              />
+            </Form.Item>
+
+            <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-slate-600">
+              <div className="flex items-start gap-2">
+                <AiOutlineInfoCircle className="mt-0.5 shrink-0 text-blue-600" />
+                <div>
+                  <div className="font-semibold text-slate-900">
+                    {selectedCreateDepartment?.department || "No department selected"}
+                  </div>
+                  <div>Budget records are checked against the selected department and period before saving.</div>
+                </div>
+              </div>
             </div>
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+            <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
               <Button
                 onClick={onReset}
                 type="default"
-                size="large"
-                className="w-full sm:w-auto h-11"
-                icon={<AiOutlineClear className="text-gray-600" />}
+                className="w-full sm:w-auto"
+                icon={<AiOutlineClear />}
               >
                 Clear
               </Button>
               <Button
                 type="primary"
                 htmlType="submit"
-                size="large"
-                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                className="w-full bg-blue-600 sm:w-auto"
                 loading={loading}
                 icon={!loading && <AiOutlineCheck />}
               >
@@ -786,154 +764,115 @@ export default function Budgets() {
 
         {/* UNBUDGETED REQUISITION MODAL */}
         <Modal
-          width={460}
-          title={
-            <div className="flex items-center gap-3">
-              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
-              <span className="text-xl font-semibold">Create Unbudgeted</span>
-            </div>
-          }
+          width={620}
+          title={null}
           open={isUnbudgetedRequisitionModalOpen}
           onCancel={handleCancelUnbudgetedRequisition}
           footer={null}
           centered
           destroyOnClose
-          styles={{
-            header: { borderBottom: '1px solid #f0f0f0', padding: '20px 24px' },
-            body: { padding: '24px' }
-          }}
           className="unbudgeted-requisition-modal"
         >
+          <div className="mb-5 flex items-start gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+              <AiOutlineRise className="text-xl" />
+            </div>
+            <div>
+              <Title level={4} className="!m-0 !text-slate-900">Create Unbudgeted</Title>
+              <Text className="text-slate-500">Record an approved request outside the active budget allocation.</Text>
+            </div>
+          </div>
+
           <Form
             form={formUnbudgeted}
             layout="vertical"
             onFinish={onFinishUnbudgetedRequisition}
             className="unbudgeted-requisition-form"
           >
-            {/* Date Field */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Date <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Request Date"
               name="date"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please select date'
-                }
-              ]}
-              className="mb-6"
+              rules={[{ required: true, message: 'Please select date' }]}
             >
               <DatePicker
-                className="w-full h-10 rounded-lg"
-                suffixIcon={<AiOutlineCalendar className="text-gray-400" />}
+                className="w-full"
+                suffixIcon={<AiOutlineCalendar className="text-slate-400" />}
                 format="MMM D, YYYY"
                 placeholder="Select date"
               />
             </Form.Item>
 
-            {/* SELECT DEPARTMENT */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Select Department <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Department"
               name="department_id"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please select department'
-                }
-              ]}
-              className="mb-6"
+              rules={[{ required: true, message: 'Please select department' }]}
             >
-              <Select placeholder="Select a department" style={{ width: '100%' }}>
-                {dataDepartment.map((item: any) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.department}
-                  </Option>
-                ))}
-              </Select>
+              <Select
+                showSearch
+                allowClear
+                placeholder="Choose department"
+                options={departmentOptions}
+                loading={loading}
+                optionFilterProp="label"
+                notFoundContent={loading ? "Loading departments..." : "No departments found"}
+              />
             </Form.Item>
 
-            {/* Amount Field */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Amount <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Amount"
               name="amount"
               rules={[
-                {
-                  required: true,
-                  message: 'Please enter amount'
-                },
-                {
-                  type: 'number',
-                  min: 0,
-                  message: 'Amount must be positive'
-                }
+                { required: true, message: 'Please enter amount' },
+                { type: 'number', min: 0, message: 'Amount must be positive' }
               ]}
-              className="mb-2"
             >
               <InputNumber
-                className="w-full h-10 rounded-lg"
+                className="w-full"
                 min={0}
                 step={1000}
-                formatter={(value) => {
-                  if (value === undefined || value === null) return '₱ 0';
-                  // Format with commas and peso sign
-                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }}
-                parser={(value: any) => {
-                  // Remove all non-numeric characters
-                  return value ? value.replace(/[^\d]/g, '') : '';
-                }}
-                placeholder="Enter amount"
+                formatter={formatPesoInput}
+                parser={parsePesoInput}
+                placeholder="Enter unbudgeted amount"
               />
             </Form.Item>
 
-            {/* Notes Field */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Notes <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Notes"
               name="notes"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please enter notes'
-                }
-              ]}
-              className="mb-2"
+              rules={[{ required: true, message: 'Please enter notes' }]}
             >
               <Input.TextArea
-                className="w-full h-20 rounded-lg"
-                placeholder="Enter notes"
+                className="w-full"
+                autoSize={{ minRows: 3, maxRows: 5 }}
+                placeholder="Add context for this unbudgeted request"
               />
             </Form.Item>
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+
+            <div className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-slate-600">
+              <div className="flex items-start gap-2">
+                <AiOutlineInfoCircle className="mt-0.5 shrink-0 text-amber-600" />
+                <div>
+                  <div className="font-semibold text-slate-900">
+                    {selectedUnbudgetedDepartment?.department || "No department selected"}
+                  </div>
+                  <div>This request is tracked separately from the department's approved budget allocation.</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
               <Button
                 onClick={onResetUnbudgetedRequisition}
                 type="default"
-                size="large"
-                className="w-full sm:w-auto h-11"
-                icon={<AiOutlineClear className="text-gray-600" />}
+                className="w-full sm:w-auto"
+                icon={<AiOutlineClear />}
               >
                 Clear
               </Button>
               <Button
                 type="primary"
                 htmlType="submit"
-                size="large"
-                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                className="w-full bg-blue-600 sm:w-auto"
                 loading={loading}
                 icon={!loading && <AiOutlineCheck />}
               >
@@ -945,36 +884,36 @@ export default function Budgets() {
 
         {/* EDIT ALLOCATED BUDGET PER DEPARTMENT */}
         <Modal
-          width={460}
-          title={
-            <div className="flex items-center gap-3">
-              <AiOutlineDollarCircle className="text-green-500 text-2xl" />
-              <span className="text-xl font-semibold">Update Budget</span>
-            </div>
-          }
+          width={620}
+          title={null}
           open={isModalOpenEditAllocateBudget}
           onCancel={handleCancel}
           footer={null}
           centered
           destroyOnClose
-          styles={{
-            header: {
-              borderBottom: '1px solid #f0f0f0',
-              padding: '20px 24px'
-            },
-            body: {
-              padding: '24px'
-            }
-          }}
           className="budget-modal"
         >
+          <div className="mb-5 flex items-start gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+              <EditOutlined className="text-lg" />
+            </div>
+            <div>
+              <Title level={4} className="!m-0 !text-slate-900">Update Budget</Title>
+              <Text className="text-slate-500">Adjust the approved allocation for the selected department.</Text>
+            </div>
+          </div>
+
           <Form
             form={formEditAllocateBudget}
             layout="vertical"
             onFinish={onFinishEditAllocateBudget}
             className="budget-form"
           >
-            <Descriptions className="mb-6" title="">
+            <Descriptions
+              className="mb-5 rounded-lg border border-slate-100 bg-slate-50 p-3"
+              column={1}
+              size="small"
+            >
               <Descriptions.Item label="Department" span={3}>
                 {dataBudgetPerDepartment?.departments?.department}
               </Descriptions.Item>
@@ -1000,65 +939,42 @@ export default function Budgets() {
               </Descriptions.Item>
             </Descriptions>
 
-            {/* Initial Balance Field */}
             <Form.Item
-              label={
-                <span className="font-medium flex items-center">
-                  Initial Budget <span className="text-red-500 ml-1">*</span>
-                </span>
-              }
+              label="Updated Budget"
               name="budget"
               rules={[
-                {
-                  required: true,
-                  message: 'Please enter initial amount'
-                },
-                {
-                  type: 'number',
-                  min: 0,
-                  message: 'Amount must be positive'
-                }
+                { required: true, message: 'Please enter initial amount' },
+                { type: 'number', min: 0, message: 'Amount must be positive' }
               ]}
-              className="mb-2"
             >
               <InputNumber
-                className="w-full h-10 rounded-lg"
+                className="w-full"
                 min={0}
                 step={1000}
-                formatter={(value) => {
-                  if (value === undefined || value === null) return '₱ 0';
-                  // Format with commas and peso sign
-                  return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                }}
-                parser={(value: any) => {
-                  // Remove all non-numeric characters
-                  return value ? value.replace(/[^\d]/g, '') : '';
-                }}
-                placeholder="Enter amount"
+                formatter={formatPesoInput}
+                parser={parsePesoInput}
+                placeholder="Enter updated allocation amount"
               />
             </Form.Item>
 
-            <div className="text-sm mb-6">
-              <AiOutlineInfoCircle className="inline mr-2" />
-              Enter the starting balance for this budget period
+            <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-slate-600">
+              <AiOutlineInfoCircle className="mr-2 inline text-emerald-600" />
+              This updates the department allocation while preserving the existing budget period.
             </div>
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+            <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
               <Button
                 onClick={onReset}
                 type="default"
-                size="large"
-                className="w-full sm:w-auto h-11"
-                icon={<AiOutlineClear className="text-gray-600" />}
+                className="w-full sm:w-auto"
+                icon={<AiOutlineClear />}
               >
                 Clear
               </Button>
               <Button
                 type="primary"
                 htmlType="submit"
-                size="large"
-                className="w-full sm:w-auto h-11 bg-green-600 hover:bg-green-700"
+                className="w-full bg-blue-600 sm:w-auto"
                 loading={loading}
                 icon={!loading && <AiOutlineCheck />}
               >

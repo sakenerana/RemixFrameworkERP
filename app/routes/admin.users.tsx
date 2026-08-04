@@ -4,7 +4,6 @@ import {
     EditOutlined,
     HomeOutlined,
     LoadingOutlined,
-    SettingOutlined,
     UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -27,6 +26,7 @@ import {
     Table,
     TableColumnsType,
     Tag,
+    Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -34,7 +34,6 @@ import {
     AiOutlineCloseCircle,
     AiOutlineContacts,
     AiOutlineDelete,
-    AiOutlineDown,
     AiOutlineEdit,
     AiOutlineInfoCircle,
     AiOutlineLock,
@@ -60,6 +59,28 @@ import { Groups } from "~/types/groups.type";
 import { Office } from "~/types/office.type";
 import { User } from "~/types/user.type";
 
+const normalizeIdList = (value: unknown): number[] => {
+    if (Array.isArray(value)) {
+        return value.map(Number).filter((item) => Number.isFinite(item));
+    }
+
+    if (typeof value === "string" && value.trim()) {
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed)
+                ? parsed.map(Number).filter((item) => Number.isFinite(item))
+                : [];
+        } catch {
+            return value
+                .split(",")
+                .map((item) => Number(item.trim()))
+                .filter((item) => Number.isFinite(item));
+        }
+    }
+
+    return [];
+};
+
 export default function UsersRoutes() {
     const [data, setData] = useState<User[]>([]);
     const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
@@ -71,7 +92,6 @@ export default function UsersRoutes() {
     const [isTitle, setIsTitle] = useState('');
     const [form] = Form.useForm<User>();
     const [editingId, setEditingId] = useState<number | null>(null);
-    const { Option } = Select;
     const { adminSignUp } = useAuth();
     const [searchText, setSearchText] = useState('');
 
@@ -102,7 +122,11 @@ export default function UsersRoutes() {
     // Edit record
     const editRecord = (record: User) => {
         setIsEditMode(true);
-        form.setFieldsValue(record);
+        form.setFieldsValue({
+            ...record,
+            access: normalizeIdList((record as any).access),
+            permissions: normalizeIdList((record as any).permissions),
+        });
         setEditingId(record.id);
         setIsModalOpen(true);
         setIsTitle('Update User & Permissions')
@@ -447,11 +471,6 @@ export default function UsersRoutes() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const optionsOffice: CheckboxOptionType<any>[] = [
-        { label: "Main Office", value: 1 },
-        { label: "Branch Office", value: 2 },
-    ];
-
     const options: CheckboxOptionType<any>[] = [
         { label: "Inventory", value: 1 },
         { label: "Budget Monitoring", value: 2 },
@@ -472,6 +491,23 @@ export default function UsersRoutes() {
 
     const activeCount = data.filter((user) => user.status_labels?.name === 'Active').length;
     const inactiveCount = data.filter((user) => user.status_labels?.name === 'Inactive').length;
+    const selectedAccess = Form.useWatch("access", form) || [];
+    const selectedPermissions = Form.useWatch("permissions", form) || [];
+
+    const departmentOptions = useMemo(
+        () => dataDepartment.map((item) => ({ label: item.department, value: item.id })),
+        [dataDepartment]
+    );
+
+    const groupOptions = useMemo(
+        () => dataGroup.map((item) => ({ label: item.group, value: item.id })),
+        [dataGroup]
+    );
+
+    const officeOptions = useMemo(
+        () => dataOffice.map((item) => ({ label: item.name, value: item.id })),
+        [dataOffice]
+    );
 
     return (
         <Card className="admin-users-page rounded-md border border-gray-200 shadow-sm" styles={{ body: { padding: 14 } }}>
@@ -522,11 +558,21 @@ export default function UsersRoutes() {
 
             {/* User Creation/Edit Modal */}
             <Modal
-                width={1100}
+                width={860}
+                className="user-form-modal"
                 title={
-                    <div className="flex items-center gap-2">
-                        <AiOutlineUser className="text-blue-500 text-xl" />
-                        <span className="text-lg font-semibold">{isTitle}</span>
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                            <AiOutlineUser className="text-xl" />
+                        </div>
+                        <div>
+                            <Typography.Title level={4} className="!mb-0">
+                                {isTitle}
+                            </Typography.Title>
+                            <Typography.Text className="text-sm text-slate-500">
+                                Maintain account profile, organization assignment, and system access.
+                            </Typography.Text>
+                        </div>
                     </div>
                 }
                 open={isModalOpen}
@@ -536,14 +582,14 @@ export default function UsersRoutes() {
                 destroyOnClose
                 styles={{
                     header: { borderBottom: '1px solid #f0f0f0', padding: '16px 24px' },
-                    body: { padding: '24px' }
+                    body: { padding: '20px 24px' }
                 }}
             >
                 <Form
                     form={form}
                     layout="vertical"
                     onFinish={onFinish}
-                    className="space-y-6"
+                    className="space-y-4"
                 >
                     {/* Personal Information Section */}
                     <Card type="inner" title={
@@ -563,6 +609,7 @@ export default function UsersRoutes() {
                                         placeholder="John"
                                         prefix={<AiOutlineUser className="text-gray-400" />}
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -575,6 +622,7 @@ export default function UsersRoutes() {
                                     <Input
                                         placeholder="Michael"
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -588,6 +636,7 @@ export default function UsersRoutes() {
                                     <Input
                                         placeholder="Doe"
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -616,6 +665,7 @@ export default function UsersRoutes() {
                                         prefix={<AiOutlineMail className="text-gray-400" />}
                                         disabled={isEditMode}
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -631,6 +681,7 @@ export default function UsersRoutes() {
                                         placeholder="+1 (555) 123-4567"
                                         prefix={<AiOutlinePhone className="text-gray-400" />}
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -645,6 +696,7 @@ export default function UsersRoutes() {
                                         placeholder="johndoe"
                                         prefix={<AiOutlineUser className="text-gray-400" />}
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -659,6 +711,7 @@ export default function UsersRoutes() {
                                         placeholder="123"
                                         prefix={<AiOutlineUser className="text-gray-400" />}
                                         className="h-10"
+                                        allowClear
                                     />
                                 </Form.Item>
                             </Col>
@@ -685,7 +738,7 @@ export default function UsersRoutes() {
                                         help="Minimum 8 characters with at least 1 number and special character"
                                     >
                                         <Input.Password
-                                            placeholder="••••••••"
+                                            placeholder="Enter a secure password"
                                             className="h-10"
                                         />
                                     </Form.Item>
@@ -710,15 +763,10 @@ export default function UsersRoutes() {
                                 >
                                     <Select
                                         placeholder="Select department"
-                                        className="h-10"
-                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    >
-                                        {dataDepartment.map((item: Department) => (
-                                            <Option key={item.id} value={item.id}>
-                                                {item.department}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                        showSearch
+                                        optionFilterProp="label"
+                                        options={departmentOptions}
+                                    />
                                 </Form.Item>
                             </Col>
 
@@ -730,15 +778,10 @@ export default function UsersRoutes() {
                                 >
                                     <Select
                                         placeholder="Select group"
-                                        className="h-10"
-                                        suffixIcon={<AiOutlineDown className="text-gray-400" />}
-                                    >
-                                        {dataGroup.map((item: Groups) => (
-                                            <Option key={item.id} value={item.id}>
-                                                {item.group}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                        showSearch
+                                        optionFilterProp="label"
+                                        options={groupOptions}
+                                    />
                                 </Form.Item>
                             </Col>
 
@@ -752,15 +795,9 @@ export default function UsersRoutes() {
                                         placeholder="Select an office"
                                         showSearch
                                         optionFilterProp="label"
-                                        className="h-10"
                                         style={{ width: '100%' }}
-                                    >
-                                        {dataOffice.map((item: Office) => (
-                                            <Option key={item.id} value={item.id}>
-                                                {item.name}
-                                            </Option>
-                                        ))}
-                                    </Select>
+                                        options={officeOptions}
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -780,9 +817,15 @@ export default function UsersRoutes() {
                                     name="access"
                                     rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    <Checkbox.Group
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        showSearch
+                                        maxTagCount="responsive"
+                                        maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} more`}
+                                        optionFilterProp="label"
+                                        placeholder="Choose system modules"
                                         options={options}
-                                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
                                     />
                                 </Form.Item>
                             </Col>
@@ -793,22 +836,45 @@ export default function UsersRoutes() {
                                     name="permissions"
                                     rules={[{ required: true, message: "Required field" }]}
                                 >
-                                    <Checkbox.Group
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        showSearch
+                                        maxTagCount="responsive"
+                                        optionFilterProp="label"
+                                        placeholder="Choose allowed actions"
                                         options={optionsPermission}
-                                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                                     />
                                 </Form.Item>
                             </Col>
                         </Row>
                     </Card>
 
+                    <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="m-0 text-sm font-semibold text-slate-900">Access summary</p>
+                                <p className="m-0 text-sm text-slate-600">
+                                    Review module access and detailed permissions before saving.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
+                                    {selectedAccess.length} modules
+                                </Tag>
+                                <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
+                                    {selectedPermissions.length} permissions
+                                </Tag>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Form Actions */}
-                    <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+                    <div className="flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-100 pt-5">
                         <Button
                             onClick={onReset}
                             type="default"
-                            size="large"
-                            className="w-full sm:w-auto h-11"
+                            className="h-10 w-full sm:w-auto"
                             icon={<AiOutlineUndo />}
                         >
                             Reset Form
@@ -816,8 +882,7 @@ export default function UsersRoutes() {
                         <Button
                             type="primary"
                             htmlType="submit"
-                            size="large"
-                            className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+                            className="h-10 w-full bg-blue-600 px-5 font-semibold hover:bg-blue-700 sm:w-auto"
                             loading={loading}
                             icon={!loading && <AiOutlineSave />}
                         >

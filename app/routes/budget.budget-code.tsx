@@ -1,5 +1,6 @@
 import {
   ApartmentOutlined,
+  CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   HomeOutlined,
@@ -22,6 +23,7 @@ import {
   Table,
   TableColumnsType,
   Tag,
+  Typography,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
@@ -150,6 +152,32 @@ export default function BudgetCodePage() {
       item.particulars?.toLowerCase().includes(normalized)
     );
   }, [data, searchText]);
+
+  const selectedDepartmentId = Form.useWatch("department_id", assignForm);
+  const selectedBudgetCodes = Form.useWatch("budget_code", assignForm) || [];
+
+  const selectedDepartment = useMemo(
+    () => departments.find((department) => department.id === selectedDepartmentId),
+    [departments, selectedDepartmentId]
+  );
+
+  const departmentOptions = useMemo(
+    () =>
+      departments.map((department) => ({
+        label: department.department,
+        value: department.id,
+      })),
+    [departments]
+  );
+
+  const particularOptions = useMemo(
+    () =>
+      data.map((item) => ({
+        label: item.particulars || "N/A",
+        value: String(item.id),
+      })),
+    [data]
+  );
 
   const openCreateModal = () => {
     setEditingRecord(null);
@@ -442,30 +470,82 @@ export default function BudgetCodePage() {
       </Modal>
 
       <Modal
-        title="Assign Department Particulars"
+        className="budget-code-assign-modal"
+        width={720}
+        title={
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <ApartmentOutlined />
+            </div>
+            <div>
+              <Typography.Title level={4} className="!mb-0">
+                Assign Department Particulars
+              </Typography.Title>
+              <Typography.Text className="text-sm text-slate-500">
+                Choose a department, then select the budget particulars available to that department.
+              </Typography.Text>
+            </div>
+          </div>
+        }
         open={isAssignModalOpen}
         onCancel={closeAssignModal}
-        onOk={handleAssignSubmit}
-        okText="Save Assignment"
         confirmLoading={assignSaving}
         destroyOnClose
+        footer={
+          <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-left text-sm text-slate-500">
+              {selectedDepartment ? (
+                <span>
+                  Assigning to <span className="font-semibold text-slate-800">{selectedDepartment.department}</span>
+                  {" "}with <span className="font-semibold text-blue-600">{selectedBudgetCodes.length}</span> selected.
+                </span>
+              ) : (
+                <span>Select a department to review its current particulars.</span>
+              )}
+            </div>
+            <Space>
+              <Button onClick={closeAssignModal}>Cancel</Button>
+              <Button
+                type="primary"
+                icon={<CheckCircleOutlined />}
+                loading={assignSaving}
+                onClick={handleAssignSubmit}
+              >
+                Save Assignment
+              </Button>
+            </Space>
+          </div>
+        }
       >
-        <Form form={assignForm} layout="vertical" className="pt-3">
+        <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="m-0 text-sm font-semibold text-slate-900">Department budget mapping</p>
+              <p className="m-0 text-sm text-slate-600">
+                Saved selections update the department's assigned budget codes.
+              </p>
+            </div>
+            <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
+              {selectedBudgetCodes.length} selected
+            </Tag>
+          </div>
+        </div>
+
+        <Form form={assignForm} layout="vertical" className="pt-1">
           <Form.Item
             label="Department"
             name="department_id"
             rules={[{ required: true, message: "Please choose a department" }]}
           >
             <Select
+              className="w-full"
               showSearch
               loading={departmentsLoading}
               placeholder="Choose department"
               optionFilterProp="label"
               onChange={handleDepartmentChange}
-              options={departments.map((department) => ({
-                label: department.department,
-                value: department.id,
-              }))}
+              options={departmentOptions}
+              notFoundContent={departmentsLoading ? "Loading departments..." : "No departments found"}
             />
           </Form.Item>
 
@@ -480,12 +560,11 @@ export default function BudgetCodePage() {
               showSearch
               loading={loading}
               maxTagCount="responsive"
+              maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} more`}
               placeholder="Choose budget particulars"
               optionFilterProp="label"
-              options={data.map((item) => ({
-                label: item.particulars || "N/A",
-                value: String(item.id),
-              }))}
+              options={particularOptions}
+              notFoundContent={loading ? "Loading particulars..." : "No particulars found"}
             />
           </Form.Item>
         </Form>

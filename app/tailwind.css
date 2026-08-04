@@ -382,6 +382,85 @@ body.dark-mode .budget-management-page .ant-card-loading-content {
   background: transparent !important;
 }
 
+body.dark-mode .budget-modal .ant-modal-content,
+body.dark-mode .budget-modal .ant-modal-header,
+body.dark-mode .unbudgeted-requisition-modal .ant-modal-content,
+body.dark-mode .unbudgeted-requisition-modal .ant-modal-header {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-modal .ant-modal-close,
+body.dark-mode .budget-modal .ant-modal-close-x,
+body.dark-mode .unbudgeted-requisition-modal .ant-modal-close,
+body.dark-mode .unbudgeted-requisition-modal .ant-modal-close-x {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-modal .ant-form-item-label > label,
+body.dark-mode .budget-modal .ant-typography,
+body.dark-mode .budget-modal .text-slate-900,
+body.dark-mode .unbudgeted-requisition-modal .ant-form-item-label > label,
+body.dark-mode .unbudgeted-requisition-modal .ant-typography,
+body.dark-mode .unbudgeted-requisition-modal .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-modal .text-slate-600,
+body.dark-mode .budget-modal .text-slate-500,
+body.dark-mode .unbudgeted-requisition-modal .text-slate-600,
+body.dark-mode .unbudgeted-requisition-modal .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .budget-modal .bg-blue-50,
+body.dark-mode .budget-modal .bg-emerald-50,
+body.dark-mode .budget-modal .bg-slate-50,
+body.dark-mode .unbudgeted-requisition-modal .bg-amber-50 {
+  background: #121212 !important;
+}
+
+body.dark-mode .budget-modal .border-blue-100,
+body.dark-mode .budget-modal .border-emerald-100,
+body.dark-mode .budget-modal .border-slate-100,
+body.dark-mode .unbudgeted-requisition-modal .border-amber-100,
+body.dark-mode .unbudgeted-requisition-modal .border-slate-100 {
+  border-color: #374151 !important;
+}
+
+body.dark-mode .budget-modal .ant-picker,
+body.dark-mode .budget-modal .ant-input-number,
+body.dark-mode .budget-modal .ant-select-selector,
+body.dark-mode .unbudgeted-requisition-modal .ant-picker,
+body.dark-mode .unbudgeted-requisition-modal .ant-input-number,
+body.dark-mode .unbudgeted-requisition-modal .ant-input,
+body.dark-mode .unbudgeted-requisition-modal .ant-select-selector {
+  background: #121212 !important;
+  border-color: #3f3f46 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-modal .ant-picker-input > input,
+body.dark-mode .budget-modal .ant-input-number-input,
+body.dark-mode .budget-modal .ant-select-selection-item,
+body.dark-mode .unbudgeted-requisition-modal .ant-picker-input > input,
+body.dark-mode .unbudgeted-requisition-modal .ant-input-number-input,
+body.dark-mode .unbudgeted-requisition-modal .ant-input,
+body.dark-mode .unbudgeted-requisition-modal .ant-select-selection-item {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-modal .ant-select-selection-placeholder,
+body.dark-mode .budget-modal .ant-select-arrow,
+body.dark-mode .budget-modal .ant-picker-suffix,
+body.dark-mode .unbudgeted-requisition-modal .ant-select-selection-placeholder,
+body.dark-mode .unbudgeted-requisition-modal .ant-select-arrow,
+body.dark-mode .unbudgeted-requisition-modal .ant-picker-suffix,
+body.dark-mode .unbudgeted-requisition-modal .ant-input::placeholder {
+  color: #94a3b8 !important;
+}
+
 body.dark-mode .budget-transactions-page {
   color: #e5e7eb;
 }
@@ -816,6 +895,171 @@ body.dark-mode .ant-modal .ant-modal-title,
 body.dark-mode .ant-modal .ant-card-head-title,
 body.dark-mode .ant-modal .ant-card-body {
   color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-code-assign-modal .ant-modal-content,
+body.dark-mode .budget-code-assign-modal .ant-modal-header {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .budget-code-assign-modal .ant-modal-title,
+body.dark-mode .budget-code-assign-modal .ant-form-item-label > label,
+body.dark-mode .budget-code-assign-modal .text-slate-900,
+body.dark-mode .budget-code-assign-modal .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-code-assign-modal .text-slate-600,
+body.dark-mode .budget-code-assign-modal .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .budget-code-assign-modal .bg-blue-50 {
+  background: #0f2748 !important;
+}
+
+body.dark-mode .budget-code-assign-modal .border-blue-100,
+body.dark-mode .budget-code-assign-modal .border-slate-100 {
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-mode .budget-code-assign-modal .ant-select-selector,
+body.dark-mode .budget-code-assign-modal .ant-select-selection-search-input {
+  background: #141414 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-code-assign-modal .ant-select-selection-placeholder,
+body.dark-mode .budget-code-assign-modal .ant-select-arrow {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .department-form-modal .ant-modal-content,
+body.dark-mode .department-form-modal .ant-modal-header {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .department-form-modal .ant-modal-title,
+body.dark-mode .department-form-modal .ant-form-item-label > label,
+body.dark-mode .department-form-modal .text-slate-900,
+body.dark-mode .department-form-modal .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .department-form-modal .text-slate-600,
+body.dark-mode .department-form-modal .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .department-form-modal .bg-blue-50 {
+  background: #0f2748 !important;
+}
+
+body.dark-mode .department-form-modal .border-blue-100,
+body.dark-mode .department-form-modal .border-slate-100 {
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-mode .department-form-modal .ant-input,
+body.dark-mode .department-form-modal .ant-input-affix-wrapper,
+body.dark-mode .department-form-modal .ant-select-selector,
+body.dark-mode .department-form-modal .ant-select-selection-search-input {
+  background: #141414 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .department-form-modal .ant-input::placeholder,
+body.dark-mode .department-form-modal .ant-select-selection-placeholder,
+body.dark-mode .department-form-modal .ant-select-arrow {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .user-form-modal .ant-modal-content,
+body.dark-mode .user-form-modal .ant-modal-header,
+body.dark-mode .user-form-modal .ant-card,
+body.dark-mode .user-form-modal .ant-card-head,
+body.dark-mode .user-form-modal .ant-card-body {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .user-form-modal .ant-modal-title,
+body.dark-mode .user-form-modal .ant-card-head-title,
+body.dark-mode .user-form-modal .ant-form-item-label > label,
+body.dark-mode .user-form-modal .text-slate-900,
+body.dark-mode .user-form-modal .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .user-form-modal .text-slate-600,
+body.dark-mode .user-form-modal .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .user-form-modal .bg-blue-50 {
+  background: #0f2748 !important;
+}
+
+body.dark-mode .user-form-modal .border-blue-100,
+body.dark-mode .user-form-modal .border-slate-100 {
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-mode .user-form-modal .ant-input,
+body.dark-mode .user-form-modal .ant-input-affix-wrapper,
+body.dark-mode .user-form-modal .ant-select-selector,
+body.dark-mode .user-form-modal .ant-select-selection-search-input {
+  background: #141414 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .user-form-modal .ant-input::placeholder,
+body.dark-mode .user-form-modal .ant-select-selection-placeholder,
+body.dark-mode .user-form-modal .ant-select-arrow {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .group-form-modal .ant-modal-content,
+body.dark-mode .group-form-modal .ant-modal-header {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+}
+
+body.dark-mode .group-form-modal .ant-modal-title,
+body.dark-mode .group-form-modal .ant-form-item-label > label,
+body.dark-mode .group-form-modal .text-slate-900,
+body.dark-mode .group-form-modal .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .group-form-modal .text-slate-600,
+body.dark-mode .group-form-modal .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .group-form-modal .bg-blue-50 {
+  background: #0f2748 !important;
+}
+
+body.dark-mode .group-form-modal .border-blue-100,
+body.dark-mode .group-form-modal .border-slate-100 {
+  border-color: #1d4ed8 !important;
+}
+
+body.dark-mode .group-form-modal .ant-input,
+body.dark-mode .group-form-modal .ant-input-affix-wrapper {
+  background: #141414 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .group-form-modal .ant-input::placeholder {
+  color: #94a3b8 !important;
 }
 
 body.dark-mode .workflow-dashboard-page {

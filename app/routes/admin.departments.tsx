@@ -5,7 +5,6 @@ import {
   EditOutlined,
   HomeOutlined,
   LoadingOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -19,10 +18,12 @@ import {
   message,
   Modal,
   Popconfirm,
+  Select,
   Spin,
   Table,
   TableColumnsType,
   Tag,
+  Typography,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -41,6 +42,26 @@ import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { BudgetCodeService } from "~/services/budget_code.service";
 import { DepartmentService } from "~/services/department.service";
 import { Department } from "~/types/department.type";
+
+const normalizeBudgetCodeIds = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(String);
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
+    } catch {
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+
+  return [];
+};
 
 export default function DepartmentsRoutes() {
   const [data, setData] = useState<Department[]>([]);
@@ -79,7 +100,10 @@ export default function DepartmentsRoutes() {
   // Edit record
   const editRecord = (record: Department) => {
     setIsEditMode(true);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      ...record,
+      budget_code: normalizeBudgetCodeIds((record as any).budget_code),
+    });
     setEditingId(record.id);
     setIsModalOpen(true);
     setIsTitle('Update Department')
@@ -131,7 +155,7 @@ export default function DepartmentsRoutes() {
       setLoading(true);
       const dataFetch = await BudgetCodeService.getAllParticulars();
       setParticularOptions(dataFetch.map((item: any) => ({
-        label: item.particulars,
+        label: item.particulars || "N/A",
         value: item.id.toString()
       })));
     } catch (error) {
@@ -157,6 +181,8 @@ export default function DepartmentsRoutes() {
       department.department?.toLowerCase().includes(normalizedSearch)
     );
   }, [data, searchText]);
+
+  const selectedBudgetCodes = Form.useWatch("budget_code", form) || [];
 
   // Create or Update record
   const onFinish = async () => {
@@ -371,11 +397,21 @@ export default function DepartmentsRoutes() {
 
       {/* Department Creation/Edit Modal */}
       <Modal
-        width={1000}
+        width={760}
+        className="department-form-modal"
         title={
           <div className="flex items-center gap-2">
-            <AiOutlineBuild className="text-blue-500 text-xl" />
-            <span className="text-lg font-semibold">{isTitle}</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <AiOutlineBuild className="text-xl" />
+            </div>
+            <div>
+              <Typography.Title level={4} className="!mb-0">
+                {isTitle}
+              </Typography.Title>
+              <Typography.Text className="text-sm text-slate-500">
+                Maintain department details and assigned budget particulars.
+              </Typography.Text>
+            </div>
           </div>
         }
         open={isModalOpen}
@@ -389,7 +425,7 @@ export default function DepartmentsRoutes() {
             padding: '16px 24px'
           },
           body: {
-            padding: '24px'
+            padding: '20px 24px'
           }
         }}
       >
@@ -397,7 +433,7 @@ export default function DepartmentsRoutes() {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          className="space-y-6"
+          className="space-y-4"
         >
 
           <Form.Item
@@ -440,17 +476,40 @@ export default function DepartmentsRoutes() {
             name="budget_code"
             rules={[{ required: true, message: 'Please select at least one budget particular' }]}
           >
-            <Checkbox.Group options={particularOptions}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" />
+            <Select
+              mode="multiple"
+              allowClear
+              showSearch
+              loading={loading}
+              maxTagCount="responsive"
+              maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} more`}
+              optionFilterProp="label"
+              placeholder="Choose budget particulars"
+              options={particularOptions}
+              notFoundContent={loading ? "Loading particulars..." : "No particulars found"}
+            />
           </Form.Item>
 
+          <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="m-0 text-sm font-semibold text-slate-900">Budget mapping</p>
+                <p className="m-0 text-sm text-slate-600">
+                  Selected particulars become available for this department's budget records.
+                </p>
+              </div>
+              <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
+                {selectedBudgetCodes.length} selected
+              </Tag>
+            </div>
+          </div>
+
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t pt-6 mt-6">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-100 pt-5">
             <Button
               onClick={onReset}
               type="default"
-              size="large"
-              className="w-full sm:w-auto h-11"
+              className="h-10 w-full sm:w-auto"
               icon={<AiOutlineUndo />}
             >
               Reset Form
@@ -458,8 +517,7 @@ export default function DepartmentsRoutes() {
             <Button
               type="primary"
               htmlType="submit"
-              size="large"
-              className="w-full sm:w-auto h-11 bg-blue-600 hover:bg-blue-700"
+              className="h-10 w-full bg-blue-600 px-5 font-semibold hover:bg-blue-700 sm:w-auto"
               loading={loading}
               icon={!loading && <AiOutlineSave />}
             >
