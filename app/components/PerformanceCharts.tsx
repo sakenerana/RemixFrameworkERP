@@ -286,7 +286,6 @@ const PerformanceCharts: React.FC<PerformanceChartsProps> = ({ selectedYear }) =
                         }
 
                         const branches = response.data?.data?.branches ?? [];
-                        console.log('Fetched collection department data:', branches);
                         const nextBranchData = branches
                             .map((branch) => ({
                                 name: branch.branch,

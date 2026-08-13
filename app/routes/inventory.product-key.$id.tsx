@@ -67,7 +67,6 @@ export default function ProductKey() {
             setLoading(true);
             const dataFetch = await LicenseService.getAllProductKeyByID(isDepartmentID, Number(id));
             setData(dataFetch); // Works in React state
-            // console.log("FILTER", dataFetch)
         } catch (error) {
             message.error("error");
         } finally {
@@ -85,7 +84,6 @@ export default function ProductKey() {
             fetchData();
         } else {
             const filtered = data[0].product_key.filter((value: any) =>
-                // console.log("FILTER!!", value)
                 value.product_key.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredData(filtered);

@@ -12,7 +12,6 @@ export default function Particulars({ item }: { item: any }) {
     const [requisitions, setRequisitions] = useState<any[]>([]);
 
     useEffect(() => {
-        console.log("Particulars item:", item);
         const fetchParticulars = async () => {
             try {
                 setLoading(true);
@@ -27,7 +26,6 @@ export default function Particulars({ item }: { item: any }) {
 
                     // AWAIT THE PROMISE
                     const dataFetch = await BudgetService.getAllParticularsByDepartment(idArray);
-                    console.log("Fetched:", dataFetch);
 
                     // Store in state
                     setParticulars(dataFetch);
@@ -42,31 +40,6 @@ export default function Particulars({ item }: { item: any }) {
                 setLoading(false);
             }
         };
-
-
-
-        // const fetchRequisitions = async () => {
-        //     const userId = Number(localStorage.getItem("ab_id"));
-        //     const username = localStorage.getItem("username") || "";
-
-        //     try {
-        //         if (item.id) {
-        //             const requisitionResponse = await Promise.all([
-        //                 axios.post<{ data: any[] }>(
-        //                     `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
-        //                     { userid: userId, username }
-        //                 )
-        //             ]);
-
-        //             console.log("All Requisition Data:", requisitionResponse[0].data.data);
-        //             setRequisitions(requisitionResponse[0].data.data);
-        //             return requisitionResponse;
-        //         }
-        //     } catch (err) {
-        //         console.error("Error fetching requisitions:", err);
-        //         return []; // Return empty array on error
-        //     }
-        // };
         const fetchRequisitions = async () => {
             const userId = Number(localStorage.getItem("ab_id"));
             const username = localStorage.getItem("username") || "";

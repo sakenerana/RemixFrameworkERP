@@ -143,7 +143,6 @@ export default function CreateLicense() {
     const handleProductKeysChange = (newData: any[]) => {
         setProductKeys(newData);
         // You can also do other things with the data here
-        // console.log("Updated product keys:", newData);
     };
 
     useMemo(() => {

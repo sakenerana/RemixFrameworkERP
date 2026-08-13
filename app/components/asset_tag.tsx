@@ -69,7 +69,7 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log('Save failed:', errInfo);
+      console.error('Save failed:', errInfo);
     }
   };
 
@@ -144,7 +144,6 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
   useEffect(() => {
     if (onDataChange) {
       onDataChange(dataSource);
-      // console.log("testing 2", dataSource)
     }
   }, [dataSource, onDataChange]);
 
@@ -226,7 +225,6 @@ const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], has
       ...item,
       ...row,
     });
-    // console.log("testing 1", newData)
     setDataSource(newData);
   };
 

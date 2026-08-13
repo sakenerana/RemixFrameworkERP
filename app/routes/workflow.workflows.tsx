@@ -151,7 +151,6 @@ export default function Workflows() {
   const topUser = data[0];
 
   const handleShowWorkflows = (value: DataType) => {
-    // console.log("value", value)
     navigate("/workflow/assigned/id?id=" + value.id);
   };
 

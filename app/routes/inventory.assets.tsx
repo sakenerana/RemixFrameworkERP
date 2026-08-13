@@ -81,7 +81,6 @@ export default function AssetsRoute() {
       setLoading(true);
       const dataFetch = await AssetService.getAllPosts(isDepartmentID);
       setData(dataFetch); // Works in React state
-      // console.log("DATA FETCH", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {

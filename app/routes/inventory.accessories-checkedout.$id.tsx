@@ -244,14 +244,7 @@ export default function Checkedout() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const onChange: TableProps<Accessories>["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log("params", pagination, filters, sorter, extra);
-    };
+    const onChange: TableProps<Accessories>["onChange"] = () => {};
 
     return (
         <Card className="w-full">

@@ -68,11 +68,7 @@ export default function HRDashboard() {
     []
   );
 
-  const handleRefresh = () => {
-    // hook this to your loader/refetch if you have one
-    // e.g. revalidator.revalidate() in Remix
-    console.log("refresh dashboard");
-  };
+  const handleRefresh = () => {};
 
   return (
     // ✅ removed ml-64 — let your Layout control left spacing

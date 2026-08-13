@@ -46,7 +46,6 @@ export default function AssetModelsRoutes() {
         try {
             setLoading(true);
             const dataFetch = await AssetModelService.getAllPosts(isDepartmentID);
-            // console.log("cats", dataFetch)
             setData(dataFetch); // Works in React state
         } catch (error) {
             message.error("error");

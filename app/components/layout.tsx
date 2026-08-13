@@ -45,7 +45,6 @@
 
 //   useEffect(() => {
 //     const storedValue = localStorage.getItem('main');
-//     console.log("get", storedValue);
 //   }, []);
 
 //   return (
