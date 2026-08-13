@@ -11,6 +11,7 @@ export interface StatusLabel {
 export interface Department {
     id: number;
     department: string;
+    budget_code?: string[] | string | null;
     status_id?: number;
     created_at?: string;
     updated_at?: string | null;

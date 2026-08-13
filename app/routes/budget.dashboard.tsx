@@ -10,7 +10,7 @@ import {
   Spin,
 } from "antd";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineDollar, AiOutlineFileText, AiOutlineShoppingCart, AiOutlineWallet } from "react-icons/ai";
 import AreaChart from "~/components/area_chart";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
@@ -18,6 +18,30 @@ import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
+
+type Language = "en" | "fil";
+
+interface MonthlySpend {
+  month: string;
+  total: number;
+}
+
+interface CompletedBudgetWorkflow {
+  startDate?: string | null;
+  status?: string | null;
+  workflowType?: string | null;
+  totalAmount?: string | number | null;
+}
+
+interface BudgetApprovalCache {
+  totals: {
+    requisition: number;
+    liquidation: number;
+    combined: number;
+  };
+  monthlyData: MonthlySpend[];
+  timestamp: number;
+}
 
 // Language content
 const translations = {
@@ -40,23 +64,17 @@ const translations = {
 };
 
 export default function BudgetRoutes() {
-  const [data, setData] = useState<Budget>();
-  const [dataUnbudget, setDataUnbudget] = useState<any>();
-  const [dataTotalBudgeted, setDataTotalBudgeted] = useState<any>(0);
-  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState<any>(0);
-  const [dataMonthly, setMonthlyData] = useState<any>();
-  const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
-  const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
-  const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
+  const [dataTotalBudgeted, setDataTotalBudgeted] = useState(0);
+  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState(0);
+  const [dataMonthly, setMonthlyData] = useState<MonthlySpend[]>([]);
+  const [dataTotalRequisition, setDataTotalRequisition] = useState(0);
+  const [dataTotalLiquidation, setDataTotalLiquidation] = useState(0);
+  const [dataCombinedTotal, setDataCombinedTotal] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [language, setLanguage] = useState<'en' | 'fil'>('en');
+  const [language, setLanguage] = useState<Language>('en');
   const [t, setT] = useState(translations.en);
-
-  const [isUserID, setUserID] = useState<any>();
-  const [isDepartmentID, setDepartmentID] = useState<any>();
-  const [isOfficeID, setOfficeID] = useState<any>();
 
   // Gradient backgrounds for statistics cards
   const statGradients = {
@@ -99,38 +117,28 @@ export default function BudgetRoutes() {
 
   const fetchData = async () => {
     try {
-      // setLoading(true);
-      const dataFetch: any = await BudgetService.getByData();
-      setData(dataFetch); // Works in React state
-      const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
+      const dataFetch = await BudgetService.getByData() as Budget[] | null;
+      const totalBudget = dataFetch?.reduce((sum, item) => sum + Number(item.budget || 0), 0) || 0;
       setDataTotalBudgeted(totalBudget);
     } catch (error) {
       message.error("error");
-    } finally {
-      // setLoading(false);
     }
   };
 
   const fetchUnbudgetData = async () => {
     try {
-      // setLoading(true);
-      const dataFetch: any = await BudgetService.getAllUnbudgeted();
-      setDataUnbudget(dataFetch); // Works in React state
-      const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
+      const dataFetch = await BudgetService.getAllUnbudgeted() as Array<{ amount?: number | string | null }> | null;
+      const totalUnBudget = dataFetch?.reduce((sum, item) => sum + Number(item.amount || 0), 0) || 0;
       setDataTotalUnBudgeted(totalUnBudget);
     } catch (error) {
       message.error("error");
-    } finally {
-      // setLoading(false);
     }
   };
 
   const fetchDataBudgetApproved = async () => {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
-    const userDepartment = localStorage.getItem("dept") || "";
-    const userOffice = localStorage.getItem("userOffice") || "";
-    const departmentId = isDepartmentID;
+    const departmentId = localStorage.getItem("userDept") || "";
     const currentYear = new Date().getFullYear();
     // const currentYear = 2024;
 
@@ -160,7 +168,7 @@ export default function BudgetRoutes() {
       // Check cache first
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { totals, monthlyData, timestamp } = JSON.parse(cachedData);
+        const { totals, monthlyData, timestamp } = JSON.parse(cachedData) as BudgetApprovalCache;
         if (now - timestamp < CACHE_EXPIRY) {
           setDataTotalRequisition(totals.requisition);
           setDataTotalLiquidation(totals.liquidation);
@@ -172,14 +180,17 @@ export default function BudgetRoutes() {
       }
 
       // Fetch data
-      const response = await axios.post<{ data: any[] }>(
+      const response = await axios.post<{ data: CompletedBudgetWorkflow[] }>(
         `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
         { userid: userId, username }
       );
 
       const items = response.data.data || [];
       // Process data in single pass
-      const result = items.reduce((acc, item) => {
+      const result = items.reduce<{
+        totals: BudgetApprovalCache["totals"];
+        monthlyTotals: Record<string, number>;
+      }>((acc, item) => {
         if (!item.startDate) return acc;
 
         const itemYear = new Date(item.startDate).getFullYear();
@@ -242,7 +253,7 @@ export default function BudgetRoutes() {
       // Fallback to cache if available
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { totals, monthlyData } = JSON.parse(cachedData);
+        const { totals, monthlyData } = JSON.parse(cachedData) as BudgetApprovalCache;
         setDataTotalRequisition(totals.requisition);
         setDataTotalLiquidation(totals.liquidation);
         setDataCombinedTotal(totals.combined);
@@ -276,12 +287,6 @@ export default function BudgetRoutes() {
     fetchAllData();
   }, []);
 
-  useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
-    setDepartmentID(localStorage.getItem('userDept'));
-    setOfficeID(localStorage.getItem('userOfficeID'));
-  }, []);
-
   const currentYear = new Date().getFullYear();
   const overallBudget = (Number(dataTotalBudgeted) || 0) + (Number(dataTotalUnBudgeted) || 0);
   const amountSpent = Number(dataCombinedTotal) || 0;
@@ -294,7 +299,7 @@ export default function BudgetRoutes() {
     const monthNumber = (index + 1).toString().padStart(2, "0");
     const monthKey = `${currentYear}-${monthNumber}`;
     const monthName = new Date(currentYear, index).toLocaleString("default", { month: "short" });
-    const total = dataMonthly?.find((item: any) => item.month === monthKey)?.total || 0;
+    const total = dataMonthly.find((item) => item.month === monthKey)?.total || 0;
 
     return {
       monthKey,
@@ -401,8 +406,8 @@ export default function BudgetRoutes() {
                       },
                     },
                     tooltip: {
-                      formatter: (datum: any) => ({
-                        name: datum.category,
+                        formatter: (datum: { category?: string; value?: string | number }) => ({
+                        name: datum.category || "Amount Spent",
                         value: formatCurrency(Number(datum.value) || 0),
                       }),
                     },

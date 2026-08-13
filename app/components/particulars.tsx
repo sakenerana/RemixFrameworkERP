@@ -4,6 +4,46 @@ import { BudgetCodeService } from "~/services/budget_code.service";
 import { BudgetService } from "~/services/budget.service";
 import Liquidation from "./liquidation";
 
+interface BudgetCodeParticular {
+    id: number | string;
+    particulars?: string | null;
+    description?: string | null;
+    allocatedAmount?: number | null;
+}
+
+interface CompletedBudgetWorkflow {
+    branch?: string | null;
+    branchCode?: string | null;
+    branchName?: string | null;
+    department?: string | null;
+    departmentName?: string | null;
+    deptCode?: string | null;
+    officeLocation?: string | null;
+    particular?: string | null;
+    processTitle?: string | null;
+    referenceNo?: string | null;
+    startDate?: string | null;
+    status?: string | null;
+    totalAmount?: string | number | null;
+    workflowType?: string | null;
+}
+
+interface LiquidationRecord {
+    key?: string;
+    startDate: string;
+    referenceNo: string;
+    particular: string;
+    totalAmount: number;
+    status: string;
+}
+
+interface BudgetDepartmentItem {
+    departments: {
+        department: string;
+        budget_code?: unknown;
+    };
+}
+
 const getBudgetCodeIds = (budgetCodes: unknown): number[] => {
     if (Array.isArray(budgetCodes)) {
         return budgetCodes
@@ -56,7 +96,7 @@ const getBudgetCodeNames = (budgetCodes: unknown): string[] => {
     return [];
 };
 
-const matchesDepartment = (record: any, department: string) => {
+const matchesDepartment = (record: CompletedBudgetWorkflow, department: string) => {
     if (!department) return true;
 
     if (
@@ -97,12 +137,12 @@ const matchesParticularValue = (recordParticular: unknown, budgetParticular: unk
     return normalizeText(recordParticular) === normalizeText(budgetParticular);
 };
 
-export default function Particulars({ item }: { item: any }) {
-    const [particulars, setParticulars] = useState<any[]>([]);
+export default function Particulars({ item }: { item: BudgetDepartmentItem }) {
+    const [particulars, setParticulars] = useState<BudgetCodeParticular[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingAmountSpent, setLoadingAmountSpent] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [requisitions, setRequisitions] = useState<any[]>([]);
+    const [requisitions, setRequisitions] = useState<CompletedBudgetWorkflow[]>([]);
     const currentYear = new Date().getFullYear();
 
     /* ===========================
@@ -125,15 +165,15 @@ export default function Particulars({ item }: { item: any }) {
                     const data = await BudgetCodeService.getAllParticulars();
                     const normalizedNames = new Set(budgetCodeNames.map((name) => name.toLowerCase()));
                     setParticulars(
-                        (data || []).filter((particular: any) =>
+                        (data || []).filter((particular: BudgetCodeParticular) =>
                             normalizedNames.has(String(particular.particulars || "").toLowerCase())
                         )
                     );
                 } else {
                     setParticulars([]);
                 }
-            } catch (err: any) {
-                setError(err.message || "Failed to load particulars");
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Failed to load particulars");
             } finally {
                 setLoading(false);
             }
@@ -153,7 +193,7 @@ export default function Particulars({ item }: { item: any }) {
             try {
                 setLoadingAmountSpent(true);
 
-                const response = await axios.post<{ data: any[] }>(
+                const response = await axios.post<{ data: CompletedBudgetWorkflow[] }>(
                     `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
                     { userid: userId, username }
                 );
@@ -181,7 +221,7 @@ export default function Particulars({ item }: { item: any }) {
     const fallbackParticulars = useMemo(() => {
         if (particulars.length || !requisitions.length) return [];
 
-        const uniqueParticulars = new Map<string, any>();
+        const uniqueParticulars = new Map<string, BudgetCodeParticular>();
 
         requisitions.forEach((record) => {
             const isCurrentYear = record.startDate
@@ -261,7 +301,7 @@ export default function Particulars({ item }: { item: any }) {
         return cache;
     }, [requisitions, displayParticulars, item.departments.department]);
 
-    const { liquidationData, liquidationTotal } = useMemo(() => {
+    const { liquidationData, liquidationTotal } = useMemo<{ liquidationData: LiquidationRecord[]; liquidationTotal: number }>(() => {
         if (!requisitions.length) return { liquidationData: [], liquidationTotal: 0 };
 
         const filteredData = requisitions.filter(item2 => {
@@ -311,7 +351,14 @@ export default function Particulars({ item }: { item: any }) {
         const total = filteredData.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
 
         return {
-            liquidationData: filteredData,
+            liquidationData: filteredData.map((record, index) => ({
+                key: record.referenceNo || `liquidation-${index}`,
+                startDate: record.startDate || "",
+                referenceNo: record.referenceNo || "",
+                particular: record.particular || "N/A",
+                totalAmount: Number(record.totalAmount || 0),
+                status: record.status || "",
+            })),
             liquidationTotal: total
         };
     }, [requisitions, item.departments.department]);
@@ -497,12 +544,13 @@ export default function Particulars({ item }: { item: any }) {
                         {!isTableLoading && displayParticulars.map((p, index) => {
                             const key = `${p.particulars}__${item.departments.department}`;
                             const spent = spentCache[key] || 0;
-                            const remaining = p.allocatedAmount - spent;
+                            const allocatedAmount = Number(p.allocatedAmount || 0);
+                            const remaining = allocatedAmount - spent;
 
                             const status =
                                 remaining <= 0
                                     ? "Exhausted"
-                                    : remaining < p.allocatedAmount * 0.2
+                                    : remaining < allocatedAmount * 0.2
                                         ? "Low"
                                         : "Available";
 

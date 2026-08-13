@@ -37,25 +37,38 @@ import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
 import { canManageBudgetParticulars } from "~/utils/budgetAccess";
 
+interface UnbudgetedRecord {
+  amount?: number | string | null;
+}
+
+interface CompletedBudgetWorkflow {
+  startDate?: string | null;
+  status?: string | null;
+  workflowType?: string | null;
+  totalAmount?: string | number | null;
+}
+
+interface BudgetTotals {
+  requisition: number;
+  liquidation: number;
+  combined: number;
+}
+
 export default function Budgets() {
-  const [data, setData] = useState<Budget>();
-  const [dataUnbudget, setDataUnbudget] = useState<any>();
-  const [dataBudgetPerDepartment, setDataBudgetPerDepartment] = useState<any>();
-  const [dataTotalRequisition, setDataTotalRequisition] = useState<any>(0);
-  const [dataTotalLiquidation, setDataTotalLiquidation] = useState<any>(0);
-  const [dataTotalBudgeted, setDataTotalBudgeted] = useState<any>(0);
-  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState<any>(0);
-  const [dataCombinedTotal, setDataCombinedTotal] = useState<any>(0);
+  const [dataBudgetPerDepartment, setDataBudgetPerDepartment] = useState<Budget | null>(null);
+  const [dataTotalRequisition, setDataTotalRequisition] = useState(0);
+  const [dataTotalLiquidation, setDataTotalLiquidation] = useState(0);
+  const [dataTotalBudgeted, setDataTotalBudgeted] = useState(0);
+  const [dataTotalUnBudgeted, setDataTotalUnBudgeted] = useState(0);
+  const [dataCombinedTotal, setDataCombinedTotal] = useState(0);
   const [dataDepartment, setDataDepartment] = useState<Department[]>([]);
-  const [dataBudgetDepartment, setDataBudgetDepartment] = useState<any[]>([]);
+  const [dataBudgetDepartment, setDataBudgetDepartment] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingBudget, setLoadingBudget] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [isUserID, setUserID] = useState<any>();
-  const [isDepartmentID, setDepartmentID] = useState<any>();
-  const [isOfficeID, setOfficeID] = useState<any>();
+  const [isOfficeID, setOfficeID] = useState<number | null>(null);
   const [canManageParticulars, setCanManageParticulars] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -143,29 +156,21 @@ export default function Budgets() {
 
   const fetchData = async () => {
     try {
-      // setLoading(true);
-      const dataFetch: any = await BudgetService.getByData();
-      setData(dataFetch); // Works in React state
-      const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
+      const dataFetch = await BudgetService.getByData() as Budget[] | null;
+      const totalBudget = dataFetch?.reduce((sum, item) => sum + Number(item.budget || 0), 0) || 0;
       setDataTotalBudgeted(totalBudget);
     } catch (error) {
       message.error("error");
-    } finally {
-      // setLoading(false);
     }
   };
 
   const fetchUnbudgetData = async () => {
     try {
-      // setLoading(true);
-      const dataFetch: any = await BudgetService.getAllUnbudgeted();
-      setDataUnbudget(dataFetch); // Works in React state
-      const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
+      const dataFetch = await BudgetService.getAllUnbudgeted() as UnbudgetedRecord[] | null;
+      const totalUnBudget = dataFetch?.reduce((sum, item) => sum + Number(item.amount || 0), 0) || 0;
       setDataTotalUnBudgeted(totalUnBudget);
     } catch (error) {
       message.error("error");
-    } finally {
-      // setLoading(false);
     }
   };
 
@@ -198,7 +203,7 @@ export default function Budgets() {
   const fetchDataBudgetApproved = async () => {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";
-    const departmentId = isDepartmentID;
+    const departmentId = localStorage.getItem("userDept") || "all";
 
     // Cache configuration
     const CACHE_KEY = `budgetApproved_${userId}_${departmentId}`;
@@ -217,7 +222,7 @@ export default function Budgets() {
       // Check cache first
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { totals, timestamp } = JSON.parse(cachedData);
+        const { totals, timestamp } = JSON.parse(cachedData) as { totals: BudgetTotals; timestamp: number };
         if (now - timestamp < CACHE_EXPIRY) {
           setDataTotalRequisition(totals.requisition);
           setDataTotalLiquidation(totals.liquidation);
@@ -229,7 +234,7 @@ export default function Budgets() {
       setLoadingBudget(true)
       // Parallel API calls
       const [requisitionResponse, budgetData] = await Promise.all([
-        axios.post<{ data: any[] }>(
+        axios.post<{ data: CompletedBudgetWorkflow[] }>(
           `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
@@ -253,7 +258,7 @@ export default function Budgets() {
       const rangeEndStr = new Date(endDate).toISOString().split('T')[0];
 
       // Calculate totals in single pass
-      const totals = items.reduce((acc, item) => {
+      const totals = items.reduce<BudgetTotals>((acc, item) => {
 
         if (!item.startDate) return acc;
 
@@ -289,7 +294,7 @@ export default function Budgets() {
       // Fallback to cache if available
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { totals } = JSON.parse(cachedData);
+        const { totals } = JSON.parse(cachedData) as { totals: BudgetTotals };
         setDataTotalRequisition(totals.requisition);
         setDataTotalLiquidation(totals.liquidation);
         setDataCombinedTotal(totals.combined);
@@ -312,7 +317,8 @@ export default function Budgets() {
   };
 
   const disableCreateBudgetButton = async () => {
-    if (isDepartmentID == 2 || isDepartmentID == 1) {
+    const departmentId = Number(localStorage.getItem("userDept"));
+    if (departmentId === 2 || departmentId === 1) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -341,10 +347,8 @@ export default function Budgets() {
     disableCreateBudgetButton();
   }, []);
 
-  useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
-    setDepartmentID(localStorage.getItem('userDept'));
-    setOfficeID(localStorage.getItem('userOfficeID'));
+  useEffect(() => {
+    setOfficeID(Number(localStorage.getItem('userOfficeID')) || null);
 
     const resolveParticularAccess = async () => {
       const localAccess = localStorage.getItem('access');
@@ -400,15 +404,15 @@ export default function Budgets() {
   const budgetHealth = utilizationRate < 50 ? "Healthy" : utilizationRate < 80 ? "Moderate" : "Critical";
   const budgetHealthColor = utilizationRate < 50 ? "success" : utilizationRate < 80 ? "warning" : "error";
   const departmentOptions = useMemo(
-    () => dataDepartment.map((item: any) => ({ label: item.department, value: item.id })),
+    () => dataDepartment.map((item) => ({ label: item.department, value: item.id })),
     [dataDepartment]
   );
   const selectedCreateDepartmentId = Form.useWatch("department_id", form);
   const selectedUnbudgetedDepartmentId = Form.useWatch("department_id", formUnbudgeted);
-  const selectedCreateDepartment = dataDepartment.find((item: any) => item.id === selectedCreateDepartmentId);
-  const selectedUnbudgetedDepartment = dataDepartment.find((item: any) => item.id === selectedUnbudgetedDepartmentId);
+  const selectedCreateDepartment = dataDepartment.find((item) => item.id === selectedCreateDepartmentId);
+  const selectedUnbudgetedDepartment = dataDepartment.find((item) => item.id === selectedUnbudgetedDepartmentId);
 
-  const departmentCards = dataBudgetDepartment.map((item: any) => {
+  const departmentCards = dataBudgetDepartment.map((item) => {
     const utilization = item.budget > 0 ? Math.min(100, (dataCombinedTotal / item.budget) * 100) : 0;
 
     return (
@@ -503,6 +507,11 @@ export default function Budgets() {
       }
 
       const [startDate, endDate] = date;
+      const officeId = isOfficeID ?? Number(localStorage.getItem('userOfficeID'));
+      if (!officeId) {
+        throw new Error("Office is required to create a budget record");
+      }
+
       const currentDate = new Date(); // Get current date
       const formattedDate = currentDate.toISOString().split('T')[0];
 
@@ -520,7 +529,7 @@ export default function Budgets() {
         start_date: startDate.format("YYYY-MM-DD"),
         end_date: endDate.format("YYYY-MM-DD"),
         status_id: 1,
-        office_id: isOfficeID,
+        office_id: officeId,
       };
 
       // Create new record
@@ -542,12 +551,16 @@ export default function Budgets() {
   const onFinishUnbudgetedRequisition = async () => {
     try {
       const values = await formUnbudgeted.validateFields();
+      const officeId = isOfficeID ?? Number(localStorage.getItem('userOfficeID'));
+      if (!officeId) {
+        throw new Error("Office is required to create an unbudgeted record");
+      }
 
       // Prepare payload with formatted dates
       const allValues = {
         ...values,
         status_id: 1,
-        office_id: isOfficeID,
+        office_id: officeId,
       };
 
       // Create new record
@@ -575,6 +588,10 @@ export default function Budgets() {
         status_id: 1,
       };
       // Update existing record
+      if (!dataBudgetPerDepartment) {
+        throw new Error("No department budget selected");
+      }
+
       const { error } = await BudgetService.updatePost(dataBudgetPerDepartment.id, allValues);
       if (error) throw new Error(error.message);
 
