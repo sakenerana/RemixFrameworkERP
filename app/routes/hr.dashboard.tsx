@@ -21,7 +21,7 @@ import StabilityChart from "~/components/StabilityChart";
 const { Title, Text } = Typography;
 
 export default function HRDashboard() {
-  // Keep KPIs memoized so icons/objects aren’t recreated every render
+  // Keep KPIs memoized so icons/objects are not recreated every render.
   const kpis = useMemo(
     () => [
       {
@@ -71,7 +71,7 @@ export default function HRDashboard() {
   const handleRefresh = () => {};
 
   return (
-    // ✅ removed ml-64 — let your Layout control left spacing
+    // Let the shared layout control left spacing.
     <div className="flex-1 p-6 space-y-6 overflow-auto">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -79,7 +79,7 @@ export default function HRDashboard() {
           <Title level={3} style={{ margin: 0 }}>
             HR Analytics Dashboard
           </Title>
-          <Text type="secondary">Team performance overview · Feb 2026</Text>
+          <Text type="secondary">Team performance overview - Feb 2026</Text>
         </div>
 
         <Space>
