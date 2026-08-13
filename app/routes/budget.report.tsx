@@ -66,9 +66,17 @@ export default function BudgetHistoryReports() {
     const fetchDataBudgetAllocated = async () => {
         try {
             // setLoading(true);
-            const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
-            setDataBudget(dataFetch); // Works in React state
-            fetchPendingApprovalsCount(dataFetch?.start_date, dataFetch?.end_date);
+            const dataFetch = await BudgetService.getByData();
+            const activeBudget = Array.isArray(dataFetch) ? dataFetch[0] : dataFetch;
+            setDataBudget(activeBudget);
+
+            if (activeBudget?.start_date && activeBudget?.end_date) {
+                fetchPendingApprovalsCount(activeBudget.start_date, activeBudget.end_date);
+            } else {
+                setDataPendingApprovals(0);
+                setDataApprovedBudget(0);
+                setLoadingPendingApproved(false);
+            }
         } catch (error) {
             message.error("errorss");
         } finally {

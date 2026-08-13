@@ -39,7 +39,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   icon,
   isLoading = false,
 }) => {
-  const formatTooltipValue = (value: number | string, name: string) => {
+  const formatTooltipValue = (value: number | string | undefined, name: string | undefined) => {
     const numericValue = Number(value) || 0;
 
     const formattedValue = numericValue >= 1000
@@ -51,7 +51,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         }).format(numericValue)
       : new Intl.NumberFormat('en-US').format(numericValue);
 
-    return [formattedValue, name];
+    return [formattedValue, name ?? 'Value'] as [string, string];
   };
 
   return (
