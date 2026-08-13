@@ -27,15 +27,36 @@ import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import dayjs from 'dayjs';
 import { RiCircleFill } from "react-icons/ri";
 import { BudgetService } from "~/services/budget.service";
+import { Budget } from "~/types/budget.type";
+
+interface BudgetTransactionRow {
+  id?: number;
+  processId?: number | string;
+  processTitle?: string;
+  referenceNo?: string;
+  startDate?: string;
+  dueDate?: string;
+  department?: string;
+  branch?: string;
+  workflowType?: "Requisition" | "Liquidation" | string;
+  requisitionType?: string;
+  status?: "Completed" | "In Progress" | "Overdue" | "Return" | string;
+  totalAmount?: number | string;
+}
+
+interface CachedTransactions {
+  data: BudgetTransactionRow[];
+  timestamp: number;
+}
 
 export default function BudgetTransactions() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<BudgetTransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [isDepartmentID, setDepartmentID] = useState<number | null>(null);
 
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<BudgetTransactionRow[]>([]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -75,7 +96,7 @@ export default function BudgetTransactions() {
       // Check cache first
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
+        const { data, timestamp } = JSON.parse(cachedData) as CachedTransactions;
         if (now - timestamp < CACHE_EXPIRY) {
           setData(data);
           setLoading(false);
@@ -85,11 +106,11 @@ export default function BudgetTransactions() {
 
       // Parallel API calls
       const [requisitionResponse, budgetData] = await Promise.all([
-        axios.post<{ data: any[] }>(
+        axios.post<{ data: BudgetTransactionRow[] }>(
           `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
           { userid: userId, username }
         ),
-        BudgetService.getTransactionByDepartment(departmentId)
+        BudgetService.getTransactionByDepartment(departmentId) as Promise<Budget | null>
       ]);
 
       const items = requisitionResponse.data.data || [];
@@ -121,7 +142,7 @@ export default function BudgetTransactions() {
 
       // Optimized sorting
       const sorted = filtered.sort((a, b) =>
-        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+        new Date(b.startDate || 0).getTime() - new Date(a.startDate || 0).getTime()
       );
 
       // Update state and cache
@@ -135,7 +156,7 @@ export default function BudgetTransactions() {
       // Fallback to cache if available
       const cachedData = localStorage.getItem(CACHE_KEY);
       if (cachedData) {
-        const { data } = JSON.parse(cachedData);
+        const { data } = JSON.parse(cachedData) as CachedTransactions;
         setData(data);
       } else {
         const message = err instanceof Error ? err.message : "Unknown error occurred";
@@ -149,7 +170,7 @@ export default function BudgetTransactions() {
   };
 
   useEffect(() => {
-    setDepartmentID(localStorage.getItem('userDept'));
+    setDepartmentID(Number(localStorage.getItem('userDept')) || null);
   }, []);
 
   useEffect(() => {
@@ -159,9 +180,10 @@ export default function BudgetTransactions() {
       // fetchDataBudget();
       fetchData();
     } else {
-      const filtered = data.filter(data =>
-        data.referenceNo?.toLowerCase().includes(searchText.toLowerCase()) ||
-        data.processTitle?.toLowerCase().includes(searchText.toLowerCase())
+      const normalizedSearch = searchText.toLowerCase();
+      const filtered = data.filter((item) =>
+        item.referenceNo?.toLowerCase().includes(normalizedSearch) ||
+        item.processTitle?.toLowerCase().includes(normalizedSearch)
       );
       setFilteredData(filtered);
     }
@@ -179,7 +201,7 @@ export default function BudgetTransactions() {
     "Amount": true,
   });
 
-  const columns: TableColumnsType<any> = [
+  const columns: TableColumnsType<BudgetTransactionRow> = [
     {
       title: "Process Title",
       dataIndex: "processTitle",
@@ -211,7 +233,7 @@ export default function BudgetTransactions() {
       title: "Start Date",
       dataIndex: "startDate",
       width: 120,
-      render: (dateString) => (
+      render: (dateString?: string) => (
         <div className="flex items-center">
           <CalendarOutlined className="mr-2 text-gray-400" />
           <div className="flex flex-col">
@@ -229,7 +251,7 @@ export default function BudgetTransactions() {
       title: "Due Date",
       dataIndex: "dueDate",
       width: 120,
-      render: (dateString) => (
+      render: (dateString?: string) => (
         <div className="flex items-center">
           <CalendarOutlined className="mr-2 text-gray-400" />
           <div className="flex flex-col">
@@ -310,7 +332,7 @@ export default function BudgetTransactions() {
       width: 120,
       render: (_, value) => (
         <div className="text-right font-medium">
-          {formatCurrency(value.totalAmount)}
+          {formatCurrency(Number(value.totalAmount || 0))}
         </div>
       ),
     },
@@ -449,7 +471,7 @@ export default function BudgetTransactions() {
           )}
         </div>
 
-        <Table<any>
+        <Table<BudgetTransactionRow>
           size="middle"
           columns={filteredColumns}
           dataSource={tableData}
@@ -459,7 +481,7 @@ export default function BudgetTransactions() {
             indicator: <LoadingOutlined style={{ fontSize: 28 }} spin />,
           }}
           scroll={{ x: "max-content" }}
-          rowKey={(record) => record.id || record.referenceNo || record.processId}
+          rowKey={(record) => record.id || record.referenceNo || record.processId || `${record.processTitle}-${record.startDate}`}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,

@@ -30,17 +30,57 @@ import { Budget } from "~/types/budget.type";
 const { RangePicker } = DatePicker;
 
 interface BudgetHistoryDataType {
-    id: number;
+    id?: number;
     referenceNo: string;
     processTitle: string;
     department: string;
     workflowType: string;
-    status: 'approved' | 'pending' | 'rejected' | 'under_review' | 'completed';
+    status: string;
     totalAmount: number;
     startDate: string;
     dueDate: string;
     notes: string;
 }
+
+interface BudgetHistoryApiRow {
+    id?: number;
+    referenceNo?: string | null;
+    processTitle?: string | null;
+    department?: string | null;
+    workflowType?: string | null;
+    status?: string | null;
+    totalAmount?: number | string | null;
+    startDate?: string | null;
+    dueDate?: string | null;
+    notes?: string | null;
+}
+
+const getBudgetHistoryItems = (payload: unknown): BudgetHistoryApiRow[] => {
+    if (Array.isArray(payload)) return payload as BudgetHistoryApiRow[];
+
+    if (
+        typeof payload === "object" &&
+        payload !== null &&
+        Array.isArray((payload as { data?: unknown }).data)
+    ) {
+        return (payload as { data: BudgetHistoryApiRow[] }).data;
+    }
+
+    return [];
+};
+
+const toBudgetHistoryRow = (item: BudgetHistoryApiRow): BudgetHistoryDataType => ({
+    id: item.id,
+    referenceNo: item.referenceNo || "",
+    processTitle: item.processTitle || "Untitled request",
+    department: item.department || "N/A",
+    workflowType: item.workflowType || "N/A",
+    status: item.status || "N/A",
+    totalAmount: Number(item.totalAmount || 0),
+    startDate: item.startDate || "",
+    dueDate: item.dueDate || "",
+    notes: item.notes || "No notes provided",
+});
 
 export default function BudgetHistoryReports() {
     const [loading, setLoading] = useState(false);
@@ -51,11 +91,11 @@ export default function BudgetHistoryReports() {
     const [selectedRecord, setSelectedRecord] = useState<BudgetHistoryDataType | null>(null);
 
     const [dataBudget, setDataBudget] = useState<Budget>();
-    const [dataPendingApprovals, setDataPendingApprovals] = useState<any>();
-    const [dataApprovedBudget, setDataApprovedBudget] = useState<any>();
+    const [dataPendingApprovals, setDataPendingApprovals] = useState(0);
+    const [dataApprovedBudget, setDataApprovedBudget] = useState(0);
 
-    const [isDepartmentID, setDepartmentID] = useState<any>();
-    const [isOfficeID, setOfficeID] = useState<any>();
+    const [isDepartmentID, setDepartmentID] = useState<number | null>(null);
+    const [isOfficeID, setOfficeID] = useState<number | null>(null);
 
     // const handleRefetch = async () => {
     //     setLoading(true);
@@ -94,37 +134,34 @@ export default function BudgetHistoryReports() {
         setLoadingPendingApproved(true);
 
         try {
-            const response = await axios.post(
+            const response = await axios.post<{ data: BudgetHistoryApiRow[] }>(
                 `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
                 { userid: userId, username }
             );
 
 
-            // Ensure the API returned an array
-            const items = Array.isArray(response.data)
-                ? response.data
-                : Array.isArray(response.data?.data)
-                    ? response.data.data
-                    : [];
+            const items = getBudgetHistoryItems(response.data);
 
             // Filter by:
             // 1️⃣ status === "In Progress"
             // 2️⃣ date >= startDate AND date <= endDate
-            const filteredPending = items.filter((item: any) => {
+            const filteredPending = items.filter((item) => {
+                if (!item.startDate) return false;
                 const itemDate = new Date(item.startDate);
                 return (
                     item.status === "In Progress" &&
-                    item.department == dept &&
+                    item.department === dept &&
                     itemDate >= new Date(startDate) &&
                     itemDate <= new Date(endDate)
                 );
             });
 
-            const filteredApproved = items.filter((item: any) => {
+            const filteredApproved = items.filter((item) => {
+                if (!item.startDate) return false;
                 const itemDate = new Date(item.startDate);
                 return (
                     item.status === "Completed" &&
-                    item.department == dept &&
+                    item.department === dept &&
                     itemDate >= new Date(startDate) &&
                     itemDate <= new Date(endDate)
                 );
@@ -151,31 +188,27 @@ export default function BudgetHistoryReports() {
         const dept = localStorage.getItem("dept") || "";
         setLoading(true);
         try {
-            const response = await axios.post(
+            const response = await axios.post<{ data: BudgetHistoryApiRow[] }>(
                 `${import.meta.env.VITE_API_BASE_URL}/completed-requisition-liquidation`,
                 { userid: userId, username }
             );
 
 
-            // Ensure the API returned an array
-            const items = Array.isArray(response.data)
-                ? response.data
-                : Array.isArray(response.data?.data)
-                    ? response.data.data
-                    : [];
+            const items = getBudgetHistoryItems(response.data);
 
             // Filter by:
             // 1️⃣ status === "In Progress"
             // 2️⃣ date >= startDate AND date <= endDate
-            const filteredDateRange = items.filter((item: any) => {
+            const filteredDateRange = items.filter((item) => {
+                if (!item.startDate) return false;
                 const itemDate = new Date(item.startDate);
                 return (
                     item.status === "Completed" &&
-                    item.department == dept &&
+                    item.department === dept &&
                     itemDate >= new Date(startDate) &&
                     itemDate <= new Date(endDate)
                 );
-            });
+            }).map(toBudgetHistoryRow);
 
             setFilteredData(filteredDateRange);
             setLoading(false);
@@ -187,8 +220,8 @@ export default function BudgetHistoryReports() {
     };
 
     useEffect(() => {
-        setDepartmentID(localStorage.getItem('userDept'));
-        setOfficeID(localStorage.getItem('userOfficeID'));
+        setDepartmentID(Number(localStorage.getItem('userDept')) || null);
+        setOfficeID(Number(localStorage.getItem('userOfficeID')) || null);
     }, []);
 
     useEffect(() => {
