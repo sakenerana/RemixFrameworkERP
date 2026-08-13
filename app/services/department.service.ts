@@ -49,7 +49,7 @@ export const DepartmentService = {
   },
 
   // Update
-  async updatePost(id: number, updates: Department) {
+  async updatePost(id: number, updates: Partial<Department>) {
     const { data, error } = await supabase
       .from('departments')
       .update(updates)

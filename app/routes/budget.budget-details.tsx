@@ -14,6 +14,7 @@ import Particulars from "~/components/particulars";
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
+import { Budget } from "~/types/budget.type";
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("en-PH", {
@@ -40,7 +41,7 @@ const parseBudgetCodes = (budgetCodes: unknown) => {
 export default function BudgetDetails() {
   const [searchParams] = useSearchParams();
   const budgetId = searchParams.get("id");
-  const [budget, setBudget] = useState<any>(null);
+  const [budget, setBudget] = useState<Budget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

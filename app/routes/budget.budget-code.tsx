@@ -250,7 +250,7 @@ export default function BudgetCodePage() {
 
       await DepartmentService.updatePost(values.department_id, {
         budget_code: values.budget_code,
-      } as any);
+      });
 
       message.success("Department particulars updated successfully");
       closeAssignModal();
