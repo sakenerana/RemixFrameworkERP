@@ -38,6 +38,7 @@ interface LiquidationRecord {
 }
 
 interface BudgetDepartmentItem {
+    budget?: number | string | null;
     departments: {
         department: string;
         budget_code?: unknown;

@@ -19,6 +19,10 @@ interface LiquidationDataType {
   status: "Completed" | "Pending" | "Rejected" | string;
 }
 
+interface LiquidationBudgetItem {
+  budget?: number | string | null;
+}
+
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -32,7 +36,7 @@ export default function Liquidation({
   liquidationCount,
   liquidationData = [],
 }: {
-  item: any;
+  item: LiquidationBudgetItem;
   requisitionTotal?: number;
   liquidationTotal?: number;
   liquidationCount?: number;

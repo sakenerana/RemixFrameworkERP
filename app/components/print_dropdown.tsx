@@ -1,28 +1,56 @@
 import { Button, Dropdown, MenuProps } from "antd";
+import type { ButtonProps } from "antd";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { FcExport } from "react-icons/fc";
-import { AlignmentType, BorderStyle, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import * as XLSX from 'xlsx';
-import { useEffect } from "react";
 import dayjs from "dayjs";
 
-export default function PrintDropdownComponent(stateData: any) {
+type ExportVariant = "default" | "workflow_assigned_like";
+type WorkflowBreakdown = Record<string, unknown> | Array<Record<string, unknown>>;
+
+interface ExportItem {
+  id?: unknown;
+  username?: unknown;
+  firstname?: unknown;
+  lastname?: unknown;
+  activities_count?: unknown;
+  workflows_breakdown?: unknown;
+}
+
+interface PrintDropdownProps {
+  stateData?: unknown[];
+  exportVariant?: ExportVariant;
+  buttonProps?: ButtonProps;
+}
+
+const getString = (value: unknown) => String(value ?? "");
+const getWorkflowBreakdown = (value: unknown): WorkflowBreakdown => {
+  if (Array.isArray(value)) return value as Array<Record<string, unknown>>;
+  if (typeof value === "object" && value !== null) return value as Record<string, unknown>;
+  return {};
+};
+
+export default function PrintDropdownComponent({
+  stateData = [],
+  exportVariant = "default",
+  buttonProps,
+}: PrintDropdownProps) {
 
   // EXPORT TO EXCEL
   const exportToExcel = () => {
-    const selectedData = Array.isArray(stateData.stateData) ? stateData.stateData : [];
-    const exportVariant = stateData?.exportVariant || "default";
+    const selectedData = (Array.isArray(stateData) ? stateData : []) as ExportItem[];
 
     if (exportVariant === "workflow_assigned_like") {
-      const assignedDetails = selectedData.flatMap((user: any) => {
+      const assignedDetails = selectedData.flatMap((user) => {
+        const breakdown = getWorkflowBreakdown(user.workflows_breakdown);
         const profileRows = [
           { section: "User Profile", field: "User ID", value: user.id },
           { section: "User Profile", field: "Username", value: user.username },
-          { section: "User Profile", field: "Full Name", value: `${user.firstname || ""} ${user.lastname || ""}`.trim() },
+          { section: "User Profile", field: "Full Name", value: `${getString(user.firstname)} ${getString(user.lastname)}`.trim() },
           { section: "User Profile", field: "Activities", value: user.activities_count },
         ];
 
-        const workflowRows = Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+        const workflowRows = Object.entries(breakdown).map(([workflow, count]) => ({
           section: "Workflow Breakdown",
           field: workflow,
           value: count,
@@ -31,23 +59,29 @@ export default function PrintDropdownComponent(stateData: any) {
         return [...profileRows, ...workflowRows, { section: "", field: "", value: "" }];
       });
 
-      const userSummary = selectedData.map((user: any) => ({
+      const userSummary = selectedData.map((user) => {
+        const breakdown = getWorkflowBreakdown(user.workflows_breakdown);
+
+        return {
         id: user.id,
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
         activities_count: user.activities_count,
-        workflow_types: Object.keys(user.workflows_breakdown || {}).length,
-      }));
+          workflow_types: Object.keys(breakdown).length,
+        };
+      });
 
-      const workflowBreakdown = selectedData.flatMap((user: any) =>
-        Object.entries(user.workflows_breakdown || {}).map(([workflow, count]) => ({
+      const workflowBreakdown = selectedData.flatMap((user) => {
+        const breakdown = getWorkflowBreakdown(user.workflows_breakdown);
+
+        return Object.entries(breakdown).map(([workflow, count]) => ({
           user_id: user.id,
           username: user.username,
           workflow,
           tasks: count,
-        }))
-      );
+        }));
+      });
 
       const wb = XLSX.utils.book_new();
 
@@ -65,24 +99,28 @@ export default function PrintDropdownComponent(stateData: any) {
       return;
     }
 
-    const usersSheetRows = selectedData.map((item: any) => ({
+    const usersSheetRows = selectedData.map((item) => {
+      const breakdown = getWorkflowBreakdown(item.workflows_breakdown);
+
+      return {
       id: item.id,
       username: item.username,
       firstname: item.firstname,
       lastname: item.lastname,
       activities_count: item.activities_count,
-      workflow_types: item.workflows_breakdown ? Object.keys(item.workflows_breakdown).length : 0,
-    }));
+        workflow_types: Object.keys(breakdown).length,
+      };
+    });
 
-    const workflowBreakdownRows = selectedData.flatMap((item: any) => {
-      const breakdown = item.workflows_breakdown || {};
+    const workflowBreakdownRows = selectedData.flatMap((item) => {
+      const breakdown = getWorkflowBreakdown(item.workflows_breakdown);
 
       if (Array.isArray(breakdown)) {
-        return breakdown.map((entry: any, index: number) => ({
+        return breakdown.map((entry, index) => ({
           user_id: item.id,
           username: item.username,
-          workflow: entry?.workflow || entry?.name || `Workflow ${index + 1}`,
-          tasks: entry?.count ?? entry?.tasks ?? entry?.value ?? 0,
+          workflow: getString(entry.workflow || entry.name || `Workflow ${index + 1}`),
+          tasks: entry.count ?? entry.tasks ?? entry.value ?? 0,
         }));
       }
 
@@ -104,100 +142,6 @@ export default function PrintDropdownComponent(stateData: any) {
 
     XLSX.writeFile(wb, "rename_this_file.xlsx");
   };
-
-  // EXPORT TO WORD
-  const exportToWord = async () => {
-  // Create table rows from data
-  const tableRows = stateData.stateData.stateData.map((item: any) => {
-    return new TableRow({
-      children: [
-        new TableCell({
-          children: [new Paragraph(item.id.toString())]
-        }),
-        new TableCell({
-          children: [new Paragraph(item.first_name + item.middle_name + item.last_name)]
-        }),
-        new TableCell({
-          children: [new Paragraph(item.email)]
-        })
-      ]
-    });
-  });
-
-  const doc = new Document({
-    sections: [{
-      properties: {},
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Report",
-              bold: true,
-              size: 28,
-            }),
-          ],
-          alignment: AlignmentType.CENTER
-        }),
-        // Add some space between title and table
-        new Paragraph({
-          children: [new TextRun("")],
-          spacing: { after: 200 }
-        }),
-        // Create the table
-        new Table({
-          width: {
-            size: 100,
-            type: WidthType.PERCENTAGE,
-          },
-          rows: [
-            // Table header row
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [new Paragraph("ID")],
-                  shading: {
-                    fill: "DDDDDD"
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph("Name")],
-                  shading: {
-                    fill: "DDDDDD"
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph("Email")],
-                  shading: {
-                    fill: "DDDDDD"
-                  }
-                })
-              ]
-            }),
-            // Add data rows
-            ...tableRows
-          ],
-          borders: {
-            top: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
-            bottom: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
-            left: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
-            right: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
-            insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: "AAAAAA" },
-            insideVertical: { style: BorderStyle.SINGLE, size: 2, color: "AAAAAA" }
-          }
-        })
-      ]
-    }]
-  });
-
-  const blob = await Packer.toBlob(doc);
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'report.docx';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
 
   const items: MenuProps['items'] = [
     // {
@@ -235,14 +179,11 @@ export default function PrintDropdownComponent(stateData: any) {
     // },
   ];
 
-  useEffect(() => {
-  }, []); // Empty dependency array means this runs once on mount
-
   return (
     <Dropdown menu={{ items }} placement="bottomLeft" trigger={["click"]}>
       <Button
         icon={<FcExport />}
-        {...(stateData.buttonProps || {})}
+        {...(buttonProps || {})}
       >
         Export
       </Button>
