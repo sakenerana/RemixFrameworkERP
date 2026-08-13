@@ -159,7 +159,6 @@ export default function Particulars({ item }: { item: any }) {
                 );
 
                 setRequisitions(response.data.data || []);
-                console.log("Fetched requisitions nad liquidation:", response.data.data);
             } catch (err) {
                 console.error("Error fetching requisitions:", err);
             } finally {

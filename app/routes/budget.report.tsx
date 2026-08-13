@@ -69,7 +69,6 @@ export default function BudgetHistoryReports() {
             const dataFetch = await BudgetService.getByData(isDepartmentID, isOfficeID);
             setDataBudget(dataFetch); // Works in React state
             fetchPendingApprovalsCount(dataFetch?.start_date, dataFetch?.end_date);
-            // console.log("BUDGET DATAS", dataFetch)
         } catch (error) {
             message.error("errorss");
         } finally {
@@ -92,7 +91,6 @@ export default function BudgetHistoryReports() {
                 { userid: userId, username }
             );
 
-            // console.log("API RAW RESPONSE:", response.data);
 
             // Ensure the API returned an array
             const items = Array.isArray(response.data)
@@ -106,7 +104,6 @@ export default function BudgetHistoryReports() {
             // 2️⃣ date >= startDate AND date <= endDate
             const filteredPending = items.filter((item: any) => {
                 const itemDate = new Date(item.startDate);
-                // console.log("ITEM DATE:", itemDate, "START:", new Date(startDate), "END:", new Date(endDate));
                 return (
                     item.status === "In Progress" &&
                     item.department == dept &&
@@ -117,7 +114,6 @@ export default function BudgetHistoryReports() {
 
             const filteredApproved = items.filter((item: any) => {
                 const itemDate = new Date(item.startDate);
-                // console.log("ITEM DATE:", itemDate, "START:", new Date(startDate), "END:", new Date(endDate));
                 return (
                     item.status === "Completed" &&
                     item.department == dept &&
@@ -131,7 +127,6 @@ export default function BudgetHistoryReports() {
             setDataPendingApprovals(countPending);
             setDataApprovedBudget(countApproved);
             setLoadingPendingApproved(false);
-            // console.log("REPORT DATA:", filteredPending);
 
         } catch (error) {
             console.error("API ERROR:", error);
@@ -153,7 +148,6 @@ export default function BudgetHistoryReports() {
                 { userid: userId, username }
             );
 
-            // console.log("API RAW RESPONSE:", response.data);
 
             // Ensure the API returned an array
             const items = Array.isArray(response.data)
@@ -167,7 +161,6 @@ export default function BudgetHistoryReports() {
             // 2️⃣ date >= startDate AND date <= endDate
             const filteredDateRange = items.filter((item: any) => {
                 const itemDate = new Date(item.startDate);
-                // console.log("ITEM DATE:", itemDate, "START:", new Date(startDate), "END:", new Date(endDate));
                 return (
                     item.status === "Completed" &&
                     item.department == dept &&
@@ -176,7 +169,6 @@ export default function BudgetHistoryReports() {
                 );
             });
 
-            console.log("REPORT DATA FILTER:", filteredDateRange);
             setFilteredData(filteredDateRange);
             setLoading(false);
 

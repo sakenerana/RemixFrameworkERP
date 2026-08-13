@@ -104,7 +104,6 @@ export default function BudgetRoutes() {
       setData(dataFetch); // Works in React state
       const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
       setDataTotalBudgeted(totalBudget);
-      // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -119,7 +118,6 @@ export default function BudgetRoutes() {
       setDataUnbudget(dataFetch); // Works in React state
       const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
       setDataTotalUnBudgeted(totalUnBudget);
-      // console.log("DATA FETCH", totalUnBudget)
     } catch (error) {
       message.error("error");
     } finally {
@@ -180,7 +178,6 @@ export default function BudgetRoutes() {
       );
 
       const items = response.data.data || [];
-      // console.log("ITEMS", items)
       // Process data in single pass
       const result = items.reduce((acc, item) => {
         if (!item.startDate) return acc;

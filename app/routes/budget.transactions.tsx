@@ -50,19 +50,6 @@ export default function BudgetTransactions() {
     setLoading(false);
   };
 
-  // const fetchDataBudget = async () => {
-  //   try {
-  //     // setLoading(true);
-  //     const dataFetch = await BudgetService.getByData();
-  //     setDataBudget(dataFetch); // Works in React state
-  //     console.log("BUDGET DATA", dataFetch)
-  //   } catch (error) {
-  //     message.error("error");
-  //   } finally {
-  //     // setLoading(false);
-  //   }
-  // };
-
   const fetchData = async () => {
     const userId = Number(localStorage.getItem("ab_id"));
     const username = localStorage.getItem("username") || "";

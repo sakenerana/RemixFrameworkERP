@@ -148,7 +148,6 @@ export default function Budgets() {
       setData(dataFetch); // Works in React state
       const totalBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.budget || 0), 0) || 0;
       setDataTotalBudgeted(totalBudget);
-      // console.log("BUDGET DATAS", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -163,7 +162,6 @@ export default function Budgets() {
       setDataUnbudget(dataFetch); // Works in React state
       const totalUnBudget = dataFetch?.reduce((sum: any, item: any) => sum + (item.amount || 0), 0) || 0;
       setDataTotalUnBudgeted(totalUnBudget);
-      console.log("UNBUDGET DATA", totalUnBudget)
     } catch (error) {
       message.error("error");
     } finally {
@@ -177,7 +175,6 @@ export default function Budgets() {
       setLoading(true);
       const dataFetch = await DepartmentService.getAllPosts();
       setDataDepartment(dataFetch); // Works in React state
-      // console.log("DATA DEPARTMENT", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -191,7 +188,6 @@ export default function Budgets() {
       setLoading(true);
       const dataFetch = await BudgetService.getAllBudgetPosts();
       setDataBudgetDepartment(dataFetch); // Works in React state
-      console.log("DATA DEPARTMENT BUDGET", dataFetch)
     } catch (error) {
       message.error("error");
     } finally {
@@ -510,7 +506,6 @@ export default function Budgets() {
       const currentDate = new Date(); // Get current date
       const formattedDate = currentDate.toISOString().split('T')[0];
 
-      // console.log("currentDate", currentDate)
       // Check if data already exists for this department in current year
       setLoading(true);
       const existingData = await BudgetService.getAllPosts(values.department_id, formattedDate);
@@ -547,8 +542,6 @@ export default function Budgets() {
   const onFinishUnbudgetedRequisition = async () => {
     try {
       const values = await formUnbudgeted.validateFields();
-      console.log("UNBUDGETED REQUISITION VALUES", values);
-      const { date, notes } = values;
 
       // Prepare payload with formatted dates
       const allValues = {
@@ -581,7 +574,6 @@ export default function Budgets() {
         ...values,
         status_id: 1,
       };
-      // console.log("UNBUDGETED REQUISITION VALUES", allValues, dataBudgetPerDepartment.id);
       // Update existing record
       const { error } = await BudgetService.updatePost(dataBudgetPerDepartment.id, allValues);
       if (error) throw new Error(error.message);
