@@ -422,30 +422,46 @@ export default function Particulars({ item }: { item: any }) {
     const isTableLoading = loading || (loadingAmountSpent && !displayParticulars.length);
 
     return (
-        <div className="space-y-6">
-            <h4 className="text-lg font-semibold mb-3">Requisition</h4>
+        <div className="budget-particulars space-y-5">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h3 className="m-0 text-base font-semibold text-slate-950">Requisition Particulars</h3>
+                    <p className="m-0 mt-1 text-sm text-slate-500">
+                        Mapped budget particulars and completed requisition spend for {currentYear}.
+                    </p>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700">
+                        {displayParticulars.length} particulars
+                    </span>
+                    <span className="rounded-full bg-blue-50 px-3 py-1 font-medium text-blue-700">
+                        {formatCurrency(requisitionTotal)}
+                    </span>
+                </div>
+            </div>
 
-            <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+            <div className="overflow-hidden rounded-lg border border-slate-200">
+                <div className="overflow-x-auto">
+                    <table className="budget-particulars-table min-w-full divide-y divide-slate-200">
+                    <thead className="bg-slate-50">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                 Particular
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                 Spent Amount
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                                 Status
                             </th>
                         </tr>
                     </thead>
 
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-slate-100 bg-white">
                         {isTableLoading && (
                             <tr>
                                 <td colSpan={3} className="px-4 py-10 text-center">
-                                    <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-500">
+                                    <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-500">
                                         <svg
                                             className="h-4 w-4 animate-spin text-blue-600"
                                             viewBox="0 0 24 24"
@@ -472,8 +488,9 @@ export default function Particulars({ item }: { item: any }) {
 
                         {!isTableLoading && !displayParticulars.length && (
                             <tr>
-                                <td colSpan={3} className="px-4 py-10 text-center text-sm text-gray-500">
-                                    No particulars found
+                                <td colSpan={3} className="px-4 py-12 text-center">
+                                    <div className="font-medium text-slate-600">No particulars found</div>
+                                    <div className="mt-1 text-sm text-slate-400">Assign particulars to this department to populate the table.</div>
                                 </td>
                             </tr>
                         )}
@@ -491,20 +508,19 @@ export default function Particulars({ item }: { item: any }) {
                                         : "Available";
 
                             return (
-                                <tr key={p.id || index}>
+                                <tr key={p.id || index} className="transition-colors hover:bg-slate-50">
                                     <td className="px-4 py-3">
-                                        <div className="font-medium">{p.particulars}</div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="font-semibold text-slate-900">{p.particulars || "N/A"}</div>
+                                        <div className="text-xs text-slate-500">
                                             {p.description || "No description"}
                                         </div>
                                     </td>
 
-                                    {/* INLINE LOADING */}
-                                    <td className="px-4 py-3 text-sm font-medium text-red-800">
+                                    <td className="px-4 py-3 text-sm font-semibold text-slate-900">
                                         {loadingAmountSpent ? (
-                                            <span className="inline-flex items-center gap-2 text-gray-500">
+                                            <span className="inline-flex items-center gap-2 text-slate-500">
                                                 <svg
-                                                    className="h-4 w-4 animate-spin text-red-600"
+                                                    className="h-4 w-4 animate-spin text-blue-600"
                                                     viewBox="0 0 24 24"
                                                 >
                                                     <circle
@@ -530,11 +546,11 @@ export default function Particulars({ item }: { item: any }) {
 
                                     <td className="px-4 py-3">
                                         <span
-                                            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${status === "Available"
-                                                ? "bg-green-100 text-green-800"
+                                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${status === "Available"
+                                                ? "bg-green-50 text-green-700"
                                                 : status === "Low"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : "bg-red-100 text-red-800"
+                                                    ? "bg-amber-50 text-amber-700"
+                                                    : "bg-red-50 text-red-700"
                                                 }`}
                                         >
                                             {status}
@@ -545,11 +561,10 @@ export default function Particulars({ item }: { item: any }) {
                         })}
                     </tbody>
                 </table>
+                </div>
             </div>
 
-            {/* LIQUIDATION */}
             <div>
-                {/* <h4 className="text-lg font-semibold mb-3">Liquidation</h4> */}
                 <Liquidation
                     item={item}
                     requisitionTotal={

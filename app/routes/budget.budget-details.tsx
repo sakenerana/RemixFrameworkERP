@@ -1,9 +1,18 @@
-import { ArrowLeftOutlined, HomeOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  BankOutlined,
+  CalendarOutlined,
+  CheckCircleOutlined,
+  HomeOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import { Link, useSearchParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Empty, Progress, Spin, Tag } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Particulars from "~/components/particulars";
+import { AppPageHeader } from "~/components/ui/AppPageHeader";
+import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
 
 const formatCurrency = (amount: number) =>
@@ -13,6 +22,20 @@ const formatCurrency = (amount: number) =>
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount || 0);
+
+const parseBudgetCodes = (budgetCodes: unknown) => {
+  if (Array.isArray(budgetCodes)) return budgetCodes.length;
+
+  if (typeof budgetCodes === "string") {
+    return budgetCodes
+      .replace(/[{}[\]"]/g, "")
+      .split(",")
+      .map((code) => code.trim())
+      .filter(Boolean).length;
+  }
+
+  return 0;
+};
 
 export default function BudgetDetails() {
   const [searchParams] = useSearchParams();
@@ -44,9 +67,25 @@ export default function BudgetDetails() {
     fetchBudget();
   }, [budgetId]);
 
+  const budgetMeta = useMemo(() => {
+    if (!budget) {
+      return {
+        departmentName: "Budget Details",
+        periodLabel: "No period",
+        budgetCodeCount: 0,
+      };
+    }
+
+    return {
+      departmentName: budget.departments?.department || "Unknown Department",
+      periodLabel: `${dayjs(budget.start_date).format("MMM D")} - ${dayjs(budget.end_date).format("MMM D, YYYY")}`,
+      budgetCodeCount: parseBudgetCodes(budget.departments?.budget_code),
+    };
+  }, [budget]);
+
   if (loading) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center">
+      <div className="budget-details-page flex min-h-[420px] items-center justify-center">
         <Spin
           indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
           tip="Loading budget details..."
@@ -57,7 +96,7 @@ export default function BudgetDetails() {
 
   if (error || !budget) {
     return (
-      <Card className="rounded-xl border border-gray-200 shadow-sm">
+      <Card className="budget-details-page rounded-lg border border-gray-200 shadow-sm">
         <Empty
           description={error || "Budget details not found"}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -73,69 +112,80 @@ export default function BudgetDetails() {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <Breadcrumb
-          items={[
-            {
-              href: "/budget",
-              title: <HomeOutlined />,
-            },
-            {
-              href: "/budget/budgets",
-              title: "Budgets",
-            },
-            {
-              title: budget.departments?.department || "Budget Details",
-            },
-          ]}
-        />
+    <div className="budget-details-page space-y-4">
+      <AppPageHeader
+        eyebrow="Department Budget"
+        title={budgetMeta.departmentName}
+        subtitle="Review allocated budget particulars, requisition totals, and liquidation activity."
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              {
+                href: "/budget",
+                title: <HomeOutlined />,
+              },
+              {
+                href: "/budget/budgets",
+                title: "Budgets",
+              },
+              {
+                title: budgetMeta.departmentName,
+              },
+            ]}
+          />
+        }
+        meta={
+          <>
+            <Tag color="green" className="m-0 rounded-full px-3 py-1">Active</Tag>
+            <Tag className="m-0 rounded-full px-3 py-1">{budgetMeta.budgetCodeCount} particulars</Tag>
+          </>
+        }
+        actions={
+          <Link to="/budget/budgets">
+            <Button icon={<ArrowLeftOutlined />}>Back to Budgets</Button>
+          </Link>
+        }
+      />
 
-        <Link to="/budget/budgets">
-          <Button icon={<ArrowLeftOutlined />}>Back to Budgets</Button>
-        </Link>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <SummaryMetricCard
+          title="Allocated Budget"
+          value={formatCurrency(Number(budget.budget))}
+          icon={<BankOutlined className="text-blue-600" />}
+          description="Approved department allocation"
+        />
+        <SummaryMetricCard
+          title="Budget Period"
+          value={budgetMeta.periodLabel}
+          icon={<CalendarOutlined className="text-emerald-600" />}
+          description="Current active coverage"
+        />
+        <SummaryMetricCard
+          title="Budget Status"
+          value="Active"
+          icon={<CheckCircleOutlined className="text-green-600" />}
+          description={`${budgetMeta.budgetCodeCount} mapped particulars`}
+          valueColor="#15803d"
+        />
       </div>
 
-      <Card className="rounded-xl border border-gray-200 shadow-sm" bodyStyle={{ padding: 24 }}>
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex min-w-0 items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
-              <span className="text-base font-bold text-white">
-                {budget.departments?.department?.charAt(0) || "B"}
-              </span>
+      <Card className="rounded-lg border border-gray-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+        <div className="mb-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="m-0 text-base font-semibold text-slate-950">Allocation Usage</h2>
+              <p className="m-0 mt-1 text-sm text-slate-500">Current spend is summarized below by particular.</p>
             </div>
-
-            <div className="min-w-0">
-              <h1 className="m-0 text-xl font-semibold text-gray-900">
-                {budget.departments?.department || "Unknown Department"}
-              </h1>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
-                <span>
-                  Budget Period: {dayjs(budget.start_date).format("MMM D")} -{" "}
-                  {dayjs(budget.end_date).format("MMM D, YYYY")}
-                </span>
-                <span className="h-1 w-1 rounded-full bg-gray-300" />
-                <span>
-                  Status: <Tag color="green">Active</Tag>
-                </span>
+            <div className="min-w-[220px]">
+              <div className="mb-1 flex justify-between text-xs text-slate-500">
+                <span>Utilization</span>
+                <span>0%</span>
               </div>
+              <Progress percent={0} showInfo={false} size="small" strokeColor="#2563eb" />
             </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-[minmax(180px,220px)_minmax(180px,220px)] md:items-center">
-            <div className="md:text-right">
-              <div className="text-2xl font-bold text-blue-800">
-                {formatCurrency(Number(budget.budget))}
-              </div>
-              <div className="text-xs text-gray-500">Allocated Budget</div>
-            </div>
-
-            <Progress percent={0} size="small" strokeColor="#10b981" />
           </div>
         </div>
-      </Card>
 
-      <Card className="rounded-xl border border-gray-200 shadow-sm" bodyStyle={{ padding: 24 }}>
         <Particulars item={budget} />
       </Card>
     </div>

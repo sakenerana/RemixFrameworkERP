@@ -461,6 +461,154 @@ body.dark-mode .unbudgeted-requisition-modal .ant-input::placeholder {
   color: #94a3b8 !important;
 }
 
+body.dark-mode .budget-details-page {
+  color: #e5e7eb;
+}
+
+body.dark-mode .budget-details-page .ant-card,
+body.dark-mode .budget-details-page .ant-card-bordered,
+body.dark-mode .budget-details-page .rounded-lg.bg-white,
+body.dark-mode .budget-details-page .bg-white,
+body.dark-mode .budget-liquidation .ant-card {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.dark-mode .budget-details-page .ant-card-body {
+  background: transparent !important;
+}
+
+body.dark-mode .budget-details-page .text-slate-950,
+body.dark-mode .budget-details-page .text-slate-900,
+body.dark-mode .budget-details-page .text-slate-800,
+body.dark-mode .budget-details-page .text-slate-700,
+body.dark-mode .budget-details-page .ant-statistic-content,
+body.dark-mode .budget-details-page .ant-statistic-content-value,
+body.dark-mode .budget-details-page .ant-breadcrumb,
+body.dark-mode .budget-details-page .ant-breadcrumb-separator,
+body.dark-mode .budget-liquidation-modal .text-slate-900,
+body.dark-mode .budget-liquidation-table .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-details-page .text-slate-600,
+body.dark-mode .budget-details-page .text-slate-500,
+body.dark-mode .budget-details-page .text-slate-400,
+body.dark-mode .budget-details-page .ant-statistic-title {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .budget-details-page .text-blue-600,
+body.dark-mode .budget-details-page .text-blue-700 {
+  color: #60a5fa !important;
+}
+
+body.dark-mode .budget-details-page .text-emerald-600,
+body.dark-mode .budget-details-page .text-emerald-700,
+body.dark-mode .budget-details-page .text-green-600,
+body.dark-mode .budget-details-page .text-green-700 {
+  color: #86efac !important;
+}
+
+body.dark-mode .budget-details-page .text-red-600,
+body.dark-mode .budget-details-page .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+body.dark-mode .budget-details-page .border-slate-200,
+body.dark-mode .budget-details-page .border-slate-100,
+body.dark-mode .budget-details-page .border-gray-200,
+body.dark-mode .budget-details-page .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+body.dark-mode .budget-details-page .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #374151 !important;
+}
+
+body.dark-mode .budget-details-page .bg-slate-50,
+body.dark-mode .budget-details-page .bg-slate-100,
+body.dark-mode .budget-details-page .hover\:bg-slate-50:hover {
+  background: #262626 !important;
+}
+
+body.dark-mode .budget-details-page .bg-blue-50 {
+  background: rgba(37, 99, 235, 0.18) !important;
+}
+
+body.dark-mode .budget-details-page .bg-green-50 {
+  background: rgba(22, 163, 74, 0.16) !important;
+}
+
+body.dark-mode .budget-details-page .bg-amber-50 {
+  background: rgba(245, 158, 11, 0.16) !important;
+}
+
+body.dark-mode .budget-details-page .bg-red-50 {
+  background: rgba(220, 38, 38, 0.16) !important;
+}
+
+body.dark-mode .budget-details-page .ant-progress-inner {
+  background: #374151 !important;
+}
+
+body.dark-mode .budget-details-page .ant-btn-default {
+  background: #121212 !important;
+  border-color: #3f3f46 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-liquidation-modal .ant-modal-content,
+body.dark-mode .budget-liquidation-modal .ant-modal-header {
+  background: #1f1f1f !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-liquidation-modal .ant-modal-title,
+body.dark-mode .budget-liquidation-modal .ant-modal-close,
+body.dark-mode .budget-liquidation-modal .ant-modal-close-x {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-table,
+body.dark-mode .budget-liquidation-table .ant-table-container,
+body.dark-mode .budget-liquidation-table .ant-table-content {
+  background: #121212 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  color: #172033 !important;
+  border-color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-table-tbody > tr > td {
+  background: #121212 !important;
+  border-color: #3f3f46 !important;
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-table-tbody > tr:hover > td {
+  background: #1f2937 !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-empty-description,
+body.dark-mode .budget-liquidation-table .ant-pagination,
+body.dark-mode .budget-liquidation-table .ant-pagination-total-text,
+body.dark-mode .budget-liquidation-table .ant-select-selector,
+body.dark-mode .budget-liquidation-table .ant-select-arrow,
+body.dark-mode .budget-liquidation-table .ant-pagination-item a {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .budget-liquidation-table .ant-select-selector,
+body.dark-mode .budget-liquidation-table .ant-pagination-item,
+body.dark-mode .budget-liquidation-table .ant-pagination-prev .ant-pagination-item-link,
+body.dark-mode .budget-liquidation-table .ant-pagination-next .ant-pagination-item-link {
+  background: #121212 !important;
+  border-color: #3f3f46 !important;
+}
+
 body.dark-mode .budget-transactions-page {
   color: #e5e7eb;
 }

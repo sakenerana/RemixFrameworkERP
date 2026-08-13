@@ -1,113 +1,99 @@
-import { CalendarOutlined, CheckCircleOutlined, LinkOutlined } from "@ant-design/icons";
-import { Button, Col, Row, Statistic, Card, Space, Modal, Table, Tag } from "antd";
-import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
-import type { ColumnsType } from 'antd/es/table';
+import {
+  CalendarOutlined,
+  CheckCircleOutlined,
+  FileSearchOutlined,
+  LinkOutlined,
+  WalletOutlined,
+} from "@ant-design/icons";
+import { Button, Card, Empty, Modal, Progress, Table, Tag } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
+import { useMemo, useState } from "react";
 
-// Define the type for your liquidation data
 interface LiquidationDataType {
-  key?: string; // Important: Add key for each record
+  key?: string;
   startDate: string;
   referenceNo: string;
   particular: string;
   totalAmount: number;
-  status: 'Completed' | 'Pending' | 'Rejected' | string;
-  // Add other fields that might be in your data
+  status: "Completed" | "Pending" | "Rejected" | string;
 }
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(amount || 0);
 
 export default function Liquidation({
   item,
   liquidationTotal,
   requisitionTotal,
   liquidationCount,
-  liquidationData = [] // Provide default empty array
+  liquidationData = [],
 }: {
   item: any;
-  requisitionTotal?: any;
-  liquidationTotal?: any;
-  liquidationCount?: any;
+  requisitionTotal?: number;
+  liquidationTotal?: number;
+  liquidationCount?: number;
   liquidationData?: LiquidationDataType[];
 }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    console.log("Liquidation data received:", liquidationData);
-  }, [liquidationData]);
-
-  // Calculate Remaining Balance
-  const totalBudget = item?.budget || 0;
-  const totalSpent = Number(requisitionTotal) + Number(liquidationTotal) || 0;
+  const totalBudget = Number(item?.budget || 0);
+  const totalSpent = Number(requisitionTotal || 0) + Number(liquidationTotal || 0);
   const remainingBalance = totalBudget - totalSpent;
+  const utilizationRate = totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0;
 
-  // Gradient backgrounds for statistics cards
-  const statGradients = {
-    totalBudget: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    totalSpent: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
-    remainingBalance: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',
-  };
+  const preparedData = useMemo(
+    () =>
+      liquidationData.map((row, index) => ({
+        ...row,
+        key: row.key || row.referenceNo || `row-${index}`,
+      })),
+    [liquidationData]
+  );
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "PHP",
-    }).format(amount);
-  };
-
-  // Prepare data with unique keys
-  const preparedData = liquidationData.map((item, index) => ({
-    ...item,
-    key: item.key || item.referenceNo || `row-${index}`, // Ensure each row has a unique key
-  }));
-
-  // Columns for the liquidation table with proper typing
   const liquidationColumns: ColumnsType<LiquidationDataType> = [
     {
       title: "Start Date",
       dataIndex: "startDate",
       key: "startDate",
-      width: 150,
+      width: 160,
       render: (dateString: string) => {
-        if (!dateString) return <span className="text-gray-400">No date</span>;
-
         const date = dayjs(dateString);
-        if (!date.isValid()) return <span className="text-gray-400">Invalid date</span>;
 
-        return (
-          <div className="flex items-center">
-            <CalendarOutlined className="mr-2 text-gray-400" />
-            <div className="flex flex-col">
-              <span className="text-sm">
-                {date.format('MMM DD YYYY')}
-              </span>
-            </div>
+        return date.isValid() ? (
+          <div className="flex items-center gap-2">
+            <CalendarOutlined className="text-slate-400" />
+            <span>{date.format("MMM DD YYYY")}</span>
           </div>
+        ) : (
+          <span className="text-slate-400">No date</span>
         );
-      }
+      },
     },
     {
       title: "Reference No",
       dataIndex: "referenceNo",
       key: "referenceNo",
       width: 180,
-      fixed: 'left' as const,
       render: (referenceNo: string) => {
-        if (!referenceNo) return <span className="text-gray-400">No reference</span>;
+        if (!referenceNo) return <span className="text-slate-400">No reference</span>;
 
         return (
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href={`${import.meta.env.VITE_AB_LINK || '#'}/activities/${referenceNo}`}
-            className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
-            onClick={(e) => {
+            href={`${import.meta.env.VITE_AB_LINK || "#"}/activities/${referenceNo}`}
+            className="inline-flex items-center gap-1 font-mono text-sm text-blue-600 hover:underline"
+            onClick={(event) => {
               if (!import.meta.env.VITE_AB_LINK) {
-                e.preventDefault();
-                console.warn('VITE_AB_LINK is not set');
+                event.preventDefault();
               }
             }}
           >
-            <LinkOutlined className="mr-1" />
+            <LinkOutlined />
             {referenceNo}
           </a>
         );
@@ -117,266 +103,141 @@ export default function Liquidation({
       title: "Particular",
       dataIndex: "particular",
       key: "particular",
-      width: 300,
-      fixed: 'left' as const,
+      width: 320,
       render: (particular: string) => (
-        <div className="font-mono text-sm">
-          {particular || <span className="text-gray-400">No particular</span>}
-        </div>
+        <span className="font-medium text-slate-900">{particular || "N/A"}</span>
       ),
     },
     {
       title: "Amount",
       dataIndex: "totalAmount",
       key: "totalAmount",
-      width: 150,
-      align: 'right' as const,
-      sorter: (a: LiquidationDataType, b: LiquidationDataType) =>
-        (a.totalAmount || 0) - (b.totalAmount || 0),
+      width: 160,
+      align: "right",
+      sorter: (a, b) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (totalAmount: number) => (
-        <div className="text-right font-medium">
-          {formatCurrency(totalAmount || 0)}
-        </div>
+        <span className="font-semibold text-slate-900">{formatCurrency(totalAmount)}</span>
       ),
     },
     {
       title: "Status",
       dataIndex: "status",
-      width: 120,
-      render: (_, record) => {
-        if (record.status === 'Completed') {
-          return (
-            <Tag color="green">
-              <CheckCircleOutlined className="float-left mt-1 mr-1" /> Completed
-            </Tag>
-          );
-        }
-      },
+      key: "status",
+      width: 130,
+      render: (status: string) => (
+        <Tag color={status === "Completed" ? "green" : "default"} className="m-0">
+          {status === "Completed" && <CheckCircleOutlined className="mr-1" />}
+          {status || "N/A"}
+        </Tag>
+      ),
     },
   ];
 
-  const showModal = () => {
-    setIsModalVisible(true);
-    console.log("Liquidation item:", preparedData);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Liquidation Statistics */}
-      <Card hoverable style={{ borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-        <Row gutter={[32, 16]} align="middle">
-          {/* Completed Liquidation */}
-          <Col xs={24} sm={12}>
-            <Statistic
-              title="Completed Liquidation"
-              value={liquidationCount}
-              valueStyle={{ color: "#3f8600", fontWeight: 600, fontSize: 24 }}
-            />
-          </Col>
+    <div className="budget-liquidation space-y-4">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <Card className="rounded-lg border border-slate-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+          <div className="text-sm text-slate-500">Completed Liquidation</div>
+          <div className="mt-2 text-2xl font-semibold text-green-700">{liquidationCount || 0}</div>
+        </Card>
 
-          {/* Overall Total Liquidation + Inline Button */}
-          <Col xs={24} sm={12}>
-            <Space size="middle" align="center">
-              <Statistic
-                title="Overall Total Requisition (Yearly)"
-                value={requisitionTotal}
-                precision={2}
-                valueStyle={{ color: "#1890ff", fontWeight: 600, fontSize: 24 }}
-                prefix=""
-              />
-            </Space>
-            <Space size="middle" align="center">
-              <Statistic
-                title="Overall Total Liquidation (Yearly)"
-                value={liquidationTotal}
-                precision={2}
-                valueStyle={{ color: "#1890ff", fontWeight: 600, fontSize: 24 }}
-                prefix=""
-              />
-              <Button
-                type="primary"
-                onClick={showModal}
-                style={{
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  height: 40,
-                  padding: "0 24px",
-                  backgroundColor: "#1890ff",
-                  borderColor: "#1890ff",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                  transition: "all 0.2s ease-in-out",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-              >
-                View Liquidation
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+        <Card className="rounded-lg border border-slate-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+          <div className="text-sm text-slate-500">Requisition Total</div>
+          <div className="mt-2 text-2xl font-semibold text-blue-700">{formatCurrency(Number(requisitionTotal || 0))}</div>
+        </Card>
 
-      {/* Dashboard Cards */}
-      <Row gutter={[24, 24]}>
-        {/* Total Budget */}
-        <Col xs={24} sm={8}>
-          <Card
-            hoverable
-            style={{
-              borderRadius: 12,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              border: 'none',
-              overflow: 'hidden'
-            }}
-            bodyStyle={{
-              padding: '24px',
-              background: statGradients.totalBudget,
-              color: 'white',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Statistic
-              title={<span style={{ color: 'white' }}>Total Budget</span>}
-              value={totalBudget}
-              precision={2}
-              valueStyle={{ color: 'white', fontWeight: 600, fontSize: 24 }}
-              prefix={<span style={{ color: 'rgba(255, 255, 255, 0.9)' }}>₱</span>}
-            />
-            <div style={{ marginTop: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.9)' }} />
-                Allocated budget amount
+        <Card className="rounded-lg border border-slate-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+          <div className="text-sm text-slate-500">Liquidation Total</div>
+          <div className="mt-2 text-2xl font-semibold text-blue-700">{formatCurrency(Number(liquidationTotal || 0))}</div>
+        </Card>
+
+        <Card className="rounded-lg border border-slate-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-sm text-slate-500">Remaining Balance</div>
+              <div className={`mt-2 text-2xl font-semibold ${remainingBalance < 0 ? "text-red-600" : "text-emerald-700"}`}>
+                {formatCurrency(remainingBalance)}
               </div>
             </div>
-          </Card>
-        </Col>
+            <WalletOutlined className="text-xl text-slate-400" />
+          </div>
+        </Card>
+      </div>
 
-        {/* Total Spent */}
-        <Col xs={24} sm={8}>
-          <Card
-            hoverable
-            style={{
-              borderRadius: 12,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              border: 'none',
-              overflow: 'hidden'
-            }}
-            bodyStyle={{
-              padding: '24px',
-              background: statGradients.totalSpent,
-              color: 'white',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Statistic
-              title={<span style={{ color: 'white' }}>Total Amount Spent</span>}
-              value={totalSpent}
-              precision={2}
-              valueStyle={{ color: 'white', fontWeight: 600, fontSize: 24 }}
-              prefix={<span style={{ color: 'rgba(255, 255, 255, 0.9)' }}>₱</span>}
-            />
-            <div style={{ marginTop: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.9)' }} />
-                Actual expenditure
-              </div>
+      <Card className="rounded-lg border border-slate-200 shadow-sm" styles={{ body: { padding: 16 } }}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="m-0 text-base font-semibold text-slate-950">Liquidation Summary</h3>
+              <Tag className="m-0 rounded-full">{preparedData.length} records</Tag>
             </div>
-          </Card>
-        </Col>
-
-        {/* Remaining Balance */}
-        <Col xs={24} sm={8}>
-          <Card
-            hoverable
-            style={{
-              borderRadius: 12,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              border: 'none',
-              overflow: 'hidden'
-            }}
-            bodyStyle={{
-              padding: '24px',
-              background: statGradients.remainingBalance,
-              color: 'white',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Statistic
-              title={<span style={{ color: 'white' }}>Remaining Balance</span>}
-              value={remainingBalance}
-              precision={2}
-              valueStyle={{ color: 'white', fontWeight: 600, fontSize: 24 }}
-              prefix={<span style={{ color: 'rgba(255, 255, 255, 0.9)' }}>₱</span>}
-            />
-            <div style={{ marginTop: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.9)' }} />
-                Available for spending
+            <p className="m-0 mt-1 text-sm text-slate-500">Liquidation activity matched to this department for the current year.</p>
+            <div className="mt-3 max-w-xl">
+              <div className="mb-1 flex justify-between text-xs text-slate-500">
+                <span>Budget utilization</span>
+                <span>{utilizationRate}%</span>
               </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Liquidation Details Modal */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '18px', fontWeight: 600 }}>Liquidation Details</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginRight: '30px' }}>
-              <Statistic
-                title="Total Liquidation"
-                value={liquidationTotal}
-                precision={2}
-                valueStyle={{ color: '#1890ff', fontSize: '16px' }}
-                prefix="₱"
+              <Progress
+                percent={Math.min(100, utilizationRate)}
+                showInfo={false}
+                strokeColor={utilizationRate > 100 ? "#dc2626" : "#2563eb"}
               />
             </div>
           </div>
-        }
+
+          <Button
+            type="primary"
+            icon={<FileSearchOutlined />}
+            onClick={() => setIsModalVisible(true)}
+            disabled={!preparedData.length}
+          >
+            View Liquidation
+          </Button>
+        </div>
+      </Card>
+
+      <Modal
+        title="Liquidation Details"
         open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={1200}
+        onCancel={() => setIsModalVisible(false)}
+        width={1100}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="close" onClick={() => setIsModalVisible(false)}>
             Close
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            OK
-          </Button>,
         ]}
-        bodyStyle={{ padding: '0' }}
+        className="budget-liquidation-modal"
       >
-        <div style={{ marginTop: '16px' }}>
-          <Table
-            columns={liquidationColumns}
-            dataSource={preparedData}
-            loading={loading}
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-            }}
-            scroll={{ x: 'max-content' }}
-            rowKey="key" // Specify which field to use as row key
-          />
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+          <div>
+            <div className="text-sm font-semibold text-slate-900">Total Liquidation</div>
+            <div className="text-xl font-semibold text-blue-700">{formatCurrency(Number(liquidationTotal || 0))}</div>
+          </div>
+          <Tag color="green" className="m-0 rounded-full px-3 py-1">
+            {preparedData.length} completed records
+          </Tag>
         </div>
+
+        <Table
+          className="budget-liquidation-table"
+          columns={liquidationColumns}
+          dataSource={preparedData}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No liquidation records found"
+              />
+            ),
+          }}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          }}
+          scroll={{ x: "max-content" }}
+          rowKey="key"
+        />
       </Modal>
     </div>
   );
