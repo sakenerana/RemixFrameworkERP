@@ -37,9 +37,13 @@ interface DataType {
   lastname: string;
   username: string;
   activities_count: number;
-  workflows_breakdown: any[];
+  workflows_breakdown: Array<Record<string, unknown>>;
   body: string;
   userId?: number; // Optional property
+}
+
+interface UserActivitiesResponse {
+  data?: DataType[];
 }
 
 const CACHE_KEY = 'userActivitiesData';
@@ -87,7 +91,7 @@ export default function Workflows() {
       }
 
       // If no cache or cache expired, make API request
-      const response = await axios.post<any>(
+      const response = await axios.post<UserActivitiesResponse>(
         `${import.meta.env.VITE_API_BASE_URL}/user-activities`,
         {
           userid: Number(getABID),
@@ -96,7 +100,7 @@ export default function Workflows() {
       );
 
       // Process data
-      const sorted = [...response.data.data].sort((a, b) => b.activities_count - a.activities_count);
+      const sorted = [...(response.data.data ?? [])].sort((a, b) => b.activities_count - a.activities_count);
       const newTopThreeUserIds = sorted.slice(0, 3).map(user => user.id);
 
       // Update state

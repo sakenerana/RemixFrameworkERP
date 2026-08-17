@@ -56,6 +56,10 @@ interface DataType {
   userId?: number;
 }
 
+interface UserActiveActivitiesResponse {
+  data?: DataType[];
+}
+
 const CACHE_EXPIRY = 15 * 60 * 1000;
 
 const getWorkflowName = (workflow?: WorkflowInfo | string) => {
@@ -103,7 +107,7 @@ export default function WorkflowTracker() {
         }
       }
 
-      const response = await axios.post<any>(
+      const response = await axios.post<UserActiveActivitiesResponse>(
         `${import.meta.env.VITE_API_BASE_URL}/user-active-activities`,
         {
           userid: Number(getABID),
@@ -112,7 +116,7 @@ export default function WorkflowTracker() {
         }
       );
 
-      const responseData = response.data.data || [];
+      const responseData = response.data.data ?? [];
       setData(responseData);
       localStorage.setItem(cacheKey, JSON.stringify({ data: responseData, timestamp: now }));
     } catch (err) {

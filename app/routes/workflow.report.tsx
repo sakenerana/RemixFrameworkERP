@@ -30,7 +30,7 @@ import { AiFillProfile } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -60,6 +60,18 @@ interface HistoryStats {
     pending_workflows: number;
 }
 
+interface WorkflowHistoryResponse {
+    data?: HistoryDataType[];
+    stats?: HistoryStats;
+}
+
+type DateRange = [Dayjs, Dayjs] | null;
+type StatusFilter = HistoryDataType['status'] | 'all';
+type PriorityFilter = HistoryDataType['priority'] | 'all';
+
+const WORKFLOW_STATUSES: HistoryDataType['status'][] = ['completed', 'cancelled', 'rejected', 'in_progress'];
+const WORKFLOW_PRIORITIES: HistoryDataType['priority'][] = ['low', 'medium', 'high', 'critical'];
+
 export default function WorkflowHistoryReports() {
     const [data, setData] = useState<HistoryDataType[]>([]);
     const [stats, setStats] = useState<HistoryStats>({
@@ -74,9 +86,9 @@ export default function WorkflowHistoryReports() {
     const [filteredData, setFilteredData] = useState<HistoryDataType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<HistoryDataType | null>(null);
-    const [dateRange, setDateRange] = useState<any>(null);
-    const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [priorityFilter, setPriorityFilter] = useState<string>('all');
+    const [dateRange, setDateRange] = useState<DateRange>(null);
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+    const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all');
 
     const navigate = useNavigate();
 
@@ -111,7 +123,7 @@ export default function WorkflowHistoryReports() {
             }
 
             // Mock API call - replace with your actual API endpoint
-            const response = await axios.post<any>(
+            await axios.post<WorkflowHistoryResponse>(
                 `${import.meta.env.VITE_API_BASE_URL}/workflow-history`,
                 {
                     userid: Number(getABID),
@@ -162,7 +174,7 @@ export default function WorkflowHistoryReports() {
             process_title: `${workflows[Math.floor(Math.random() * workflows.length)]} Process`,
             requested_by: users[Math.floor(Math.random() * users.length)],
             requested_by_department: departments[Math.floor(Math.random() * departments.length)],
-            status: ['completed', 'cancelled', 'rejected', 'in_progress'][Math.floor(Math.random() * 4)] as any,
+            status: WORKFLOW_STATUSES[Math.floor(Math.random() * WORKFLOW_STATUSES.length)],
             created_at: dayjs().subtract(Math.floor(Math.random() * 30), 'days').format('YYYY-MM-DD HH:mm:ss'),
             completed_at: dayjs().subtract(Math.floor(Math.random() * 15), 'days').format('YYYY-MM-DD HH:mm:ss'),
             duration_days: Math.floor(Math.random() * 20) + 1,
@@ -170,7 +182,7 @@ export default function WorkflowHistoryReports() {
             completed_steps: Math.floor(Math.random() * 8) + 1,
             current_step: `Step ${Math.floor(Math.random() * 5) + 1}`,
             assigned_to: users[Math.floor(Math.random() * users.length)],
-            priority: ['low', 'medium', 'high', 'critical'][Math.floor(Math.random() * 4)] as any,
+            priority: WORKFLOW_PRIORITIES[Math.floor(Math.random() * WORKFLOW_PRIORITIES.length)],
         }));
     };
 
@@ -237,8 +249,8 @@ export default function WorkflowHistoryReports() {
         setSelectedRecord(null);
     };
 
-    const getStatusColor = (status: string) => {
-        const colors: any = {
+    const getStatusColor = (status: HistoryDataType['status']) => {
+        const colors: Record<HistoryDataType['status'], string> = {
             completed: 'green',
             in_progress: 'blue',
             cancelled: 'orange',
@@ -247,8 +259,8 @@ export default function WorkflowHistoryReports() {
         return colors[status] || 'default';
     };
 
-    const getPriorityColor = (priority: string) => {
-        const colors: any = {
+    const getPriorityColor = (priority: HistoryDataType['priority']) => {
+        const colors: Record<HistoryDataType['priority'], string> = {
             low: 'blue',
             medium: 'green',
             high: 'orange',
@@ -713,7 +725,8 @@ export default function WorkflowHistoryReports() {
                     <span className="text-sm font-medium text-gray-700">Filters:</span>
 
                     <RangePicker
-                        onChange={setDateRange}
+                        value={dateRange}
+                        onChange={(dates) => setDateRange(dates as DateRange)}
                         className="w-full lg:w-auto"
                         placeholder={['Start Date', 'End Date']}
                     />
