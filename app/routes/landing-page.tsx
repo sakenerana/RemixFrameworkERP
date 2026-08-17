@@ -140,6 +140,14 @@ interface DashboardMetric {
     isLoading: boolean;
 }
 
+interface BudgetSummaryItem {
+    budget?: number | string | null;
+}
+
+interface UnbudgetedSummaryItem {
+    amount?: number | string | null;
+}
+
 const formatCompactCurrency = (amount: number) =>
     new Intl.NumberFormat('en-PH', {
         style: 'currency',
@@ -228,8 +236,16 @@ export default function LandingPage2() {
             ]);
 
             return {
-                budgeted: budgetData?.reduce((sum: number, item: any) => sum + Number(item?.budget || 0), 0) || 0,
-                unbudgeted: unbudgetData?.reduce((sum: number, item: any) => sum + Number(item?.amount || 0), 0) || 0,
+                budgeted:
+                    (budgetData as BudgetSummaryItem[] | null)?.reduce(
+                        (sum, item) => sum + Number(item?.budget || 0),
+                        0,
+                    ) || 0,
+                unbudgeted:
+                    (unbudgetData as UnbudgetedSummaryItem[] | null)?.reduce(
+                        (sum, item) => sum + Number(item?.amount || 0),
+                        0,
+                    ) || 0,
             };
         } catch {
             return { budgeted: 0, unbudgeted: 0 };
