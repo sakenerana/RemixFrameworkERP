@@ -18,8 +18,14 @@ const deobfuscate = (str: string): string => decodeURIComponent(escape(atob(str)
 
 export const handle = { hydrate: false };
 
+interface LoginFormValues {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
 export default function LoginIndex() {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<LoginFormValues>();
   const [loading, setLoading] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
   // const { getUser } = useAuth();
@@ -49,11 +55,7 @@ export default function LoginIndex() {
     }
   }, [form]);
 
-  const onFinish = async (values: {
-    email: string;
-    password: string;
-    remember: boolean;
-  }) => {
+  const onFinish = async (values: LoginFormValues) => {
     try {
       setLoading(true);
       setErrorAlert(false);

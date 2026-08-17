@@ -5,14 +5,18 @@ import { useState } from "react";
 // import ClientOnly from "~/components/client-only";
 import { useAuth } from "~/auth/AuthContext";
 
+interface ForgotPasswordFormValues {
+  email: string;
+}
+
 export default function ForgotPasswordIndex() {
   const [loading, setLoading] = useState(false);
   const [sentEmail, setSentEmail] = useState<string>();
   const [errorAlert, setErrorAlert] = useState(false);
-  const [form] = Form.useForm<any>();
+  const [form] = Form.useForm<ForgotPasswordFormValues>();
   const { resetPassword } = useAuth();
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: ForgotPasswordFormValues) => {
     setLoading(true);
     setErrorAlert(false);
     setSentEmail(undefined);
