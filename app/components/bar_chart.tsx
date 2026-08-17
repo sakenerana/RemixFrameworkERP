@@ -1,11 +1,12 @@
 // bar_chart.tsx
 import React, { useEffect, useRef } from 'react';
-import { Bar } from '@antv/g2plot';
+import { Bar, type BarOptions } from '@antv/g2plot';
 
 export interface BarChartData {
   category: string;
   value: number;
   color?: string; // Custom color for each bar
+  [key: string]: string | number | undefined;
 }
 
 interface BarChartProps {
@@ -16,8 +17,13 @@ interface BarChartProps {
   colorField?: string; // NEW: Field name for colors
   height?: number;
   width?: number;
-  config?: Partial<any>;
+  config?: Partial<BarOptions>;
 }
+
+type ChartDatum = Record<string, string | number | undefined>;
+type CustomBarOptions = BarOptions & {
+  colorField?: string;
+};
 
 const BarChart: React.FC<BarChartProps> = ({
   data,
@@ -48,7 +54,7 @@ const BarChart: React.FC<BarChartProps> = ({
       [colorField]: item.color || generateColor(index)
     }));
 
-    const chartConfig: any = {
+    const chartConfig: CustomBarOptions = {
       data: chartData,
       xField,
       yField,
@@ -79,14 +85,17 @@ const BarChart: React.FC<BarChartProps> = ({
           fill: '#FFFFFF',
           fontSize: 12,
         },
-        formatter: (datum: any) => {
-          return datum.value.toLocaleString();
+        formatter: (datum: ChartDatum) => {
+          return Number(datum[yField] ?? 0).toLocaleString();
         },
       },
       tooltip: {
         showMarkers: false,
-        formatter: (datum: any) => {
-          return { name: datum[xField], value: datum[yField].toLocaleString() };
+        formatter: (datum: ChartDatum) => {
+          return {
+            name: String(datum[xField] ?? ''),
+            value: Number(datum[yField] ?? 0).toLocaleString(),
+          };
         },
       },
       ...config,

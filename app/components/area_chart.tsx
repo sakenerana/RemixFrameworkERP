@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Area } from '@antv/g2plot';
+import { Area, type AreaOptions } from '@antv/g2plot';
 
 interface ChartData {
   date: string;
@@ -9,7 +9,7 @@ interface ChartData {
 
 interface AreaChartProps {
   data: ChartData[];
-  config?: Partial<any>;
+  config?: Partial<AreaOptions>;
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({ data, config = {} }) => {
@@ -25,7 +25,7 @@ const AreaChart: React.FC<AreaChartProps> = ({ data, config = {} }) => {
       chartRef.current = null;
     }
 
-    const chartConfig: any = {
+    const chartConfig: AreaOptions = {
       data: data || [],
       xField: 'date',
       yField: 'value',
