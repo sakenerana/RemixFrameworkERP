@@ -4,16 +4,22 @@ export interface BudgetCodePayload {
   particulars: string;
 }
 
+export interface BudgetCodeParticular {
+  id: number;
+  created_at?: string | null;
+  particulars: string | null;
+}
+
 export const BudgetCodeService = {
 
   // Read All
-  async getAllParticulars() {
+  async getAllParticulars(): Promise<BudgetCodeParticular[]> {
     const { data, error } = await supabase
       .from('budget_code')
       .select('*')
       .order('created_at', { ascending: false })
     if (error) throw error
-    return data
+    return data ?? []
   },
 
   // Create

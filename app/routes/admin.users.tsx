@@ -124,8 +124,8 @@ export default function UsersRoutes() {
         setIsEditMode(true);
         form.setFieldsValue({
             ...record,
-            access: normalizeIdList((record as any).access),
-            permissions: normalizeIdList((record as any).permissions),
+            access: normalizeIdList(record.access),
+            permissions: normalizeIdList(record.permissions),
         });
         setEditingId(record.id);
         setIsModalOpen(true);
@@ -232,7 +232,7 @@ export default function UsersRoutes() {
     }, [data, searchText]);
 
     // Create or Update record
-    const onFinish = async (event: any) => {
+    const onFinish = async () => {
         // event.preventDefault(); // Prevents the default form submission
         try {
             const values = await form.validateFields();
@@ -471,7 +471,7 @@ export default function UsersRoutes() {
         column.title ? columnVisibility[column.title.toString()] : true
     );
 
-    const options: CheckboxOptionType<any>[] = [
+    const options: CheckboxOptionType<number>[] = [
         { label: "Inventory", value: 1 },
         { label: "Budget Monitoring", value: 2 },
         { label: "Workflow", value: 3 },
@@ -482,7 +482,7 @@ export default function UsersRoutes() {
         { label: "Reports", value: 8 },
     ];
 
-    const optionsPermission: CheckboxOptionType<any>[] = [
+    const optionsPermission: CheckboxOptionType<number>[] = [
         { label: "Create", value: 1 },
         { label: "Update", value: 2 },
         { label: "Delete", value: 3 },

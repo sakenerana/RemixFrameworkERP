@@ -1,3 +1,18 @@
+interface StatusLabel {
+    id?: number;
+    name?: string;
+}
+
+interface UserDepartment {
+    id?: number;
+    department?: string;
+}
+
+interface UserOffice {
+    id: number;
+    name: string;
+}
+
 export interface User {
     key: React.Key;
     id: number;
@@ -11,16 +26,13 @@ export interface User {
     department_id: number;
     group_id: number;
     office_id: number;
-    access: any;
-    permissions: any;
-    departments: any;
-    status_labels: any;
+    access: number[] | string | null;
+    permissions: number[] | string | null;
+    departments?: UserDepartment | null;
+    status_labels?: StatusLabel | null;
     status_id: number;
-    count: any;
-    auth_id: any;
+    count?: number | null;
+    auth_id?: string | null;
     actions: string;
-    office: {
-        id: number;
-        name: string;
-    }
+    office?: UserOffice | null;
 }

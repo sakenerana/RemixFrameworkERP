@@ -102,7 +102,7 @@ export default function DepartmentsRoutes() {
     setIsEditMode(true);
     form.setFieldsValue({
       ...record,
-      budget_code: normalizeBudgetCodeIds((record as any).budget_code),
+      budget_code: normalizeBudgetCodeIds(record.budget_code),
     });
     setEditingId(record.id);
     setIsModalOpen(true);
@@ -154,7 +154,7 @@ export default function DepartmentsRoutes() {
     try {
       setLoading(true);
       const dataFetch = await BudgetCodeService.getAllParticulars();
-      setParticularOptions(dataFetch.map((item: any) => ({
+      setParticularOptions(dataFetch.map((item) => ({
         label: item.particulars || "N/A",
         value: item.id.toString()
       })));
