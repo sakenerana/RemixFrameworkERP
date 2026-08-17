@@ -40,8 +40,12 @@ interface DataType {
     lastname: string;
     username: string;
     activities_count: number;
-    workflows_breakdown: any[];
+    workflows_breakdown: Record<string, number | string>;
     userId?: number; // Optional property
+}
+
+interface UserActivitiesResponse {
+    data?: DataType[];
 }
 
 interface HistoryLog {
@@ -54,6 +58,9 @@ interface HistoryLog {
     details: string;
 }
 
+type HistoryStatus = HistoryLog['status'];
+type TimeFilter = 'day' | 'week' | 'month' | 'year';
+
 export default function Assigned() {
     const [searchParams] = useSearchParams();
     const id = searchParams.get("id");
@@ -63,7 +70,7 @@ export default function Assigned() {
     const [loading, setLoading] = useState(true);
     const [historyLoading, setHistoryLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [timeFilter, setTimeFilter] = useState<string>('day');
+    const [timeFilter, setTimeFilter] = useState<TimeFilter>('day');
 
     const fetchData = async () => {
         const getABID = localStorage.getItem('ab_id');
@@ -73,7 +80,7 @@ export default function Assigned() {
             setLoading(true);
             setError(null);
 
-            const response = await axios.post<any>(
+            const response = await axios.post<UserActivitiesResponse>(
                 `${import.meta.env.VITE_API_BASE_URL}/user-activities`,
                 {
                     userid: Number(getABID),
@@ -82,7 +89,7 @@ export default function Assigned() {
             );
 
             // Filter data to only include items with ID ##
-            const filteredData = response.data.data.filter((item: any) => item.id === Number(id));
+            const filteredData = (response.data.data ?? []).filter((item) => item.id === Number(id));
             setData(filteredData); // Only stores data where ID = ##
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -93,8 +100,6 @@ export default function Assigned() {
     };
 
     const fetchHistoryLogs = async () => {
-        const getABID = localStorage.getItem('ab_id');
-
         try {
             setHistoryLoading(true);
 
@@ -174,7 +179,7 @@ export default function Assigned() {
         }
     };
 
-    const applyTimeFilter = (logs: HistoryLog[], filter: string) => {
+    const applyTimeFilter = (logs: HistoryLog[], filter: TimeFilter) => {
         const now = dayjs();
         let filtered: HistoryLog[] = [];
 
@@ -206,8 +211,8 @@ export default function Assigned() {
         setFilteredHistory(filtered);
     };
 
-    const getStatusColor = (status: string) => {
-        const colors: any = {
+    const getStatusColor = (status: HistoryStatus) => {
+        const colors: Record<HistoryStatus, string> = {
             completed: 'green',
             in_progress: 'blue',
             pending: 'orange',
