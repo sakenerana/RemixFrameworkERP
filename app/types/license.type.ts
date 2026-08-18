@@ -27,6 +27,12 @@ export interface LicenseCheck {
     // Add other fields from your license_check table
 }
 
+export interface ProductKeyItem {
+    key: React.Key;
+    id: number;
+    product_key: string;
+}
+
 export interface License {
     key: React.Key;
     id: number;
@@ -39,10 +45,10 @@ export interface License {
     seats: number;
     order_number: string;
     purchase_cost: number;
-    purchase_date: any;
+    purchase_date: string | null;
     purchase_order_no: number;
-    product_key: any;
-    expiration_date: any;
+    product_key: ProductKeyItem[] | null;
+    expiration_date: string | null;
     termination_date: Date;
     license_email: string;
     license_name: string;
@@ -72,7 +78,7 @@ export interface License {
 
     // Computed fields
     count?: number; // If you need to store count separately
-    filter?: any; // Only if needed for frontend filtering
+    filter?: string; // Only if needed for frontend filtering
     check_status?: string; // Derived status from license_check
 
     license: {

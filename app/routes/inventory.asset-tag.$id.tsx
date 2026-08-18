@@ -32,17 +32,17 @@ import { Link, useParams } from "react-router-dom";
 import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AssetService } from "~/services/asset.service";
-import { Asset } from "~/types/asset.type";
+import { Asset, AssetTagItem } from "~/types/asset.type";
 
 export default function AssetTag() {
     const { id } = useParams();
     const [data, setData] = useState<Asset[]>([]);
-    const [dataRow, setDataRow] = useState<Asset>();
+    const [dataRow, setDataRow] = useState<Record<string, unknown>>();
     const [loading, setLoading] = useState(false);
     const [isUserID, setUserID] = useState<any>();
     const [isDepartmentID, setDepartmentID] = useState<any>();
     const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<Asset[]>([]);
+    const [filteredData, setFilteredData] = useState<AssetTagItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -83,14 +83,14 @@ export default function AssetTag() {
         if (searchText.trim() === '') {
             fetchData();
         } else {
-            const filtered = data[0].asset_tag.filter((value: any) =>
+            const filtered = (data[0]?.asset_tag ?? []).filter((value) =>
                 value.asset_tag.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredData(filtered);
         }
     }, [searchText]); // Empty dependency array means this runs once on mount
 
-    const handleCheckoutButton = (values: Asset) => {
+    const handleCheckoutButton = (values: AssetTagItem) => {
         // Include your extra field
         const newValues = {
             ...values,
@@ -124,7 +124,7 @@ export default function AssetTag() {
         "Checkout": true,
     });
 
-    const columns: TableColumnsType<Asset> = [
+    const columns: TableColumnsType<AssetTagItem> = [
         {
             title: "Asset Tag",
             dataIndex: "asset_tag",
@@ -308,10 +308,10 @@ export default function AssetTag() {
             </div>
             {loading && <Spin></Spin>}
             {!loading && (
-                <Table<Asset>
+                <Table<AssetTagItem>
                     size="small"
                     columns={filteredColumns}
-                    dataSource={searchText ? filteredData : data[0]?.asset_tag}
+                    dataSource={searchText ? filteredData : data[0]?.asset_tag ?? []}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

@@ -31,18 +31,18 @@ import { Link, useParams } from "react-router-dom";
 import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
-import { License } from "~/types/license.type";
+import { License, ProductKeyItem } from "~/types/license.type";
 const { Paragraph, Text } = Typography;
 
 export default function ProductKey() {
     const { id } = useParams();
     const [data, setData] = useState<License[]>([]);
-    const [dataRow, setDataRow] = useState<License>();
+    const [dataRow, setDataRow] = useState<Record<string, unknown>>();
     const [loading, setLoading] = useState(false);
     const [isUserID, setUserID] = useState<any>();
     const [isDepartmentID, setDepartmentID] = useState<any>();
     const [searchText, setSearchText] = useState('');
-    const [filteredData, setFilteredData] = useState<License[]>([]);
+    const [filteredData, setFilteredData] = useState<ProductKeyItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -83,14 +83,14 @@ export default function ProductKey() {
         if (searchText.trim() === '') {
             fetchData();
         } else {
-            const filtered = data[0].product_key.filter((value: any) =>
+            const filtered = (data[0]?.product_key ?? []).filter((value) =>
                 value.product_key.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredData(filtered);
         }
     }, [searchText]); // Empty dependency array means this runs once on mount
 
-    const handleCheckoutButton = (values: License) => {
+    const handleCheckoutButton = (values: ProductKeyItem) => {
         // Include your extra field
         const newValues = {
             ...values,
@@ -122,7 +122,7 @@ export default function ProductKey() {
         "Checkout": true,
     });
 
-    const columns: TableColumnsType<License> = [
+    const columns: TableColumnsType<ProductKeyItem> = [
         {
             title: "Product Key",
             dataIndex: "product_key",
@@ -277,10 +277,10 @@ export default function ProductKey() {
             </div>
             {loading && <Spin></Spin>}
             {!loading && (
-                <Table<License>
+                <Table<ProductKeyItem>
                     size="small"
                     columns={filteredColumns}
-                    dataSource={searchText ? filteredData : data[0]?.product_key}
+                    dataSource={searchText ? filteredData : data[0]?.product_key ?? []}
                     className="pt-5"
                     bordered
                     scroll={{ x: "max-content" }}

@@ -11,7 +11,7 @@ import { ManufacturerService } from "~/services/manufacturer.service";
 import { SupplierService } from "~/services/supplier.service";
 import { Category } from "~/types/category.type";
 import { Depreciation } from "~/types/depreciation.type";
-import { License } from "~/types/license.type";
+import { License, ProductKeyItem } from "~/types/license.type";
 import { Manufacturer } from "~/types/manufacturer.type";
 import { Supplier } from "~/types/supplier.type";
 const { TextArea } = Input;
@@ -44,7 +44,7 @@ export default function CreateLicense() {
     const [dataDepreciation, setDataDepreciation] = useState<Depreciation[]>([]);
     const { Option } = Select;
 
-    const [productKeys, setProductKeys] = useState<License[]>([]);
+    const [productKeys, setProductKeys] = useState<ProductKeyItem[]>([]);
 
     // Fetch data from Supabase
     const fetchDataCategory = async () => {
@@ -140,7 +140,7 @@ export default function CreateLicense() {
         }
     };
 
-    const handleProductKeysChange = (newData: any[]) => {
+    const handleProductKeysChange = (newData: ProductKeyItem[]) => {
         setProductKeys(newData);
         // You can also do other things with the data here
     };

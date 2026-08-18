@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AiOutlineBarcode, AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineInfoCircle, AiOutlineRollback, AiOutlineSave, AiOutlineShoppingCart, AiOutlineStock, AiOutlineTags } from "react-icons/ai";
 import AssetTag from "~/components/asset_tag";
 import { AssetService } from "~/services/asset.service";
-import { Asset } from "~/types/asset.type";
+import { Asset, AssetTagItem } from "~/types/asset.type";
 import { Location } from "~/types/location.type";
 const { TextArea } = Input;
 import { LocationService } from "~/services/location.service";
@@ -35,7 +35,7 @@ export default function CreateAssets() {
     const [dataLocation, setDataLocation] = useState<Location[]>([]);
     const { Option } = Select;
 
-    const [assetTag, setAssetTag] = useState<Asset[]>([]);
+    const [assetTag, setAssetTag] = useState<AssetTagItem[]>([]);
 
     // Fetch data from Supabase
     const fetchDataAssetModel = async () => {
@@ -89,7 +89,7 @@ export default function CreateAssets() {
         }
     };
 
-    const handleAssetTagChange = (newData: any[]) => {
+    const handleAssetTagChange = (newData: AssetTagItem[]) => {
         setAssetTag(newData);
         // You can also do other things with the data here
     };

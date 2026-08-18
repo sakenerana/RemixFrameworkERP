@@ -27,12 +27,20 @@ export interface AssetsCheck {
     // Add other fields from your assets_check table
 }
 
+export interface AssetTagItem {
+    key: React.Key;
+    id: number;
+    asset_tag: string;
+    serial: string;
+    status_type: string;
+}
+
 export interface Asset {
     key: React.Key;
     id: number;
     name: string;
     device_image: string;
-    asset_tag: any;
+    asset_tag: AssetTagItem[] | null;
     serial_no: string;
     model: string;
     category: string;
@@ -40,7 +48,7 @@ export interface Asset {
     location: string;
     order_no: string;
     purchase_cost: number;
-    purchase_date: any;
+    purchase_date: string | null;
     current_value: number;
     accounting_code: string;
     installed: string;
@@ -69,7 +77,7 @@ export interface Asset {
 
     // Computed fields
     count?: number; // If you need to store count separately
-    filter?: any; // Only if needed for frontend filtering
+    filter?: string; // Only if needed for frontend filtering
     check_status?: string; // Derived status from assets_check
 
     assets: {
