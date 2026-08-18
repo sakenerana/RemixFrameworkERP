@@ -1,6 +1,8 @@
 import { User } from "~/types/user.type";
 import supabase from "~/utils/supabase.client";
 
+type ProfilePayload = Record<string, unknown>;
+
 export const UserService = {
   // Create
   async createPost(postData: User) {
@@ -14,7 +16,7 @@ export const UserService = {
   },
 
   // Create
-  async createPostProfile(postData: any) {
+  async createPostProfile(postData: ProfilePayload) {
     const { data, error } = await supabase
       .from("profile")
       .insert(postData)
@@ -25,7 +27,7 @@ export const UserService = {
   },
 
   // Read (single)
-  async getPostById(id: any) {
+  async getPostById(id: number | string) {
     const { data, error } = await supabase
       .from("users")
       .select("*")
