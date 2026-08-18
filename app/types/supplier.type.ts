@@ -7,7 +7,7 @@ export interface Supplier {
   key: React.Key;
   id: number;
   name: string;
-  image: any;
+  image: string | null;
   url: string;
   address: string;
   address2: string;
@@ -20,6 +20,6 @@ export interface Supplier {
   notes: string;
   status_labels: StatusLabel;
   check_status: string;
-  actions: any;
+  actions: React.ReactNode;
 }
 
