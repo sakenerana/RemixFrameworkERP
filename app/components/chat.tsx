@@ -9,9 +9,24 @@ const MESSAGES_PER_PAGE = 300;
 // Days to keep messages before applying date filter
 const DAYS_TO_KEEP = 7;
 
+interface ChatMessageUser {
+    id: number;
+    first_name?: string | null;
+    middle_name?: string | null;
+    last_name?: string | null;
+}
+
+interface ChatMessage {
+    id: number | string;
+    content: string;
+    created_at: string;
+    user_id: number;
+    user?: ChatMessageUser | null;
+}
+
 export default function ManagerGroupChat({ isDarkMode }: { isDarkMode: boolean }) {
     const [getAuthID, setAuthID] = useState('');
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -46,10 +61,12 @@ export default function ManagerGroupChat({ isDarkMode }: { isDarkMode: boolean }
             if (error) throw error;
 
             if (data) {
+                const fetchedMessages = [...data].reverse() as ChatMessage[];
+
                 if (initialLoad) {
-                    setMessages(data.reverse());
+                    setMessages(fetchedMessages);
                 } else {
-                    setMessages(prev => [...prev, ...data.reverse()]);
+                    setMessages(prev => [...prev, ...fetchedMessages]);
                 }
                 setHasMore(data.length === MESSAGES_PER_PAGE);
             }
@@ -83,7 +100,7 @@ export default function ManagerGroupChat({ isDarkMode }: { isDarkMode: boolean }
                     filter: `group_chat_id=eq.${groupChatId}`
                 },
                 (payload) => {
-                    setMessages(prev => [...prev, payload.new]);
+                    setMessages(prev => [...prev, payload.new as ChatMessage]);
                     scrollToBottom();
                 }
             )
@@ -132,7 +149,7 @@ export default function ManagerGroupChat({ isDarkMode }: { isDarkMode: boolean }
 
     // Group messages by date for better organization
     const groupMessagesByDate = useCallback(() => {
-        const grouped: Record<string, any[]> = {};
+        const grouped: Record<string, ChatMessage[]> = {};
 
         messages.forEach(msg => {
             const date = dayjs(msg.created_at).format('MMMM D, YYYY');
@@ -219,7 +236,7 @@ export default function ManagerGroupChat({ isDarkMode }: { isDarkMode: boolean }
                                                                 <Avatar
                                                                     size="small"
                                                                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${msg.user?.first_name || 'U'}`}
-                                                                    alt={msg.user?.first_name}
+                                                                    alt={msg.user?.first_name ?? undefined}
                                                                 />
                                                             )}
 
