@@ -465,9 +465,9 @@ export default function CreateLicense() {
                                             // Format with commas and peso sign
                                             return `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                         }}
-                                        parser={(value: any) => {
+                                        parser={(value?: string) => {
                                             // Remove all non-numeric characters
-                                            return value ? value.replace(/[^\d]/g, '') : '';
+                                            return value ? Number(value.replace(/[^\d]/g, '')) : 0;
                                         }}
                                         placeholder="Enter amount"
                                     />

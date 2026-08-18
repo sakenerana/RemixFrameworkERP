@@ -420,7 +420,7 @@ export default function CreateComponents() {
                                         min={0}
                                         step={0.01}
                                         formatter={(value) => `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                        parser={(value: any) => value?.replace(/[^\d.]/g, '') || ''}
+                                        parser={(value?: string) => value ? Number(value.replace(/[^\d.]/g, '')) : 0}
                                         placeholder="0.00"
                                     />
                                 </Form.Item>
