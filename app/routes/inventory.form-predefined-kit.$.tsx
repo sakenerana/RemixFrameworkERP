@@ -16,8 +16,8 @@ export default function CreateManufacturer() {
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
     const [isTitle, setIsTitle] = useState('');
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const navigate = useNavigate();
 
     // Fetch data from Supabase
@@ -59,8 +59,8 @@ export default function CreateManufacturer() {
             setIsEditMode(false);
         }
 
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     const onReset = () => {
