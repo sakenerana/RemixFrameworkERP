@@ -40,8 +40,8 @@ export default function PredefinedKitRoute() {
   const [data, setData] = useState<PredefinedKit[]>([]);
   const [dataRow, setDataRow] = useState<PredefinedKit>();
   const [loading, setLoading] = useState(false);
-  const [isUserID, setUserID] = useState<any>();
-  const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [isUserID, setUserID] = useState(0);
+  const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<PredefinedKit[]>([]);
@@ -92,8 +92,8 @@ export default function PredefinedKitRoute() {
   };
 
   useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
-    setDepartmentID(localStorage.getItem('userDept'));
+    setUserID(Number(localStorage.getItem('userAuthID')));
+    setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 
   useEffect(() => {
