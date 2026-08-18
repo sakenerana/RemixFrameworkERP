@@ -2,6 +2,6 @@ export interface Office {
     key: React.Key;
     id: number;
     name: string;
-    created_at: any;
+    created_at?: string | null;
     action: string;
 }

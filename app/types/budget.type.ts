@@ -29,8 +29,8 @@ export interface Budget {
     created_at?: string;
     updated_at?: string;
     deleted_at?: string;
-    start_date: any;
-    end_date: any;
+    start_date: string | null;
+    end_date: string | null;
     budget: number;
     user_id: number;
     date?: [Moment, Moment];
