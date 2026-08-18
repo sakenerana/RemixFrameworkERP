@@ -11,8 +11,8 @@ import { Asset } from "~/types/asset.type";
 export default function DeletedAssets() {
     const [data, setData] = useState<Asset[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Asset[]>([]);
@@ -48,8 +48,8 @@ export default function DeletedAssets() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {

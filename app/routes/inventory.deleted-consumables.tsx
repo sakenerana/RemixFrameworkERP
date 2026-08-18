@@ -12,8 +12,8 @@ import dayjs from 'dayjs';
 export default function DeletedConsumables() {
     const [data, setData] = useState<Consumable[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Consumable[]>([]);
@@ -49,8 +49,8 @@ export default function DeletedConsumables() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
