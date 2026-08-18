@@ -31,7 +31,7 @@ import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
 import { BudgetService } from "~/services/budget.service";
 import { Budget } from "~/types/budget.type";
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { DepartmentService } from "~/services/department.service";
 import { UserService } from "~/services/user.service";
 import { Department } from "~/types/department.type";
@@ -52,6 +52,13 @@ interface BudgetTotals {
   requisition: number;
   liquidation: number;
   combined: number;
+}
+
+interface UnbudgetedRequisitionFormValues {
+  date: Dayjs;
+  department_id: number;
+  amount: number;
+  notes: string;
 }
 
 export default function Budgets() {
@@ -76,7 +83,7 @@ export default function Budgets() {
   const [isUnbudgetedRequisitionModalOpen, setIsUnbudgetedRequisitionModalOpen] = useState(false);
   const [form] = Form.useForm<Budget>();
   const [formEditAllocateBudget] = Form.useForm<Budget>();
-  const [formUnbudgeted] = Form.useForm<any>();
+  const [formUnbudgeted] = Form.useForm<UnbudgetedRequisitionFormValues>();
   const { RangePicker } = DatePicker;
   const { Text, Title } = Typography;
 

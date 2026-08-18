@@ -1,4 +1,4 @@
-import { Budget } from "~/types/budget.type"
+import { Budget, type UnbudgetedRequisitionPayload } from "~/types/budget.type"
 import supabase from "~/utils/supabase.client"
 
 export const BudgetService = {
@@ -15,7 +15,7 @@ export const BudgetService = {
     },
 
     // Create Unbudgeted
-    async createUnbudgeted(postData: Budget) {
+    async createUnbudgeted(postData: UnbudgetedRequisitionPayload) {
         const { data, error } = await supabase
             .from('unbudget')
             .insert(postData)

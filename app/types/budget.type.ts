@@ -1,4 +1,5 @@
 import { Moment } from "moment";
+import { type Dayjs } from "dayjs";
 
 export interface StatusLabel {
     id: number;
@@ -41,4 +42,13 @@ export interface Budget {
     // Relationships
     status_labels: StatusLabel;
     departments: Department;
+}
+
+export interface UnbudgetedRequisitionPayload {
+    date: Dayjs;
+    department_id: number;
+    amount: number;
+    notes: string;
+    status_id: number;
+    office_id: number;
 }
