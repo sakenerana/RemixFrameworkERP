@@ -40,7 +40,7 @@ export interface Consumable {
     remaining: string;
     location: string;
     order_no: string;
-    purchase_date: any;
+    purchase_date: string | null;
     purchase_cost: string;
     action?: string;
     notes?: string;
@@ -61,7 +61,7 @@ export interface Consumable {
 
     // Computed fields
     count?: number; // If you need to store count separately
-    filter?: any; // Only if needed for frontend filtering
+    filter?: string; // Only if needed for frontend filtering
     check_status?: string; // Derived status from consumables_check
 
     consumables: {

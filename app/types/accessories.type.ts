@@ -39,7 +39,7 @@ export interface Accessories {
   min_qty: number;
   total: string;
   checked_out: string;
-  purchase_date: any;
+  purchase_date: string | null;
   purchase_cost: number;
   action?: string;
   notes?: string;
@@ -60,7 +60,7 @@ export interface Accessories {
 
   // Computed fields
   count?: number; // If you need to store count separately
-  filter?: any; // Only if needed for frontend filtering
+  filter?: string; // Only if needed for frontend filtering
   check_status?: string; // Derived status from accessories_check
 
   accessories: {

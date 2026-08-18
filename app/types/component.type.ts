@@ -40,7 +40,7 @@ export interface Component {
     location: string;
     total: number;
     order_no: string;
-    purchase_date: any;
+    purchase_date: string | null;
     purchase_cost: number;
     action?: string;
     notes?: string;
@@ -61,7 +61,7 @@ export interface Component {
 
     // Computed fields
     count?: number; // If you need to store count separately
-    filter?: any; // Only if needed for frontend filtering
+    filter?: string; // Only if needed for frontend filtering
     check_status?: string; // Derived status from components_check
 
     components: {
