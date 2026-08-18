@@ -1,6 +1,7 @@
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
+import type { NameType, Payload, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 const data = [
   { year: "2020", attrition: 12, onBoard: 23, transfer: 10, hcGrowth: 23 },
@@ -11,15 +12,21 @@ const data = [
   { year: "2025", attrition: 5, onBoard: 10, transfer: 3, hcGrowth: 131 },
 ];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: ReadonlyArray<Payload<ValueType, NameType>>;
+  label?: string | number;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload) return null;
   return (
     <div className="glass-card p-3 !bg-card border border-border text-xs space-y-1">
       <p className="font-semibold text-foreground">{label}</p>
-      {payload.map((p: any) => (
-        <div key={p.dataKey} className="flex items-center gap-2">
+      {payload.map((p) => (
+        <div key={String(p.dataKey)} className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-muted-foreground capitalize">{p.dataKey}:</span>
+          <span className="text-muted-foreground capitalize">{String(p.dataKey)}:</span>
           <span className="text-foreground font-medium">{p.value}</span>
         </div>
       ))}
