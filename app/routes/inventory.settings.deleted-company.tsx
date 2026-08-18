@@ -11,8 +11,8 @@ import { Company } from "~/types/company.type";
 export default function DeletedCompanies() {
     const [data, setData] = useState<Company[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Company[]>([]);
@@ -48,8 +48,8 @@ export default function DeletedCompanies() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {

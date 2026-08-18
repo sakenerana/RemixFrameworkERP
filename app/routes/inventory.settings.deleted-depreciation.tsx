@@ -11,8 +11,8 @@ import { Depreciation } from "~/types/depreciation.type";
 export default function DeletedDepreciation() {
     const [data, setData] = useState<Depreciation[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Depreciation[]>([]);
@@ -48,8 +48,8 @@ export default function DeletedDepreciation() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {

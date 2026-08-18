@@ -11,8 +11,8 @@ import { Manufacturer } from "~/types/manufacturer.type";
 export default function DeletedManufacturer() {
     const [data, setData] = useState<Manufacturer[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<Manufacturer[]>([]);
@@ -48,8 +48,8 @@ export default function DeletedManufacturer() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
