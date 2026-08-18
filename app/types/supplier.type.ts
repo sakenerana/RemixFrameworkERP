@@ -1,3 +1,8 @@
+interface StatusLabel {
+  id?: number;
+  name?: string;
+}
+
 export interface Supplier {
   key: React.Key;
   id: number;
@@ -13,7 +18,7 @@ export interface Supplier {
   phone: string;
   fax: string;
   notes: string;
-  status_labels: any;
+  status_labels: StatusLabel;
   check_status: string;
   actions: any;
 }

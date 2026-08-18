@@ -1,3 +1,8 @@
+interface StatusLabel {
+    id?: number;
+    name?: string;
+}
+
 export interface Depreciation {
     key: React.Key;
     id: number;
@@ -8,6 +13,6 @@ export interface Depreciation {
     assets_models: number;
     licenses: number;
     notes: string;
-    status_labels: any;
+    status_labels: StatusLabel;
     action: string;
 }

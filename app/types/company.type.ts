@@ -1,3 +1,8 @@
+interface StatusLabel {
+    id?: number;
+    name?: string;
+}
+
 export interface Company {
     key: React.Key;
     id: number;
@@ -6,6 +11,6 @@ export interface Company {
     fax: string;
     email: string;
     image: string;
-    status_labels: any;
+    status_labels: StatusLabel;
     action: string;
 }

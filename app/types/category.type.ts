@@ -1,3 +1,8 @@
+interface StatusLabel {
+  id?: number;
+  name?: string;
+}
+
 export interface Category {
   key: React.Key;
   id: number;
@@ -5,6 +10,6 @@ export interface Category {
   type: string;
   qty: number;
   notes: string;
-  status_labels: any;
+  status_labels: StatusLabel;
   action: string;
 }
