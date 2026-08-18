@@ -1,19 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { GetRef, InputRef, TableProps } from 'antd';
 import { Button, Form, Input, Popconfirm, Select, Table } from 'antd';
-import { Asset } from '~/types/asset.type';
+import type { AssetTagItem } from '~/types/asset.type';
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
+const EditableContext = React.createContext<FormInstance<Partial<AssetTagItem>> | null>(null);
 
-interface Item {
-  key: string;
-  id: number;
-  asset_tag: string;
-  serial: string;
-  status_type: string;
-}
+type Item = AssetTagItem;
 
 interface EditableRowProps {
   index: number;
@@ -98,27 +92,18 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-interface DataType {
-  key: React.Key;
-  id: number;
-  asset_tag: string;
-  serial: string;
-  status_type: string;
-}
+type DataType = AssetTagItem;
 
 interface AssetTagProps {
   onDataChange?: (data: DataType[]) => void;
-  initialKeys?: any[];
-  hasID?: any;
+  initialKeys?: DataType[];
+  hasID?: React.Key | boolean | null;
 }
 
 type ColumnTypes = Exclude<TableProps<DataType>['columns'], undefined>;
 
 const AssetTag: React.FC<AssetTagProps> = ({ onDataChange, initialKeys = [], hasID }) => {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
-  // Use `initialKeys` to set the initial state
-  const [keys, setKeys] = useState<Asset[]>(initialKeys);
-
   const [count, setCount] = useState(2);
   const { Option } = Select;
 

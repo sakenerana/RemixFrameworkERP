@@ -1,17 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { GetRef, InputRef, TableProps } from 'antd';
 import { Button, Form, Input, Popconfirm, Table } from 'antd';
-import { License } from '~/types/license.type';
+import type { ProductKeyItem } from '~/types/license.type';
 
 type FormInstance<T> = GetRef<typeof Form<T>>;
 
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
+const EditableContext = React.createContext<FormInstance<Partial<ProductKeyItem>> | null>(null);
 
-interface Item {
-  key: string;
-  id: number;
-  product_key: string;
-}
+type Item = ProductKeyItem;
 
 interface EditableRowProps {
   index: number;
@@ -96,25 +92,18 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-interface DataType {
-  key: React.Key;
-  id: number;
-  product_key: string;
-}
+type DataType = ProductKeyItem;
 
 type ColumnTypes = Exclude<TableProps<DataType>['columns'], undefined>;
 
 interface ProductKeyProps {
   onDataChange?: (data: DataType[]) => void;
-  initialKeys?: any[];
-  hasID?: any;
+  initialKeys?: DataType[];
+  hasID?: React.Key | boolean | null;
 }
 
 const ProductKey: React.FC<ProductKeyProps> = ({ onDataChange, initialKeys = [], hasID }) => {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
-  // Use `initialKeys` to set the initial state
-  const [keys, setKeys] = useState<License[]>(initialKeys);
-
   const [count, setCount] = useState(1);
 
   useEffect(() => {
