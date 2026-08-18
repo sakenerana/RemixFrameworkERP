@@ -1,5 +1,5 @@
 import { Button, Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { AiOutlineCalendar, AiOutlineSend } from "react-icons/ai";
 import { AccessoryService } from "~/services/accessory.service";
 import { AssetService } from "~/services/asset.service";
@@ -10,17 +10,29 @@ import { PredefinedKitService } from "~/services/predefined_kit.service";
 const { TextArea } = Input;
 import dayjs from 'dayjs';
 
+interface CheckoutStateData {
+    id?: number | string;
+    name?: string;
+    categories?: {
+        type?: string;
+    } | null;
+    license_id?: number | string;
+    product_key?: ReactNode;
+    assets_id?: number | string;
+    asset_tag?: ReactNode;
+}
+
 interface CheckoutProps {
-    stateData: any;
+    stateData?: CheckoutStateData;
     onSuccess?: () => void; // Callback for parent component
     onClose?: () => void; // Callback to close modal
 }
 
-export default function Checkout({ stateData, onSuccess, onClose }: CheckoutProps) {
+export default function Checkout({ stateData = {}, onSuccess, onClose }: CheckoutProps) {
     const [form] = Form.useForm<any>();
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState<string | null>(null);
+    const [isDepartmentID, setDepartmentID] = useState<string | null>(null);
 
     useEffect(() => {
         setUserID(localStorage.getItem('userAuthID'));
