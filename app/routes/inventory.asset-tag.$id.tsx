@@ -39,8 +39,8 @@ export default function AssetTag() {
     const [data, setData] = useState<Asset[]>([]);
     const [dataRow, setDataRow] = useState<Record<string, unknown>>();
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<AssetTagItem[]>([]);
 
@@ -75,8 +75,8 @@ export default function AssetTag() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
@@ -96,7 +96,7 @@ export default function AssetTag() {
             ...values,
             status_id: 1,
             user_id: isUserID,
-            department_id: Number(isDepartmentID),
+            department_id: isDepartmentID,
             categories: data[0].asset_model.categories,
             assets_id: data[0].id,
             name: data[0].name

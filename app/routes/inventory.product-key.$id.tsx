@@ -39,8 +39,8 @@ export default function ProductKey() {
     const [data, setData] = useState<License[]>([]);
     const [dataRow, setDataRow] = useState<Record<string, unknown>>();
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<ProductKeyItem[]>([]);
 
@@ -75,8 +75,8 @@ export default function ProductKey() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
@@ -96,7 +96,7 @@ export default function ProductKey() {
             ...values,
             status_id: 1,
             user_id: isUserID,
-            department_id: Number(isDepartmentID),
+            department_id: isDepartmentID,
             categories: data[0].categories,
             license_id: data[0].id,
             name: data[0].name
