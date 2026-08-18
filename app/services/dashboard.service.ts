@@ -1,9 +1,12 @@
 import supabase from "~/utils/supabase.client"
 
+type PostPayload = Record<string, unknown>;
+type PostId = number | string;
+
 export const DashboardService = {
     
   // Create
-  async createPost(postData: any) {
+  async createPost(postData: PostPayload) {
     const { data, error } = await supabase
       .from('posts')
       .insert(postData)
@@ -14,7 +17,7 @@ export const DashboardService = {
   },
 
   // Read (single)
-  async getPostById(id: any) {
+  async getPostById(id: PostId) {
     const { data, error } = await supabase
       .from('posts')
       .select('*')
@@ -37,7 +40,7 @@ export const DashboardService = {
   },
 
   // Update
-  async updatePost(id: any, updates: any) {
+  async updatePost(id: PostId, updates: Partial<PostPayload>) {
     const { data, error } = await supabase
       .from('posts')
       .update(updates)
@@ -49,7 +52,7 @@ export const DashboardService = {
   },
 
   // Delete
-  async deletePost(id: any) {
+  async deletePost(id: PostId) {
     const { error } = await supabase
       .from('posts')
       .delete()
@@ -60,7 +63,7 @@ export const DashboardService = {
   },
 
   // Custom query example
-  async getPostsByUser(userId: any) {
+  async getPostsByUser(userId: PostId) {
     const { data, error } = await supabase
       .from('posts')
       .select('*')
