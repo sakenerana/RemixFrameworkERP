@@ -125,6 +125,14 @@ interface ChartCardProps {
     isCurrency?: boolean;
 }
 
+interface BarLabelProps {
+    x?: number | string;
+    y?: number | string;
+    width?: number | string;
+    height?: number | string;
+    value?: unknown;
+}
+
 const formatChartMetricValue = (value: number, isCurrency = false) => {
     const safeValue = Number.isFinite(value) ? value : 0;
 
@@ -136,14 +144,20 @@ const formatChartMetricValue = (value: number, isCurrency = false) => {
     return `${sign}\u20B1${Math.abs(safeValue).toLocaleString()}`;
 };
 
-const renderBarLabel = (props: any, isCurrency: boolean) => {
+const toChartCoordinate = (value: number | string | undefined) => Number(value ?? 0);
+
+const renderBarLabel = (props: BarLabelProps, isCurrency: boolean) => {
     const {
-        x = 0,
-        y = 0,
-        width = 0,
-        height = 0,
+        x: rawX,
+        y: rawY,
+        width: rawWidth,
+        height: rawHeight,
         value = 0,
     } = props;
+    const x = toChartCoordinate(rawX);
+    const y = toChartCoordinate(rawY);
+    const width = toChartCoordinate(rawWidth);
+    const height = toChartCoordinate(rawHeight);
 
     return (
         <text
