@@ -37,7 +37,6 @@ import dayjs from 'dayjs';
 export default function LicensesRoute() {
   const [data, setData] = useState<License[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
@@ -89,7 +88,6 @@ export default function LicensesRoute() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 
