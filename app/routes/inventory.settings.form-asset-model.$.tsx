@@ -23,8 +23,8 @@ export default function CreateAssetModel() {
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
     const [isTitle, setIsTitle] = useState('');
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const navigate = useNavigate();
 
     const [dataCategory, setDataCategory] = useState<Category[]>([]);
@@ -117,8 +117,8 @@ export default function CreateAssetModel() {
             setIsEditMode(false);
         }
 
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
@@ -149,7 +149,7 @@ export default function CreateAssetModel() {
                 ...values,
                 status_id: 1,
                 user_id: isUserID,
-                department_id: Number(isDepartmentID)
+                department_id: isDepartmentID
             };
 
             if (id) {

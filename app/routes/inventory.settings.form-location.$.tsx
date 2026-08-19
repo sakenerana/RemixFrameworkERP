@@ -16,8 +16,8 @@ export default function CreateLocation() {
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(true);
     const [isTitle, setIsTitle] = useState('');
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const navigate = useNavigate();
 
     // Fetch data from Supabase
@@ -52,8 +52,8 @@ export default function CreateLocation() {
             setIsEditMode(false);
         }
 
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     const onReset = () => {
@@ -77,7 +77,7 @@ export default function CreateLocation() {
                 ...values,
                 status_id: 1,
                 user_id: isUserID,
-                department_id: Number(isDepartmentID)
+                department_id: isDepartmentID
             };
 
             if (id) {
