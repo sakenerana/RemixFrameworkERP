@@ -49,6 +49,14 @@ interface DashboardMetric {
     gradient: string;
 }
 
+interface InventoryMetrics {
+    assets: number;
+    licenses: number;
+    accessory: number;
+    consumable: number;
+    component: number;
+}
+
 // Language content
 const translations = {
     en: {
@@ -118,21 +126,21 @@ const dataAreaChart = [
 ];
 
 export default function DashboardRoutes() {
-    const [dataAsset, setDataAsset] = useState<any>();
+    const [dataAsset, setDataAsset] = useState(0);
     const [dataAssetTable, setDataAssetTable] = useState<Asset[]>([]);
-    const [dataLicense, setDataLicense] = useState<any>();
-    const [dataAccessory, setDataAccessory] = useState<any>();
-    const [dataConsumable, setDataConsumable] = useState<any>();
-    const [dataComponent, setDataComponent] = useState<any>();
+    const [dataLicense, setDataLicense] = useState(0);
+    const [dataAccessory, setDataAccessory] = useState(0);
+    const [dataConsumable, setDataConsumable] = useState(0);
+    const [dataComponent, setDataComponent] = useState(0);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState<'en' | 'fil'>('en');
     const [t, setT] = useState(translations.en);
 
-    const [isUserID, setUserID] = useState<any>();
-    const [isDepartmentID, setDepartmentID] = useState<any>();
+    const [isUserID, setUserID] = useState(0);
+    const [isDepartmentID, setDepartmentID] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
-    const [metrics, setMetrics] = useState<any>({
+    const [metrics, setMetrics] = useState<InventoryMetrics>({
         assets: 0,
         licenses: 0,
         accessory: 0,
@@ -160,17 +168,17 @@ export default function DashboardRoutes() {
             ]);
 
             setMetrics({
-                assets,
-                licenses,
-                accessory,
-                consumable,
-                component
+                assets: assets ?? 0,
+                licenses: licenses ?? 0,
+                accessory: accessory ?? 0,
+                consumable: consumable ?? 0,
+                component: component ?? 0
             });
-            setDataAsset(assets);
-            setDataLicense(licenses);
-            setDataAccessory(accessory);
-            setDataConsumable(consumable);
-            setDataComponent(dataComponent);
+            setDataAsset(assets ?? 0);
+            setDataLicense(licenses ?? 0);
+            setDataAccessory(accessory ?? 0);
+            setDataConsumable(consumable ?? 0);
+            setDataComponent(component ?? 0);
         } catch (err) {
             setError("Failed to load dashboard data");
             console.error(err);
@@ -193,8 +201,8 @@ export default function DashboardRoutes() {
     };
 
     useMemo(() => {
-        setUserID(localStorage.getItem('userAuthID'));
-        setDepartmentID(localStorage.getItem('userDept'));
+        setUserID(Number(localStorage.getItem('userAuthID')));
+        setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
     useEffect(() => {
