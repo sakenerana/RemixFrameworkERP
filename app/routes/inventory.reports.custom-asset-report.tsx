@@ -22,6 +22,7 @@ import { ManufacturerService } from "~/services/manufacturer.service";
 import { SupplierService } from "~/services/supplier.service";
 import { AssetModel } from "~/types/asset_model.tpye";
 import { Category } from "~/types/category.type";
+import { CustomAssetReportFilters, CustomAssetReportRow } from "~/types/custom_asset.type";
 import { Location } from "~/types/location.type";
 import { Manufacturer } from "~/types/manufacturer.type";
 import { Supplier } from "~/types/supplier.type";
@@ -66,10 +67,10 @@ export default function CustomAssetReportRoutes() {
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [checkAll, setCheckAll] = useState<boolean>(false);
 
-  const [form] = Form.useForm<any>();
-  const [data, setData] = useState<any[]>([]);
-  const [isUserID, setUserID] = useState<any>();
-  const [isDepartmentID, setDepartmentID] = useState<any>();
+  const [form] = Form.useForm<CustomAssetReportFilters>();
+  const [data, setData] = useState<CustomAssetReportRow[]>([]);
+  const [isUserID, setUserID] = useState(0);
+  const [isDepartmentID, setDepartmentID] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dataCategory, setDataCategory] = useState<Category[]>([]);
   const [dataManufacturer, setDataManufacturer] = useState<Manufacturer[]>([]);
@@ -157,8 +158,8 @@ export default function CustomAssetReportRoutes() {
   };
 
   useMemo(() => {
-    setUserID(localStorage.getItem('userAuthID'));
-    setDepartmentID(localStorage.getItem('userDept'));
+    setUserID(Number(localStorage.getItem('userAuthID')));
+    setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 
   useEffect(() => {
@@ -216,14 +217,14 @@ export default function CustomAssetReportRoutes() {
   };
 
   // EXPORT TO EXCEL
-  // const exportToExcel = (data: any) => {
+  // const exportToExcel = (data: CustomAssetReportRow[]) => {
   //   const dateString = getFormattedDate();
   //   const ws = XLSX.utils.json_to_sheet(data); //data []
   //   const wb = XLSX.utils.book_new();
   //   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
   //   XLSX.writeFile(wb, `custom-asset-report-${dateString}.xlsx`);
   // };
-  const exportToExcel = (data: any[], checkedList: any[]) => {
+  const exportToExcel = (data: CustomAssetReportRow[], checkedList: string[]) => {
     const dateString = getFormattedDate();
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();

@@ -1,5 +1,5 @@
 import { Asset } from "~/types/asset.type"
-import { CustomAsset } from "~/types/custom_asset.type"
+import { CustomAsset, CustomAssetReportFilters, CustomAssetReportRow, CustomAssetReportSource } from "~/types/custom_asset.type"
 import supabase from "~/utils/supabase.client"
 
 export const AssetService = {
@@ -16,7 +16,7 @@ export const AssetService = {
   },
 
   // Create
-  async createReport(postData: any) {
+  async createReport(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('activity_report')
       .insert(postData)
@@ -132,7 +132,7 @@ export const AssetService = {
   },
 
   // Read (multiple)
-  async getAllPostsReport(postData: CustomAsset) {
+  async getAllPostsReport(postData: CustomAssetReportFilters): Promise<CustomAssetReportRow[]> {
     const { data, error } = await supabase
       .from('assets')
       .select(`
@@ -164,7 +164,7 @@ export const AssetService = {
     if (error) throw error
 
     // Flatten the data for Excel
-    const excelData = data.map((asset: any) => ({
+    const excelData = (data as unknown as CustomAssetReportSource[]).map((asset) => ({
       asset_id: asset.id,
       created_at: asset.created_at,
       asset_name: asset.name,
@@ -177,32 +177,32 @@ export const AssetService = {
       asset_status: asset.status_labels?.name,
 
       // // User data
-      user_id: asset.users.id,
-      user_fname: asset.users.first_name,
-      user_mname: asset.users.middle_name,
-      user_lname: asset.users.last_name,
-      user_email: asset.users.email,
+      user_id: asset.users?.id,
+      user_fname: asset.users?.first_name,
+      user_mname: asset.users?.middle_name,
+      user_lname: asset.users?.last_name,
+      user_email: asset.users?.email,
 
       // // Department data (flattened)
-      department_id: asset.departments.id,
-      department_name: asset.departments.department,
+      department_id: asset.departments?.id,
+      department_name: asset.departments?.department,
 
       // // Asset model data
-      model_id: asset.asset_model.id,
+      model_id: asset.asset_model?.id,
       model_name: asset.asset_model?.name,
 
       // // Location data
-      location_id: asset.locations.id,
+      location_id: asset.locations?.id,
       location_name: asset.locations?.name,
 
       // // Supplier data
-      supplier_id: asset.asset_model.supplier_id,
+      supplier_id: asset.asset_model?.supplier_id,
 
       // // Manufacturer data
-      manufacturer_id: asset.asset_model.manufacturer_id,
+      manufacturer_id: asset.asset_model?.manufacturer_id,
 
       // // Category data
-      category_id: asset.asset_model.category_id,
+      category_id: asset.asset_model?.category_id,
     }));
 
     return excelData
@@ -245,7 +245,7 @@ export const AssetService = {
   //   if (error) throw error;
 
   //   // Flatten the data for Excel
-  //   const excelData = data.map((asset: any) => ({
+  //   const excelData = data.map((asset: CustomAssetReportSource) => ({
   //     asset_id: asset.id,
   //     created_at: asset.created_at,
   //     asset_name: asset.name,

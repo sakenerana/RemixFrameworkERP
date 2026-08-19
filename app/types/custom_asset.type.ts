@@ -121,3 +121,58 @@ export interface CustomAsset {
     categories: Category;
 
 }
+
+export interface CustomAssetReportFilters {
+    location_id?: number;
+    department_id?: number;
+    supplier_id?: number;
+    asset_model_id?: number;
+    manufacturer_id?: number;
+    category_id?: number;
+    status_id?: number;
+    check_list?: string[];
+}
+
+export interface CustomAssetReportSource {
+    id: number;
+    created_at?: string;
+    name?: string;
+    order_no?: string;
+    purchase_date?: string | null;
+    purchase_cost?: number;
+    qty?: number;
+    min_qty?: number;
+    notes?: string | null;
+    status_labels?: Pick<StatusLabel, "name"> | null;
+    users?: Partial<User> | null;
+    departments?: Partial<Department> | null;
+    asset_model?: Partial<AssetModel> | null;
+    locations?: Partial<Location> | null;
+}
+
+export interface CustomAssetReportRow {
+    asset_id: number;
+    created_at?: string;
+    asset_name?: string;
+    order_no?: string;
+    purchase_date?: string | null;
+    purchase_cost?: number;
+    qty?: number;
+    min_qty?: number;
+    asset_notes?: string | null;
+    asset_status?: string;
+    user_id?: number;
+    user_fname?: string;
+    user_mname?: string;
+    user_lname?: string;
+    user_email?: string;
+    department_id?: number;
+    department_name?: string;
+    model_id?: number;
+    model_name?: string;
+    location_id?: number;
+    location_name?: string;
+    supplier_id?: number;
+    manufacturer_id?: number;
+    category_id?: number;
+}
