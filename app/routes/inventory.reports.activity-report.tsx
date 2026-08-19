@@ -26,7 +26,6 @@ export default function ActivityReportRoutes() {
   const [data, setData] = useState<ActivityReport[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
@@ -46,7 +45,6 @@ export default function ActivityReportRoutes() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 

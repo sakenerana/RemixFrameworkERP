@@ -69,7 +69,6 @@ export default function CustomAssetReportRoutes() {
 
   const [form] = Form.useForm<CustomAssetReportFilters>();
   const [data, setData] = useState<CustomAssetReportRow[]>([]);
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dataCategory, setDataCategory] = useState<Category[]>([]);
@@ -158,7 +157,6 @@ export default function CustomAssetReportRoutes() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 

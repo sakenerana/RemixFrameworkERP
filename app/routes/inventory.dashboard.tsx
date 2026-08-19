@@ -136,7 +136,6 @@ export default function DashboardRoutes() {
     const [language, setLanguage] = useState<'en' | 'fil'>('en');
     const [t, setT] = useState(translations.en);
 
-    const [isUserID, setUserID] = useState(0);
     const [isDepartmentID, setDepartmentID] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
@@ -201,7 +200,6 @@ export default function DashboardRoutes() {
     };
 
     useEffect(() => {
-        setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
