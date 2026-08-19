@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineBarcode, AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineForm, AiOutlineNumber, AiOutlineRollback, AiOutlineSave, AiOutlineSetting, AiOutlineShop, AiOutlineTag } from "react-icons/ai";
 import { AssetModelService } from "~/services/asset_model.service";
 import { CategoryService } from "~/services/category.service";
@@ -107,7 +107,7 @@ export default function CreateAssetModel() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Asset Model");
             setIsEditMode(true);

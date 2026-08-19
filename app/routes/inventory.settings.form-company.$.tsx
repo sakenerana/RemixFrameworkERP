@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineBank, AiOutlineClear, AiOutlineContacts, AiOutlineMail, AiOutlinePhone, AiOutlinePrinter, AiOutlineRollback, AiOutlineSave, AiOutlineSolution } from "react-icons/ai";
 import { CompanyService } from "~/services/company.service";
 import { Company } from "~/types/company.type";
@@ -41,7 +41,7 @@ export default function CreateCompanies() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Company");
             setIsEditMode(true);

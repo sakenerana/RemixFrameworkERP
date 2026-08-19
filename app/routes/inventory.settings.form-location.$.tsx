@@ -1,6 +1,6 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClear, AiOutlineDown, AiOutlineEnvironment, AiOutlineFlag, AiOutlineGlobal, AiOutlineHome, AiOutlineRollback, AiOutlineSave } from "react-icons/ai";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LocationService } from "~/services/location.service";
@@ -42,7 +42,7 @@ export default function CreateLocation() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Location");
             setIsEditMode(true);

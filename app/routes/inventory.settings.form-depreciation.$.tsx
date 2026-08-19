@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalculator, AiOutlineCalendar, AiOutlineClear, AiOutlineRollback, AiOutlineSave, AiOutlineSolution } from "react-icons/ai";
 import { DepreciationService } from "~/services/depreciation.service";
 import { Depreciation } from "~/types/depreciation.type";
@@ -41,7 +41,7 @@ export default function CreateDepreciation() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Depreciation");
             setIsEditMode(true);

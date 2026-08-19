@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineBuild, AiOutlineClear, AiOutlineCustomerService, AiOutlineLink, AiOutlineMail, AiOutlinePhone, AiOutlineRollback, AiOutlineSave, AiOutlineSolution } from "react-icons/ai";
 import { ManufacturerService } from "~/services/manufacturer.service";
 import { Manufacturer } from "~/types/manufacturer.type";
@@ -41,7 +41,7 @@ export default function CreateManufacturer() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Manufacturer");
             setIsEditMode(true);

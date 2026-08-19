@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, message, Modal, Select } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineAppstore, AiOutlineBars, AiOutlineClear, AiOutlineDown, AiOutlineRollback, AiOutlineSave, AiOutlineTag } from "react-icons/ai";
 import { CategoryService } from "~/services/category.service";
 import { Category } from "~/types/category.type";
@@ -42,7 +42,7 @@ export default function CreateCategories() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Category");
             setIsEditMode(true);
