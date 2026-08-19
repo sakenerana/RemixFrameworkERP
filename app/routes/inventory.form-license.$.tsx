@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, message, Modal, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalendar, AiOutlineClear, AiOutlineCode, AiOutlineDown, AiOutlineFileText, AiOutlineRollback, AiOutlineSave, AiOutlineShop, AiOutlineTags } from "react-icons/ai";
 import ProductKey from "~/components/product_key";
 import { CategoryService } from "~/services/category.service";
@@ -145,7 +145,7 @@ export default function CreateLicense() {
         // You can also do other things with the data here
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update License");
             setIsEditMode(true);

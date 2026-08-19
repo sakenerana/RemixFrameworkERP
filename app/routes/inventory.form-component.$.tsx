@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, message, Modal, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineRollback, AiOutlineSave, AiOutlineShop, AiOutlineStock, AiOutlineTags, AiOutlineTool } from "react-icons/ai";
 import { CategoryService } from "~/services/category.service";
 import { CompanyService } from "~/services/company.service";
@@ -134,7 +134,7 @@ export default function CreateComponents() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Component");
             setIsEditMode(true);

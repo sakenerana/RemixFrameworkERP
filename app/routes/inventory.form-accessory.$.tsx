@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, DatePicker, Form, Input, InputNumber, message, Modal, Select } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalendar, AiOutlineClear, AiOutlineDown, AiOutlineRollback, AiOutlineSave, AiOutlineShop, AiOutlineStock, AiOutlineTags, AiOutlineTool } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { AccessoryService } from "~/services/accessory.service";
@@ -135,7 +135,7 @@ export default function CreateAccessory() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Accessory");
             setIsEditMode(true);

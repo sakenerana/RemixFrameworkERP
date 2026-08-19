@@ -1,7 +1,7 @@
 import { HomeOutlined } from "@ant-design/icons";
 import { useParams } from "@remix-run/react";
 import { Breadcrumb, Button, Card, Form, Input, InputNumber, message, Modal } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClear, AiOutlineDropbox, AiOutlineRollback, AiOutlineSave, AiOutlineStock, AiOutlineTags } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
@@ -49,7 +49,7 @@ export default function CreateManufacturer() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         if (id) {
             setIsTitle("Update Predefined Kit");
             setIsEditMode(true);
