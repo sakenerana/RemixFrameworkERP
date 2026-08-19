@@ -33,6 +33,10 @@ import { PredefinedKitService } from "~/services/predefined_kit.service";
 import { PredefinedKit } from "~/types/predefined_kit.type";
 import dayjs from 'dayjs';
 
+interface CheckInFormValues {
+    checkin: string;
+}
+
 export default function Checkedout() {
     const { id } = useParams();
     const [data, setData] = useState<PredefinedKit[]>([]);
@@ -45,7 +49,7 @@ export default function Checkedout() {
     const [filteredData, setFilteredData] = useState<PredefinedKit[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm<any>();
+    const [form] = Form.useForm<CheckInFormValues>();
 
     const navigate = useNavigate();
 

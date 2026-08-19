@@ -41,6 +41,10 @@ import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
 import dayjs from 'dayjs';
 
+interface CheckInFormValues {
+    checkin: string;
+}
+
 export default function Checkedout() {
     const { id } = useParams();
     const [data, setData] = useState<Accessories[]>([]);
@@ -53,7 +57,7 @@ export default function Checkedout() {
     const [filteredData, setFilteredData] = useState<Accessories[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm<any>();
+    const [form] = Form.useForm<CheckInFormValues>();
 
     const navigate = useNavigate();
 

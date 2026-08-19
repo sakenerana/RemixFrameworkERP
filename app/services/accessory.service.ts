@@ -15,7 +15,7 @@ export const AccessoryService = {
   },
 
   // Create
-  async createPostAccessoriesCheck(postData: Accessories) {
+  async createPostAccessoriesCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('accessories_check')
       .insert(postData)

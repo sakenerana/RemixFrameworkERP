@@ -15,7 +15,7 @@ export const ConsumableService = {
   },
 
   // Create
-  async createPostConsumableCheck(postData: Consumable) {
+  async createPostConsumableCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('consumables_check')
       .insert(postData)

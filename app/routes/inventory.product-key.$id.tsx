@@ -46,7 +46,7 @@ export default function ProductKey() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
-    const [form] = Form.useForm<any>();
+    const [form] = Form.useForm<Record<string, never>>();
 
     const navigate = useNavigate();
 

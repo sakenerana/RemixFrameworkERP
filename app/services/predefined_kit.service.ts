@@ -15,7 +15,7 @@ export const PredefinedKitService = {
   },
 
   // Create
-  async createPostPredefinedCheck(postData: PredefinedKit) {
+  async createPostPredefinedCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('predefined_check')
       .insert(postData)

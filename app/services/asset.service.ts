@@ -27,7 +27,7 @@ export const AssetService = {
   },
 
   // Create
-  async createPostAssetsCheck(postData: Asset) {
+  async createPostAssetsCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('assets_check')
       .insert(postData)

@@ -17,7 +17,7 @@ export const LicenseService = {
   },
 
   // Create
-  async createPostLicenseCheck(postData: License) {
+  async createPostLicenseCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('license_check')
       .insert(postData)

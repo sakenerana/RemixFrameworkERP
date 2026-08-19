@@ -34,6 +34,10 @@ import { ConsumableService } from "~/services/consumable.service";
 import { Consumable } from "~/types/consumable.type";
 import dayjs from 'dayjs';
 
+interface CheckInFormValues {
+    checkin: string;
+}
+
 export default function Checkedout() {
     const { id } = useParams();
     const [data, setData] = useState<Consumable[]>([]);
@@ -46,7 +50,7 @@ export default function Checkedout() {
     const [filteredData, setFilteredData] = useState<Consumable[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm<any>();
+    const [form] = Form.useForm<CheckInFormValues>();
 
     const navigate = useNavigate();
 

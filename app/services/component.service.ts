@@ -15,7 +15,7 @@ export const ComponentService = {
   },
 
   // Create
-  async createPostComponentCheck(postData: Component) {
+  async createPostComponentCheck(postData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from('components_check')
       .insert(postData)

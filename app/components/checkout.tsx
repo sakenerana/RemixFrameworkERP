@@ -8,7 +8,7 @@ import { ConsumableService } from "~/services/consumable.service";
 import { LicenseService } from "~/services/license.service";
 import { PredefinedKitService } from "~/services/predefined_kit.service";
 const { TextArea } = Input;
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
 interface CheckoutStateData {
     id?: number | string;
@@ -28,8 +28,16 @@ interface CheckoutProps {
     onClose?: () => void; // Callback to close modal
 }
 
+interface CheckoutFormValues {
+    item_no?: string;
+    model_no?: string;
+    name: string;
+    checkout_date?: Dayjs | string | null;
+    notes?: string;
+}
+
 export default function Checkout({ stateData = {}, onSuccess, onClose }: CheckoutProps) {
-    const [form] = Form.useForm<any>();
+    const [form] = Form.useForm<CheckoutFormValues>();
     const [loading, setLoading] = useState(false);
     const [isUserID, setUserID] = useState<string | null>(null);
     const [isDepartmentID, setDepartmentID] = useState<string | null>(null);
@@ -52,121 +60,83 @@ export default function Checkout({ stateData = {}, onSuccess, onClose }: Checkou
     const onFinish = async () => {
         try {
             const values = await form.validateFields();
-
+            const checkout_date = values.checkout_date
+                ? dayjs(values.checkout_date).format('YYYY-MM-DD')
+                : null;
+            const baseValues = {
+                ...values,
+                checkout_date,
+                status_id: 1,
+                user_id: isUserID,
+                department_id: Number(isDepartmentID),
+            };
 
             if (stateData.categories && stateData.categories.type === "Component") {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
+                const allValues = {
+                    ...baseValues,
                     component_id: stateData.id,
                 };
-            } else if (stateData.categories && stateData.categories.type === "Consumable") {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
-                    consumable_id: stateData.id,
-                };
-            } else if (stateData.categories && stateData.categories.type === "Accessory") {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
-                    accessory_id: stateData.id,
-                };
-            } else if (stateData.categories && stateData.categories.type === "License") {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
-                    license_id: stateData.license_id,
-                    product_key: stateData.product_key,
-                };
-            } else if (stateData.categories && stateData.categories.type === "Asset") {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
-                    assets_id: stateData.assets_id,
-                    asset_tag: stateData.asset_tag,
-                };
-            } else {
-                var allValues = {
-                    ...values,
-                    checkout_date: values.checkout_date
-                        ? dayjs(values.checkout_date).format('YYYY-MM-DD')
-                        : null,
-                    status_id: 1,
-                    user_id: isUserID,
-                    department_id: Number(isDepartmentID),
-                    predefined_id: stateData.id,
-                };
-                // Runs otherwise (including if categories is missing)
-            }
 
-            setLoading(true);
-
-            if (stateData.categories && stateData.categories.type === "Component") {
+                setLoading(true);
                 const { error } = await ComponentService.createPostComponentCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record component checked out successfully");
                 form.resetFields();
             } else if (stateData.categories && stateData.categories.type === "Consumable") {
+                const allValues = {
+                    ...baseValues,
+                    consumable_id: stateData.id,
+                };
+
+                setLoading(true);
                 const { error } = await ConsumableService.createPostConsumableCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record consumable checked out successfully");
                 form.resetFields();
             } else if (stateData.categories && stateData.categories.type === "Accessory") {
+                const allValues = {
+                    ...baseValues,
+                    accessory_id: stateData.id,
+                };
+
+                setLoading(true);
                 const { error } = await AccessoryService.createPostAccessoriesCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record accessory checked out successfully");
                 form.resetFields();
             } else if (stateData.categories && stateData.categories.type === "License") {
+                const allValues = {
+                    ...baseValues,
+                    license_id: stateData.license_id,
+                    product_key: stateData.product_key,
+                };
+
+                setLoading(true);
                 const { error } = await LicenseService.createPostLicenseCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record license checked out successfully");
                 form.resetFields();
             } else if (stateData.categories && stateData.categories.type === "Asset") {
+                const allValues = {
+                    ...baseValues,
+                    assets_id: stateData.assets_id,
+                    asset_tag: stateData.asset_tag,
+                };
+
+                setLoading(true);
                 const { error } = await AssetService.createPostAssetsCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record asset checked out successfully");
                 form.resetFields();
             } else {
+                const allValues = {
+                    ...baseValues,
+                    predefined_id: stateData.id,
+                };
+
+                setLoading(true);
                 const { error } = await PredefinedKitService.createPostPredefinedCheck(allValues);
-
                 if (error) throw new Error(error.message);
-
                 message.success("Record predefined checked out successfully");
                 form.resetFields();
             }
