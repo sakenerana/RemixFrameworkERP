@@ -12,7 +12,6 @@ import { Accessories } from "~/types/accessories.type";
 export default function DeletedAccessory() {
     const [data, setData] = useState<Accessories[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState(0);
     const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
@@ -49,7 +48,6 @@ export default function DeletedAccessory() {
     };
 
     useEffect(() => {
-        setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 

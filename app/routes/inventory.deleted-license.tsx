@@ -12,7 +12,6 @@ import { License } from "~/types/license.type";
 export default function DeletedLicense() {
     const [data, setData] = useState<License[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState(0);
     const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
@@ -49,7 +48,6 @@ export default function DeletedLicense() {
     };
 
     useEffect(() => {
-        setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 

@@ -11,7 +11,6 @@ import { PredefinedKit } from "~/types/predefined_kit.type";
 export default function DeletedManufacturer() {
     const [data, setData] = useState<PredefinedKit[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState(0);
     const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
@@ -48,7 +47,6 @@ export default function DeletedManufacturer() {
     };
 
     useEffect(() => {
-        setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
