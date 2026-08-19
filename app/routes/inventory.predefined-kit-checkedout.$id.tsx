@@ -20,7 +20,7 @@ import {
     TableColumnsType,
     Tag,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     AiOutlineExport,
     AiOutlineRollback,
@@ -72,7 +72,7 @@ export default function Checkedout() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
