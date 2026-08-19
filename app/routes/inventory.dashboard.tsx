@@ -14,7 +14,7 @@ import {
     Typography,
     Progress,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineDesktop, AiOutlineMobile, AiOutlineSchedule, AiOutlineShopping, AiOutlineSnippets } from "react-icons/ai";
 import { RiCircleFill, RiPieChart2Fill } from "react-icons/ri";
 import AreaChart from "~/components/area_chart";
@@ -200,7 +200,7 @@ export default function DashboardRoutes() {
         }
     };
 
-    useMemo(() => {
+    useEffect(() => {
         setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);

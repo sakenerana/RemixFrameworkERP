@@ -15,7 +15,7 @@ import {
   TableColumnsType,
   Tag,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineEdit, AiOutlineUserAdd } from "react-icons/ai";
 import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
@@ -45,7 +45,7 @@ export default function ActivityReportRoutes() {
     }
   };
 
-  useMemo(() => {
+  useEffect(() => {
     setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);

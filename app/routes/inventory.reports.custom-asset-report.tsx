@@ -12,7 +12,7 @@ import {
   Row,
   Select,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineDown, AiOutlineFileExcel } from "react-icons/ai";
 import { AssetService } from "~/services/asset.service";
 import { AssetModelService } from "~/services/asset_model.service";
@@ -157,7 +157,7 @@ export default function CustomAssetReportRoutes() {
     }
   };
 
-  useMemo(() => {
+  useEffect(() => {
     setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
