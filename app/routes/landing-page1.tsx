@@ -12,7 +12,6 @@ import { ProtectedRoute } from "~/components/ProtectedRoute";
 
 export default function LandingPage() {
   const { user } = useAuth();
-  const [dataUser, setData] = useState<any>();
   const [dataInventory, setDataInventory] = useState(false);
   const [dataBudget, setDataBudget] = useState(false);
   const [dataNewMembership, setDataNewMembership] = useState(false);
@@ -47,8 +46,6 @@ export default function LandingPage() {
       localStorage.setItem('username', dataFetch.username);
       localStorage.setItem('access', dataFetch?.access || '[]');
 
-      // Update all states at once
-      setData(dataFetch);
       setDataInventory(arr.includes(1));
       setDataBudget(arr.includes(2));
       setDataWorkflow(arr.includes(3));
