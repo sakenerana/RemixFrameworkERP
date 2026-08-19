@@ -13,13 +13,18 @@ import { useAuth } from "~/auth/AuthContext";
 import { supabase } from "~/lib/supabase";
 
 interface ChildComponentProps {
-  onSendData: (data: any) => void;
+  onSendData: (data: boolean) => void;
+}
+
+interface PasswordFormValues {
+  password: string;
+  password2: string;
 }
 
 const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<PasswordFormValues>();
   const { signOut, getUser } = useAuth();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -96,7 +101,7 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
     setLoading(false);
   };
 
-  const onFinish = async (event: any) => {
+  const onFinish = async () => {
     try {
       const values = await form.validateFields();
 
