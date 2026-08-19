@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { MenuProps } from "antd";
 import { Card, message } from "antd";
 import { Link } from "@remix-run/react";
@@ -121,9 +121,9 @@ export default function LandingPage() {
     iconBg: "bg-purple-600/30"
   };
 
-  useMemo(() => {
+  useEffect(() => {
     fetchDataByUUID();
-  }, []);
+  }, [user?.id]);
 
   return (
     <ProtectedRoute>
