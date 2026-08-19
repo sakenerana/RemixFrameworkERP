@@ -18,7 +18,7 @@ import {
   Tag,
   Tooltip,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AiOutlineCloseCircle,
   AiOutlineDelete,
@@ -91,7 +91,7 @@ export default function PredefinedKitRoute() {
     }
   };
 
-  useMemo(() => {
+  useEffect(() => {
     setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
