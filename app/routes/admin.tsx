@@ -167,7 +167,7 @@ export default function AdminLayoutIndex() {
     localStorage.removeItem("workflowDashboardData");
     localStorage.removeItem("userActivitiesData");
 
-    // Clear any cached API data (remove all keys starting with your app's cache prefix)
+    // Clear cached API data (remove all keys starting with your app's cache prefix)
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith("budgetApproved_") || key.startsWith("completedRequisition_") || key.startsWith("userActiveActivities_")) {
         localStorage.removeItem(key);

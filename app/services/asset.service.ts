@@ -287,16 +287,6 @@ export const AssetService = {
   //   }));
 
   //   // Filter out null/undefined values from the returned data
-  //   // const filteredData = data?.map(asset => {
-  //   //   const filteredAsset: Record<string, any> = {};
-  //   //   Object.entries(asset).forEach(([key, value]) => {
-  //   //     if (value != null) {
-  //   //       filteredAsset[key] = value;
-  //   //     }
-  //   //   });
-  //   //   return filteredAsset;
-  //   // });
-
   //   return excelData;
   // },
 

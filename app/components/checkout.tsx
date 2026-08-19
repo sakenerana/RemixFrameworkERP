@@ -252,7 +252,7 @@ export default function Checkout({ stateData = {}, onSuccess, onClose }: Checkou
                         >
                             <TextArea
                                 rows={4}
-                                placeholder="Add any additional notes (optional)"
+                                placeholder="Add additional notes (optional)"
                                 className="py-2"
                             />
                         </Form.Item>
