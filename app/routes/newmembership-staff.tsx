@@ -1,11 +1,29 @@
 import { Avatar } from "antd";
+import type { ReactNode } from "react";
 import { ArrowLeftFromLine, Award, Home, TrendingUp } from "lucide-react";
+
+interface StaffPerformance {
+    id: number;
+    name: string;
+    department: string;
+    tasks: number;
+    taskCompleted: number;
+    replenishmentDays: number;
+    avgDailySales: number;
+    status: string;
+    efficiency: number;
+}
+
+interface SummaryCardProps {
+    title: string;
+    value: ReactNode;
+}
 
 export default function NewMembershipStaff() {
     const branchName = "Main Branch";
     const type = "tasks";
 
-    const staffs = [
+    const staffs: StaffPerformance[] = [
         {
             id: 1,
             name: "John Doe",
@@ -37,7 +55,7 @@ export default function NewMembershipStaff() {
 
     const topStaffName = sortedStaff[0]?.name || "N/A";
 
-    const openStaffDetails = (staff: any) => {
+    const openStaffDetails = (staff: StaffPerformance) => {
         alert(staff.name);
     };
 
@@ -227,7 +245,7 @@ export default function NewMembershipStaff() {
 }
 
 /* 🔷 Reusable Summary Card */
-function SummaryCard({ title, value }: any) {
+function SummaryCard({ title, value }: SummaryCardProps) {
     return (
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <p className="text-xs text-gray-500">{title}</p>
