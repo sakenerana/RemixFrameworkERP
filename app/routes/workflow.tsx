@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   FullscreenExitOutlined,
   FullscreenOutlined,
@@ -10,7 +10,6 @@ import {
   SwapOutlined,
   VerticalAlignTopOutlined,
   MessageOutlined,
-  CloseOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag, MenuProps } from "antd";
@@ -22,18 +21,10 @@ import ScrollingAttentionBanner from "~/components/scrolling_attention";
 import MovingAttentionAlert from "~/components/attention";
 import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
-import ManagerGroupChat from "~/components/chat";
-import { AiOutlineMinus } from "react-icons/ai";
 import { LuChartBarStacked, LuGitBranch, LuLayoutDashboard, LuWorkflow } from "react-icons/lu";
 import { useAuth } from "~/auth/AuthContext";
 
 const { Header, Sider, Content } = Layout;
-
-interface MenuItem {
-  key: string;
-  icon: React.ReactNode;
-  label: React.ReactNode;
-}
 
 export default function WorkflowLayoutIndex() {
   const navigate = useNavigate();
@@ -45,9 +36,7 @@ export default function WorkflowLayoutIndex() {
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const [chatVisible, setChatVisible] = useState(false);
-  const [isChatMinimized, setIsChatMinimized] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
-  const { signOut, getUser } = useAuth();
+  const { signOut } = useAuth();
 
   // Get current path for menu selection
   const currentPath = matches[matches.length - 1]?.pathname || '';
@@ -126,16 +115,7 @@ export default function WorkflowLayoutIndex() {
   };
 
   const toggleChat = () => {
-    setChatVisible(prev => {
-      if (!prev) {
-        setIsChatMinimized(false);
-      }
-      return !prev;
-    });
-  };
-
-  const toggleChatMinimize = () => {
-    setIsChatMinimized(prev => !prev);
+    setChatVisible(prev => !prev);
   };
 
   const siderWidth = collapsed ? 80 : 280;
