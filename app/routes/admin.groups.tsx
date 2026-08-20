@@ -4,7 +4,6 @@ import {
   EditOutlined,
   HomeOutlined,
   LoadingOutlined,
-  SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import {
