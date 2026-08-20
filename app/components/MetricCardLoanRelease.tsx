@@ -36,7 +36,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
   value,
   percentage,
   percentageColor,
-  subtitle,
   subtitleValue,
   topStaffLabel,
   topStaffName,
@@ -45,7 +44,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
   branchName = 'Main Branch'
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
 
   // Sort staff by performance (for ranking)
   const sortedStaff = [...staffs].sort((a, b) => {
@@ -69,10 +67,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
       return <Trophy className="w-4 h-4 mr-1" />;
     }
     return <TrendingUp className="w-4 h-4 mr-1" />;
-  };
-
-  const openStaffDetails = (staff: Staff) => {
-    setSelectedStaff(staff);
   };
 
   return (
@@ -128,8 +122,7 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
               {staffs.slice(0, 5).map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => openStaffDetails(p)}
+                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-2 text-[10px]">{p.name}</td>
                   <td className="py-2">
@@ -255,7 +248,6 @@ const MetricCardLoanRelease: React.FC<MetricCardProps> = ({
                           ${rank <= 5 ? 'bg-gradient-to-r from-green-50/50 to-transparent' : ''}
                           ${rank === 1 ? 'border-l-4 border-l-yellow-500' : ''}
                         `}
-                        onClick={() => openStaffDetails(staff)}
                       >
                         <td className="p-3">
                           <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${getRankColor(rank)}`}>

@@ -36,7 +36,6 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
   value,
   percentage,
   percentageColor,
-  subtitle,
   subtitleValue,
   topStaffLabel,
   topStaffName,
@@ -45,7 +44,6 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
   branchName = 'Main Branch'
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
 
   // Sort staff by performance (for ranking)
   const sortedStaff = [...staffs].sort((a, b) => {
@@ -69,10 +67,6 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
       return <Trophy className="w-4 h-4 mr-1" />;
     }
     return <TrendingUp className="w-4 h-4 mr-1" />;
-  };
-
-  const openStaffDetails = (staff: Staff) => {
-    setSelectedStaff(staff);
   };
 
   return (
@@ -128,8 +122,7 @@ const MetricCardNewMembership: React.FC<MetricCardProps> = ({
               {staffs.slice(0, 5).map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => openStaffDetails(p)}
+                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-2 text-[10px]">{p.name}</td>
                   <td className="py-2">
