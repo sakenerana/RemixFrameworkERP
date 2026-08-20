@@ -18,7 +18,6 @@ import {
     Select,
     Timeline,
     Tag,
-    Statistic,
     Button,
     Progress,
     Space,
