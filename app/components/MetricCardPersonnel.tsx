@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, X, Trophy, Award, TrendingUp, TrendingDown } from 'lucide-react';
+import { X, Trophy, Award, TrendingUp } from 'lucide-react';
 
 export interface Staff {
   id: string;
@@ -34,7 +34,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
   value,
   percentage,
   percentageColor,
-  subtitle,
   subtitleValue,
   topStaffLabel,
   topStaffName,
@@ -43,7 +42,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
   branchName = 'Main Branch'
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const maxTaskValue = Math.max(...staffs.map((staff) => Number(staff.tasks ?? 0)), 0);
 
   // Sort staff by performance (for ranking)
@@ -68,10 +66,6 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
       return <Trophy className="w-4 h-4 mr-1" />;
     }
     return <TrendingUp className="w-4 h-4 mr-1" />;
-  };
-
-  const openStaffDetails = (staff: Staff) => {
-    setSelectedStaff(staff);
   };
 
   return (
@@ -127,8 +121,7 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
               {staffs.slice(0, 5).map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => openStaffDetails(p)}
+                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-2 text-[10px]">{p.name}</td>
                   <td className="py-2">
@@ -254,11 +247,10 @@ const MetricCardPersonnel: React.FC<MetricCardProps> = ({
                     return (
                       <tr
                         key={staff.id}
-                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer
+                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors
                           ${rank <= 5 ? 'bg-gradient-to-r from-green-50/50 to-transparent' : ''}
                           ${rank === 1 ? 'border-l-4 border-l-yellow-500' : ''}
                         `}
-                        onClick={() => openStaffDetails(staff)}
                       >
                         <td className="p-3">
                           <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${getRankColor(rank)}`}>
