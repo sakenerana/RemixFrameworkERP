@@ -111,7 +111,7 @@ export const UserService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: User) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from("users")
       .update({ status_id: 1 })
@@ -123,7 +123,7 @@ export const UserService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: User) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from("users")
       .update({ status_id: 2 })

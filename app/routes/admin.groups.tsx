@@ -93,13 +93,13 @@ export default function GroupsRoutes() {
 
   const handleDeleteButton = async (record: Groups) => {
     if (record.status_labels?.name === 'Active') {
-      const { error } = await GroupService.deactivateStatus(record.id, record);
+      const { error } = await GroupService.deactivateStatus(record.id);
 
       if (error) throw message.error(error.message);
       message.success("Record deactivated successfully");
       fetchData();
     } else if (record.status_labels?.name === 'Inactive') {
-      const { error } = await GroupService.activateStatus(record.id, record);
+      const { error } = await GroupService.activateStatus(record.id);
 
       if (error) throw message.error(error.message);
       message.success("Record activated successfully");

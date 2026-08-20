@@ -61,7 +61,7 @@ export const OfficeService = {
     },
 
     // Activate
-    async activateStatus(id: number, updates: Groups) {
+    async activateStatus(id: number) {
         const { data, error } = await supabase
             .from('office')
             .update({ status_id: 1 })
@@ -73,7 +73,7 @@ export const OfficeService = {
     },
 
     // Deactivate
-    async deactivateStatus(id: number, updates: Groups) {
+    async deactivateStatus(id: number) {
         const { data, error } = await supabase
             .from('office')
             .update({ status_id: 2 })

@@ -140,13 +140,13 @@ export default function UsersRoutes() {
 
     const handleDeleteButton = async (record: User) => {
         if (record.status_labels?.name === 'Active') {
-            const { error } = await UserService.deactivateStatus(record.id, record);
+            const { error } = await UserService.deactivateStatus(record.id);
 
             if (error) throw error;
             message.success("Record deactivated successfully");
             await fetchData();
         } else if (record.status_labels?.name === 'Inactive') {
-            const { error } = await UserService.activateStatus(record.id, record);
+            const { error } = await UserService.activateStatus(record.id);
 
             if (error) throw error;
             message.success("Record activated successfully");

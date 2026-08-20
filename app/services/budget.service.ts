@@ -260,7 +260,7 @@ export const BudgetService = {
     },
 
     // Activate
-    async activateStatus(id: number, updates: Budget) {
+    async activateStatus(id: number) {
         const { data, error } = await supabase
             .from('budget')
             .update({ status_id: 1 })
@@ -272,7 +272,7 @@ export const BudgetService = {
     },
 
     // Deactivate
-    async deactivateStatus(id: number, updates: Budget) {
+    async deactivateStatus(id: number) {
         const { data, error } = await supabase
             .from('budget')
             .update({ status_id: 2 })
