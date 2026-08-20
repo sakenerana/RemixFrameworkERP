@@ -24,8 +24,7 @@ export default function DeletedAssetModel() {
 
     const handleActivateButton = async (record: AssetModel) => {
         const { error } = await AssetModelService.activateStatus(
-            record.id,
-            record
+            record.id
         );
 
         if (error) throw message.error(error.message);

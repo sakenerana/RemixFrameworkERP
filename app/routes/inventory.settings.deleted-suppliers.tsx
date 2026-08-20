@@ -24,8 +24,7 @@ export default function DeleteSuppliers() {
 
     const handleActivateButton = async (record: Supplier) => {
         const { error } = await SupplierService.activateStatus(
-            record.id,
-            record
+            record.id
         );
 
         if (error) throw message.error(error.message);

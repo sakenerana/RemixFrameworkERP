@@ -78,7 +78,7 @@ export const AssetModelService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: AssetModel) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('asset_model')
       .update({ status_id: 1 })
@@ -90,7 +90,7 @@ export const AssetModelService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: AssetModel) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('asset_model')
       .update({ status_id: 2 })

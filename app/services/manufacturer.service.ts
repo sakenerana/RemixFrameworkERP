@@ -65,7 +65,7 @@ export const ManufacturerService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Manufacturer) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('manufacturers')
       .update({ status_id: 1 })
@@ -77,7 +77,7 @@ export const ManufacturerService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Manufacturer) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('manufacturers')
       .update({ status_id: 2 })

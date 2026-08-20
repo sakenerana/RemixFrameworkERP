@@ -55,8 +55,7 @@ export default function LocationsRoutes() {
 
   const handleDeactivateButton = async (record: Location) => {
     const { error } = await LocationService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

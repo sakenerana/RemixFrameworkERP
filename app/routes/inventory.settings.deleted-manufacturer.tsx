@@ -24,8 +24,7 @@ export default function DeletedManufacturer() {
 
     const handleActivateButton = async (record: Manufacturer) => {
         const { error } = await ManufacturerService.activateStatus(
-            record.id,
-            record
+            record.id
         );
 
         if (error) throw message.error(error.message);

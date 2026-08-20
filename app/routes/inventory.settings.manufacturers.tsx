@@ -56,8 +56,7 @@ export default function ManufacturersRoutes() {
 
   const handleDeactivateButton = async (record: Manufacturer) => {
     const { error } = await ManufacturerService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

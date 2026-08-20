@@ -65,7 +65,7 @@ export const LocationService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Location) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('locations')
       .update({ status_id: 1 })
@@ -77,7 +77,7 @@ export const LocationService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Location) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('locations')
       .update({ status_id: 2 })

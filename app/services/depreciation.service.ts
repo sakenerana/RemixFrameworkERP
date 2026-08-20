@@ -65,7 +65,7 @@ export const DepreciationService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Depreciation) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('depreciations')
       .update({ status_id: 1 })
@@ -77,7 +77,7 @@ export const DepreciationService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Depreciation) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('depreciations')
       .update({ status_id: 2 })
