@@ -27,7 +27,6 @@ type CustomBarOptions = BarOptions & {
 
 const BarChart: React.FC<BarChartProps> = ({
   data,
-  title = '',
   xField = 'category',
   yField = 'value',
   colorField = 'color', // NEW prop

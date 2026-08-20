@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    Layout,
     ConfigProvider,
     Avatar,
 } from "antd";
@@ -11,8 +10,6 @@ import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { ArrowLeftFromLine, Home } from "lucide-react";
 import MetricCardLoanRelease from "~/components/MetricCardLoanRelease";
 import BranchTopRightSider from "~/components/BranchTopRightSider";
-
-const { Header } = Layout;
 
 interface Staff {
     id: string;
