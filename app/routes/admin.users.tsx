@@ -33,8 +33,6 @@ import {
     AiOutlineCheckCircle,
     AiOutlineCloseCircle,
     AiOutlineContacts,
-    AiOutlineDelete,
-    AiOutlineEdit,
     AiOutlineInfoCircle,
     AiOutlineLock,
     AiOutlineMail,
