@@ -368,8 +368,6 @@ export default function Particulars({ item }: { item: BudgetDepartmentItem }) {
         if (!requisitions.length) return 0;
         let total = 0;
         displayParticulars.forEach(particular => {
-            const key = `${particular.particulars}__${item.departments.department}`;
-
             const filtered = requisitions.filter(item2 => {
                 let matchesParticular = true;
                 let matchesWorkflowType = true;
