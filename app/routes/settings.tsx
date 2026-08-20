@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   CloseOutlined,
   LogoutOutlined,
@@ -25,7 +26,7 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm<PasswordFormValues>();
-  const { signOut, getUser } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -187,7 +188,7 @@ const Setting: React.FC<ChildComponentProps> = ({ onSendData }) => {
           className="mt-6"
           itemLayout="horizontal"
           dataSource={data}
-          renderItem={(item, index) => (
+          renderItem={(item) => (
             <List.Item>
               <List.Item.Meta
                 avatar={<QuestionOutlined />}
