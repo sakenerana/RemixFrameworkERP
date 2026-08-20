@@ -11,7 +11,6 @@ import { Location } from "~/types/location.type";
 export default function DeletedLocation() {
     const [data, setData] = useState<Location[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isUserID, setUserID] = useState(0);
     const [isDepartmentID, setDepartmentID] = useState(0);
 
     const [searchText, setSearchText] = useState('');
@@ -48,7 +47,6 @@ export default function DeletedLocation() {
     };
 
     useEffect(() => {
-        setUserID(Number(localStorage.getItem('userAuthID')));
         setDepartmentID(Number(localStorage.getItem('userDept')));
     }, []);
 
