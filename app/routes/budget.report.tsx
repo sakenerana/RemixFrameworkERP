@@ -1,6 +1,5 @@
 import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, EyeOutlined, DollarOutlined, PieChartOutlined, BarChartOutlined } from "@ant-design/icons";
 import {
-    Alert,
     Breadcrumb,
     Button,
     Checkbox,
@@ -85,7 +84,6 @@ const toBudgetHistoryRow = (item: BudgetHistoryApiRow): BudgetHistoryDataType =>
 export default function BudgetHistoryReports() {
     const [loading, setLoading] = useState(false);
     const [loadingpendingApproved, setLoadingPendingApproved] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [filteredData, setFilteredData] = useState<BudgetHistoryDataType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<BudgetHistoryDataType | null>(null);
@@ -271,6 +269,7 @@ export default function BudgetHistoryReports() {
             render: (refno) => (
                 <a
                     target="_blank"
+                    rel="noreferrer"
                     href={`${import.meta.env.VITE_AB_LINK}/budget/${refno}`}
                     className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
                 >
@@ -474,15 +473,6 @@ export default function BudgetHistoryReports() {
                     description="Loaded report total"
                 />
             </div>
-
-            {error && (
-                <Alert
-                    message="Unable to load the budget report."
-                    description={error}
-                    type="error"
-                    showIcon
-                />
-            )}
 
             <Card
                 className="border border-slate-200 shadow-sm"
