@@ -5,6 +5,7 @@ import {
   LoadingOutlined,
   TeamOutlined,
   UserOutlined,
+  CrownFilled,
 } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
@@ -26,7 +27,6 @@ import {
 import axios from "axios";
 import { Key, useEffect, useMemo, useState } from "react";
 import PrintDropdownComponent from "~/components/print_dropdown";
-import { CrownFilled } from '@ant-design/icons';
 import { AppPageHeader } from "~/components/ui/AppPageHeader";
 import { DataTableToolbar } from "~/components/ui/DataTableToolbar";
 import { SummaryMetricCard } from "~/components/ui/SummaryMetricCard";
@@ -48,13 +48,12 @@ interface UserActivitiesResponse {
 
 const CACHE_KEY = 'userActivitiesData';
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes cache
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 export default function Workflows() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [topThreeUserIds, setTopThreeUserIds] = useState<number[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
@@ -74,8 +73,6 @@ export default function Workflows() {
 
     try {
       setLoading(true);
-      setError(null);
-
       // Check cache first
       const cachedData = localStorage.getItem(CACHE_KEY);
       const now = new Date().getTime();
@@ -121,8 +118,6 @@ export default function Workflows() {
         const { data, topThreeUserIds } = JSON.parse(cachedData);
         setData(data);
         setTopThreeUserIds(topThreeUserIds);
-      } else {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
       console.error('Failed to fetch data:', err);
     } finally {
