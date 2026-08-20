@@ -1,5 +1,4 @@
 import { CalendarOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
@@ -49,8 +48,6 @@ export default function Checkedout() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm<CheckInFormValues>();
-
-    const navigate = useNavigate();
 
     const handleRefetch = async () => {
         setLoading(true);

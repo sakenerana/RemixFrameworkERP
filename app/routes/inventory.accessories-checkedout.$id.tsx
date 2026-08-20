@@ -1,5 +1,4 @@
-import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
+import { CalendarOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from "@ant-design/icons";
 import {
     Alert,
     Breadcrumb,
@@ -24,18 +23,12 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import {
-    AiOutlineCloseCircle,
-    AiOutlineDelete,
-    AiOutlineEdit,
     AiOutlineExport,
-    AiOutlineFileExclamation,
-    AiOutlinePlus,
     AiOutlineRollback,
     AiOutlineSend,
 } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
 import { Link, useParams } from "react-router-dom";
-import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { AccessoryService } from "~/services/accessory.service";
 import { Accessories } from "~/types/accessories.type";
@@ -57,8 +50,6 @@ export default function Checkedout() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm<CheckInFormValues>();
-
-    const navigate = useNavigate();
 
     const handleRefetch = async () => {
         setLoading(true);
