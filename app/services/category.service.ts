@@ -121,7 +121,7 @@ export const CategoryService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Category) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('categories')
       .update({ status_id: 1 })
@@ -133,7 +133,7 @@ export const CategoryService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Category) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('categories')
       .update({ status_id: 2 })

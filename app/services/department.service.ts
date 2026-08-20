@@ -63,7 +63,7 @@ export const DepartmentService = {
   
 
   // Activate
-  async activateStatus(id: number, updates: Department) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('departments')
       .update({ status_id: 1 })
@@ -75,7 +75,7 @@ export const DepartmentService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Department) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('departments')
       .update({ status_id: 2 })

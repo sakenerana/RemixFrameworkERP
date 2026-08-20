@@ -116,8 +116,7 @@ export default function DepartmentsRoutes() {
   const handleDeleteButton = async (record: Department) => {
     if (record.status_labels?.name === 'Active') {
       const { error } = await DepartmentService.deactivateStatus(
-        record.id,
-        record
+        record.id
       );
 
       if (error) throw message.error(error.message);
@@ -125,8 +124,7 @@ export default function DepartmentsRoutes() {
       fetchData();
     } else if (record.status_labels?.name === 'Inactive') {
       const { error } = await DepartmentService.activateStatus(
-        record.id,
-        record
+        record.id
       );
 
       if (error) throw message.error(error.message);

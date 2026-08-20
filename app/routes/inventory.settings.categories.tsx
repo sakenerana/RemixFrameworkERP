@@ -15,7 +15,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -56,8 +55,7 @@ export default function CategoriesRoutes() {
 
   const handleDeactivateButton = async (record: Category) => {
     const { error } = await CategoryService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

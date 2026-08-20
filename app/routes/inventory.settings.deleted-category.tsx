@@ -24,8 +24,7 @@ export default function DeletedCategories() {
 
     const handleActivateButton = async (record: Category) => {
         const { error } = await CategoryService.activateStatus(
-            record.id,
-            record
+            record.id
         );
 
         if (error) throw message.error(error.message);

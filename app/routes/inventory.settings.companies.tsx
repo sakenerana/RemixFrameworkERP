@@ -57,8 +57,7 @@ export default function CompaniesRoutes() {
 
   const handleDeactivateButton = async (record: Company) => {
     const { error } = await CompanyService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);
