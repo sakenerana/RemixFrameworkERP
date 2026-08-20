@@ -16,10 +16,6 @@ import {
 import { Button, Layout, Menu, Space, theme, Image, Modal, ConfigProvider, Switch, Dropdown, Tooltip, Avatar, Tag, MenuProps } from "antd";
 import { Link, Outlet, useMatches, useNavigate } from "@remix-run/react";
 import {
-  FcConferenceCall,
-  FcDepartment,
-  FcGlobe,
-  FcPortraitMode,
   FcSettings,
 } from "react-icons/fc";
 import ScrollingAttentionBanner from "~/components/scrolling_attention";
@@ -33,12 +29,6 @@ import { useAuth } from "~/auth/AuthContext";
 
 const { Header, Sider, Content } = Layout;
 
-interface MenuItem {
-  key: string;
-  icon: React.ReactNode;
-  label: React.ReactNode;
-}
-
 export default function AdminLayoutIndex() {
   const navigate = useNavigate();
   const matches = useMatches();
@@ -51,7 +41,7 @@ export default function AdminLayoutIndex() {
   const [chatVisible, setChatVisible] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
-  const { signOut, getUser } = useAuth();
+  const { signOut } = useAuth();
 
   // Get current path for menu selection
   const currentPath = matches[matches.length - 1]?.pathname || '';
@@ -144,12 +134,7 @@ export default function AdminLayoutIndex() {
 
   const siderWidth = collapsed ? 80 : 280;
 
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
   const handleTrack = () => setIsModalOpen(true);
-  const handleOk = () => setIsModalOpen(false);
   const handleCancel = () => setIsModalOpen(false);
 
   const handleSignout = async () => {
@@ -694,8 +679,9 @@ export default function AdminLayoutIndex() {
               }}
             >
               {/* Chat Header - Always visible */}
-              <div
-                className={`flex items-center justify-between p-3 cursor-pointer ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'
+              <button
+                type="button"
+                className={`flex w-full items-center justify-between border-0 p-3 text-left cursor-pointer ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'
                   }`}
                 onClick={toggleChatMinimize}
                 style={{
@@ -731,7 +717,7 @@ export default function AdminLayoutIndex() {
                     }}
                   />
                 </div>
-              </div>
+              </button>
 
               {/* Chat Content - Scrollable area */}
               {!isChatMinimized && (
