@@ -9,11 +9,9 @@ import {
 import {
   Alert,
   Breadcrumb,
-  Button,
   Card,
   Checkbox,
   MenuProps,
-  message,
   Table,
   TableColumnsType,
   Tag,
@@ -220,6 +218,7 @@ export default function BudgetTransactions() {
       render: (_, value) => (
         <a
           target="_blank"
+          rel="noreferrer"
           href={`${import.meta.env.VITE_AB_LINK}/activities/${value.referenceNo}`} // Adjust the URL as needed
           className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
         >
