@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Spin } from 'antd';
 import dayjs from 'dayjs';
@@ -256,21 +256,13 @@ const BranchTopRightSider: React.FC<BranchTopRightSiderProps> = ({
     const leadingBranch = branches[0]?.name ?? 'No data';
     const metricLabelLower = metricLabel.toLowerCase();
     const isCollectionBillingView = useBillingBranchApi && metricLabelLower === 'collection';
-    const maxAvgDaily = useMemo(
-        () => Math.max(
-            ...branches.map((branch) => (isCollectionBillingView ? Math.abs(Number(branch.paid ?? 0)) : branch.avgDaily)),
-            0
-        ),
-        [branches, isCollectionBillingView]
-    );
-
     return (
         <aside className="w-80 bg-[#1e293b] text-white flex flex-col h-screen overflow-y-auto">
             <div className="p-5">
                 <h2 className="text-lg font-bold mb-4 tracking-wide">BRANCH PERFORMANCE</h2>
 
                 <div className="mb-6">
-                    <label className="text-[10px] text-gray-400 uppercase font-bold block mb-2">Selected Year</label>
+                    <span className="text-[10px] text-gray-400 uppercase font-bold block mb-2">Selected Year</span>
                     <div className="w-full rounded-sm bg-[#334155] px-3 py-2 text-xs font-semibold text-gray-200">
                         {selectedYear}
                     </div>
