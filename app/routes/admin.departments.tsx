@@ -495,7 +495,7 @@ export default function DepartmentsRoutes() {
               <div>
                 <p className="m-0 text-sm font-semibold text-slate-900">Budget mapping</p>
                 <p className="m-0 text-sm text-slate-600">
-                  Selected particulars become available for this department's budget records.
+                  Selected particulars become available for this department&apos;s budget records.
                 </p>
               </div>
               <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
