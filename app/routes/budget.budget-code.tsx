@@ -522,7 +522,7 @@ export default function BudgetCodePage() {
             <div>
               <p className="m-0 text-sm font-semibold text-slate-900">Department budget mapping</p>
               <p className="m-0 text-sm text-slate-600">
-                Saved selections update the department's assigned budget codes.
+                Saved selections update the department&apos;s assigned budget codes.
               </p>
             </div>
             <Tag className="m-0 rounded-full border-0 bg-white px-3 py-1 text-blue-600">
