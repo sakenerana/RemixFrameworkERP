@@ -13,7 +13,8 @@ interface EditableRowProps {
   index: number;
 }
 
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
+const EditableRow: React.FC<EditableRowProps> = ({ index: _index, ...props }) => {
+  void _index;
   const [form] = Form.useForm();
   return (
     <Form form={form} component={false}>
@@ -79,13 +80,21 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
       </Form.Item>
     ) : (
-      <div
+      <button
+        type="button"
         className="editable-cell-value-wrap"
-        style={{ paddingInlineEnd: 24 }}
+        style={{
+          paddingInlineEnd: 24,
+          width: '100%',
+          border: 0,
+          background: 'transparent',
+          textAlign: 'inherit',
+          cursor: 'pointer',
+        }}
         onClick={toggleEdit}
       >
         {children}
-      </div>
+      </button>
     );
   }
 

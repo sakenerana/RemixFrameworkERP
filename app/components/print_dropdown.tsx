@@ -158,12 +158,16 @@ export default function PrintDropdownComponent({
     {
       key: '2',
       label: (
-        <a className="flex flex-wrap" onClick={exportToExcel}>
+        <button
+          type="button"
+          className="flex flex-wrap w-full border-0 bg-transparent p-0 text-left cursor-pointer"
+          onClick={exportToExcel}
+        >
           <div className="pt-1 pr-2">
             <AiOutlineFileExcel className="text-green-500" />
           </div>
           <div>Excel</div>
-        </a>
+        </button>
       ),
     },
     // {
