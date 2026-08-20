@@ -1,5 +1,4 @@
 import { HomeOutlined, InfoCircleOutlined, SettingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
@@ -32,7 +31,7 @@ import Checkout from "~/components/checkout";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import { LicenseService } from "~/services/license.service";
 import { License, ProductKeyItem } from "~/types/license.type";
-const { Paragraph, Text } = Typography;
+const { Paragraph } = Typography;
 
 export default function ProductKey() {
     const { id } = useParams();
@@ -45,14 +44,11 @@ export default function ProductKey() {
     const [filteredData, setFilteredData] = useState<ProductKeyItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
     const [form] = Form.useForm<Record<string, never>>();
-
-    const navigate = useNavigate();
 
     const handleSuccess = () => {
         setIsModalOpen(false);
-        setRefreshKey(prev => prev + 1); // Triggers data refresh
+        fetchData();
     };
 
     const handleRefetch = async () => {
@@ -152,7 +148,7 @@ export default function ProductKey() {
             dataIndex: "checkout",
             width: 120,
             fixed: "right",
-            render: (_, record, index) => {
+            render: (_, record) => {
                 const currentName = data[0]?.license_check.find(
                     item => item.product_key === record.product_key // or some other matching property
                 );

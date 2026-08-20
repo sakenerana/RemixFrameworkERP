@@ -1,5 +1,4 @@
 import { HomeOutlined, InfoCircleOutlined, SettingOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
 import {
     Alert,
     Breadcrumb,
@@ -17,7 +16,6 @@ import {
     Spin,
     Table,
     TableColumnsType,
-    TableProps,
     Tag,
     Tooltip,
 } from "antd";
@@ -45,14 +43,11 @@ export default function AssetTag() {
     const [filteredData, setFilteredData] = useState<AssetTagItem[]>([]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
     const [form] = Form.useForm<Record<string, never>>();
-
-    const navigate = useNavigate();
 
     const handleSuccess = () => {
         setIsModalOpen(false);
-        setRefreshKey(prev => prev + 1); // Triggers data refresh
+        fetchData();
     };
 
     const handleRefetch = async () => {
@@ -141,7 +136,7 @@ export default function AssetTag() {
             title: "Status Type",
             dataIndex: "status_type",
             width: 120,
-            render: (_, record, index) => {
+            render: (_, record) => {
                 return (
                     <div>
                         {record.status_type === 'Pending' && (
@@ -183,7 +178,7 @@ export default function AssetTag() {
             dataIndex: "checkout",
             width: 120,
             fixed: "right",
-            render: (_, record, index) => {
+            render: (_, record) => {
                 const currentName = data[0]?.assets_check.find(
                     item => item.asset_tag === record.asset_tag // or some other matching property
                 );

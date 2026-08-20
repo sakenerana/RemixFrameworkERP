@@ -35,22 +35,13 @@ import dayjs from 'dayjs';
 
 export default function AssetsRoute() {
   const [data, setData] = useState<Asset[]>([]);
-  const [dataRow, setDataRow] = useState<Asset>();
   const [loading, setLoading] = useState(false);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<Asset[]>([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
   const navigate = useNavigate();
-
-  const handleSuccess = () => {
-    setIsModalOpen(false);
-    setRefreshKey(prev => prev + 1); // Triggers data refresh
-  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -134,7 +125,7 @@ export default function AssetsRoute() {
               size="small"
               className="mr-2"
             /> */}
-            <a className="hover:underline">{data.name || 'N/A'}</a>
+            <span className="hover:underline">{data.name || 'N/A'}</span>
           </div>
         </Link>
       )
