@@ -575,9 +575,9 @@ export default function PerformanceReportLayoutIndex() {
             </div>
 
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              {kpiData.map((kpi, idx) => (
+              {kpiData.map((kpi) => (
                 <Link key={kpi.label} to={kpi.link} className="block transition-transform duration-200 hover:-translate-y-0.5">
-                  <KPICard data={kpi} index={idx} />
+                  <KPICard data={kpi} />
                 </Link>
               ))}
             </section>

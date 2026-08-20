@@ -78,7 +78,6 @@ export const KPI_DATA: KPIData[] = [
 
 interface Props {
     data: KPIData;
-    index: number;
 }
 
 const formatTooltipValue = (value: number) => {
@@ -111,7 +110,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
     );
 };
 
-const KPICard: React.FC<Props> = ({ data, index }) => {
+const KPICard: React.FC<Props> = ({ data }) => {
     const isPositive = data.trend >= 0;
     const showLoading = Boolean(data.isLoading);
     const showError = Boolean(data.isError);
