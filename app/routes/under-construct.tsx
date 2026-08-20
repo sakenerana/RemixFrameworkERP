@@ -10,7 +10,7 @@ export default function Loan() {
 
                 {/* Subheading */}
                 <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                    We're currently enhancing our loan infrastructure to provide you with a better experience. This section will be available shortly.
+                    We&apos;re currently enhancing our loan infrastructure to provide you with a better experience. This section will be available shortly.
                 </p>
 
                 {/* Progress Bar */}
