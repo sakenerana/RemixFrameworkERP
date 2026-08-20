@@ -124,7 +124,7 @@ export const AccessoryService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Accessories) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('accessories')
       .update({ status_id: 1 })
@@ -136,7 +136,7 @@ export const AccessoryService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Accessories) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('accessories')
       .update({ status_id: 2 })

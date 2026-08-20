@@ -124,7 +124,7 @@ export const ComponentService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: Component) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('components')
       .update({ status_id: 1 })
@@ -136,7 +136,7 @@ export const ComponentService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: Component) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('components')
       .update({ status_id: 2 })

@@ -16,7 +16,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
   Tooltip,
 } from "antd";
@@ -71,8 +70,7 @@ export default function ConsumablesRoute() {
 
   const handleDeactivateButton = async (record: Consumable) => {
     const { error } = await ConsumableService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

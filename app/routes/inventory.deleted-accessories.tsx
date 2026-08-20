@@ -1,6 +1,6 @@
 import { CheckCircleOutlined, HomeOutlined, SettingOutlined } from "@ant-design/icons";
 import { Link } from "@remix-run/react";
-import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, TableProps, Tag } from "antd";
+import { Alert, Breadcrumb, Button, Checkbox, Dropdown, Input, MenuProps, message, Popconfirm, Space, Spin, Table, TableColumnsType, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { AiOutlineCloseCircle, AiOutlineDelete, AiOutlineRollback } from "react-icons/ai";
 import { FcRefresh } from "react-icons/fc";
@@ -25,8 +25,7 @@ export default function DeletedAccessory() {
 
     const handleActivateButton = async (record: Accessories) => {
         const { error } = await AccessoryService.activateStatus(
-            record.id,
-            record
+            record.id
         );
 
         if (error) throw message.error(error.message);

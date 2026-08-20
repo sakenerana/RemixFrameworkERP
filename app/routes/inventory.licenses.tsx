@@ -65,8 +65,7 @@ export default function LicensesRoute() {
 
   const handleDeactivateButton = async (record: License) => {
     const { error } = await LicenseService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

@@ -104,7 +104,7 @@ export const PredefinedKitService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: PredefinedKit) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('predefined')
       .update({ status_id: 1 })
@@ -116,7 +116,7 @@ export const PredefinedKitService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: PredefinedKit) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('predefined')
       .update({ status_id: 2 })

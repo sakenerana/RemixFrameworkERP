@@ -1,4 +1,4 @@
-import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SearchOutlined, SettingOutlined, ToolOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, HomeOutlined, InfoCircleOutlined, LoadingOutlined, SettingOutlined, ToolOutlined } from "@ant-design/icons";
 import { useNavigate } from "@remix-run/react";
 import {
   Alert,
@@ -16,7 +16,6 @@ import {
   Spin,
   Table,
   TableColumnsType,
-  TableProps,
   Tag,
   Tooltip,
 } from "antd";
@@ -71,8 +70,7 @@ export default function ComponentsRoute() {
 
   const handleDeactivateButton = async (record: Component) => {
     const { error } = await ComponentService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);

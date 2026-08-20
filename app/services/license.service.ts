@@ -1,5 +1,3 @@
-import { Accessories } from "~/types/accessories.type"
-import { Category } from "~/types/category.type"
 import { License } from "~/types/license.type"
 import supabase from "~/utils/supabase.client"
 
@@ -151,7 +149,7 @@ export const LicenseService = {
   },
 
   // Activate
-  async activateStatus(id: number, updates: License) {
+  async activateStatus(id: number) {
     const { data, error } = await supabase
       .from('licenses')
       .update({ status_id: 1 })
@@ -163,7 +161,7 @@ export const LicenseService = {
   },
 
   // Deactivate
-  async deactivateStatus(id: number, updates: License) {
+  async deactivateStatus(id: number) {
     const { data, error } = await supabase
       .from('licenses')
       .update({ status_id: 2 })

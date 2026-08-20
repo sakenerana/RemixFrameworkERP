@@ -69,8 +69,7 @@ export default function AccesoriessRoute() {
 
   const handleDeactivateButton = async (record: Accessories) => {
     const { error } = await AccessoryService.deactivateStatus(
-      record.id,
-      record
+      record.id
     );
 
     if (error) throw message.error(error.message);
