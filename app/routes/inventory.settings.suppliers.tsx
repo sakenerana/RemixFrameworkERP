@@ -36,7 +36,6 @@ import { Supplier } from "~/types/supplier.type";
 export default function SuppliersRoutes() {
   const [data, setData] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
@@ -80,7 +79,6 @@ export default function SuppliersRoutes() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 

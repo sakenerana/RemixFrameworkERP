@@ -37,7 +37,6 @@ import { Company } from "~/types/company.type";
 export default function CompaniesRoutes() {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
@@ -81,7 +80,6 @@ export default function CompaniesRoutes() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 

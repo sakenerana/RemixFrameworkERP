@@ -34,7 +34,6 @@ import { Depreciation } from "~/types/depreciation.type";
 export default function DepreciationRoutes() {
   const [data, setData] = useState<Depreciation[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isUserID, setUserID] = useState(0);
   const [isDepartmentID, setDepartmentID] = useState(0);
 
   const [searchText, setSearchText] = useState('');
@@ -78,7 +77,6 @@ export default function DepreciationRoutes() {
   };
 
   useEffect(() => {
-    setUserID(Number(localStorage.getItem('userAuthID')));
     setDepartmentID(Number(localStorage.getItem('userDept')));
   }, []);
 
