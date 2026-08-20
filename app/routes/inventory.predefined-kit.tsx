@@ -46,13 +46,12 @@ export default function PredefinedKitRoute() {
   const [filteredData, setFilteredData] = useState<PredefinedKit[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
 
   const handleSuccess = () => {
     setIsModalOpen(false);
-    setRefreshKey(prev => prev + 1); // Triggers data refresh
+    fetchData();
   };
 
   const handleRefetch = async () => {
@@ -109,14 +108,6 @@ export default function PredefinedKitRoute() {
     setDataRow(data);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
     "Name": true,
@@ -136,7 +127,7 @@ export default function PredefinedKitRoute() {
       render: (_, data) => (
         <Link to={`/inventory/predefined-kit-checkedout/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
-          <a className="hover:underline">{data.name || 'N/A'}</a>
+          <span className="hover:underline">{data.name || 'N/A'}</span>
         </Link>
       )
     },

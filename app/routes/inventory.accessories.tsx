@@ -47,13 +47,12 @@ export default function AccesoriessRoute() {
   const [filteredData, setFilteredData] = useState<Accessories[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
 
   const handleSuccess = () => {
     setIsModalOpen(false);
-    setRefreshKey(prev => prev + 1); // Triggers data refresh
+    fetchData();
   };
 
   const handleRefetch = async () => {
@@ -111,10 +110,6 @@ export default function AccesoriessRoute() {
     setDataRow(data);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -153,7 +148,7 @@ export default function AccesoriessRoute() {
               size="small"
               className="mr-2"
             /> */}
-            <a className="hover:underline">{data.name || 'N/A'}</a>
+            <span className="hover:underline">{data.name || 'N/A'}</span>
           </div>
         </Link>
       )

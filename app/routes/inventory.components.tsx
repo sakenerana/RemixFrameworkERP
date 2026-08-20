@@ -48,13 +48,12 @@ export default function ComponentsRoute() {
   const [filteredData, setFilteredData] = useState<Component[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
 
   const handleSuccess = () => {
     setIsModalOpen(false);
-    setRefreshKey(prev => prev + 1); // Triggers data refresh
+    fetchData();
   };
 
   const handleRefetch = async () => {
@@ -112,10 +111,6 @@ export default function ComponentsRoute() {
     setDataRow(data);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -149,7 +144,7 @@ export default function ComponentsRoute() {
       render: (_, data) => (
         <Link to={`/inventory/components-checkedout/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
-          <a className="hover:underline">{data.name || 'N/A'}</a>
+          <span className="hover:underline">{data.name || 'N/A'}</span>
         </Link>
       )
     },

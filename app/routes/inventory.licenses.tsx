@@ -42,15 +42,7 @@ export default function LicensesRoute() {
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState<License[]>([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
   const navigate = useNavigate();
-
-  const handleSuccess = () => {
-    setIsModalOpen(false);
-    setRefreshKey(prev => prev + 1); // Triggers data refresh
-  };
 
   const handleRefetch = async () => {
     setLoading(true);
@@ -134,7 +126,7 @@ export default function LicensesRoute() {
       render: (_, data) => (
         <Link to={`/inventory/product-key/${data.id}`} className="flex flex-wrap">
           <AiOutlineForm className="mt-1 mr-2" />
-          <a className="hover:underline">{data.name || 'N/A'}</a>
+          <span className="hover:underline">{data.name || 'N/A'}</span>
         </Link>
       )
     },
