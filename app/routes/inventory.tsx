@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  CloseOutlined,
   FullscreenExitOutlined,
   FullscreenOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuOutlined,
   MenuUnfoldOutlined,
-  MessageOutlined,
   MoonOutlined,
   SunOutlined,
   SwapOutlined,
@@ -55,17 +53,8 @@ import MovingAttentionAlert from "~/components/attention";
 import Setting from "./settings";
 import { ProtectedRoute } from "~/components/ProtectedRoute";
 import { useAuth } from "~/auth/AuthContext";
-import { AiOutlineMinus } from "react-icons/ai";
-import ManagerGroupChat from "~/components/chat";
 
 const { Header, Sider, Content } = Layout;
-
-interface MenuItem {
-  key: string;
-  icon: React.ReactNode;
-  label: React.ReactNode;
-  children?: MenuItem[];
-}
 
 export default function InventoryLayoutIndex() {
   const navigate = useNavigate();
@@ -76,10 +65,7 @@ export default function InventoryLayoutIndex() {
   const [isFname, setIsFname] = useState('');
   const [isLname, setIsLname] = useState('');
   const [isMobile, setIsMobile] = useState(false);
-  const [chatVisible, setChatVisible] = useState(false);
-  const [isChatMinimized, setIsChatMinimized] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
-  const { signOut, getUser } = useAuth();
+  const { signOut } = useAuth();
 
   // Get current path for menu selection
   const currentPath = matches[matches.length - 1]?.pathname || '';
@@ -152,15 +138,6 @@ export default function InventoryLayoutIndex() {
       setIsHorizontal(prev => !prev);
     }
   };
-  const toggleChat = () => {
-    setChatVisible(prev => {
-      if (!prev) {
-        setIsChatMinimized(false);
-      }
-      return !prev;
-    });
-  };
-  const toggleChatMinimize = () => setIsChatMinimized(prev => !prev);
   const handleTrack = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
