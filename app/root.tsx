@@ -4,7 +4,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
@@ -17,7 +16,6 @@ import '@fontsource/montserrat/400.css'; // Regular (Normal)
 import '@fontsource/montserrat/500.css'; // Medium
 import '@fontsource/montserrat/600.css'; // Semi-Bold
 import '@fontsource/montserrat/700.css'; // Bold
-import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
