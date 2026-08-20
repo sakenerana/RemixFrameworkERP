@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   Progress,
-  Row,
   Tag,
   message,
   Skeleton,
@@ -75,31 +74,6 @@ export default function BudgetRoutes() {
   const [error, setError] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [t, setT] = useState(translations.en);
-
-  // Gradient backgrounds for statistics cards
-  const statGradients = {
-    totalBudget: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',        // Purple gradient
-    totalRequisition: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',  // Green gradient
-    totalLiquidation: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)', // Orange gradient
-    amountSpent: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)'       // Red gradient
-  };
-
-  // Alternative gradient options:
-  // Option 2 (Corporate Blue theme):
-  // const statGradients = {
-  //   totalBudget: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-  //   totalRequisition: 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
-  //   totalLiquidation: 'linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)',
-  //   amountSpent: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)'
-  // };
-
-  // Option 3 (Elegant theme):
-  // const statGradients = {
-  //   totalBudget: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
-  //   totalRequisition: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-  //   totalLiquidation: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
-  //   amountSpent: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)'
-  // };
 
   // Toggle language
   const toggleLanguage = () => {
