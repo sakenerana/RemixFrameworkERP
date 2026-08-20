@@ -1,5 +1,4 @@
-import { CalendarOutlined, FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, FilterOutlined, DownloadOutlined, EyeOutlined } from "@ant-design/icons";
-import { useNavigate } from "@remix-run/react";
+import { FileSearchOutlined, HomeOutlined, LinkOutlined, LoadingOutlined, SettingOutlined, FilterOutlined, EyeOutlined } from "@ant-design/icons";
 import {
     Alert,
     Breadcrumb,
@@ -9,7 +8,6 @@ import {
     Input,
     MenuProps,
     Modal,
-    Popconfirm,
     Space,
     Spin,
     Table,
@@ -25,10 +23,8 @@ import {
     Col,
 } from "antd";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
-import { AiFillProfile } from "react-icons/ai";
+import { useEffect, useState } from "react";
 import { FcRefresh } from "react-icons/fc";
-import { RiCircleFill } from "react-icons/ri";
 import PrintDropdownComponent from "~/components/print_dropdown";
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -81,7 +77,6 @@ export default function WorkflowHistoryReports() {
         pending_workflows: 0,
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState<HistoryDataType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,8 +84,6 @@ export default function WorkflowHistoryReports() {
     const [dateRange, setDateRange] = useState<DateRange>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all');
-
-    const navigate = useNavigate();
 
     const handleRefetch = async () => {
         setLoading(true);
@@ -106,8 +99,6 @@ export default function WorkflowHistoryReports() {
 
         try {
             setLoading(true);
-            setError(null);
-
             // Check cache first
             const cachedData = localStorage.getItem(CACHE_KEY);
             const now = new Date().getTime();
@@ -152,8 +143,6 @@ export default function WorkflowHistoryReports() {
                 const { data, stats } = JSON.parse(cachedData);
                 setData(data);
                 setStats(stats);
-            } else {
-                setError(err instanceof Error ? err.message : 'An unknown error occurred');
             }
             console.error('Failed to fetch history data:', err);
         } finally {
@@ -320,6 +309,7 @@ export default function WorkflowHistoryReports() {
             render: (refno) => (
                 <a
                     target="_blank"
+                    rel="noreferrer"
                     href={`${import.meta.env.VITE_AB_LINK}/activities/${refno}`}
                     className="font-mono text-sm flex items-center hover:text-blue-500 hover:underline"
                 >
